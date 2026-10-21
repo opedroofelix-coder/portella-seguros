@@ -10,24 +10,33 @@
   var $$ = function (s, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(s)); };
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- Partículas douradas ---------- */
-  var particles = $('[data-particles]');
-  if (particles && !reduceMotion) {
-    for (var k = 0; k < 36; k++) {
+  /* ---------- Pó dourado no hero ---------- */
+  var dust = $('[data-dust]');
+  if (dust && !reduceMotion) {
+    for (var k = 0; k < 26; k++) {
       var p = document.createElement('span');
-      var dur = 8 + ((k * 13) % 9);
-      p.className = 'particle';
-      p.style.left = ((k * 37.3) % 100).toFixed(2) + '%';
-      p.style.height = (8 + ((k * 5) % 12)) + 'px';
-      p.style.animationDuration = dur + 's';
-      p.style.animationDelay = (-((k * 7.7) % dur)).toFixed(2) + 's';
-      particles.appendChild(p);
+      var dur = 12 + ((k * 7) % 11), size = 2 + (k % 3);
+      p.className = 'dust';
+      p.style.cssText = 'left:' + ((k * 37.9) % 100).toFixed(1) + '%;width:' + size + 'px;height:' + size + 'px;opacity:.6;animation-duration:' + dur + 's;animation-delay:' + (-((k * 2.9) % dur)).toFixed(1) + 's';
+      dust.appendChild(p);
     }
+  }
+
+  /* ---------- Menu mobile ---------- */
+  var toggle = $('[data-menu-toggle]'), menu = $('#menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function () {
+      var open = menu.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    $$('a', menu).forEach(function (a) {
+      a.addEventListener('click', function () { menu.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); });
+    });
   }
 
   /* ---------- Marquees: duplica o conteúdo para o loop contínuo ---------- */
   $$('[data-marquee]').forEach(function (track) {
-    $$(':scope > *', track).forEach(function (item) {
+    Array.prototype.slice.call(track.children).forEach(function (item) {
       var clone = item.cloneNode(true);
       clone.setAttribute('aria-hidden', 'true');
       track.appendChild(clone);
@@ -35,8 +44,16 @@
   });
 
   /* ---------- Estrelas dos depoimentos ---------- */
-  var star = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#C9A24A" aria-hidden="true"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>';
+  var star = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>';
   $$('[data-stars]').forEach(function (el) { el.innerHTML = star + star + star + star + star; });
+
+  /* ---------- Carrossel de seguros (setas) ---------- */
+  var track = $('[data-track]');
+  $$('[data-scroll]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (track) track.scrollBy({ left: +btn.getAttribute('data-scroll') * 344, behavior: 'smooth' });
+    });
+  });
 
   /* ---------- Revelar ao rolar ---------- */
   var reveals = $$('.reveal');
@@ -45,7 +62,7 @@
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     reveals.forEach(function (el) { io.observe(el); });
   } else {
     reveals.forEach(function (el) { el.classList.add('is-visible'); });
@@ -54,30 +71,25 @@
   /* ---------- Contadores ---------- */
   function countUp(el) {
     var target = +el.dataset.count, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
-    var start = performance.now(), duration = 2000;
+    var start = performance.now(), duration = 1800;
     (function tick(now) {
       var t = Math.min(1, (now - start) / duration), eased = 1 - Math.pow(1 - t, 3);
       el.textContent = pre + Math.round(target * eased) + suf;
       if (t < 1) requestAnimationFrame(tick);
     })(start);
   }
-  var counters = $$('[data-count]');
   if ('IntersectionObserver' in window && !reduceMotion) {
     var co = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) { if (e.isIntersecting) { countUp(e.target); co.unobserve(e.target); } });
     }, { threshold: 0.6 });
-    counters.forEach(function (el) { co.observe(el); });
+    $$('[data-count]').forEach(function (el) { co.observe(el); });
   }
 
-  /* ---------- FAQ (acordeão) ---------- */
-  $$('[data-faq] .faq__q').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var open = btn.getAttribute('aria-expanded') === 'true';
-      $$('[data-faq] .faq__q').forEach(function (b) {
-        b.setAttribute('aria-expanded', 'false');
-        b.nextElementSibling.hidden = true;
-      });
-      if (!open) { btn.setAttribute('aria-expanded', 'true'); btn.nextElementSibling.hidden = false; }
+  /* ---------- FAQ: mantém só uma pergunta aberta ---------- */
+  var faqItems = $$('.faq details');
+  faqItems.forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (d.open) faqItems.forEach(function (o) { if (o !== d) o.open = false; });
     });
   });
 
@@ -94,7 +106,7 @@
   }
   function openQuote(type) {
     currentType = type || (typeSelect && typeSelect.value) || '';
-    tagEl.textContent = currentType ? 'Seguro ' + currentType : 'Cotação gratuita';
+    tagEl.textContent = currentType ? 'Seguro ' + currentType : 'Cotação';
     lastFocus = document.activeElement;
     modal.hidden = false; document.body.style.overflow = 'hidden';
     setStep(1);
@@ -108,6 +120,8 @@
   $$('[data-open-quote]').forEach(function (btn) {
     btn.addEventListener('click', function () { openQuote(btn.getAttribute('data-open-quote')); });
   });
+  var quoteBar = $('[data-quote-bar]');
+  if (quoteBar) quoteBar.addEventListener('submit', function (e) { e.preventDefault(); openQuote(); });
   $$('[data-close-quote]').forEach(function (btn) { btn.addEventListener('click', closeQuote); });
   modal.addEventListener('click', function (e) { if (e.target === modal) closeQuote(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closeQuote(); });
@@ -142,7 +156,7 @@
     closeQuote();
   });
 
-  /* ---------- Formulário de contato (provisório) ---------- */
+  /* ---------- Formulário de contato (provisório: abre o e-mail) ---------- */
   var contactForm = $('[data-contact-form]');
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {

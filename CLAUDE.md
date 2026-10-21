@@ -11,7 +11,8 @@
   - Instagram: @portellacorretora; Facebook: PortellaCorretoraDeSeguros
 - Seguradoras parceiras (12): Porto Seguro, HDI, Ituran, Azul, Suhai, Tokio Marine, SulAmérica,
   Liberty, Bradesco Seguros, Mapfre, Allianz, Sompo.
-- Cores e fonte ficam em `:root` no `assets/css/style.css`. A identidade visual ainda vai ser definida.
+- Cores e fonte ficam em `:root` no `assets/css/style.css`.
+- **Direção escolhida pela cliente (21/10/2026): Premium A "Noir Dourado".** O site inteiro (index.html, style.css, main.js) já segue essa direção: fundo marinho profundo, dourado e marfim, Lora nos títulos e Jost nos textos, consultora num arco com fio dourado e brasão com o ícone.
 - Não inventar números, depoimentos ou dados (CNPJ, SUSEP, horário). Usar `[inserir]` até a Portella informar.
 - Lista de pendências: README.md.
 - Próximo passo combinado: trocar os logos das seguradoras por versões oficiais em alta qualidade

@@ -4,54 +4,51 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Portella Corretora de Seguros | Osasco – SP</title>
-  <meta name="description" content="Portella Corretora de Seguros: seguro auto, vida, previdência, saúde, residencial, fiança locatícia, responsabilidade civil e empresarial com as melhores seguradoras do país.">
+  <meta name="description" content="Portella Corretora de Seguros: consultoria em seguro auto, vida, previdência, saúde, residencial, fiança locatícia, responsabilidade civil e empresarial, com as seguradoras mais respeitadas do país.">
+  <meta name="theme-color" content="#0E1729">
+  <link rel="icon" type="image/svg+xml" href="assets/img/brand/icon-gold-navy.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-
-  <!-- Partículas douradas (geradas pelo JS) -->
-  <div class="particles" aria-hidden="true" data-particles></div>
 
   <!-- 1. HEADER -->
   <header class="site-header">
     <div class="site-header__inner">
       <a class="brand" href="#inicio" aria-label="Portella Corretora de Seguros – início">
-        <span class="brand__name">Portella</span>
-        <span class="brand__tag">Corretora de Seguros</span>
+        <img class="brand__icon" src="assets/img/brand/icon-gold-ivory.svg" alt="">
+        <img class="brand__word" src="assets/img/brand/wordmark-ivory.svg" alt="Portella">
       </a>
-      <div class="site-header__right">
-        <nav class="nav" aria-label="Principal">
-          <a href="#sobre">Sobre Nós</a>
-          <a href="#seguros">Produtos</a>
-          <a href="#seguradoras">Seguradoras</a>
-          <a href="#depoimentos">Depoimentos</a>
-          <a href="#duvidas">Dúvidas</a>
-          <a href="#contato">Contato</a>
-        </nav>
-        <div class="header-actions">
-          <button class="btn btn-gold" type="button" data-open-quote>Cotar Agora</button>
-          <button class="icon-btn" type="button" aria-label="Alternar tema (em breve)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="color: var(--accent)"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-          </button>
-        </div>
-      </div>
+      <nav class="nav" id="menu" aria-label="Principal">
+        <a href="#sobre">A Corretora</a>
+        <a href="#seguros">Seguros</a>
+        <a href="#seguradoras">Seguradoras</a>
+        <a href="#depoimentos">Depoimentos</a>
+        <a href="#duvidas">Dúvidas</a>
+        <a href="#contato">Contato</a>
+      </nav>
+      <button class="btn btn-ghost header-cta" type="button" data-open-quote>Cotar Agora</button>
+      <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-controls="menu" aria-expanded="false" data-menu-toggle>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      </button>
     </div>
   </header>
 
   <main>
     <!-- 2. HERO -->
     <section class="hero" id="inicio">
-      <div class="container hero__grid">
+      <div class="dust-layer" aria-hidden="true" data-dust></div>
+      <div class="hero__grid">
         <div class="hero__text">
-          <h1 class="hero__title fu">Seguros para você e para o seu <span class="hl">Negócio</span></h1>
-          <p class="hero__sub fu d1">Corretora especializada em todos os ramos de seguros, com as seguradoras mais conhecidas do país e consultoria pensada para a sua necessidade.</p>
-          <div class="quote-bar fu d2">
-            <label class="quote-bar__select">
+          <span class="eyebrow fu" style="color: var(--gold-light)">Corretora de Seguros · Osasco</span>
+          <h1 class="hero__title fu d1">Proteção <em class="gold-shine">sob medida</em> para o que é seu.</h1>
+          <p class="hero__sub fu d2">Consultoria em todos os ramos de seguros, com as seguradoras mais respeitadas do país e um atendimento feito para você.</p>
+          <form class="quote-bar fu d3" data-quote-bar>
+            <label>
               <span class="sr-only">Tipo de seguro</span>
-              <select data-type-select>
+              <select name="tipo" data-type-select>
                 <option value="">Selecione o tipo de seguro</option>
                 <option>Auto</option>
                 <option>Vida</option>
@@ -62,285 +59,213 @@
                 <option>Responsabilidade Civil</option>
                 <option>Empresarial</option>
               </select>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4A4F5C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D9BC7E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
             </label>
-            <button class="btn btn-gold" type="button" data-open-quote>Cotar Grátis →</button>
+            <button class="btn btn-gold" type="submit">Cotar Grátis</button>
+          </form>
+          <div class="hero__stats fu d4">
+            <div class="hero__stat"><b>12</b><span>Seguradoras</span></div>
+            <div class="hero__stat"><b>24h</b><span>Assistência</span></div>
+            <div class="hero__stat"><b>Todos</b><span>Os ramos</span></div>
           </div>
         </div>
-        <div class="hero__media fr">
-          <!-- TODO: substituir pela foto principal da Portella: <img src="assets/img/hero.jpg" alt="..."> -->
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#B08A3E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg>
-          <span>[Foto principal Portella]</span>
+        <div class="hero__visual">
+          <img class="hero__mark" src="assets/img/brand/icon-gold-mono.svg" alt="" aria-hidden="true">
+          <div class="arch" aria-hidden="true"></div>
+          <svg class="arch-line" viewBox="0 0 480 640" preserveAspectRatio="none" aria-hidden="true"><path d="M 1 640 L 1 240 A 239 239 0 0 1 479 240 L 479 640" fill="none" stroke="#D9BC7E" stroke-width="1.5"></path></svg>
+          <img class="hero__photo" src="assets/img/hero/consultora-1.webp" alt="Consultora da Portella Corretora de Seguros" width="680" height="1252">
+          <div class="crest"><img src="assets/img/brand/icon-gold-ivory.svg" alt=""></div>
+          <a class="hero__tag fu d4" href="tel:+551135925216"><small>Atendimento</small><span>(11) 3592-5216</span></a>
         </div>
       </div>
     </section>
 
     <!-- 3. SEGURADORAS -->
-    <section class="insurers" id="seguradoras" aria-label="Seguradoras parceiras">
+    <section class="insurers" id="seguradoras" aria-labelledby="insurers-label">
+      <p class="insurers__label" id="insurers-label">Seguradoras parceiras</p>
       <div class="marquee">
         <div class="marquee__track" data-marquee>
           <div class="insurer"><img src="assets/img/seguradoras/porto.png" alt="Porto Seguro" loading="lazy"></div>
+          <div class="insurer"><img src="assets/img/seguradoras/allianz.png" alt="Allianz" loading="lazy"></div>
+          <div class="insurer"><img src="assets/img/seguradoras/bradesco.png" alt="Bradesco Seguros" loading="lazy"></div>
+          <div class="insurer"><img src="assets/img/seguradoras/sulamerica.png" alt="SulAmérica" loading="lazy"></div>
+          <div class="insurer"><img src="assets/img/seguradoras/tokio.png" alt="Tokio Marine Seguradora" loading="lazy"></div>
           <div class="insurer"><img src="assets/img/seguradoras/hdi.png" alt="HDI Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/ituran.png" alt="Ituran" loading="lazy"></div>
+          <div class="insurer"><img src="assets/img/seguradoras/mapfre.png" alt="Mapfre Seguros" loading="lazy"></div>
+          <div class="insurer"><img src="assets/img/seguradoras/liberty.png" alt="Liberty Seguros" loading="lazy"></div>
+          <div class="insurer"><img src="assets/img/seguradoras/sompo.png" alt="Sompo Seguros" loading="lazy"></div>
           <div class="insurer"><img src="assets/img/seguradoras/azul.png" alt="Azul Seguros" loading="lazy"></div>
           <div class="insurer"><img src="assets/img/seguradoras/suhai.png" alt="Suhai Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/tokio.png" alt="Tokio Marine Seguradora" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/sulamerica.png" alt="SulAmérica" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/liberty.png" alt="Liberty Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/bradesco.png" alt="Bradesco Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/mapfre.png" alt="Mapfre Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/allianz.png" alt="Allianz" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/sompo.png" alt="Sompo Seguros" loading="lazy"></div>
+          <div class="insurer"><img src="assets/img/seguradoras/ituran.png" alt="Ituran" loading="lazy"></div>
         </div>
       </div>
     </section>
 
     <!-- 4. SOBRE -->
-    <section class="section" id="sobre">
-      <div class="container about__grid">
-        <div class="about__text reveal">
-          <h2 class="section-title">Sobre a <span class="hl">Portella Corretora</span></h2>
-          <p>A Portella Corretora de Seguros nasceu para atender à demanda de seguro fiança locatícia e seguros de riscos da Portella Imóveis, empresa do mesmo grupo.</p>
-          <p>Hoje somos especializados em todos os ramos de seguros e trabalhamos com as seguradoras mais conhecidas do país, oferecendo consultoria e gerenciamento de riscos e criando produtos de acordo com a necessidade de cada cliente.</p>
-          <div class="stats">
-            <div class="stat"><span class="stat__value" data-count="12" data-prefix="+">+12</span><span class="stat__label">Seguradoras</span></div>
-            <div class="stat"><span class="stat__value" data-count="24" data-suffix="h">24h</span><span class="stat__label">Assistência</span></div>
-            <div class="stat"><span class="stat__value" data-count="8" data-prefix="+">+8</span><span class="stat__label">Ramos de seguro</span></div>
+    <section class="section ivory" id="sobre">
+      <div class="container">
+        <div class="about__grid">
+          <div class="about__text reveal">
+            <span class="eyebrow">A Corretora</span>
+            <h2 class="h-section">Sobre a <em>Portella</em></h2>
+            <p class="lead">A Portella Corretora de Seguros nasceu para atender à demanda de seguro fiança locatícia e seguros de riscos da Portella Imóveis, empresa do mesmo grupo.</p>
+            <p class="lead">Hoje somos especializados em todos os ramos de seguros e trabalhamos com as seguradoras mais conhecidas do país, oferecendo consultoria e gerenciamento de riscos e criando produtos de acordo com a necessidade de cada cliente.</p>
+            <div class="stats">
+              <div class="stat"><span class="stat__value" data-count="12">12</span><span class="stat__label">Seguradoras</span></div>
+              <div class="stat"><span class="stat__value" data-count="24" data-suffix="h">24h</span><span class="stat__label">Assistência</span></div>
+              <div class="stat"><span class="stat__value" data-count="8" data-prefix="+">+8</span><span class="stat__label">Ramos de seguro</span></div>
+            </div>
+          </div>
+          <div class="why reveal reveal-d2">
+            <h3>Por que escolher a <em>Portella</em></h3>
+            <ul>
+              <li><span>I.</span>Todos os ramos de seguros</li>
+              <li><span>II.</span>As seguradoras mais respeitadas do país</li>
+              <li><span>III.</span>Consultoria e gerenciamento de riscos</li>
+              <li><span>IV.</span>Produtos criados para a sua necessidade</li>
+              <li><span>V.</span>Ética e transparência em cada apólice</li>
+            </ul>
           </div>
         </div>
-        <div class="why reveal">
-          <h3>Por que escolher a Portella?</h3>
-          <ul>
-            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B08A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l5 5L20 5"/></svg>Todos os ramos de seguros</li>
-            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B08A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l5 5L20 5"/></svg>Seguradoras mais conhecidas do país</li>
-            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B08A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l5 5L20 5"/></svg>Consultoria e gestão de riscos</li>
-            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B08A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l5 5L20 5"/></svg>Produtos sob medida</li>
-            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B08A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l5 5L20 5"/></svg>Ética e transparência</li>
-          </ul>
+        <div class="pillars reveal">
+          <div class="pillar"><h4>Missão</h4><p>Prestar serviços de seguros com excelência e responsabilidade.</p></div>
+          <div class="pillar"><h4>Visão</h4><p>Ser referência inovadora e líder em serviços de seguros.</p></div>
+          <div class="pillar"><h4>Valores</h4><p>Integridade, ética, transparência e responsabilidade.</p></div>
         </div>
       </div>
     </section>
 
-    <!-- 5. NOSSAS SOLUÇÕES -->
-    <section class="section section--alt" id="seguros">
+    <!-- 5. SEGUROS -->
+    <section class="section dark products" id="seguros">
+      <img class="products__mark" src="assets/img/brand/icon-gold-mono.svg" alt="" aria-hidden="true">
       <div class="container">
         <div class="section-head reveal">
-          <h2 class="section-title">Nossas <span class="hl">Soluções</span></h2>
-          <p class="section-sub">Um portfólio completo de seguros para cada momento da sua vida e para o sucesso da sua empresa.</p>
+          <span class="eyebrow">Seguros</span>
+          <h2 class="h-section">Nossas <em>soluções</em></h2>
+          <p class="lead">Um portfólio completo de seguros para cada momento da sua vida e para o sucesso da sua empresa.</p>
         </div>
-        <div class="products-track">
-          <article class="product card">
-            <div class="product__img">[Foto Seguro Auto]</div>
-            <div class="product__body">
-              <h3>Seguro Auto</h3>
-              <p>Proteção contra colisão, roubo, furto e danos a terceiros, com assistência 24h.</p>
-              <div class="product__actions"><a class="btn btn-line" href="#contato">Saiba +</a><button class="btn btn-gold" type="button" data-open-quote="Auto">Cotar Grátis →</button></div>
-            </div>
-          </article>
-          <article class="product card">
-            <div class="product__img">[Foto Seguro de Vida]</div>
-            <div class="product__body">
-              <h3>Seguro de Vida</h3>
-              <p>Tranquilidade financeira para quem você ama, com coberturas individuais ou em grupo.</p>
-              <div class="product__actions"><a class="btn btn-line" href="#contato">Saiba +</a><button class="btn btn-gold" type="button" data-open-quote="Vida">Cotar Grátis →</button></div>
-            </div>
-          </article>
-          <article class="product card">
-            <div class="product__img">[Foto Previdência]</div>
-            <div class="product__body">
-              <h3>Previdência</h3>
-              <p>Planeje seu futuro e garanta uma renda complementar para a aposentadoria.</p>
-              <div class="product__actions"><a class="btn btn-line" href="#contato">Saiba +</a><button class="btn btn-gold" type="button" data-open-quote="Previdência">Cotar Grátis →</button></div>
-            </div>
-          </article>
-          <article class="product card">
-            <div class="product__img">[Foto Seguro Saúde]</div>
-            <div class="product__body">
-              <h3>Seguro Saúde</h3>
-              <p>Planos de saúde para você, sua família ou sua empresa.</p>
-              <div class="product__actions"><a class="btn btn-line" href="#contato">Saiba +</a><button class="btn btn-gold" type="button" data-open-quote="Saúde">Cotar Grátis →</button></div>
-            </div>
-          </article>
-          <article class="product card">
-            <div class="product__img">[Foto Seguro Residencial]</div>
-            <div class="product__body">
-              <h3>Seguro Residencial</h3>
-              <p>Sua casa protegida contra incêndio, roubo e danos elétricos, com assistência.</p>
-              <div class="product__actions"><a class="btn btn-line" href="#contato">Saiba +</a><button class="btn btn-gold" type="button" data-open-quote="Residencial">Cotar Grátis →</button></div>
-            </div>
-          </article>
-          <article class="product card">
-            <div class="product__img">[Foto Fiança Locatícia]</div>
-            <div class="product__body">
-              <h3>Fiança Locatícia</h3>
-              <p>Substitua o fiador na locação do imóvel de forma simples, rápida e segura.</p>
-              <div class="product__actions"><a class="btn btn-line" href="#contato">Saiba +</a><button class="btn btn-gold" type="button" data-open-quote="Fiança Locatícia">Cotar Grátis →</button></div>
-            </div>
-          </article>
-          <article class="product card">
-            <div class="product__img">[Foto Responsabilidade Civil]</div>
-            <div class="product__body">
-              <h3>Responsabilidade Civil</h3>
-              <p>Cobertura para danos causados a terceiros no exercício da sua atividade.</p>
-              <div class="product__actions"><a class="btn btn-line" href="#contato">Saiba +</a><button class="btn btn-gold" type="button" data-open-quote="Responsabilidade Civil">Cotar Grátis →</button></div>
-            </div>
-          </article>
-          <article class="product card">
-            <div class="product__img">[Foto Seguro Empresa]</div>
-            <div class="product__body">
-              <h3>Seguro Empresa</h3>
-              <p>Proteção para o patrimônio do seu negócio, incluindo risco de engenharia.</p>
-              <div class="product__actions"><a class="btn btn-line" href="#contato">Saiba +</a><button class="btn btn-gold" type="button" data-open-quote="Empresarial">Cotar Grátis →</button></div>
-            </div>
-          </article>
+        <div class="products__nav">
+          <button class="arrow" type="button" aria-label="Seguros anteriores" data-scroll="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+          <button class="arrow" type="button" aria-label="Próximos seguros" data-scroll="1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+        </div>
+        <div class="products-track" data-track>
+          <article class="product"><div class="product__img">[Foto Seguro Auto]</div><div class="product__body"><span class="product__num">01</span><h3>Seguro Auto</h3><p>Proteção contra colisão, roubo, furto e danos a terceiros, com assistência 24h.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Auto">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
+          <article class="product"><div class="product__img">[Foto Seguro de Vida]</div><div class="product__body"><span class="product__num">02</span><h3>Seguro de Vida</h3><p>Tranquilidade financeira para quem você ama, com coberturas individuais ou em grupo.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Vida">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
+          <article class="product"><div class="product__img">[Foto Previdência]</div><div class="product__body"><span class="product__num">03</span><h3>Previdência</h3><p>Planeje seu futuro e garanta uma renda complementar para a aposentadoria.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Previdência">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
+          <article class="product"><div class="product__img">[Foto Seguro Saúde]</div><div class="product__body"><span class="product__num">04</span><h3>Seguro Saúde</h3><p>Planos de saúde para você, sua família ou sua empresa.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Saúde">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
+          <article class="product"><div class="product__img">[Foto Seguro Residencial]</div><div class="product__body"><span class="product__num">05</span><h3>Seguro Residencial</h3><p>Sua casa protegida contra incêndio, roubo e danos elétricos, com assistência.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Residencial">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
+          <article class="product"><div class="product__img">[Foto Fiança Locatícia]</div><div class="product__body"><span class="product__num">06</span><h3>Fiança Locatícia</h3><p>Substitua o fiador na locação do imóvel de forma simples, rápida e segura.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Fiança Locatícia">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
+          <article class="product"><div class="product__img">[Foto Responsabilidade Civil]</div><div class="product__body"><span class="product__num">07</span><h3>Responsabilidade Civil</h3><p>Cobertura para danos causados a terceiros no exercício da sua atividade.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Responsabilidade Civil">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
+          <article class="product"><div class="product__img">[Foto Seguro Empresa]</div><div class="product__body"><span class="product__num">08</span><h3>Seguro Empresa</h3><p>Proteção para o patrimônio do seu negócio, incluindo risco de engenharia.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Empresarial">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
         </div>
       </div>
     </section>
 
     <!-- 6. DEPOIMENTOS -->
-    <section class="section" id="depoimentos" style="padding-left: 0; padding-right: 0">
-      <div class="section-head reveal" style="padding: 0 24px">
-        <h2 class="section-title">O que dizem <span class="hl">nossos clientes</span></h2>
-        <p class="section-sub">A satisfação de quem confia na Portella para proteger o que mais importa.</p>
+    <section class="section ivory-2 testimonials" id="depoimentos">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="quote-mark" aria-hidden="true">“</span>
+          <h2 class="h-section">O que dizem <em>nossos clientes</em></h2>
+          <p class="lead">A confiança de quem já protege o que tem valor com a Portella.</p>
+        </div>
       </div>
       <!-- TODO: substituir pelos depoimentos reais (ex.: avaliações do Google) -->
       <div class="reviews">
         <div class="marquee__track" data-marquee>
-          <figure class="review">
-            <div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div>
-            <blockquote>[Inserir depoimento real de cliente]</blockquote>
-            <figcaption><span class="avatar">A</span><span class="review__name">[Nome do cliente]<small>Seguro Auto</small></span></figcaption>
-          </figure>
-          <figure class="review">
-            <div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div>
-            <blockquote>[Inserir depoimento real de cliente]</blockquote>
-            <figcaption><span class="avatar">B</span><span class="review__name">[Nome do cliente]<small>Fiança Locatícia</small></span></figcaption>
-          </figure>
-          <figure class="review">
-            <div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div>
-            <blockquote>[Inserir depoimento real de cliente]</blockquote>
-            <figcaption><span class="avatar">C</span><span class="review__name">[Nome do cliente]<small>Seguro de Vida</small></span></figcaption>
-          </figure>
-          <figure class="review">
-            <div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div>
-            <blockquote>[Inserir depoimento real de cliente]</blockquote>
-            <figcaption><span class="avatar">D</span><span class="review__name">[Nome do cliente]<small>Seguro Residencial</small></span></figcaption>
-          </figure>
+          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>[Inserir depoimento real de cliente]</blockquote><figcaption><span class="avatar">A</span><span class="review__name">[Nome do cliente]<small>Seguro Auto</small></span></figcaption></figure>
+          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>[Inserir depoimento real de cliente]</blockquote><figcaption><span class="avatar">B</span><span class="review__name">[Nome do cliente]<small>Fiança Locatícia</small></span></figcaption></figure>
+          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>[Inserir depoimento real de cliente]</blockquote><figcaption><span class="avatar">C</span><span class="review__name">[Nome do cliente]<small>Seguro de Vida</small></span></figcaption></figure>
+          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>[Inserir depoimento real de cliente]</blockquote><figcaption><span class="avatar">D</span><span class="review__name">[Nome do cliente]<small>Seguro Residencial</small></span></figcaption></figure>
         </div>
       </div>
-      <div class="reviews-cta">
-        <a class="btn btn-line" href="#depoimentos">Ver mais avaliações no Google</a>
+      <div class="container reviews-cta">
+        <a class="btn btn-outline-light" href="#depoimentos">Ver avaliações no Google</a>
       </div>
     </section>
 
-    <!-- 7. DÚVIDAS FREQUENTES -->
-    <section class="section section--alt" id="duvidas">
-      <div class="section-head reveal">
-        <h2 class="section-title">Dúvidas <span class="hl">Frequentes</span></h2>
-      </div>
-      <div class="faq" data-faq>
-        <div class="faq__item reveal">
-          <button class="faq__q" type="button" aria-expanded="false"><span>Por que contratar com uma corretora e não direto no banco?</span><span class="faq__icon" aria-hidden="true">+</span></button>
-          <p class="faq__a" hidden>A corretora trabalha com várias seguradoras e compara condições para você, orienta na escolha das coberturas e acompanha todo o atendimento, inclusive em caso de sinistro.</p>
+    <!-- 7. DÚVIDAS -->
+    <section class="section ivory" id="duvidas">
+      <div class="container faq__grid">
+        <div class="faq__intro reveal">
+          <span class="eyebrow">Dúvidas</span>
+          <h2 class="h-section">Perguntas <em>frequentes</em></h2>
+          <p class="lead">Não encontrou o que procura? Fale com a nossa equipe pelo telefone (11) 3592-5216.</p>
         </div>
-        <div class="faq__item reveal">
-          <button class="faq__q" type="button" aria-expanded="false"><span>Quais seguradoras vocês trabalham?</span><span class="faq__icon" aria-hidden="true">+</span></button>
-          <p class="faq__a" hidden>Trabalhamos com as seguradoras mais conhecidas do país, em todos os ramos de seguros. Consulte-nos para saber as opções para o seu caso.</p>
-        </div>
-        <div class="faq__item reveal">
-          <button class="faq__q" type="button" aria-expanded="false"><span>O que fazer em caso de sinistro?</span><span class="faq__icon" aria-hidden="true">+</span></button>
-          <p class="faq__a" hidden>Em emergências, ligue para a assistência 24 horas da sua seguradora. Depois, fale com a Portella para orientarmos todos os próximos passos.</p>
-        </div>
-        <div class="faq__item reveal">
-          <button class="faq__q" type="button" aria-expanded="false"><span>A cotação tem algum custo?</span><span class="faq__icon" aria-hidden="true">+</span></button>
+        <div class="faq reveal reveal-d1">
+          <details><summary>Por que contratar com uma corretora e não direto no banco?<span class="faq__icon" aria-hidden="true">+</span></summary><p>A corretora trabalha com várias seguradoras e compara condições para você, orienta na escolha das coberturas e acompanha todo o atendimento, inclusive em caso de sinistro.</p></details>
+          <details><summary>Com quais seguradoras vocês trabalham?<span class="faq__icon" aria-hidden="true">+</span></summary><p>Trabalhamos com as seguradoras mais conhecidas do país, como Porto Seguro, Allianz, Bradesco Seguros, SulAmérica e Tokio Marine, entre outras.</p></details>
+          <details><summary>O que fazer em caso de sinistro?<span class="faq__icon" aria-hidden="true">+</span></summary><p>Em emergências, ligue para a assistência 24 horas da sua seguradora. Depois, fale com a Portella para orientarmos todos os próximos passos.</p></details>
           <!-- TODO: confirmar resposta com a Portella -->
-          <p class="faq__a" hidden>[Confirmar com a Portella] Fale conosco pelo telefone (11) 3592-5216 ou pelo formulário para receber sua cotação.</p>
+          <details><summary>A cotação tem algum custo?<span class="faq__icon" aria-hidden="true">+</span></summary><p>[Confirmar com a Portella] Fale conosco pelo telefone (11) 3592-5216 ou pelo formulário para receber sua cotação.</p></details>
         </div>
       </div>
     </section>
 
     <!-- 8. CTA -->
-    <section class="section">
-      <div class="cta reveal">
-        <h2>Pronto para se <span class="hl">proteger</span>?</h2>
-        <p>Fale com nossos especialistas hoje mesmo e descubra como podemos ajudar você a viver com mais tranquilidade.</p>
-        <button class="btn btn-gold btn-lg" type="button" data-open-quote>Fazer Cotação Gratuita</button>
+    <section class="section dark cta">
+      <div class="cta__frame" aria-hidden="true"></div>
+      <img class="cta__mark" src="assets/img/brand/icon-gold-mono.svg" alt="" aria-hidden="true">
+      <div class="container cta__inner reveal">
+        <span class="eyebrow">Cotação</span>
+        <h2 class="h-section">Pronto para se <em>proteger?</em></h2>
+        <p class="lead">Converse com nossos especialistas e receba uma proposta pensada para o seu momento.</p>
+        <button class="btn btn-gold btn-lg" type="button" data-open-quote>Solicitar cotação</button>
       </div>
     </section>
 
-    <!-- 9. FALE CONOSCO -->
-    <section class="section section--alt" id="contato">
-      <div class="container">
-        <div class="section-head reveal">
-          <h2 class="section-title">Fale <span class="hl">Conosco</span></h2>
-          <p class="section-sub">Estamos disponíveis para esclarecer dúvidas ou realizar cotações.</p>
-        </div>
-        <div class="contact__grid">
-          <div class="contact__info reveal">
-            <h3>Portella Corretora de Seguros</h3>
-            <p>Seu patrimônio nas mãos de especialistas. Entre em contato pelos canais abaixo:</p>
-            <a class="contact__row" href="tel:+551135925216">
-              <span class="contact__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A6128" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span>
-              (11) 3592-5216
-            </a>
-            <a class="contact__row" href="mailto:contato@portellacorretora.com.br">
-              <span class="contact__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A6128" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></span>
-              contato@portellacorretora.com.br
-            </a>
-            <div class="contact__row">
-              <span class="contact__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A6128" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
-              [Seg a Sex, inserir horário]
-            </div>
-            <div class="contact__row">
-              <span class="contact__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A6128" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><path d="M12 11.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg></span>
-              Av. Padre Vicente Melillo, 1399 – Umuarama, Osasco – SP, 06036-016
-            </div>
+    <!-- 9. CONTATO -->
+    <section class="section ivory" id="contato">
+      <div class="container contact__grid">
+        <div class="contact__info reveal">
+          <span class="eyebrow">Contato</span>
+          <h2 class="h-section">Fale <em>conosco</em></h2>
+          <p class="lead">Estamos à disposição para esclarecer dúvidas ou preparar a sua cotação.</p>
+          <div class="contact__list">
+            <a class="contact__row" href="tel:+551135925216"><small>Telefone</small><span>(11) 3592-5216</span></a>
+            <a class="contact__row" href="mailto:contato@portellacorretora.com.br"><small>E-mail</small><span>contato@portellacorretora.com.br</span></a>
+            <div class="contact__row"><small>Endereço</small><span>Av. Padre Vicente Melillo, 1399 – Umuarama, Osasco – SP, 06036-016</span></div>
+            <div class="contact__row"><small>Horário</small><span>[Seg a Sex, inserir horário]</span></div>
           </div>
-          <!-- TODO: conectar o formulário a um serviço de envio (ex.: Formspree, e-mail ou WhatsApp) -->
-          <form class="contact-form reveal" data-contact-form>
-            <label><span class="sr-only">Nome</span><input type="text" name="nome" placeholder="Seu nome" required></label>
-            <label><span class="sr-only">E-mail</span><input type="email" name="email" placeholder="Seu e-mail" required></label>
-            <label><span class="sr-only">Telefone</span><input type="tel" name="telefone" placeholder="Seu telefone (WhatsApp)"></label>
-            <label><span class="sr-only">Assunto</span>
-              <select name="assunto">
-                <option value="">Assunto / Interesse</option>
-                <option>Seguro Auto</option>
-                <option>Seguro de Vida</option>
-                <option>Seguro Residencial</option>
-                <option>Seguro Fiança Locatícia</option>
-                <option>Seguro Empresarial</option>
-                <option>Outros seguros / Dúvidas</option>
-              </select>
-            </label>
-            <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="4" placeholder="Sua mensagem..."></textarea></label>
-            <button class="btn btn-gold" type="submit">Enviar Mensagem</button>
-          </form>
         </div>
+        <!-- TODO: conectar o formulário a um serviço de envio (ex.: Formspree, e-mail ou WhatsApp) -->
+        <form class="contact-form reveal reveal-d1" data-contact-form>
+          <h3>Envie uma mensagem</h3>
+          <label><span class="sr-only">Nome</span><input type="text" name="nome" placeholder="Nome" required></label>
+          <label><span class="sr-only">E-mail</span><input type="email" name="email" placeholder="E-mail" required></label>
+          <label><span class="sr-only">Telefone</span><input type="tel" name="telefone" placeholder="Telefone / WhatsApp"></label>
+          <label><span class="sr-only">Assunto</span>
+            <select name="assunto">
+              <option value="">Assunto</option>
+              <option>Seguro Auto</option>
+              <option>Seguro de Vida</option>
+              <option>Seguro Residencial</option>
+              <option>Seguro Fiança Locatícia</option>
+              <option>Seguro Empresarial</option>
+              <option>Outros seguros / Dúvidas</option>
+            </select>
+          </label>
+          <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="4" placeholder="Mensagem"></textarea></label>
+          <button class="btn btn-navy btn-lg" type="submit">Enviar mensagem</button>
+        </form>
       </div>
     </section>
 
     <!-- 10. BLOG -->
-    <section class="section" id="blog">
+    <section class="section ivory-2" id="blog">
       <div class="container">
-        <div class="blog-head reveal">
-          <h2>Conteúdos <span class="hl">recentes</span> para escolher melhor seu seguro</h2>
-          <p>Acompanhe nosso blog e fique por dentro das novidades.</p>
-          <a class="link-more" href="#blog">Ver todas as matérias →</a>
+        <div class="blog__head reveal">
+          <div>
+            <span class="eyebrow">Conteúdo</span>
+            <h2 class="h-section">Para escolher melhor o <em>seu seguro</em></h2>
+          </div>
+          <a class="link-line" href="#blog">Ver todas as matérias</a>
         </div>
         <!-- TODO: substituir pelas matérias reais -->
         <div class="posts">
-          <article class="post card reveal">
-            <div class="post__img">[Imagem da matéria]</div>
-            <div class="post__body"><span class="post__meta">[x] min leitura | [data]</span><h3>[Título da matéria 1]</h3><p>[Resumo da matéria]</p><a class="link-more" href="#blog">Ler matéria completa →</a></div>
-          </article>
-          <article class="post card reveal">
-            <div class="post__img">[Imagem da matéria]</div>
-            <div class="post__body"><span class="post__meta">[x] min leitura | [data]</span><h3>[Título da matéria 2]</h3><p>[Resumo da matéria]</p><a class="link-more" href="#blog">Ler matéria completa →</a></div>
-          </article>
-          <article class="post card reveal">
-            <div class="post__img">[Imagem da matéria]</div>
-            <div class="post__body"><span class="post__meta">[x] min leitura | [data]</span><h3>[Título da matéria 3]</h3><p>[Resumo da matéria]</p><a class="link-more" href="#blog">Ler matéria completa →</a></div>
-          </article>
+          <a class="post reveal" href="#blog"><div class="post__img">[Imagem da matéria]</div><span class="post__meta">[x] min de leitura · [data]</span><h3>[Título da matéria 1]</h3><p>[Resumo da matéria]</p></a>
+          <a class="post reveal reveal-d1" href="#blog"><div class="post__img">[Imagem da matéria]</div><span class="post__meta">[x] min de leitura · [data]</span><h3>[Título da matéria 2]</h3><p>[Resumo da matéria]</p></a>
+          <a class="post reveal reveal-d2" href="#blog"><div class="post__img">[Imagem da matéria]</div><span class="post__meta">[x] min de leitura · [data]</span><h3>[Título da matéria 3]</h3><p>[Resumo da matéria]</p></a>
         </div>
       </div>
     </section>
@@ -350,25 +275,26 @@
   <footer class="site-footer">
     <div class="container">
       <div class="footer__grid">
-        <div class="footer__col">
-          <a class="brand" href="#inicio"><span class="brand__name">Portella</span><span class="brand__tag">Corretora de Seguros</span></a>
-          <p>Integridade, ética, transparência e responsabilidade para proteger o que importa para você.</p>
+        <div class="footer__brand">
+          <img src="assets/img/brand/logo-gold-ivory.svg" alt="Portella Corretora de Seguros">
+          <p>Integridade, ética, transparência e responsabilidade para proteger o que tem valor para você.</p>
           <div class="socials">
-            <a href="https://www.instagram.com/portellacorretora/" target="_blank" rel="noopener" aria-label="Instagram da Portella Corretora"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="#141414"/></svg></a>
-            <a href="https://www.facebook.com/PortellaCorretoraDeSeguros" target="_blank" rel="noopener" aria-label="Facebook da Portella Corretora"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V10H6.5v3.5H9V21h3.5v-7.5H15l.5-3.5h-3V7a1 1 0 0 1 1-1H15z"/></svg></a>
+            <a href="https://www.instagram.com/portellacorretora/" target="_blank" rel="noopener" aria-label="Instagram da Portella Corretora"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"></circle></svg></a>
+            <a href="https://www.facebook.com/PortellaCorretoraDeSeguros" target="_blank" rel="noopener" aria-label="Facebook da Portella Corretora"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V10H6.5v3.5H9V21h3.5v-7.5H15l.5-3.5h-3V7a1 1 0 0 1 1-1H15z"></path></svg></a>
           </div>
         </div>
         <div class="footer__col">
           <h4>Empresa</h4>
-          <a href="#sobre">Sobre nós</a>
-          <a href="#seguros">Nossos seguros</a>
-          <a href="#seguradoras">Parceiros</a>
+          <a href="#sobre">A Corretora</a>
+          <a href="#seguros">Seguros</a>
+          <a href="#seguradoras">Seguradoras</a>
           <a href="#blog">Blog</a>
         </div>
         <div class="footer__col">
           <h4>Contato</h4>
           <a href="tel:+551135925216">(11) 3592-5216</a>
           <a href="mailto:contato@portellacorretora.com.br">contato@portellacorretora.com.br</a>
+          <span>Av. Padre Vicente Melillo, 1399 – Umuarama, Osasco – SP</span>
         </div>
         <div class="footer__col">
           <h4>Legal</h4>
@@ -381,44 +307,42 @@
       <div class="footer__bottom">
         <span>© <span data-year>2026</span> Portella Corretora de Seguros. Todos os direitos reservados.</span>
         <!-- TODO: inserir CNPJ e SUSEP -->
-        <span>CNPJ: [inserir] · SUSEP: [inserir]</span>
+        <span>CNPJ [inserir] · SUSEP [inserir]</span>
       </div>
     </div>
   </footer>
 
   <!-- Botão flutuante (TODO: trocar por link do WhatsApp, ex.: https://wa.me/55DDDNUMERO) -->
   <a class="fab" href="tel:+551135925216" aria-label="Falar com a Portella">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.1-4A8 8 0 1 1 20 12z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1a4 4 0 0 1-2-2l1-1-1-2z"/></svg>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.1-4A8 8 0 1 1 20 12z"></path><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1a4 4 0 0 1-2-2l1-1-1-2z"></path></svg>
   </a>
 
   <!-- Modal de cotação (2 etapas) -->
   <div class="modal" data-modal hidden>
     <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <button class="modal__close" type="button" aria-label="Fechar" data-close-quote>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
       </button>
-      <span class="modal__tag"><span data-modal-tag>Cotação gratuita</span> · Etapa <span data-modal-step>1</span> de 2</span>
-      <h3 id="modal-title">Fazer Cotação</h3>
-
+      <span class="modal__tag"><span data-modal-tag>Cotação</span> · Etapa <span data-modal-step>1</span> de 2</span>
+      <h3 id="modal-title">Solicitar cotação</h3>
       <form class="modal__step" data-step="1">
-        <label class="field">Nome<input type="text" name="nome" placeholder="Seu nome" required></label>
-        <label class="field">Telefone / WhatsApp<input type="tel" name="telefone" placeholder="(11) 90000-0000" required></label>
-        <button class="btn btn-gold" type="submit">Continuar →</button>
+        <label class="field">Nome<input type="text" name="nome" required></label>
+        <label class="field">Telefone / WhatsApp<input type="tel" name="telefone" required></label>
+        <button class="btn btn-gold btn-lg" type="submit">Continuar</button>
       </form>
-
       <form class="modal__step" data-step="2" hidden>
         <fieldset class="plans">
           <legend>Tipo de plano</legend>
           <button class="plan" type="button" aria-pressed="true">Individual</button>
-          <button class="plan" type="button" aria-pressed="false">Adesão (Por Profissão)</button>
-          <button class="plan" type="button" aria-pressed="false">PME (Empresarial)</button>
+          <button class="plan" type="button" aria-pressed="false">Adesão (por profissão)</button>
+          <button class="plan" type="button" aria-pressed="false">PME (empresarial)</button>
         </fieldset>
-        <label class="field">Profissão<input type="text" name="profissao" placeholder="Sua profissão"></label>
+        <label class="field">Profissão<input type="text" name="profissao"></label>
         <div class="field-row">
-          <label class="field">Idade<input type="number" name="idade" min="0" placeholder="35"></label>
-          <label class="field">Nº de pessoas<input type="number" name="pessoas" min="1" placeholder="1"></label>
+          <label class="field">Idade<input type="number" name="idade" min="0"></label>
+          <label class="field">Nº de pessoas<input type="number" name="pessoas" min="1"></label>
         </div>
-        <button class="btn btn-whatsapp" type="submit">Ir para WhatsApp →</button>
+        <button class="btn btn-gold btn-lg" type="submit">Enviar pelo WhatsApp</button>
       </form>
     </div>
   </div>
