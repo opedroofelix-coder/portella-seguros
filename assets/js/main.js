@@ -47,13 +47,66 @@
   var star = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>';
   $$('[data-stars]').forEach(function (el) { el.innerHTML = star + star + star + star + star; });
 
-  /* ---------- Carrossel de seguros (setas) ---------- */
-  var track = $('[data-track]');
-  $$('[data-scroll]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      if (track) track.scrollBy({ left: +btn.getAttribute('data-scroll') * 344, behavior: 'smooth' });
+  /* ---------- Carrossel de seguros: autoplay, setas, arrastar e progresso ---------- */
+  (function carousel() {
+    var viewport = $('[data-viewport]'), track = $('[data-track]'), progress = $('[data-progress]');
+    if (!viewport || !track) return;
+    var cards = Array.prototype.slice.call(track.children);
+    var index = 0, timer = null, DELAY = 3500;
+
+    function step() { var gap = parseFloat(getComputedStyle(track).columnGap) || 24; return cards[0].getBoundingClientRect().width + gap; }
+    function maxIndex() { return Math.max(0, cards.length - Math.floor((viewport.clientWidth + 24) / step())); }
+    function render() {
+      var max = maxIndex();
+      if (index > max) index = max;
+      track.style.transform = 'translateX(' + (-index * step()) + 'px)';
+      if (progress) {
+        var visible = cards.length - max;
+        progress.style.width = (visible / cards.length * 100) + '%';
+        progress.style.left = (index / cards.length * 100) + '%';
+      }
+    }
+    function go(dir) {
+      var max = maxIndex();
+      index = index + dir;
+      if (index > max) index = 0;          // chegou ao fim: volta ao começo
+      if (index < 0) index = max;          // antes do começo: vai para o fim
+      render();
+    }
+    function play() { stop(); if (!reduceMotion) timer = setInterval(function () { go(1); }, DELAY); }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+    $$('[data-scroll]').forEach(function (btn) {
+      btn.addEventListener('click', function () { go(+btn.getAttribute('data-scroll')); play(); });
     });
-  });
+    viewport.addEventListener('mouseenter', stop);
+    viewport.addEventListener('mouseleave', play);
+    viewport.addEventListener('focusin', stop);
+    viewport.addEventListener('focusout', play);
+
+    // arrastar com o dedo / mouse
+    var startX = null, dx = 0;
+    viewport.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse') return;
+      startX = e.clientX; dx = 0; stop(); viewport.classList.add('is-dragging');
+    });
+    viewport.addEventListener('pointermove', function (e) {
+      if (startX === null) return;
+      dx = e.clientX - startX;
+      track.style.transform = 'translateX(' + (-index * step() + dx) + 'px)';
+    });
+    function end() {
+      if (startX === null) return;
+      viewport.classList.remove('is-dragging'); startX = null;
+      if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1); else render();
+      play();
+    }
+    viewport.addEventListener('pointerup', end);
+    viewport.addEventListener('pointercancel', end);
+
+    window.addEventListener('resize', render);
+    render(); play();
+  })();
 
   /* ---------- Revelar ao rolar ---------- */
   var reveals = $$('.reveal');
