@@ -38,3 +38,8 @@
   fio dourado e brasão), Premium B "Editorial Marfim" (fundo marfim, nome "Portella" gigante atrás da
   consultora e selo girando) e Premium C "Galeria" (painel marinho + moldura dourada com a foto "saindo"
   do quadro e faixa com os nomes das seguradoras). Aguardando a escolha da cliente.
+- Segunda rodada no canvas: Premium D "Cortina" (cortinas que abrem, moldura dourada, título dividido
+  em volta da consultora), Premium E "Concierge" (fundo marfim, arco marinho, serviços em algarismos
+  romanos e cartão de atendimento) e Premium F "Monograma" (padrão discreto com o ícone, medalhão com
+  anel de texto girando, título revelado linha a linha).
+- Não escrever "premium", "grife" ou "luxo" nos textos do site: o requinte deve vir do visual.
