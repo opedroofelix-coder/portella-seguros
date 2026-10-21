@@ -16,3 +16,11 @@
 - Lista de pendências: README.md.
 - Próximo passo combinado: trocar os logos das seguradoras por versões oficiais em alta qualidade
   (ex.: SVGs do Wikimedia Commons), mantendo os nomes dos arquivos em `assets/img/seguradoras/`.
+
+## Identidade visual (recebida em 21/10/2026)
+- Cores: branco #FFFFFF, laranja #F49629, azul-marinho #1A2B4B.
+  Laranja em texto sobre fundo branco não atinge o contraste mínimo; para texto em destaque no branco use #C46A0E. Botão laranja: texto em azul-marinho.
+- Fontes: Jost (textos, conforme o manual da marca) e Lora (títulos, próxima do nome "Portella" do logo).
+- Logos vetoriais extraídos do manual em `assets/img/brand/`: icon-*, wordmark-*, logo-* (variações dark, navy e white).
+- Fotos da consultora com fundo removido: `assets/img/hero/consultora-1..3.webp`.
+- 3 opções de abertura (hero) estão no canvas de design: A (selo girando, fundo azul), B (ícone gigante com a mão "segurando" a foto) e C (painel azul com janelas que acendem). Aguardando a escolha da cliente.
