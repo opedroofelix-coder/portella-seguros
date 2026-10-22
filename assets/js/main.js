@@ -146,6 +146,137 @@
     });
   });
 
+  /* ---------- Seletor de seguro (lista personalizada sobre o select nativo) ---------- */
+  (function quoteSelect() {
+    var select = $('[data-type-select]');
+    if (!select) return;
+    var label = select.closest('label');
+    var placeholder = select.options[0].text;
+    var uid = 0;
+
+    var wrap = document.createElement('div');
+    wrap.className = 'qs';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'qs__button';
+    btn.setAttribute('aria-haspopup', 'listbox');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '<span class="qs__value is-empty"></span><svg class="qs__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>';
+    var valueEl = $('.qs__value', btn);
+    valueEl.textContent = placeholder;
+
+    var panel = document.createElement('div');
+    panel.className = 'qs__panel';
+    panel.id = 'qs-panel';
+    panel.setAttribute('role', 'listbox');
+    panel.setAttribute('aria-label', placeholder);
+    panel.tabIndex = -1;
+    panel.hidden = true;
+    btn.setAttribute('aria-controls', panel.id);
+
+    var items = [];
+    Array.prototype.forEach.call(select.children, function (node) {
+      if (node.tagName !== 'OPTGROUP') return;
+      var group = document.createElement('div');
+      group.className = 'qs__group';
+      group.setAttribute('role', 'group');
+      var title = document.createElement('span');
+      title.className = 'qs__title';
+      title.id = 'qs-g' + (++uid);
+      title.textContent = node.label;
+      group.setAttribute('aria-labelledby', title.id);
+      group.appendChild(title);
+      Array.prototype.forEach.call(node.children, function (opt) {
+        var item = document.createElement('div');
+        item.className = 'qs__option';
+        item.id = 'qs-o' + (++uid);
+        item.setAttribute('role', 'option');
+        item.setAttribute('aria-selected', 'false');
+        item.dataset.value = opt.value || opt.text;
+        item.innerHTML = '<span></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>';
+        item.firstChild.textContent = opt.text;
+        item.addEventListener('mousedown', function (e) { e.preventDefault(); });
+        item.addEventListener('click', function () { choose(item); });
+        item.addEventListener('mousemove', function () { setActive(items.indexOf(item)); });
+        group.appendChild(item);
+        items.push(item);
+      });
+      panel.appendChild(group);
+    });
+
+    wrap.appendChild(btn);
+    wrap.appendChild(panel);
+    label.parentNode.insertBefore(wrap, label);
+    label.hidden = true;
+    select.tabIndex = -1;
+
+    var active = -1;
+    function setActive(i) {
+      items.forEach(function (it, k) { it.classList.toggle('is-active', k === i); });
+      active = i;
+      if (i >= 0) {
+        panel.setAttribute('aria-activedescendant', items[i].id);
+        items[i].scrollIntoView({ block: 'nearest' });
+      } else {
+        panel.removeAttribute('aria-activedescendant');
+      }
+    }
+    function selectedIndex() {
+      for (var i = 0; i < items.length; i++) if (items[i].dataset.value === select.value) return i;
+      return -1;
+    }
+    function open() {
+      panel.hidden = false;
+      wrap.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+      // abre para cima quando não cabe abaixo (o hero corta o que passa da borda)
+      panel.classList.remove('is-up');
+      var area = wrap.closest('.hero'), r = panel.getBoundingClientRect(), b = wrap.getBoundingClientRect();
+      var limit = Math.min(window.innerHeight, area ? area.getBoundingClientRect().bottom : Infinity);
+      if (r.bottom > limit && b.top - (area ? area.getBoundingClientRect().top : 0) > r.height + 14) panel.classList.add('is-up');
+      setActive(Math.max(0, selectedIndex()));
+      panel.focus({ preventScroll: true });
+    }
+    function close(refocus) {
+      panel.hidden = true;
+      wrap.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+      if (refocus) btn.focus();
+    }
+    function choose(item) {
+      select.value = item.dataset.value;
+      items.forEach(function (it) { it.setAttribute('aria-selected', it === item ? 'true' : 'false'); });
+      valueEl.textContent = item.dataset.value;
+      valueEl.classList.remove('is-empty');
+      close(true);
+    }
+
+    btn.addEventListener('click', function () { if (panel.hidden) open(); else close(true); });
+    btn.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(); }
+    });
+    panel.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(Math.min(items.length - 1, active + 1)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(Math.max(0, active - 1)); }
+      else if (e.key === 'Home') { e.preventDefault(); setActive(0); }
+      else if (e.key === 'End') { e.preventDefault(); setActive(items.length - 1); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (active >= 0) choose(items[active]); }
+      else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+      else if (e.key === 'Tab') { close(false); }
+      else if (e.key.length === 1) {
+        var ch = e.key.toLowerCase();
+        for (var n = 1; n <= items.length; n++) {
+          var k = (active + n) % items.length;
+          if (items[k].dataset.value.toLowerCase().charAt(0) === ch) { setActive(k); break; }
+        }
+      }
+    });
+    panel.addEventListener('focusout', function (e) {
+      if (!wrap.contains(e.relatedTarget)) close(false);
+    });
+    document.addEventListener('click', function (e) { if (!wrap.contains(e.target) && !panel.hidden) close(false); });
+  })();
+
   /* ---------- Modal de cotação ---------- */
   var modal = $('[data-modal]');
   var typeSelect = $('[data-type-select]');
@@ -159,7 +290,7 @@
   }
   function openQuote(type) {
     currentType = type || (typeSelect && typeSelect.value) || '';
-    tagEl.textContent = currentType ? 'Seguro ' + currentType : 'Cotação';
+    tagEl.textContent = !currentType ? 'Cotação' : /^(Consórcio|Previdência)$/.test(currentType) ? currentType : 'Seguro ' + currentType;
     lastFocus = document.activeElement;
     modal.hidden = false; document.body.style.overflow = 'hidden';
     setStep(1);
