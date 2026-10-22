@@ -247,22 +247,7 @@ a.contact__row:hover span { color: var(--gold-text); }
 .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { outline: none; border-bottom-color: var(--gold-line); }
 .contact-form .btn { margin-top: 20px; }
 
-/* ---------- 10. Blog ---------- */
-.blog__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 56px; }
-.blog__head > div { display: flex; flex-direction: column; gap: 18px; max-width: 640px; }
-.link-line { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; text-decoration: none; color: var(--text-on-light); border-bottom: 1px solid var(--gold-line); padding-bottom: 5px; }
-.link-line:hover { color: var(--gold-text); }
-.posts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
-.post { display: flex; flex-direction: column; gap: 22px; text-decoration: none; color: inherit; }
-.post__img { aspect-ratio: 4 / 3; background: #E6DCC8; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--gold-text); overflow: hidden; }
-.post__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
-.post:hover .post__img img { transform: scale(1.04); }
-.post__meta { font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold-text); }
-.post h3 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 24px; line-height: 1.3; transition: color .3s; }
-.post:hover h3 { color: var(--gold-text); }
-.post p { margin: 0; font-size: 15px; font-weight: 300; line-height: 1.7; color: var(--text-muted-light); }
-
-/* ---------- 11. Footer ---------- */
+/* ---------- 10. Footer ---------- */
 .site-footer { background: var(--navy-deep); color: var(--text-light); padding: 96px 0 36px; border-top: 1px solid rgba(217, 188, 126, .2); }
 .footer__grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 48px; padding-bottom: 64px; border-bottom: 1px solid rgba(217, 188, 126, .16); }
 .footer__brand { display: flex; flex-direction: column; gap: 22px; }
@@ -348,7 +333,6 @@ a.contact__row:hover span { color: var(--gold-text); }
   .crest img { height: 38px; }
   .hero__tag { bottom: 40px; }
   .hero__mark { display: none; }
-  .posts { grid-template-columns: minmax(0, 1fr); }
   .pillars { grid-template-columns: minmax(0, 1fr); }
   .pillar + .pillar { padding-left: 0; border-left: 0; border-top: 1px solid var(--cream-line); }
 }
@@ -402,9 +386,3 @@ a.contact__row:hover span { color: var(--gold-text); }
 .dark .contact-form ::placeholder { color: var(--text-faint-dark); }
 .dark .contact-form select option { color: var(--navy-deep); }
 .dark .contact-form input:focus, .dark .contact-form select:focus, .dark .contact-form textarea:focus { border-bottom-color: var(--gold-light); }
-.dark .link-line { color: var(--text-light); }
-.dark .link-line:hover { color: var(--gold-light); }
-.dark .post__img { background: #24406E; color: var(--text-faint-dark); }
-.dark .post__meta { color: var(--gold-light); }
-.dark .post:hover h3 { color: var(--gold-light); }
-.dark .post p { color: var(--text-muted-dark); }

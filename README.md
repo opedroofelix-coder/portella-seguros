@@ -20,7 +20,7 @@ npx serve .        # ou: python3 -m http.server 8000
 ## Estrutura
 
 ```
-index.html                     # página única com as 11 seções
+index.html                     # página única com as 10 seções
 assets/css/style.css           # estilos; cores e fontes em :root (variáveis CSS)
 assets/js/main.js              # pó dourado, menu mobile, carrosséis, contadores, FAQ e modal de cotação
 api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
@@ -41,8 +41,7 @@ assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratad
 7. Dúvidas frequentes: acordeão
 8. Chamada para cotação
 9. Contato: dados e formulário
-10. Blog: 3 matérias
-11. Footer
+10. Footer
 
 Os três carrosséis (seguradoras, seguros e depoimentos) usam o mesmo código (`[data-carousel]` no `main.js`): avançam um card a cada 3,5 s, têm setas, arrastar no celular e barra de progresso.
 
@@ -72,13 +71,11 @@ Com o cache de 1 dia são cerca de 30 consultas por mês.
 - [x] **Logos das seguradoras em alta qualidade:** versões oficiais (sites das seguradoras e Wikimedia Commons), em PNG 600x240 transparente. A Liberty virou Yelum (`yelum.png`).
 - [ ] Nomes das outras 10 seguradoras parceiras (das 22), para incluir os logos na faixa.
 - [x] Fotos dos 10 seguros: Unsplash (licença livre), em `assets/img/seguros/`.
-- [ ] Fotos das matérias do blog.
 - [x] Número de WhatsApp: (11) 94784-1580 em `WHATSAPP_NUMBER` (`assets/js/main.js`) e nos links `wa.me` do site.
 - [ ] Horário de atendimento (seção Contato).
 - [ ] CNPJ e SUSEP (footer).
 - [ ] **Avaliações do Google:** o código está pronto (`api/avaliacoes.js` + `assets/js/main.js`). Falta criar a chave da API do Google Places e cadastrar `GOOGLE_PLACES_API_KEY` na Vercel (passo a passo abaixo).
 - [ ] Resposta da pergunta "A cotação tem algum custo?".
-- [ ] Matérias do blog.
 - [ ] Integração do formulário de contato (hoje abre o e-mail via `mailto:`).
 - [ ] Páginas legais (Privacidade, Termos, LGPD, Cookies).
 - [ ] Próximas etapas: CRM de seguros e consórcio.
