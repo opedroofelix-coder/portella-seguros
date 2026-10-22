@@ -95,7 +95,7 @@ for (const tela of LARGURAS) {
     test('todas as telas sem rolagem horizontal', async ({ page }) => {
       await page.goto(URL);
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/seguros-entrar-${tela.nome}.png`, fullPage: true });
+      await page.screenshot({ path: `test-results/telas/seguros-entrar-${tela.nome}.png`, fullPage: true, animations: 'disabled' });
       await primeiroAcesso(page, URL);
       await importar(page, FIXTURE, /Apólices/);
 
@@ -105,18 +105,18 @@ for (const tela of LARGURAS) {
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
         await page.waitForLoadState('networkidle');
         await conferirLayout(page, tela.width);
-        await page.screenshot({ path: `test-results/telas/seguros-${nome.toLowerCase().replace(/\s/g, '-')}-${tela.nome}.png`, fullPage: true });
+        await page.screenshot({ path: `test-results/telas/seguros-${nome.toLowerCase().replace(/\s/g, '-')}-${tela.nome}.png`, fullPage: true, animations: 'disabled' });
       }
 
       await irPara(page, 'Clientes');
       await page.getByText('Cliente Teste Alfa').click();
       await expect(page.getByRole('heading', { name: 'Cliente Teste Alfa' })).toBeVisible();
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/seguros-ficha-${tela.nome}.png`, fullPage: true });
+      await page.screenshot({ path: `test-results/telas/seguros-ficha-${tela.nome}.png`, fullPage: true, animations: 'disabled' });
 
       await page.getByRole('button', { name: 'Nova apólice' }).click();
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/seguros-form-apolice-${tela.nome}.png` });
+      await page.screenshot({ path: `test-results/telas/seguros-form-apolice-${tela.nome}.png`, animations: 'disabled' });
     });
   });
 }

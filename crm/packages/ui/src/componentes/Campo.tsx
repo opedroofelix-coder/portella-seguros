@@ -28,10 +28,11 @@ export function Campo({ rotulo, erro, dica, obrigatorio, className, children }: 
 
   return (
     <div className={[styles.campo, className].filter(Boolean).join(' ')}>
-      <label className={styles.rotulo} htmlFor={id}>
-        {rotulo}
+      {/* O asterisco fica fora do <label> para não entrar no nome acessível; aria-required informa. */}
+      <span className={styles.linhaRotulo}>
+        <label className={styles.rotulo} htmlFor={id}>{rotulo}</label>
         {obrigatorio && <span className={styles.obrigatorio} aria-hidden="true">*</span>}
-      </label>
+      </span>
       {controle}
       {dica && !erro && <span id={idDica} className={styles.dica}>{dica}</span>}
       {erro && <span id={idErro} className={styles.erro} role="alert">{erro}</span>}

@@ -11,7 +11,7 @@ for (const tela of LARGURAS) {
       await page.goto(URL);
       await expect(page.getByRole('heading', { name: /Catálogo de componentes/ })).toBeVisible();
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/catalogo-${tela.nome}.png`, fullPage: true });
+      await page.screenshot({ path: `test-results/telas/catalogo-${tela.nome}.png`, fullPage: true, animations: 'disabled' });
     });
 
     test('tabela vira cartões no celular e o menu abre/fecha', async ({ page }) => {
@@ -41,7 +41,7 @@ for (const tela of LARGURAS) {
       expect(caixa!.width).toBeLessThanOrEqual(tela.width);
       expect(caixa!.y).toBeGreaterThanOrEqual(0);
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/catalogo-modal-${tela.nome}.png` });
+      await page.screenshot({ path: `test-results/telas/catalogo-modal-${tela.nome}.png`, animations: 'disabled' });
     });
   });
 }
