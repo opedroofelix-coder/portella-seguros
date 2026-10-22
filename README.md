@@ -37,14 +37,14 @@ assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratad
 3. Seguradoras parceiras: carrossel com os logos
 4. Sobre: texto, contadores, "Por que escolher a Portella" e Missão, Visão e Valores
 5. Seguros: carrossel com 10 produtos
-
-Os três carrosséis (seguradoras, seguros e depoimentos) usam o mesmo código (`[data-carousel]` no `main.js`): avançam um card a cada 3,5 s, têm setas, arrastar no celular e barra de progresso.
 6. Depoimentos: carrossel com as avaliações do Google
 7. Dúvidas frequentes: acordeão
 8. Chamada para cotação
 9. Contato: dados e formulário
 10. Blog: 3 matérias
 11. Footer
+
+Os três carrosséis (seguradoras, seguros e depoimentos) usam o mesmo código (`[data-carousel]` no `main.js`): avançam um card a cada 3,5 s, têm setas, arrastar no celular e barra de progresso.
 
 Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a mensagem para o WhatsApp.
 
