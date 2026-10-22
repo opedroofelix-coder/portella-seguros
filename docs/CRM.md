@@ -4,18 +4,143 @@ Especificação dos dois sistemas de gestão de clientes (CRM) da **Portella Cor
 um para **seguros** e outro, separado, para **consórcio**. Os dados iniciais vêm da planilha
 de produção da corretora (`Portella_Corretora_Seguros_Dezembro.xlsx`).
 
-> **Pendente:** colar aqui o texto combinado na conversa anterior. Ele será revisado e
-> incorporado a este documento.
+Este documento reúne o que a Deliziane (administradora) definiu para o sistema, na conversa
+de construção do primeiro protótipo (arquivo `crm-portella.html`), e como cada ponto está no
+CRM atual. A seção 0 é a especificação de negócio; as seções seguintes descrevem o sistema.
 
 ---
 
-## 1. Objetivo
+## 0. Requisitos da Portella (especificação de negócio)
 
-- Reunir num só lugar clientes, apólices, renovações e cotações de seguros.
-- Manter o consórcio num CRM próprio, com cotas, lances e contemplações.
-- Controlar o acesso por perfil: cada corretor vê a própria carteira e a gestão vê tudo.
-- Substituir o controle de comissões e o financeiro feitos hoje na planilha.
-- Funcionar como webapp instalável (PWA) no computador e no celular.
+### 0.1 Como o negócio funciona
+
+1. O produtor fecha o seguro e **transmite a proposta** à seguradora. A proposta gera um
+   **número** e um valor a pagar, do qual sai o **prêmio líquido**.
+2. Sobre o prêmio líquido incide a **comissão trabalhada** (em geral de 0% a 40%). Em planos de
+   saúde ela pode passar de 100% do prêmio (ex.: 300%).
+3. A seguradora paga essa comissão **à vista ou em parcelas**. Muitas vezes não se sabe quantas
+   parcelas serão nem quando cairão: pode vir uma parte no mês 1, outra no mês 2, outra no 4º,
+   outra no 18º. Por isso o controle é por **saldo**:
+   `comissão a receber − comissão recebida = saldo a receber`, por cliente e por produtor.
+   Quando a soma dos recebimentos atinge a comissão, o saldo zera e a proposta sai do "a receber".
+4. Algumas seguradoras pagam **comissão vitalícia** (um % sobre o prêmio líquido que continua
+   depois da comissão principal). Exemplo de saúde: 300% pago na 1ª, 4ª, 5ª ou 6ª parcela, e
+   depois 2% vitalício.
+5. Do que a corretora **recebe**, ela **repassa** ao produtor o % combinado (de 1% a 50%).
+   Repasse = comissão recebida × % do produtor. Uma venda pode ter **mais de um produtor**, cada
+   um com o seu %.
+6. Todo mês a administradora paga cada produtor. O pagamento considera as comissões recebidas no
+   mês, **menos estornos** (cancelamentos) e **menos vales** (adiantamentos).
+
+### 0.2 Usuários e acesso
+
+- **Administradora** (Deliziane): vê e faz tudo. É quem aprova propostas, dá baixa nos
+  recebimentos, lança estornos e vales e paga os produtores.
+- **Produtor**: um login por produtor. Vê só as próprias propostas e lança propostas novas. Não vê
+  nem lança a comissão recebida da seguradora.
+- **Senha inicial padrão `1234`** para todos, com **troca obrigatória no primeiro acesso**. A
+  administradora pode redefinir a senha de um produtor para `1234` quando ele esquecer.
+- Produtores atuais (pela conversa): Deliziane, Mary, Gisele, Gabriel, Danila, Luana e Renata
+  (Cadu foi retirado). A planilha de dezembro/2024 traz também Carla, Felippe e Silvana. A lista
+  deve ser editável: incluir e retirar produtores.
+- **% de repasse padrão por produtor**, sugerido ao lançar a proposta e editável caso a caso:
+  Deliziane 40%, Danila 50%, Luana 50%, Gisele 50%, Mary 15%.
+
+### 0.3 Fluxo de aprovação
+
+1. O produtor lança a proposta → ela fica **"Pendente de aprovação"** e ainda não entra no
+   painel, no saldo a receber nem nos relatórios.
+2. Enquanto está pendente, o produtor pode editar ou excluir a própria proposta.
+3. A administradora vê um **aviso** (contador no menu e faixa no painel: "Você tem X propostas
+   aguardando aprovação"), revisa, corrige se preciso e **aprova**.
+4. Depois de aprovada, a proposta entra no controle geral. Só a administradora edita, inclusive
+   os campos de comissão, porque existem **comissões adicionais** que chegam depois.
+
+### 0.4 Cadastro da proposta
+
+| Campo | Observação |
+|---|---|
+| Nome completo do cliente (segurado) | |
+| Número da proposta / apólice | |
+| Data da proposta | |
+| Seguradora | lista editável (abaixo) |
+| Produto (ramo) | lista editável (abaixo) |
+| **Tipo de negócio** | **Seguro novo** ou **Renovação da carteira** (renovação da própria corretora, não de congênere) |
+| Prêmio líquido (R$) | |
+| Comissão trabalhada (%) | 0% a 40% em geral; pode passar de 100% (saúde) |
+| Comissão a receber (R$) | calculada: prêmio líquido × comissão trabalhada |
+| Regra de recebimento | **Normal** (por saldo) ou **com vitalício depois** + **% vitalício** sobre o prêmio líquido |
+| Produtores | um ou mais, cada um com o **% de repasse**; ao digitar o %, mostra na hora **"Receberá R$ X"** sobre a comissão total |
+| Recebimentos (só administradora) | cada um com **data**, **valor** e **parcela em texto livre** ("1ª", "6.6", "9.12", "156") |
+| Calculados | comissão recebida (soma), **saldo a receber**, quantidade de recebimentos |
+
+**Produtos**: Automóvel, Residencial, Saúde, Vida, Dental, Consórcio, Rastreador, Assinatura
+Mensal, Celular, Equipamentos Portáteis, Empresarial, Aluguel, Responsabilidade Civil,
+RC Profissional e Fiança Locatícia, com a opção de incluir outros.
+
+**Seguradoras**: Aliro, Allianz, Azos, Akad, Azul, Azul por Assinatura, Bp Seguradora, Bradesco,
+Darwin, Excelsior, Ezze, GNDI, HDI, Itaú, Ituran, Justos, Justos Mensal, Liberty, Loovi, Mapfre,
+Mitsui, Novo Seguros, Novo Seguros Mensal, Pier, Porto Seguro, Servopa, Sompo, Suhai, Sul América,
+Tokio Marine, Yelum, Youse e Zurich, com a opção de incluir outras.
+
+### 0.5 Estornos e vales
+
+- **Estorno**: nome do segurado, nº da apólice, seguradora, produto, produtor, data e valor.
+  Desconta do pagamento do produtor no mês.
+- **Vale**: produtor, data, valor e motivo. Desconta do pagamento do mês.
+
+### 0.6 Relatórios
+
+- **Pagamento mensal por produtor**: comissões recebidas no mês (pela data de cada
+  recebimento) × % do produtor, **menos estornos, menos vales = líquido a pagar**. Exportar em
+  **PDF** e em planilha para enviar ao produtor. (A conversa pediu XML; o protótipo usou Excel,
+  `.xlsx`, que abre direto no computador.)
+- **Comissões pendentes / futuras por produtor**: tudo o que ainda tem saldo a receber da
+  seguradora e quanto disso será repassado a cada produtor, para controlar o que está em aberto.
+
+### 0.7 Painel (dashboard)
+
+Com filtro de período, em **valores em R$**:
+- Produção geral (prêmio líquido emitido).
+- Prêmio líquido **por produtor**.
+- Prêmio líquido **Seguro novo × Renovação da carteira** (valor e quantidade).
+- Prêmio líquido **por produto** e **por seguradora**, em tabela com os valores exatos.
+- Comissão recebida geral e comissão repassada aos produtores.
+- **Comissão pendente por produtor**: saldo a receber e repasse projetado (sem filtro de período).
+- **Crescimento mês a mês** (variação sobre o mês anterior e sobre o mesmo mês do ano anterior)
+  e **ano a ano**.
+
+Decisão a validar: a produção por produtor conta o prêmio **cheio** da proposta para cada
+produtor envolvido (ranking de vendas), e não o prêmio dividido pelo % de cada um.
+
+### 0.8 Fora do escopo por enquanto
+
+- Empréstimo do Gabriel e Poupança Portella (abas da planilha). Observação: o CRM atual importa a
+  Poupança no Financeiro; dá para retirar se não for desejado.
+- Desconto de imposto combinado com a Renata (acerto específico). Se precisar, usar estorno como ajuste.
+
+### 0.9 O que já existe no CRM e o que falta
+
+| Requisito | Situação no CRM atual |
+|---|---|
+| Login por usuário, perfis administrador e corretor (produtor) | ✔ existe (também há o perfil gestor) |
+| Senha padrão `1234` com troca obrigatória no 1º acesso | ✘ falta: hoje o administrador define a senha inicial, com no mínimo 8 caracteres |
+| Produtor vê só as próprias propostas | ✔ existe |
+| Fluxo de aprovação de propostas, com aviso para a administradora | ✘ falta |
+| Proposta com tipo de negócio (novo × renovação) | ✘ falta |
+| Comissão trabalhada (%) e comissão a receber calculada | ◐ parcial: a apólice tem prêmio e %, mas a comissão a receber fica nas parcelas |
+| Recebimentos por saldo, com parcela em texto livre | ◐ parcial: cada parcela é um lançamento separado; falta o saldo por proposta |
+| Comissão acima de 100% e % vitalício | ✘ falta |
+| Vários produtores por proposta, cada um com o seu % e "Receberá R$ X" | ◐ parcial: há o "repasse adicional" da importação, mas o formulário só tem um responsável |
+| % de repasse padrão por produtor | ✘ falta |
+| Listas editáveis de produtos e seguradoras | ✘ falta: listas fixas no código (seguradora fora da lista entra pelo nome) |
+| Estornos com segurado, nº da apólice, seguradora e produto | ◐ parcial: estorno é um tipo de lançamento de comissão |
+| Vales | ✘ falta |
+| Relatório de pagamento mensal (recebido − estornos − vales) com PDF e Excel | ◐ parcial: há o "Repasse por corretor" na tela; faltam vales e exportação |
+| Relatório de comissões pendentes por produtor | ◐ parcial: filtro "a receber" na tela de Comissões |
+| Painel: novo × renovação, por produto e seguradora em R$, crescimento mês a mês e ano a ano | ◐ parcial: há gráficos por seguradora e ramo (em quantidade); faltam o resto |
+| Consórcio | ✔ CRM separado (na conversa, consórcio era um produto do mesmo sistema) |
+| Dados compartilhados entre computadores | ✘ falta: depende da escolha do backend |
 
 ## 2. Perfis de usuário
 
@@ -32,7 +157,8 @@ de produção da corretora (`Portella_Corretora_Seguros_Dezembro.xlsx`).
 | Financeiro da corretora | ✔ | ✔ | – |
 
 Regras extras:
-- No primeiro acesso, o sistema pede para criar o administrador. Não existe senha padrão.
+- No primeiro acesso, o sistema pede para criar o administrador. Hoje não existe senha padrão
+  (a seção 0.2 pede senha inicial `1234` com troca obrigatória; ainda não implementado).
 - O sistema sempre mantém pelo menos um administrador ativo.
 - Um usuário desativado não entra mais e perde a sessão aberta.
 - Senha com no mínimo 8 caracteres. Cada pessoa pode trocar a própria senha em "Minha conta".
