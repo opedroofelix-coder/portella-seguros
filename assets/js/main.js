@@ -49,6 +49,9 @@
     if (!box || !track || !window.fetch) return;
     var star = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>';
 
+    // estrelas das avaliações fixas do HTML (todas 5 estrelas no Google)
+    $$('[data-stars]').forEach(function (e) { e.innerHTML = star + star + star + star + star; });
+
     function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
 
     function card(a) {
