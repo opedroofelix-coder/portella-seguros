@@ -1,0 +1,8 @@
+dist
+dist-demo
+node_modules
+package-lock.json
+playwright-report
+test-results
+dados
+e2e/fixtures

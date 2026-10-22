@@ -1,0 +1,61 @@
+.tela {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  /* Sempre marinho, como o menu: a marca entra antes do tema. */
+  background: linear-gradient(135deg, #0f1e3c, #1a2b4b 55%, #22365c);
+}
+.caixa {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 28px 20px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-top: 3px solid var(--destaque);
+  border-radius: 18px;
+  box-shadow: var(--sombra-forte);
+}
+@media (min-width: 480px) {
+  .caixa {
+    padding: 40px 36px;
+  }
+}
+.marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.marca img {
+  height: 46px;
+  width: auto;
+}
+.titulo {
+  font-size: 26px;
+  text-align: center;
+}
+.texto {
+  margin: -8px 0 0;
+  text-align: center;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.erro {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--perigo-borda);
+  border-radius: 8px;
+  background: var(--perigo-fundo);
+  color: var(--perigo);
+  font-size: 14px;
+}

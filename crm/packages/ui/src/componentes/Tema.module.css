@@ -1,0 +1,62 @@
+.seletor {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--superficie-2);
+}
+.opcao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  color: var(--texto-suave);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.opcao + .opcao {
+  border-left: 1px solid var(--borda-forte);
+}
+.opcao:hover {
+  color: var(--texto);
+}
+.opcao[aria-pressed='true'] {
+  background: var(--primaria);
+  color: var(--primaria-texto);
+}
+/* No menu lateral (sempre marinho): botões compactos, rótulo só no item escolhido. */
+.menu {
+  display: grid;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--menu-linha);
+}
+.menu .opcao {
+  min-height: 36px;
+  padding: 0 6px;
+  color: var(--menu-texto);
+  font-size: 12px;
+}
+.menu .opcao + .opcao {
+  border-left-color: var(--menu-linha);
+}
+.menu .opcao:hover {
+  color: var(--menu-texto-forte);
+}
+.menu .opcao[aria-pressed='true'] {
+  background: var(--menu-ativo-fundo);
+  color: var(--menu-ativo);
+}
+@media (pointer: coarse), (max-width: 1023px) {
+  .opcao,
+  .menu .opcao {
+    min-height: var(--touch);
+  }
+}

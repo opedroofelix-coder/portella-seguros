@@ -1,0 +1,156 @@
+.envoltorio {
+  width: 100%;
+}
+/* Desktop: se as colunas não couberem, só a tabela rola, nunca a página. */
+@media (min-width: 900px) {
+  .envoltorio {
+    overflow-x: auto;
+  }
+}
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.tabela th {
+  padding: 9px 12px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  background: var(--superficie-2);
+  border-bottom: 1px solid var(--borda);
+  white-space: nowrap;
+}
+.tabela th:first-child {
+  border-radius: 7px 0 0 0;
+}
+.tabela th:last-child {
+  border-radius: 0 7px 0 0;
+}
+.tabela td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borda);
+  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+}
+.tabela tbody tr:last-child td {
+  border-bottom: 0;
+}
+.tabela tbody tr {
+  transition: background-color 0.15s;
+}
+.clicavel {
+  cursor: pointer;
+}
+.clicavel:hover,
+.clicavel:focus-visible {
+  background: var(--superficie-2);
+}
+.direita {
+  text-align: right !important;
+}
+
+/* A coluna principal (nome) não fica espremida em três linhas. */
+@media (min-width: 900px) {
+  .tabela td.principal {
+    min-width: 11em;
+    font-weight: 500;
+  }
+}
+
+/* Celular e tablet: cada linha vira um cartão com rótulo e valor. */
+@media (max-width: 899px) {
+  .tabela thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .tabela,
+  .tabela tbody,
+  .tabela tr,
+  .tabela td {
+    display: block;
+    width: 100%;
+  }
+  .tabela tbody {
+    display: grid;
+    gap: 10px;
+  }
+  .tabela tr {
+    margin: 0;
+    padding: 12px 14px;
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-left: 3px solid var(--destaque);
+    border-radius: 10px;
+    box-shadow: var(--sombra);
+  }
+  .tabela td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 5px 0;
+    border: 0;
+    text-align: right;
+    min-width: 0;
+  }
+  .tabela td::before {
+    content: attr(data-rotulo);
+    /* Rótulos longos quebram linha em vez de empurrar o valor para fora do cartão. */
+    flex: 0 1 auto;
+    max-width: 55%;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--texto-fraco);
+    text-align: left;
+  }
+  .tabela td > * {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .tabela td.principal {
+    display: block;
+    text-align: left;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 17px;
+    padding-bottom: 8px;
+  }
+  .tabela td.principal::before {
+    content: none;
+  }
+  .ocultarMobile {
+    display: none !important;
+  }
+  .direita {
+    text-align: right !important;
+  }
+}
+@media (min-width: 720px) and (max-width: 899px) {
+  .tabela tbody {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+.paginacao div {
+  display: flex;
+  gap: 8px;
+}

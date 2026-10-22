@@ -1,0 +1,36 @@
+.abas {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+  padding: 4px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borda);
+  border-radius: 9px;
+  scrollbar-width: none;
+}
+.aba {
+  flex-shrink: 0;
+  min-height: 38px;
+  padding: 6px 14px;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  color: var(--texto-suave);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.aba:hover {
+  color: var(--texto);
+  background: var(--superficie-3);
+}
+.aba[aria-selected='true'] {
+  background: var(--primaria);
+  color: var(--primaria-texto);
+}
+@media (pointer: coarse), (max-width: 719px) {
+  .aba {
+    min-height: var(--touch);
+  }
+}
