@@ -43,9 +43,46 @@
     });
   });
 
-  /* ---------- Estrelas dos depoimentos ---------- */
-  var star = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>';
-  $$('[data-stars]').forEach(function (el) { el.innerHTML = star + star + star + star + star; });
+  /* ---------- Depoimentos: avaliações do Google via /api/avaliacoes ---------- */
+  (function reviews() {
+    var box = $('[data-reviews]'), track = $('[data-reviews-track]'), summary = $('[data-reviews-summary]'), link = $('[data-reviews-link]');
+    if (!box || !track || !window.fetch) return;
+    var star = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>';
+
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+
+    function card(a) {
+      var fig = el('figure', 'review');
+      var stars = el('div', 'review__stars'); stars.setAttribute('role', 'img'); stars.setAttribute('aria-label', a.nota + ' estrelas');
+      for (var i = 0; i < a.nota; i++) stars.insertAdjacentHTML('beforeend', star);
+      fig.appendChild(stars);
+      fig.appendChild(el('blockquote', '', a.texto));
+      var cap = el('figcaption');
+      cap.appendChild(el('span', 'avatar', a.nome.trim().charAt(0).toUpperCase()));
+      var name = el('span', 'review__name');
+      var who = a.perfil ? el('a', '', a.nome) : document.createTextNode(a.nome);
+      if (a.perfil) { who.href = a.perfil; who.target = '_blank'; who.rel = 'noopener'; }
+      name.appendChild(who);
+      name.appendChild(el('small', '', 'Google' + (a.quando ? ' · ' + a.quando : '')));
+      cap.appendChild(name);
+      fig.appendChild(cap);
+      return fig;
+    }
+
+    fetch('/api/avaliacoes').then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); }).then(function (d) {
+      if (d.link && link) link.href = d.link;
+      if (d.nota && summary) {
+        summary.textContent = d.nota.toFixed(1).replace('.', ',') + ' de 5 no Google · ' + d.total + (d.total === 1 ? ' avaliação' : ' avaliações');
+        summary.hidden = false;
+      }
+      if (!d.avaliacoes || !d.avaliacoes.length) return;
+      // duas cópias para o loop contínuo do marquee (a segunda fica oculta para leitores de tela)
+      [false, true].forEach(function (copy) {
+        d.avaliacoes.forEach(function (a) { var c = card(a); if (copy) c.setAttribute('aria-hidden', 'true'); track.appendChild(c); });
+      });
+      box.hidden = false;
+    }).catch(function () { /* sem avaliações: fica só o botão para o Google */ });
+  })();
 
   /* ---------- Carrossel de seguros: autoplay, setas, arrastar e progresso ---------- */
   (function carousel() {

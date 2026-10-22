@@ -186,17 +186,13 @@
           <p class="lead">A confiança de quem já protege o que tem valor com a Portella.</p>
         </div>
       </div>
-      <!-- TODO: substituir pelos depoimentos reais (ex.: avaliações do Google) -->
-      <div class="reviews">
-        <div class="marquee__track" data-marquee>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>[Inserir depoimento real de cliente]</blockquote><figcaption><span class="avatar">A</span><span class="review__name">[Nome do cliente]<small>Seguro Auto</small></span></figcaption></figure>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>[Inserir depoimento real de cliente]</blockquote><figcaption><span class="avatar">B</span><span class="review__name">[Nome do cliente]<small>Fiança Locatícia</small></span></figcaption></figure>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>[Inserir depoimento real de cliente]</blockquote><figcaption><span class="avatar">C</span><span class="review__name">[Nome do cliente]<small>Seguro de Vida</small></span></figcaption></figure>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>[Inserir depoimento real de cliente]</blockquote><figcaption><span class="avatar">D</span><span class="review__name">[Nome do cliente]<small>Seguro Residencial</small></span></figcaption></figure>
-        </div>
+      <!-- Avaliações do Google carregadas de /api/avaliacoes (assets/js/main.js); sem resposta, a faixa fica oculta -->
+      <p class="reviews-summary" data-reviews-summary hidden></p>
+      <div class="reviews" data-reviews hidden>
+        <div class="marquee__track" data-reviews-track></div>
       </div>
       <div class="container reviews-cta">
-        <a class="btn btn-outline-light" href="#depoimentos">Ver avaliações no Google</a>
+        <a class="btn btn-outline-light" href="https://www.google.com/maps/search/?api=1&amp;query=Portella+Corretora+de+Seguros+em+Osasco" target="_blank" rel="noopener" data-reviews-link>Ver avaliações no Google</a>
       </div>
     </section>
 

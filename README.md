@@ -23,6 +23,7 @@ npx serve .        # ou: python3 -m http.server 8000
 index.html                     # página única com as 11 seções
 assets/css/style.css           # estilos; cores e fontes em :root (variáveis CSS)
 assets/js/main.js              # pó dourado, menu mobile, carrosséis, contadores, FAQ e modal de cotação
+api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
 assets/img/seguradoras/*.png   # logos das 12 seguradoras parceiras
@@ -45,6 +46,24 @@ assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratad
 
 Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a mensagem para o WhatsApp.
 
+## Avaliações do Google
+
+A seção Depoimentos mostra as avaliações do Google da Portella e se atualiza sozinha:
+a função da Vercel `api/avaliacoes.js` consulta a API do Google Places (New) e guarda a resposta
+por 1 dia, então avaliações novas aparecem no site em até 24 h. A API devolve a nota, o total e
+até 5 avaliações (as que o Google considera mais relevantes). Sem a chave, o site mostra só o botão
+"Ver avaliações no Google".
+
+Para ativar:
+
+1. No [Google Cloud Console](https://console.cloud.google.com/), crie um projeto, ative a
+   **Places API (New)** e crie uma **chave de API** (restrinja a chave à Places API).
+2. Na Vercel, em *Settings → Environment Variables*, crie `GOOGLE_PLACES_API_KEY` com a chave.
+   Opcional: `GOOGLE_PLACE_ID` com o ID do lugar, para não depender da busca pelo nome.
+3. Faça um novo deploy.
+
+Com o cache de 1 dia são cerca de 30 consultas por mês.
+
 ## Pendências
 
 - [x] **Logos das seguradoras em alta qualidade:** versões oficiais (sites das seguradoras e Wikimedia Commons), em PNG 600x240 transparente. A Liberty virou Yelum (`yelum.png`).
@@ -54,7 +73,7 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 - [x] Número de WhatsApp: (11) 94784-1580 em `WHATSAPP_NUMBER` (`assets/js/main.js`) e nos links `wa.me` do site.
 - [ ] Horário de atendimento (seção Contato).
 - [ ] CNPJ e SUSEP (footer).
-- [ ] Depoimentos reais (ex.: avaliações do Google) e o link "Ver avaliações no Google".
+- [ ] **Avaliações do Google:** o código está pronto (`api/avaliacoes.js` + `assets/js/main.js`). Falta criar a chave da API do Google Places e cadastrar `GOOGLE_PLACES_API_KEY` na Vercel (passo a passo abaixo).
 - [ ] Resposta da pergunta "A cotação tem algum custo?".
 - [ ] Matérias do blog.
 - [ ] Integração do formulário de contato (hoje abre o e-mail via `mailto:`).
