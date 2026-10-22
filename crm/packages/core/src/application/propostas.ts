@@ -1,6 +1,6 @@
-import { ErroNaoEncontrado, ErroPermissao } from '../domain/erros';
+import { ErroNaoEncontrado, ErroPermissao, ErroValidacao } from '../domain/erros';
 import type { Proposta, Recebimento } from '../domain/proposta';
-import { participa, saldoReceber, validarProposta } from '../domain/proposta';
+import { alterarPercentualProdutor, participa, saldoReceber, validarProposta } from '../domain/proposta';
 import type { DadosRegistro, Registro } from '../domain/registro';
 import type { Usuario } from '../domain/usuario';
 import type { Ambiente } from '../ports/relogio';
@@ -80,6 +80,39 @@ export class ServicoPropostas extends ServicoCarteira<Proposta> {
     validarProposta(aprovada);
     await this.repositorio.salvar(aprovada);
     return aprovada;
+  }
+
+  /**
+   * Aplica o novo % de repasse do produtor às propostas em aberto (com saldo a receber) em que ele
+   * participa. O que já foi recebido continua com o % antigo. Propostas em que a soma dos % passaria
+   * de 100% ficam como estão (o retorno diz quantas).
+   */
+  async aplicarPercentualProdutor(
+    usuario: Usuario,
+    produtorId: string,
+    percentual: number,
+  ): Promise<{ alteradas: number; ignoradas: number }> {
+    exigir(usuario, 'financeiro:gerenciar');
+    if (!(percentual >= 0 && percentual <= 100)) {
+      throw new ErroValidacao('Informe um % entre 0 e 100.', { percentual: 'Entre 0 e 100.' });
+    }
+    const agora = this.ambiente.agora().toISOString();
+    let alteradas = 0;
+    let ignoradas = 0;
+    for (const p of await this.repositorio.listar()) {
+      if (saldoReceber(p) <= 0) continue;
+      const nova = alterarPercentualProdutor(p, produtorId, percentual);
+      if (nova === p) continue;
+      try {
+        validarProposta(nova);
+      } catch {
+        ignoradas++;
+        continue;
+      }
+      await this.repositorio.salvar({ ...nova, atualizadoEm: agora });
+      alteradas++;
+    }
+    return { alteradas, ignoradas };
   }
 
   /** Baixa de um recebimento da seguradora. Quitada a comissão principal, o que entra é vitalício. */

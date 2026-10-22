@@ -134,6 +134,7 @@ produtor envolvido (ranking de vendas), e não o prêmio dividido pelo % de cada
 | Regra vitalício com % sobre o prêmio líquido | ✔ recebimentos depois de quitada a comissão viram vitalício |
 | Vários produtores por proposta, cada um com o seu % e "Receberá R$ X" | ✔ |
 | Listas editáveis de produtos e seguradoras | ✔ menu **Configurações** |
+| Administradora altera o % de repasse dos produtores | ✔ **Configurações › Repasse dos produtores**, com opção de aplicar às propostas em aberto |
 | Estornos (segurado, nº da apólice, seguradora, produto, produtor, valor) e vales | ✔ menu **Estornos e vales** |
 | Relatório de pagamento mensal (repasse − estornos − vales) com PDF e Excel | ✔ menu **Relatórios**, com "Registrar pagamento" |
 | Relatório de comissões pendentes por produtor | ✔ PDF e Excel |
@@ -237,6 +238,11 @@ Substitui as abas "A Receber" e "Comissões <corretor>". Segue a seção 0.
   ela está pendente. A administradora vê o contador no menu **Aprovações** e a faixa no painel,
   revisa, lança recebimentos e aprova. Depois disso só a administração altera.
 - **Repasse**: em cada recebimento, o produtor recebe o seu % (ou o valor fixo que veio da planilha).
+- **Alterar os %** (administrador): em **Configurações › Repasse dos produtores**, um campo por
+  produtor. O novo % é sugerido nas propostas novas. Com **Aplicar também às propostas em aberto**,
+  ele passa a valer nas propostas com saldo a receber em que o produtor participa; o repasse do que
+  já foi recebido fica congelado no % antigo, e propostas em que a soma dos % passaria de 100% ficam
+  como estão (o aviso diz quantas). O % de uma proposta específica se altera na própria proposta.
 - **Estornos e vales**: descontam do pagamento do produtor no mês da data.
 - **Relatórios**: pagamento mensal por produtor (repasse dos recebimentos do mês − estornos −
   vales = líquido), com **PDF**, **Excel** e **Registrar pagamento**; fechamento do mês com todos

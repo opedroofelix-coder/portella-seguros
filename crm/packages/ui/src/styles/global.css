@@ -184,7 +184,7 @@ h3 em {
 .lista-simples li + li {
   border-top: 1px solid var(--line);
 }
-.lista-simples button {
+.lista-simples > li > button {
   width: 100%;
   min-height: var(--touch);
   display: flex;
@@ -197,7 +197,7 @@ h3 em {
   text-align: left;
   cursor: pointer;
 }
-.lista-simples button:hover {
+.lista-simples > li > button:hover {
   background: rgba(217, 188, 126, 0.05);
 }
 .lista-simples .linha {
@@ -207,8 +207,11 @@ h3 em {
   gap: 12px;
   padding: 10px 4px;
 }
+.lista-simples .linha > button {
+  flex-shrink: 0;
+}
 .lista-simples .linha > span:first-child,
-.lista-simples button > span:first-child {
+.lista-simples > li > button > span:first-child {
   display: flex;
   flex-direction: column;
   min-width: 0;

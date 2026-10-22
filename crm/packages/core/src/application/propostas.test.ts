@@ -133,6 +133,49 @@ describe('propostas', () => {
   });
 });
 
+describe('alteração do % do produtor', () => {
+  it('vale para as propostas em aberto, sem mudar o repasse do que já foi recebido', async () => {
+    const servico = new ServicoPropostas(new RepositorioMemoria(), ambiente);
+    const aberta = await servico.salvar(
+      admin,
+      nova({ recebimentos: [{ id: 'r1', data: '2026-10-05', valor: 4000 }] }),
+    );
+    const quitada = await servico.salvar(
+      admin,
+      nova({ numero: '2', recebimentos: [{ id: 'r2', data: '2026-10-05', valor: 10000 }] }),
+    );
+    const estouraria = await servico.salvar(
+      admin,
+      nova({
+        numero: '3',
+        produtores: [
+          { produtorId: 'gisele', percentual: 50 },
+          { produtorId: 'mary', percentual: 45 },
+        ],
+      }),
+    );
+    const outra = await servico.salvar(
+      admin,
+      nova({ numero: '4', produtores: [{ produtorId: 'mary', percentual: 15 }] }),
+    );
+
+    await expect(servico.aplicarPercentualProdutor(gisele, 'gisele', 60)).rejects.toThrow(ErroPermissao);
+    await expect(servico.aplicarPercentualProdutor(admin, 'gisele', 120)).rejects.toThrow(ErroValidacao);
+    expect(await servico.aplicarPercentualProdutor(admin, 'gisele', 60)).toEqual({
+      alteradas: 1,
+      ignoradas: 1,
+    });
+
+    const depois = await servico.obter(admin, aberta.id);
+    expect(depois.produtores).toEqual([{ produtorId: 'gisele', percentual: 60 }]);
+    // R$ 40,00 já recebidos ficam com o repasse de 50% (R$ 20,00)
+    expect(depois.recebimentos[0]?.repasses).toEqual({ gisele: 2000 });
+    expect((await servico.obter(admin, quitada.id)).produtores[0]?.percentual).toBe(50);
+    expect((await servico.obter(admin, estouraria.id)).produtores[0]?.percentual).toBe(50);
+    expect(await servico.obter(admin, outra.id)).toEqual(outra);
+  });
+});
+
 describe('estornos, vales e pagamentos', () => {
   it('só a administração lança; o produtor consulta os seus', async () => {
     const vales = new ServicoLancamentosGestao<Vale>(new RepositorioMemoria(), undefined, ambiente);

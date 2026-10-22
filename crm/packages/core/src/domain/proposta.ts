@@ -99,6 +99,24 @@ export function repasseDoRecebimento(r: Recebimento, produtorId: string, percent
   return r.repasses?.[produtorId] ?? porcentagem(r.valor, percentual);
 }
 
+/**
+ * Troca o % do produtor na proposta sem mexer no que já foi recebido: os recebimentos anteriores
+ * guardam o repasse calculado com o % antigo, e o novo % vale para os próximos.
+ */
+export function alterarPercentualProdutor(p: Proposta, produtorId: string, percentual: number): Proposta {
+  const antigo = p.produtores.find((x) => x.produtorId === produtorId);
+  if (!antigo || antigo.percentual === percentual) return p;
+  return {
+    ...p,
+    produtores: p.produtores.map((x) => (x.produtorId === produtorId ? { ...x, percentual } : x)),
+    recebimentos: p.recebimentos.map((r) =>
+      r.repasses?.[produtorId] != null
+        ? r
+        : { ...r, repasses: { ...r.repasses, [produtorId]: porcentagem(r.valor, antigo.percentual) } },
+    ),
+  };
+}
+
 /** "Receberá R$ X": o repasse sobre a comissão total a receber. */
 export function repassePrevisto(p: Pick<Proposta, 'comissaoReceber'>, percentual: number): Centavos {
   return porcentagem(p.comissaoReceber, percentual);

@@ -140,6 +140,20 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await entrar(page, URL, ADMIN);
     await expect(page.getByRole('status').filter({ hasText: 'proposta aguardando aprovação' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Aprovações 1 pendente(s)' })).toBeVisible();
+
+    // Administradora muda o % do produtor de 30% para 25%, também nas propostas em aberto
+    await irPara(page, 'Configurações');
+    await page.getByLabel('Aplicar também às propostas em aberto').check();
+    await page.getByLabel(`% de ${CORRETOR.nome}`).fill('25');
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: CORRETOR.nome })
+      .getByRole('button', { name: 'Salvar e aplicar' })
+      .click();
+    await expect(
+      page.getByText(`Repasse de ${CORRETOR.nome}: 25%. 1 proposta(s) em aberto atualizada(s).`),
+    ).toBeVisible();
+
     await irPara(page, 'Aprovações');
     await page.getByRole('row', { name: /Cliente Teste Proposta/ }).click();
     const aprovar = page.getByRole('dialog', { name: /Cliente Teste Proposta/ });
@@ -163,13 +177,13 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await vale.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByRole('table', { name: 'Vales' })).toContainText('R$ 10,00');
 
-    // Relatório mensal: 200 × 30% − 10 = 50, com PDF e Excel
+    // Relatório mensal: 200 × 25% − 10 = 40, com PDF e Excel
     await irPara(page, 'Relatórios');
     await page
       .getByRole('table', { name: 'Fechamento do mês' })
       .getByRole('row', { name: /Corretor Teste/ })
       .click();
-    await expect(page.getByText('Líquido a pagar').locator('..')).toContainText('R$ 50,00');
+    await expect(page.getByText('Líquido a pagar').locator('..')).toContainText('R$ 40,00');
     for (const [botao, extensao] of [
       ['PDF', '.pdf'],
       ['Excel', '.xlsx'],
