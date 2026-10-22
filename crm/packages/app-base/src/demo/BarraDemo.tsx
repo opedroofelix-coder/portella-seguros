@@ -34,7 +34,7 @@ export function BarraDemo({ aoRecomecar }: { aoRecomecar: () => void }) {
       </span>
       <label className={styles.visao}>
         <span>Ver como</span>
-        <select value={usuario ? visao : ''} onChange={(e) => trocar(e.target.value)}>
+        <select aria-label="Ver como" value={usuario ? visao : ''} onChange={(e) => trocar(e.target.value)}>
           {!usuario && <option value="">Escolha…</option>}
           <option value="admin">Administradora</option>
           <option value="produtora">Gisele (produtora)</option>
