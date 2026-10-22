@@ -96,6 +96,8 @@ input, select, textarea, button { font: inherit; }
 .quote-bar select option { color: var(--navy-deep); }
 .quote-bar label > svg { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); pointer-events: none; }
 .quote-bar { position: relative; z-index: 5; }
+/* sem transform depois da entrada: a lista de seguros (position: fixed) precisa se posicionar pela tela */
+.quote-bar.fu { animation-fill-mode: backwards; }
 
 /* Seletor de seguro personalizado */
 .qs { position: relative; flex-grow: 1; min-width: 0; }
@@ -106,7 +108,7 @@ input, select, textarea, button { font: inherit; }
 .qs.is-open .qs__chev { transform: rotate(180deg); }
 .qs__panel { position: absolute; z-index: 30; left: -25px; top: calc(100% + 14px); width: 460px; max-width: calc(100vw - 40px); max-height: min(440px, 62vh); overflow-y: auto; padding: 12px 0; background: var(--navy-deep); border: 1px solid rgba(217, 188, 126, .4); box-shadow: 0 40px 70px -30px rgba(0, 0, 0, .75); outline: none; animation: qsIn .35s var(--ease) both; scrollbar-width: thin; scrollbar-color: var(--gold-line) transparent; }
 .qs__panel[hidden] { display: none; }
-.qs__panel.is-up { top: auto; bottom: calc(100% + 14px); animation-name: qsUp; }
+.qs__panel.is-fixed { position: fixed; }
 .qs__group { display: flex; flex-direction: column; }
 .qs__title { display: flex; align-items: center; gap: 10px; padding: 14px 26px 6px; font-size: 10.5px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; color: var(--gold-light); }
 .qs__title::before { content: ""; width: 18px; height: 1px; background: var(--gold-line); }
@@ -120,7 +122,6 @@ input, select, textarea, button { font: inherit; }
 .qs__option.is-active .qs__icon, .qs__option[aria-selected="true"] .qs__icon { background: var(--gold); border-color: var(--gold); color: var(--navy-deep); }
 .qs__option[aria-selected="true"] .qs__name { color: var(--gold-light); }
 .qs__option[aria-selected="true"] .qs__check { opacity: 1; }
-@keyframes qsUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes qsIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 
 .hero__stats { display: flex; flex-wrap: wrap; gap: 20px 44px; border-top: 1px solid rgba(217, 188, 126, .15); padding-top: 22px; }

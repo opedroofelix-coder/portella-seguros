@@ -281,20 +281,39 @@
       for (var i = 0; i < items.length; i++) if (items[i].dataset.value === select.value) return i;
       return -1;
     }
+    // a lista abre sempre para baixo: fica fixa na tela (o hero corta o que passa da borda)
+    // e, se não couber abaixo da barra, a página rola um pouco antes
+    var header = $('.site-header');
+    function place() {
+      var b = wrap.getBoundingClientRect(), top = b.bottom + 14;
+      if (b.bottom < (header ? header.getBoundingClientRect().bottom : 0)) { close(false); return; }
+      panel.style.top = top + 'px';
+      panel.style.maxHeight = Math.max(180, Math.min(440, window.innerHeight - top - 16)) + 'px';
+    }
+    function onResize() { close(false); }
     function open() {
       panel.hidden = false;
       wrap.classList.add('is-open');
       btn.setAttribute('aria-expanded', 'true');
-      // abre para cima quando não cabe abaixo (o hero corta o que passa da borda)
-      panel.classList.remove('is-up');
-      var area = wrap.closest('.hero'), r = panel.getBoundingClientRect(), b = wrap.getBoundingClientRect();
-      var limit = Math.min(window.innerHeight, area ? area.getBoundingClientRect().bottom : Infinity);
-      if (r.bottom > limit && b.top - (area ? area.getBoundingClientRect().top : 0) > r.height + 14) panel.classList.add('is-up');
+      var r = panel.getBoundingClientRect(), b = wrap.getBoundingClientRect();
+      var minTop = (header ? header.getBoundingClientRect().height : 0) + 16;
+      var missing = b.bottom + 14 + Math.min(r.height, 440) + 16 - window.innerHeight;
+      if (missing > 0) window.scrollBy(0, Math.min(missing, Math.max(0, b.top - minTop)));
+      panel.classList.add('is-fixed');
+      panel.style.left = r.left + 'px';
+      panel.style.width = r.width + 'px';
+      place();
+      window.addEventListener('scroll', place, { passive: true });
+      window.addEventListener('resize', onResize);
       setActive(Math.max(0, selectedIndex()));
       panel.focus({ preventScroll: true });
     }
     function close(refocus) {
       panel.hidden = true;
+      panel.classList.remove('is-fixed');
+      panel.removeAttribute('style');
+      window.removeEventListener('scroll', place);
+      window.removeEventListener('resize', onResize);
       wrap.classList.remove('is-open');
       btn.setAttribute('aria-expanded', 'false');
       if (refocus) btn.focus();
