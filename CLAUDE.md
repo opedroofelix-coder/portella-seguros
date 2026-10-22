@@ -7,11 +7,12 @@
 - Conteúdo oficial da Portella: https://www.portellacorretora.com.br/
   - Telefone principal (divulgar no site): (11) 94784-1580, que é WhatsApp (links `wa.me/5511947841580`). Fixo (11) 3592-5216 só no rodapé.
   - E-mail: contato@portellacorretora.com.br
-  - Endereço: Av. Padre Vicente Melillo, 1399 – Umuarama, Osasco – SP, 06036-016
+  - Endereço (atualizado pela cliente em 22/10/2026): Rua Ana Pereira Melo, 253 – Vila Campesina, Osasco – SP, 06023-080
   - Instagram: @portellacorretora; Facebook: PortellaCorretoraDeSeguros
-- Seguradoras parceiras (12): Porto Seguro, HDI, Ituran, Azul, Suhai, Tokio Marine, SulAmérica,
-  Yelum (antiga Liberty), Bradesco Seguros, Mapfre, Allianz, Sompo.
-  São as 12 da faixa de logos. No total a Portella trabalha com **22 seguradoras** (confirmado em 22/10/2026);
+- Faixa "Seguradoras & Operadoras" (14): Porto Seguro, Allianz, Bradesco Seguros, SulAmérica, Tokio Marine,
+  HDI, Mapfre, Yelum (antiga Liberty), Azul, Suhai, Ituran, Justos, Youse, Pier. A Sompo saiu (não faz mais
+  automóvel). Falta incluir operadoras de saúde: a cliente ainda vai dizer quais. O FAQ "Com quais
+  seguradoras" não cita SulAmérica nem Sompo. No total a Portella trabalha com **22 seguradoras** (confirmado em 22/10/2026);
   o site diz "22 seguradoras". A lista de opções do CRM (`docs/CRM.md`) não é a lista de parceiras.
 - A Portella também vende consórcio (imóvel, automóvel, moto, pesados, serviços). Nada do CRM interno
   (produtores, comissões, valores, faturamento) vai para o site.
@@ -19,6 +20,10 @@
 - **Direção escolhida pela cliente (21/10/2026): Premium A "Noir Dourado".** O site inteiro (index.html, style.css, main.js) já segue essa direção: predominantemente azul e dourado (pedido da cliente: sem seções marfim; seções alternam #0F1E3C, #1A2B4B e #15274A; logos das seguradoras em placas marfim com fio dourado), Lora nos títulos e Jost nos textos, consultora num arco com fio dourado e brasão com o ícone.
 - Não inventar números, depoimentos ou dados (CNPJ, SUSEP, horário). Usar `[inserir]` até a Portella informar.
 - Lista de pendências: README.md.
+- Ordem dos seguros (pedido da cliente): 1. Seguro Auto, 2. Plano de Saúde, 3. Consórcio, 4. Celular e
+  Portáteis; os demais sem ordem definida.
+- Seção "Nossa equipe" (depois do Sobre): cards com [Nome]/[Cargo] até a Portella enviar as fotos.
+- A cotação não tem custo (confirmado pela cliente).
 - Logos das seguradoras: versões oficiais em `assets/img/seguradoras/` (PNG 600x240 transparente).
   Faltam os nomes das outras 10 parceiras para completar a faixa.
 
