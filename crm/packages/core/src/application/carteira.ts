@@ -12,9 +12,9 @@ import { enxerga, exigir } from './permissoes';
  */
 export class ServicoCarteira<T extends Registro> {
   constructor(
-    private readonly repositorio: Repositorio<T>,
+    protected readonly repositorio: Repositorio<T>,
     private readonly validar: (dados: DadosRegistro<T>) => void = () => {},
-    private readonly ambiente: Ambiente = ambientePadrao,
+    protected readonly ambiente: Ambiente = ambientePadrao,
   ) {}
 
   async listar(usuario: Usuario): Promise<T[]> {

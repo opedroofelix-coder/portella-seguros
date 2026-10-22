@@ -1,18 +1,28 @@
 import type {
+  Catalogo,
   Cliente,
+  Estorno,
   GatewayAutenticacao,
-  LancamentoComissao,
   Oportunidade,
+  PagamentoProdutor,
+  Proposta,
   Repositorio,
+  TipoCatalogo,
   Usuario,
+  Vale,
 } from '@portella/core';
 import {
   ServicoAutenticacao,
   ServicoCarteira,
-  ServicoComissoes,
+  ServicoCatalogos,
+  ServicoLancamentosGestao,
+  ServicoPropostas,
   ServicoUsuarios,
   validarCliente,
+  validarEstorno,
   validarOportunidade,
+  validarPagamento,
+  validarVale,
 } from '@portella/core';
 import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
@@ -23,7 +33,11 @@ export interface ServicosBase {
   usuarios: ServicoUsuarios;
   clientes: ServicoCarteira<Cliente>;
   oportunidades: ServicoCarteira<Oportunidade>;
-  comissoes: ServicoComissoes;
+  propostas: ServicoPropostas;
+  estornos: ServicoLancamentosGestao<Estorno>;
+  vales: ServicoLancamentosGestao<Vale>;
+  pagamentos: ServicoLancamentosGestao<PagamentoProdutor>;
+  catalogos: ServicoCatalogos;
 }
 
 export interface RepositoriosBase {
@@ -31,16 +45,38 @@ export interface RepositoriosBase {
   usuarios: Repositorio<Usuario>;
   clientes: Repositorio<Cliente>;
   oportunidades: Repositorio<Oportunidade>;
-  comissoes: Repositorio<LancamentoComissao>;
+  propostas: Repositorio<Proposta>;
+  estornos: Repositorio<Estorno>;
+  vales: Repositorio<Vale>;
+  pagamentos: Repositorio<PagamentoProdutor>;
+  catalogos: Repositorio<Catalogo>;
 }
 
-export function montarServicosBase(r: RepositoriosBase): ServicosBase {
+/** Coleções de cada app (para o IndexedDB e para a limpeza). */
+export const COLECOES_BASE = [
+  'clientes',
+  'oportunidades',
+  'propostas',
+  'estornos',
+  'vales',
+  'pagamentos',
+  'catalogos',
+] as const;
+
+export function montarServicosBase(
+  r: RepositoriosBase,
+  catalogosPadrao: Record<TipoCatalogo, string[]>,
+): ServicosBase {
   return {
     autenticacao: new ServicoAutenticacao(r.auth, r.usuarios),
     usuarios: new ServicoUsuarios(r.usuarios, r.auth),
     clientes: new ServicoCarteira<Cliente>(r.clientes, validarCliente),
     oportunidades: new ServicoCarteira<Oportunidade>(r.oportunidades, validarOportunidade),
-    comissoes: new ServicoComissoes(r.comissoes),
+    propostas: new ServicoPropostas(r.propostas),
+    estornos: new ServicoLancamentosGestao<Estorno>(r.estornos, validarEstorno),
+    vales: new ServicoLancamentosGestao<Vale>(r.vales, validarVale),
+    pagamentos: new ServicoLancamentosGestao<PagamentoProdutor>(r.pagamentos, validarPagamento),
+    catalogos: new ServicoCatalogos(r.catalogos, catalogosPadrao),
   };
 }
 

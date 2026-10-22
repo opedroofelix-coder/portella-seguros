@@ -1,5 +1,5 @@
 import type { ConfigApp, RotaApp } from '@portella/app-base';
-import { AppCrm, MENU_COMUM, ROTA_FUNIL } from '@portella/app-base';
+import { AppCrm, MENU_COMUM, PRODUTORES_INICIAIS, ROTA_FUNIL } from '@portella/app-base';
 import { criarImportacao } from '../application/importacao';
 import type { ServicosSeguros } from '../application/servicos';
 import { RAMOS } from '../domain/catalogo';
@@ -28,13 +28,19 @@ export function App({ servicos }: { servicos: ServicosSeguros }) {
       { para: '/apolices', rotulo: 'Apólices', icone: 'documento' },
       { para: '/renovacoes', rotulo: 'Renovações', icone: 'calendario' },
       { para: ROTA_FUNIL, rotulo: 'Cotações', icone: 'funil' },
-      MENU_COMUM.comissoes,
+      MENU_COMUM.propostas,
+      MENU_COMUM.aprovacoes,
+      MENU_COMUM.producao,
+      MENU_COMUM.relatorios,
+      MENU_COMUM.estornosVales,
       { para: '/financeiro', rotulo: 'Financeiro', icone: 'carteira', acao: 'financeiro:gerenciar' },
+      MENU_COMUM.configuracoes,
       MENU_COMUM.usuarios,
       MENU_COMUM.importar,
       MENU_COMUM.conta,
     ],
     importacao: criarImportacao(servicos),
+    produtoresIniciais: PRODUTORES_INICIAIS,
     abasCliente: [
       { id: 'apolices', rotulo: 'Apólices', render: (cliente) => <ApolicesDoCliente cliente={cliente} /> },
     ],

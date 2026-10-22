@@ -1,7 +1,7 @@
 import type { Importacao } from '@portella/app-base';
+import { prepararComissoesImportadas } from '@portella/app-base';
 import type {
   ApoliceImportada,
-  ComissaoImportada,
   DespesaImportada,
   FechamentoImportado,
   MovimentoImportado,
@@ -13,7 +13,6 @@ import {
   normalizar,
   paraCentavos,
   prepararClientes,
-  prepararComissoes,
   resolverResponsavel,
 } from '@portella/core';
 import type { Apolice } from '../domain/apolice';
@@ -53,7 +52,7 @@ const motivo = (e: unknown) =>
 export function criarImportacao(servicos: ServicosSeguros): Importacao {
   return {
     descricao:
-      'Clientes, apólices, comissões e financeiro da planilha da Portella. Reimportar o mesmo arquivo atualiza os registros, sem duplicar.',
+      'Clientes, apólices, propostas com os recebimentos, estornos, pagamentos aos produtores e financeiro da planilha da Portella. Reimportar o mesmo arquivo atualiza os registros, sem duplicar.',
     async analisar(dados: unknown, ator: Usuario, equipe: Usuario[]) {
       const arquivo = lerArquivoImportacao(dados, 'seguros');
       const agora = new Date().toISOString();
@@ -94,14 +93,7 @@ export function criarImportacao(servicos: ServicosSeguros): Importacao {
         }
       }
 
-      const comissoes = prepararComissoes(
-        (arquivo.comissoes as ComissaoImportada[] | undefined) ?? [],
-        ator,
-        resolver,
-        idPorChave,
-        idApolice,
-        agora,
-      );
+      const comissoes = prepararComissoesImportadas(arquivo, ator, equipe, resolver, idPorChave, agora);
 
       const movimentos: Movimento[] = ((arquivo.movimentos as MovimentoImportado[] | undefined) ?? []).map(
         ({ chave, valor, ...m }) => ({
@@ -142,7 +134,7 @@ export function criarImportacao(servicos: ServicosSeguros): Importacao {
         resumo: [
           ['Clientes', clientes.length],
           ['Apólices', apolices.length],
-          ['Comissões', comissoes.length],
+          ...comissoes.resumo,
           ['Movimentos de conta', movimentos.length],
           ['Despesas', despesas.length],
           ['Meses de faturamento', fechamentos.length],
@@ -151,7 +143,7 @@ export function criarImportacao(servicos: ServicosSeguros): Importacao {
         confirmar: async () => {
           await servicos.clientes.importar(ator, clientes);
           await servicos.apolices.importar(ator, apolices);
-          await servicos.comissoes.importar(ator, comissoes);
+          await comissoes.confirmar(servicos);
           await servicos.movimentos.importar(ator, movimentos);
           await servicos.despesas.importar(ator, despesas);
           await servicos.fechamentos.importar(ator, fechamentos);

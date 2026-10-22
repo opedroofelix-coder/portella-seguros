@@ -1,4 +1,13 @@
-import type { Cliente, LancamentoComissao, Oportunidade, Usuario } from '@portella/core';
+import type {
+  Catalogo,
+  Cliente,
+  Estorno,
+  Oportunidade,
+  PagamentoProdutor,
+  Proposta,
+  Usuario,
+  Vale,
+} from '@portella/core';
 import { AutenticacaoMemoria, RepositorioMemoria } from '@portella/core';
 import { describe, expect, it } from 'vitest';
 import type { Apolice } from '../domain/apolice';
@@ -10,7 +19,7 @@ import { montarServicos } from './servicos';
 const admin: Usuario = {
   id: 'adm',
   nome: 'Ana Admin',
-  email: 'a@x.com',
+  login: 'ana',
   perfil: 'admin',
   ativo: true,
   criadoEm: '',
@@ -23,7 +32,11 @@ function servicos() {
     usuarios: new RepositorioMemoria<Usuario>([admin, carlos]),
     clientes: new RepositorioMemoria<Cliente>(),
     oportunidades: new RepositorioMemoria<Oportunidade>(),
-    comissoes: new RepositorioMemoria<LancamentoComissao>(),
+    propostas: new RepositorioMemoria<Proposta>(),
+    estornos: new RepositorioMemoria<Estorno>(),
+    vales: new RepositorioMemoria<Vale>(),
+    pagamentos: new RepositorioMemoria<PagamentoProdutor>(),
+    catalogos: new RepositorioMemoria<Catalogo>(),
     apolices: new RepositorioMemoria<Apolice>(),
     movimentos: new RepositorioMemoria<Movimento>(),
     despesas: new RepositorioMemoria<Despesa>(),
@@ -104,30 +117,47 @@ describe('importação de seguros', () => {
         },
         { chave: 'a3', clienteChave: 'k2', seguradora: 'GNDI', ramo: 'Saude', inicioVigencia: '2024-06-01' },
       ],
-      comissoes: [
+      propostas: [
         {
-          chave: 'x1',
+          chave: 'p1',
           clienteChave: 'k1',
           vendaChave: 'a1',
           clienteNome: 'Maria',
+          data: '2024-04-23',
           produto: 'Auto',
           companhia: 'Porto Seguro',
+          premioLiquido: 1500.5,
           comissaoReceber: 300,
-          comissaoRecebida: 300,
-          repasse: 60,
-          responsavel: 'Carlos',
+          produtores: [{ nome: 'Carlos', percentual: 20 }],
+          recebimentos: [
+            { chave: 'r1', data: '2024-12-18', valor: 300, parcela: '1/1', repasses: { Carlos: 60 } },
+          ],
         },
         {
-          chave: 'x2',
+          chave: 'p2',
           clienteChave: 'k2',
           clienteNome: 'João',
+          data: '2024-06-01',
           produto: 'Endosso',
           companhia: 'HDI',
           comissaoReceber: 40,
-          comissaoRecebida: 0,
-          vendaDaCorretora: true,
+          produtores: [],
+          recebimentos: [],
         },
       ],
+      estornos: [
+        {
+          chave: 'e1',
+          produtor: 'Carlos',
+          segurado: 'Maria',
+          companhia: 'Porto Seguro',
+          produto: 'Auto',
+          data: '2024-12-30',
+          valor: 100,
+          descontoProdutor: 20,
+        },
+      ],
+      pagamentos: [{ chave: 'pg1', produtor: 'Carlos', mes: '2024-12', data: '2025-01-05', valor: 40 }],
       movimentos: [
         {
           chave: 'm1',
@@ -154,7 +184,10 @@ describe('importação de seguros', () => {
     expect(previa.resumo).toEqual([
       ['Clientes', 2],
       ['Apólices', 2],
-      ['Comissões', 2],
+      ['Propostas', 2],
+      ['Recebimentos', 1],
+      ['Estornos', 1],
+      ['Pagamentos a produtores', 1],
       ['Movimentos de conta', 2],
       ['Despesas', 1],
       ['Meses de faturamento', 1],
@@ -175,15 +208,21 @@ describe('importação de seguros', () => {
       seguradora: 'GNDI',
       fimVigencia: undefined,
     });
-    const comissoes = await s.comissoes.listar(admin);
-    expect(comissoes).toHaveLength(2);
-    expect(comissoes.find((c) => c.clienteNome === 'Maria')).toMatchObject({
-      vendaId: 'imp:apolice:a1',
-      comissaoRecebida: 30000,
-      repasse: 6000,
-      responsavelId: 'c1',
+    const propostas = await s.propostas.listar(admin);
+    expect(propostas).toHaveLength(2);
+    expect(propostas.find((p) => p.clienteNome === 'Maria')).toMatchObject({
+      status: 'aprovada',
+      comissaoReceber: 30000,
+      produtores: [{ produtorId: 'c1', percentual: 20 }],
+      recebimentos: [expect.objectContaining({ valor: 30000, repasses: { c1: 6000 } })],
     });
-    expect(await s.comissoes.listar(carlos)).toHaveLength(1);
+    expect(await s.propostas.listar(carlos)).toHaveLength(1);
+    expect(await s.estornos.listar(carlos)).toEqual([expect.objectContaining({ descontoProdutor: 2000 })]);
+    expect(await s.pagamentos.listar(carlos)).toEqual([
+      expect.objectContaining({ mes: '2024-12', valor: 4000 }),
+    ]);
+    expect(await s.catalogos.obter('seguradoras')).toContain('Porto Seguro');
+    expect(await s.catalogos.obter('produtos')).toContain('Endosso');
     expect(await s.movimentos.listar(admin)).toHaveLength(2);
     await expect(s.movimentos.listar(carlos)).rejects.toThrow();
     expect((await s.fechamentos.listar(admin))[0]).toMatchObject({ id: '2024-12', faturamento: 6534109 });

@@ -61,3 +61,9 @@ export function linkWhatsApp(telefone: string): string | null {
   if (d.length < 10) return null;
   return `https://wa.me/${d.length <= 11 ? `55${d}` : d}`;
 }
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function emailValido(email: string): boolean {
+  return EMAIL.test(email.trim());
+}

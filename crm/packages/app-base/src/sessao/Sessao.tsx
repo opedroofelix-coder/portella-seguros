@@ -10,7 +10,7 @@ interface EstadoSessao {
   carregando: boolean;
   /** false enquanto não existir nenhum usuário (primeiro acesso). */
   configurado: boolean;
-  entrar: (email: string, senha: string) => Promise<void>;
+  entrar: (login: string, senha: string) => Promise<void>;
   sair: () => Promise<void>;
   atualizar: () => Promise<void>;
   pode: (acao: Acao, recurso?: { responsavelId: string }) => boolean;
@@ -42,8 +42,8 @@ export function ProvedorSessao({ children }: { children: ReactNode }) {
   );
 
   const entrar = useCallback(
-    async (email: string, senha: string) => {
-      await autenticacao.entrar(email, senha);
+    async (login: string, senha: string) => {
+      await autenticacao.entrar(login, senha);
       limparDados();
       await atualizar();
     },

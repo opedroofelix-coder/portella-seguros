@@ -27,6 +27,12 @@
 }
 .titulo {
   font-size: 22px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* Título longo não espreme o botão de fechar. */
+.cabecalho > button {
+  flex-shrink: 0;
 }
 .corpo {
   padding: 16px;

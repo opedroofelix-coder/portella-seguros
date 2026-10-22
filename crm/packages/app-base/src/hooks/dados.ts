@@ -1,4 +1,15 @@
-import type { DadosRegistro, Registro, ServicoCarteira, Usuario } from '@portella/core';
+import type {
+  DadosRegistro,
+  Estorno,
+  PagamentoProdutor,
+  Proposta,
+  Registro,
+  ServicoCarteira,
+  TipoCatalogo,
+  Usuario,
+  Vale,
+} from '@portella/core';
+import { pode } from '@portella/core';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useUsuario } from '../sessao/Sessao';
@@ -42,4 +53,41 @@ export function useEquipe() {
 /** Mapa id → registro, útil para mostrar o nome do cliente em listas de apólices/cotas. */
 export function useIndice<T extends { id: string }>(itens: T[] | undefined) {
   return useMemo(() => new Map((itens ?? []).map((i) => [i.id, i])), [itens]);
+}
+
+/** Lista editável de produtos ou seguradoras. */
+export function useCatalogo(tipo: TipoCatalogo) {
+  const { catalogos } = useServicos();
+  const consulta = useQuery({ queryKey: ['catalogos', tipo], queryFn: () => catalogos.obter(tipo) });
+  return consulta.data ?? [];
+}
+
+/** Tudo o que os relatórios de comissão precisam, já filtrado pelo que o usuário pode ver. */
+export function useDadosComissao() {
+  const s = useServicos();
+  const propostas = useColecao<Proposta>('propostas', s.propostas);
+  const estornos = useColecao<Estorno>('estornos', s.estornos);
+  const vales = useColecao<Vale>('vales', s.vales);
+  const pagamentos = useColecao<PagamentoProdutor>('pagamentos', s.pagamentos);
+  return {
+    carregando: propostas.isPending || estornos.isPending || vales.isPending || pagamentos.isPending,
+    dados: {
+      propostas: propostas.data ?? [],
+      estornos: estornos.data ?? [],
+      vales: vales.data ?? [],
+      pagamentos: pagamentos.data ?? [],
+    },
+  };
+}
+
+/** Propostas aguardando aprovação (só faz sentido para a administração). */
+export function usePendentesAprovacao(): number {
+  const { propostas } = useServicos();
+  const usuario = useUsuario();
+  const consulta = useQuery({
+    queryKey: ['propostas', usuario.id],
+    queryFn: () => propostas.listar(usuario),
+    enabled: pode(usuario, 'financeiro:gerenciar'),
+  });
+  return (consulta.data ?? []).filter((p) => p.status === 'pendente').length;
 }

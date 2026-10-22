@@ -1,4 +1,4 @@
-import type { Acao, Cliente, Usuario } from '@portella/core';
+import type { Acao, Cliente, ProdutorInicial, Usuario } from '@portella/core';
 import type { ItemMenu } from '@portella/ui';
 import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
@@ -30,6 +30,8 @@ export interface ConfigApp {
   nomeFunil: string;
   /** Seções extras na ficha do cliente (ex.: apólices, cotas). */
   importacao?: Importacao;
+  /** Produtores cadastrados no primeiro acesso, com senha 1234. */
+  produtoresIniciais?: ProdutorInicial[];
   abasCliente?: Array<{ id: string; rotulo: string; render: (cliente: Cliente) => ReactNode }>;
 }
 

@@ -12,14 +12,17 @@ import { useSessao } from '../sessao/Sessao';
 import styles from './Entrar.module.css';
 
 const esquemaLogin = z.object({
-  email: z.string().trim().email('Informe um e-mail válido.'),
+  login: z.string().trim().min(1, 'Informe o usuário.'),
   senha: z.string().min(1, 'Informe a senha.'),
 });
 
 const esquemaAdmin = z
   .object({
     nome: z.string().trim().min(2, 'Informe o nome.'),
-    email: z.string().trim().email('Informe um e-mail válido.'),
+    login: z
+      .string()
+      .trim()
+      .regex(/^[A-Za-z0-9._@-]{3,60}$/, 'Ao menos 3 letras ou números, sem espaços.'),
     senha: z.string().min(SENHA_TAMANHO_MINIMO, `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres.`),
     confirmacao: z.string(),
   })
@@ -55,10 +58,10 @@ function FormularioLogin({ destino }: { destino: string }) {
     resolver: zodResolver(esquemaLogin),
   });
 
-  const enviar = handleSubmit(async ({ email, senha }) => {
+  const enviar = handleSubmit(async ({ login, senha }) => {
     setErro(null);
     try {
-      await entrar(email, senha);
+      await entrar(login, senha);
       navegar(destino, { replace: true });
     } catch (e) {
       setErro(mensagemErro(e));
@@ -74,8 +77,8 @@ function FormularioLogin({ destino }: { destino: string }) {
             {erro}
           </p>
         )}
-        <Campo rotulo="E-mail" erro={formState.errors.email?.message}>
-          <Entrada type="email" autoComplete="username" inputMode="email" {...register('email')} />
+        <Campo rotulo="Usuário" erro={formState.errors.login?.message}>
+          <Entrada autoComplete="username" autoCapitalize="none" spellCheck={false} {...register('login')} />
         </Campo>
         <Campo rotulo="Senha" erro={formState.errors.senha?.message}>
           <Entrada type="password" autoComplete="current-password" {...register('senha')} />
@@ -90,17 +93,20 @@ function FormularioLogin({ destino }: { destino: string }) {
 
 function FormularioPrimeiroAcesso() {
   const { usuarios } = useServicos();
+  const { produtoresIniciais } = useConfig();
   const { entrar } = useSessao();
   const [erro, setErro] = useState<string | null>(null);
   const { register, handleSubmit, formState, setError } = useForm<z.infer<typeof esquemaAdmin>>({
     resolver: zodResolver(esquemaAdmin),
   });
 
-  const enviar = handleSubmit(async ({ nome, email, senha }) => {
+  const enviar = handleSubmit(async ({ nome, login, senha }) => {
     setErro(null);
     try {
-      await usuarios.configurarAdministrador({ nome, email, senha });
-      await entrar(email, senha);
+      const admin = await usuarios.configurarAdministrador({ nome, login, senha });
+      // Equipe inicial de produtores (senha 1234, troca no primeiro acesso).
+      if (produtoresIniciais?.length) await usuarios.criarProdutoresIniciais(admin, produtoresIniciais);
+      await entrar(login, senha);
     } catch (e) {
       aplicarErros(e, setError);
       setErro(mensagemErro(e));
@@ -122,8 +128,8 @@ function FormularioPrimeiroAcesso() {
         <Campo rotulo="Nome" erro={formState.errors.nome?.message}>
           <Entrada autoComplete="name" {...register('nome')} />
         </Campo>
-        <Campo rotulo="E-mail" erro={formState.errors.email?.message}>
-          <Entrada type="email" autoComplete="username" inputMode="email" {...register('email')} />
+        <Campo rotulo="Usuário" erro={formState.errors.login?.message} dica="Ex.: deliziane">
+          <Entrada autoComplete="username" autoCapitalize="none" spellCheck={false} {...register('login')} />
         </Campo>
         <Campo
           rotulo="Senha"

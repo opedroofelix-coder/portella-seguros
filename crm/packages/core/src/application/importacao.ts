@@ -2,8 +2,14 @@ import type { Cliente } from '../domain/cliente';
 import { paraCentavos } from '../domain/dinheiro';
 import { normalizar } from '../domain/cliente';
 import { ErroValidacao } from '../domain/erros';
-import type { LancamentoComissao } from '../domain/comissao';
-import type { ArquivoImportacao, ClienteImportado, ComissaoImportada } from '../domain/importacao';
+import type {
+  ArquivoImportacao,
+  ClienteImportado,
+  EstornoImportado,
+  PagamentoImportado,
+  PropostaImportada,
+} from '../domain/importacao';
+import type { Estorno, PagamentoProdutor, Proposta } from '../domain/proposta';
 import { idImportado } from '../domain/importacao';
 import type { Usuario } from '../domain/usuario';
 import { exigir } from './permissoes';
@@ -67,28 +73,94 @@ export function prepararClientes(
 
 const centavos = (reais?: number) => (reais == null ? undefined : (paraCentavos(reais) ?? undefined));
 
-/** Converte as parcelas de comissão do arquivo, ligando-as aos clientes e às vendas já preparados. */
-export function prepararComissoes(
-  itens: ComissaoImportada[],
+/** Converte as propostas do arquivo, ligando clientes e produtores (pelo nome) aos cadastros do CRM. */
+export function prepararPropostas(
+  itens: PropostaImportada[],
   ator: Usuario,
   resolver: (nome?: string) => string,
   idClientePorChave: Map<string, string>,
-  idVendaPorChave: Map<string, string>,
   agora: string,
-): LancamentoComissao[] {
+  /** % padrão do produtor, usado quando a planilha ainda não tem o repasse da venda. */
+  percentualPadrao: (produtorId: string) => number | undefined = () => undefined,
+): Proposta[] {
   exigir(ator, 'dados:importar');
-  return itens.map(({ chave, clienteChave, vendaChave, responsavel, ...c }) => ({
-    ...c,
-    id: idImportado('comissao', chave),
-    clienteId: idClientePorChave.get(clienteChave),
-    vendaId: vendaChave ? idVendaPorChave.get(vendaChave) : undefined,
-    premio: centavos(c.premio),
-    comissaoReceber: centavos(c.comissaoReceber) ?? 0,
-    comissaoRecebida: centavos(c.comissaoRecebida) ?? 0,
-    repasse: centavos(c.repasse),
-    repassePago: centavos(c.repassePago),
-    responsavelId: c.vendaDaCorretora ? ator.id : resolver(responsavel),
+  return itens.map((p) => {
+    const produtores = p.produtores.map((x) => {
+      const produtorId = resolver(x.nome);
+      return { produtorId, percentual: x.percentual || (percentualPadrao(produtorId) ?? 0) };
+    });
+    const idPorNome = new Map(p.produtores.map((x, i) => [x.nome, produtores[i]!.produtorId]));
+    return {
+      id: idImportado('proposta', p.chave),
+      responsavelId: produtores[0]?.produtorId ?? ator.id,
+      criadoEm: agora,
+      atualizadoEm: agora,
+      clienteId: idClientePorChave.get(p.clienteChave),
+      clienteNome: p.clienteNome,
+      numero: p.numero,
+      data: p.data,
+      companhia: p.companhia,
+      produto: p.produto,
+      tipoNegocio: p.tipoNegocio,
+      premioLiquido: centavos(p.premioLiquido),
+      comissaoPercentual: p.comissaoPercentual,
+      comissaoReceber: centavos(p.comissaoReceber) ?? 0,
+      percentualVitalicio: p.percentualVitalicio,
+      produtores,
+      recebimentos: p.recebimentos.map((r) => ({
+        id: idImportado('recebimento', r.chave),
+        data: r.data,
+        valor: centavos(r.valor) ?? 0,
+        parcela: r.parcela,
+        repasses: r.repasses
+          ? Object.fromEntries(
+              Object.entries(r.repasses).map(([nome, v]) => [
+                idPorNome.get(nome) ?? resolver(nome),
+                centavos(v) ?? 0,
+              ]),
+            )
+          : undefined,
+      })),
+      status: 'aprovada',
+      aprovadaEm: agora,
+      aprovadaPor: ator.id,
+      observacoes: p.observacoes,
+    };
+  });
+}
+
+export function prepararEstornos(
+  itens: EstornoImportado[],
+  ator: Usuario,
+  resolver: (nome?: string) => string,
+  agora: string,
+): Estorno[] {
+  exigir(ator, 'dados:importar');
+  return itens.map(({ chave, produtor, valor, descontoProdutor, ...e }) => ({
+    ...e,
+    id: idImportado('estorno', chave),
+    responsavelId: resolver(produtor),
+    valor: centavos(valor) ?? 0,
+    descontoProdutor: centavos(descontoProdutor) ?? 0,
     criadoEm: agora,
     atualizadoEm: agora,
+  }));
+}
+
+export function prepararPagamentos(
+  itens: PagamentoImportado[],
+  ator: Usuario,
+  resolver: (nome?: string) => string,
+  agora: string,
+): PagamentoProdutor[] {
+  exigir(ator, 'dados:importar');
+  return itens.map(({ chave, produtor, valor, ...p }) => ({
+    ...p,
+    id: idImportado('pagamento', chave),
+    responsavelId: resolver(produtor),
+    valor: centavos(valor) ?? 0,
+    criadoEm: agora,
+    atualizadoEm: agora,
+    observacoes: 'Importado da planilha (Comissão Paga).',
   }));
 }

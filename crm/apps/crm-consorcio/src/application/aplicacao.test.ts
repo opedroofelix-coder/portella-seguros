@@ -1,4 +1,13 @@
-import type { Cliente, LancamentoComissao, Oportunidade, Usuario } from '@portella/core';
+import type {
+  Catalogo,
+  Cliente,
+  Estorno,
+  Oportunidade,
+  PagamentoProdutor,
+  Proposta,
+  Usuario,
+  Vale,
+} from '@portella/core';
 import { AutenticacaoMemoria, RepositorioMemoria } from '@portella/core';
 import { describe, expect, it } from 'vitest';
 import type { Cota } from '../domain/cota';
@@ -10,7 +19,7 @@ import { montarServicos } from './servicos';
 const admin: Usuario = {
   id: 'adm',
   nome: 'Ana Admin',
-  email: 'a@x.com',
+  login: 'ana',
   perfil: 'admin',
   ativo: true,
   criadoEm: '',
@@ -23,7 +32,11 @@ const servicos = () =>
     usuarios: new RepositorioMemoria<Usuario>([admin, corretor]),
     clientes: new RepositorioMemoria<Cliente>(),
     oportunidades: new RepositorioMemoria<Oportunidade>(),
-    comissoes: new RepositorioMemoria<LancamentoComissao>(),
+    propostas: new RepositorioMemoria<Proposta>(),
+    estornos: new RepositorioMemoria<Estorno>(),
+    vales: new RepositorioMemoria<Vale>(),
+    pagamentos: new RepositorioMemoria<PagamentoProdutor>(),
+    catalogos: new RepositorioMemoria<Catalogo>(),
     cotas: new RepositorioMemoria<Cota>(),
     lances: new RepositorioMemoria<Lance>(),
   });
@@ -78,18 +91,18 @@ describe('importação de consórcio', () => {
       origem: 'x',
       geradoEm: '',
       clientes: [{ chave: 'k1', nome: 'Maria', responsavel: 'Carlos Souza' }],
-      comissoes: [
+      propostas: [
         {
-          chave: 'x1',
+          chave: 'p1',
           clienteChave: 'k1',
           vendaChave: 'q1',
           clienteNome: 'Maria',
+          data: '2024-07-19',
           produto: 'Consorcio',
           companhia: 'Magalu',
           comissaoReceber: 1680,
-          comissaoRecebida: 1680,
-          repasse: 504,
-          responsavel: 'Carlos Souza',
+          produtores: [{ nome: 'Carlos Souza', percentual: 30 }],
+          recebimentos: [{ chave: 'r1', data: '2024-12-10', valor: 1680, repasses: { 'Carlos Souza': 504 } }],
         },
       ],
       cotas: [
@@ -135,7 +148,10 @@ describe('importação de consórcio', () => {
     expect(previa.resumo).toEqual([
       ['Clientes', 1],
       ['Cotas', 2],
-      ['Comissões', 1],
+      ['Propostas', 1],
+      ['Recebimentos', 1],
+      ['Estornos', 0],
+      ['Pagamentos a produtores', 0],
     ]);
     expect(previa.avisos.join('\n')).toMatch(/1020\/34/);
     expect(previa.avisos.join('\n')).toMatch(/1 cota\(s\) sem grupo/);
@@ -148,7 +164,10 @@ describe('importação de consórcio', () => {
       valorCredito: 42000000,
       status: 'ativa',
     });
-    expect((await s.comissoes.listar(corretor))[0]).toMatchObject({ vendaId: 'imp:cota:q1', repasse: 50400 });
+    expect((await s.propostas.listar(corretor))[0]).toMatchObject({
+      comissaoReceber: 168000,
+      recebimentos: [expect.objectContaining({ repasses: { c1: 50400 } })],
+    });
     const cota = (await s.cotas.listar(corretor)).find((c) => c.grupo === '1020');
     expect(cota).toMatchObject({
       grupo: '1020',

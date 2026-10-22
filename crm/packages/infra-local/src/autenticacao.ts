@@ -3,7 +3,7 @@ import { ErroAutenticacao } from '@portella/core';
 
 export interface Credencial {
   id: string; // id do usuário
-  email: string;
+  login: string;
   sal: string;
   hash: string;
 }
@@ -52,20 +52,20 @@ export class AutenticacaoLocal implements GatewayAutenticacao {
     private readonly agora: () => number = Date.now,
   ) {}
 
-  async verificarCredenciais(email: string, senha: string): Promise<string> {
+  async verificarCredenciais(login: string, senha: string): Promise<string> {
     const todas = await this.credenciais.listar();
-    const c = todas.find((x) => x.email === email);
+    const c = todas.find((x) => x.login === login);
     // Deriva mesmo sem usuário, para não revelar pelo tempo de resposta se o e-mail existe.
     const hash = await derivar(senha, c ? deBase64(c.sal) : new Uint8Array(16));
     if (!c || hash !== c.hash) throw new ErroAutenticacao();
     return c.id;
   }
 
-  async definirSenha(usuario: Pick<Usuario, 'id' | 'email'>, senha: string): Promise<void> {
+  async definirSenha(usuario: Pick<Usuario, 'id' | 'login'>, senha: string): Promise<void> {
     const sal = crypto.getRandomValues(new Uint8Array(16));
     await this.credenciais.salvar({
       id: usuario.id,
-      email: usuario.email,
+      login: usuario.login,
       sal: paraBase64(sal),
       hash: await derivar(senha, sal),
     });

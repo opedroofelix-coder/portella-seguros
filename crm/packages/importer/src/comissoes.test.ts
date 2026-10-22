@@ -269,61 +269,84 @@ describe('formato "Controle de Comissões"', () => {
     'teste.xlsx',
     new Date('2026-10-22T00:00:00Z'),
   );
-  const comissoes = seguros.comissoes as Array<Record<string, unknown>>;
-  const daCliente = (nome: string) => comissoes.filter((c) => c.clienteNome === nome);
+  const propostas = seguros.propostas as Array<Record<string, unknown>>;
+  const daCliente = (nome: string) => propostas.filter((p) => p.clienteNome === nome);
 
   it('reconhece o formato', () => {
     expect(ehFormatoComissoes(abas)).toBe(true);
     expect(ehFormatoComissoes([{ nome: 'Clientes', linhas: [] }])).toBe(false);
   });
 
-  it('usa "A Receber" como base e completa o repasse pela aba do corretor', () => {
-    const [um, adicional] = daCliente('Cliente Teste Um');
-    expect(um).toMatchObject({
-      parcela: '8/10',
-      dataRecebimento: '2024-12-18',
-      comissaoReceber: 83.89,
-      comissaoRecebida: 83.89,
-      repasse: 16.78,
-      repassePago: 16.78,
-      responsavel: 'Carla',
-      percentualRepasse: 20,
-    });
-    // Repasse da Deliziane sobre a mesma parcela, sem repetir o valor da seguradora
-    expect(adicional).toMatchObject({
-      comissaoReceber: 0,
-      comissaoRecebida: 0,
-      repasse: 33.56,
-      responsavel: 'Deliziane',
-    });
+  it('agrupa as parcelas da venda numa proposta, com o repasse de cada produtor por recebimento', () => {
+    expect(daCliente('Cliente Teste Um')).toEqual([
+      expect.objectContaining({
+        chave: 'azul|3144210781',
+        vendaChave: 'azul|3144210781',
+        numero: '3144210781',
+        data: '2024-04-23',
+        companhia: 'Azul',
+        produto: 'Automovel',
+        premioLiquido: 4194.49,
+        comissaoPercentual: 2,
+        comissaoReceber: 83.89,
+        // A Deliziane recebe sobre a mesma parcela (supervisão): segundo produtor, sem repetir o valor
+        produtores: [
+          { nome: 'Carla', percentual: 20 },
+          { nome: 'Deliziane', percentual: 40 },
+        ],
+        recebimentos: [
+          {
+            chave: expect.any(String),
+            data: '2024-12-18',
+            valor: 83.89,
+            parcela: '8/10',
+            repasses: { Carla: 16.78, Deliziane: 33.56 },
+          },
+        ],
+      }),
+    ]);
     // Produto diferente nas duas abas (Endosso × Automovel) não impede a junção
     expect(daCliente('Cliente Teste Dois')).toEqual([
-      expect.objectContaining({ produto: 'Endosso', repasse: 2.68 }),
+      expect.objectContaining({
+        produto: 'Endosso',
+        vendaChave: undefined,
+        produtores: [{ nome: 'Carla', percentual: 20 }],
+        recebimentos: [expect.objectContaining({ valor: 13.39, repasses: { Carla: 2.68 } })],
+      }),
     ]);
+    // Parcela ainda não recebida: fica no saldo a receber, com o % do produtor
     expect(daCliente('Cliente Teste Cinco')[0]).toMatchObject({
-      comissaoRecebida: 0,
-      repasse: 10,
-      repassePago: 0,
+      comissaoReceber: 50,
+      produtores: [{ nome: 'Carla', percentual: 20 }],
+      recebimentos: [],
     });
   });
 
-  it('marca vendas da corretora (sem repasse) e lê os estornos, inclusive sem seguradora', () => {
+  it('venda da corretora fica sem produtor; estornos e pagamentos por produtor e mês', () => {
     expect(daCliente('Cliente Teste Três')[0]).toMatchObject({
-      vendaDaCorretora: true,
-      responsavel: undefined,
-      repasse: undefined,
+      produtores: [],
+      recebimentos: [expect.objectContaining({ valor: 29.42, repasses: undefined })],
     });
-    expect(daCliente('Cliente Teste Seis')[0]).toMatchObject({
-      estorno: true,
-      comissaoReceber: -574.01,
-      repasse: -114.8,
-      responsavel: 'Carla',
-    });
-    expect(daCliente('Cliente Teste Sete')[0]).toMatchObject({
-      estorno: true,
-      companhia: 'Não informada',
-      repasse: -100,
-    });
+    expect(seguros.estornos).toEqual([
+      expect.objectContaining({
+        produtor: 'Carla',
+        segurado: 'Cliente Teste Seis',
+        companhia: 'Azul',
+        data: '2024-12-30',
+        valor: 574.01,
+        descontoProdutor: 114.8,
+      }),
+      expect.objectContaining({
+        segurado: 'Cliente Teste Sete',
+        companhia: 'Não informada',
+        descontoProdutor: 100,
+      }),
+    ]);
+    // Comissão paga no mês, já descontados os estornos (como na planilha)
+    expect(seguros.pagamentos).toEqual([
+      { chave: 'carla|2024-12', produtor: 'Carla', mes: '2024-12', data: '2024-12-30', valor: -195.34 },
+      { chave: 'deliziane|2024-12', produtor: 'Deliziane', mes: '2024-12', data: '2024-12-30', valor: 33.56 },
+    ]);
   });
 
   it('cria apólices com vigência estimada só para ramos anuais e não cria para endosso nem estorno', () => {
@@ -336,7 +359,6 @@ describe('formato "Controle de Comissões"', () => {
       seguradora: 'Azul',
     });
     expect(apolices.find((a) => a.ramo === 'Vida')).toMatchObject({ fimVigencia: undefined });
-    expect(daCliente('Cliente Teste Um')[0]?.vendaChave).toBe('azul|3144210781');
   });
 
   it('separa o consórcio com cota pendente de grupo, cota e prazo', () => {
@@ -351,26 +373,24 @@ describe('formato "Controle de Comissões"', () => {
       }),
     ]);
     expect((consorcio.cotas as Array<Record<string, unknown>>)[0]).not.toHaveProperty('grupo');
-    expect(consorcio.comissoes).toEqual([
-      expect.objectContaining({ comissaoRecebida: 1680, vendaChave: 'magalu|9125116' }),
+    expect(consorcio.propostas).toEqual([
+      expect.objectContaining({
+        comissaoReceber: 1680,
+        vendaChave: 'magalu|9125116',
+        recebimentos: [expect.objectContaining({ valor: 1680 })],
+      }),
     ]);
   });
 
-  it('lê extrato, despesas, poupança e faturamento', () => {
+  it('lê extrato, despesas e faturamento, sem a poupança', () => {
     expect(seguros.movimentos).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ conta: 'Bradesco', tipo: 'saldo_inicial', valor: 1000 }),
         expect.objectContaining({ conta: 'Bradesco', tipo: 'saida', valor: 16.78 }),
-        expect.objectContaining({
-          conta: 'Poupança Portella',
-          tipo: 'saida',
-          valor: 15000,
-          descricao: 'Resgate',
-        }),
-        expect.objectContaining({ conta: 'Tracker', tipo: 'entrada', valor: 1000 }),
       ]),
     );
-    expect((seguros.movimentos as unknown[]).length).toBe(3 + 2 + 1);
+    expect((seguros.movimentos as Array<{ conta: string }>).every((m) => m.conta === 'Bradesco')).toBe(true);
+    expect((seguros.movimentos as unknown[]).length).toBe(3);
     expect(seguros.despesas).toEqual([
       expect.objectContaining({
         descricao: 'Provedor de internet',
@@ -388,6 +408,7 @@ describe('formato "Controle de Comissões"', () => {
 
   it('relata o uso de cada aba', () => {
     expect(relatorio.abas.find((a) => a.nome === 'Essencial Allianz')?.uso).toMatch(/ignorada/);
+    expect(relatorio.abas.find((a) => a.nome === 'Poupanca Portella')?.uso).toMatch(/ignorada/);
     expect(relatorio.abas.find((a) => a.nome === 'Comissoes Deliziane')?.uso).toMatch(
       /1 repasse\(s\) adicional/,
     );

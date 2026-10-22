@@ -7,3 +7,7 @@ export * from './hooks/dados';
 export * from './servicos';
 export * from './sessao/Rotas';
 export * from './sessao/Sessao';
+export * from './paginas/Propostas';
+export * from './exportar';
+export * from './padroes';
+export * from './importacaoComissoes';

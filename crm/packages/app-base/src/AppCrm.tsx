@@ -8,16 +8,21 @@ import { BrowserRouter, Outlet, Route, Routes, useNavigate } from 'react-router-
 import type { ConfigApp, ItemMenuApp } from './config';
 import { ProvedorConfig, useConfig as useConfigInterno } from './config';
 import { PaginaCliente, PaginaClientes } from './paginas/Clientes';
-import { PaginaComissoes } from './paginas/Comissoes';
+import { PaginaConfiguracoes } from './paginas/Configuracoes';
+import { PaginaEstornosVales } from './paginas/EstornosVales';
 import { PaginaEntrar } from './paginas/Entrar';
 import { PaginaFunil } from './paginas/Funil';
 import { PaginaImportar } from './paginas/Importar';
 import { PaginaMinhaConta } from './paginas/MinhaConta';
+import { PaginaProducao } from './paginas/Producao';
+import { PaginaPropostas, ROTA_APROVACOES } from './paginas/Propostas';
+import { PaginaRelatorios } from './paginas/Relatorios';
 import { PaginaUsuarios } from './paginas/Usuarios';
 import type { ServicosBase } from './servicos';
 import { ProvedorServicos } from './servicos';
 import { ExigePermissao, RotaProtegida } from './sessao/Rotas';
 import { ProvedorSessao, useSessao, useUsuario } from './sessao/Sessao';
+import { usePendentesAprovacao } from './hooks/dados';
 
 export interface RotaApp {
   caminho: string;
@@ -30,7 +35,17 @@ export const ROTA_FUNIL = '/oportunidades';
 
 export const MENU_COMUM = {
   clientes: { para: '/clientes', rotulo: 'Clientes', icone: 'clientes' },
-  comissoes: { para: '/comissoes', rotulo: 'Comissões', icone: 'moeda' },
+  producao: { para: '/producao', rotulo: 'Painel de produção', icone: 'painel' },
+  propostas: { para: '/propostas', rotulo: 'Propostas', icone: 'documento' },
+  aprovacoes: { para: ROTA_APROVACOES, rotulo: 'Aprovações', icone: 'funil', acao: 'financeiro:gerenciar' },
+  relatorios: { para: '/relatorios', rotulo: 'Relatórios', icone: 'moeda' },
+  estornosVales: { para: '/estornos-vales', rotulo: 'Estornos e vales', icone: 'lixeira' },
+  configuracoes: {
+    para: '/configuracoes',
+    rotulo: 'Configurações',
+    icone: 'editar',
+    acao: 'financeiro:gerenciar',
+  },
   usuarios: { para: '/usuarios', rotulo: 'Usuários', icone: 'usuarios', acao: 'usuarios:gerenciar' },
   importar: { para: '/importar', rotulo: 'Importar', icone: 'importar', acao: 'dados:importar' },
   conta: { para: '/conta', rotulo: 'Minha conta', icone: 'editar' },
@@ -79,7 +94,26 @@ export function AppCrm<S extends ServicosBase>({
                     <Route path="/clientes" element={<PaginaClientes />} />
                     <Route path="/clientes/:id" element={<PaginaCliente />} />
                     <Route path={ROTA_FUNIL} element={<PaginaFunil />} />
-                    <Route path="/comissoes" element={<PaginaComissoes />} />
+                    <Route path="/producao" element={<PaginaProducao />} />
+                    <Route path="/propostas" element={<PaginaPropostas />} />
+                    <Route
+                      path={ROTA_APROVACOES}
+                      element={
+                        <ExigePermissao acao="financeiro:gerenciar">
+                          <PaginaPropostas somentePendentes />
+                        </ExigePermissao>
+                      }
+                    />
+                    <Route path="/relatorios" element={<PaginaRelatorios />} />
+                    <Route path="/estornos-vales" element={<PaginaEstornosVales />} />
+                    <Route
+                      path="/configuracoes"
+                      element={
+                        <ExigePermissao acao="financeiro:gerenciar">
+                          <PaginaConfiguracoes />
+                        </ExigePermissao>
+                      }
+                    />
                     <Route
                       path="/usuarios"
                       element={
@@ -135,5 +169,11 @@ function Layout() {
 function useConfigMenu() {
   const config = useConfigInterno();
   const { pode } = useSessao();
-  return { ...config, menu: config.menu.filter((i) => !i.acao || pode(i.acao)) };
+  const pendentes = usePendentesAprovacao();
+  return {
+    ...config,
+    menu: config.menu
+      .filter((i) => !i.acao || pode(i.acao))
+      .map((i) => (i.para === ROTA_APROVACOES ? { ...i, contador: pendentes } : i)),
+  };
 }

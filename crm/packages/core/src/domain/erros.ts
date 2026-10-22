@@ -28,7 +28,7 @@ export class ErroNaoEncontrado extends ErroDominio {
 }
 
 export class ErroAutenticacao extends ErroDominio {
-  constructor(mensagem = 'E-mail ou senha incorretos.') {
+  constructor(mensagem = 'Usuário ou senha incorretos.') {
     super(mensagem);
   }
 }

@@ -1,5 +1,5 @@
 import type { RepositoriosBase, ServicosBase } from '@portella/app-base';
-import { montarServicosBase } from '@portella/app-base';
+import { CATALOGOS_PADRAO, montarServicosBase } from '@portella/app-base';
 import type { Repositorio } from '@portella/core';
 import { ServicoCarteira, ServicoFinanceiro } from '@portella/core';
 import type { Apolice } from '../domain/apolice';
@@ -23,7 +23,7 @@ export interface RepositoriosSeguros extends RepositoriosBase {
 
 export function montarServicos(repos: RepositoriosSeguros): ServicosSeguros {
   return {
-    ...montarServicosBase(repos),
+    ...montarServicosBase(repos, CATALOGOS_PADRAO),
     apolices: new ServicoCarteira<Apolice>(repos.apolices, validarApolice),
     movimentos: new ServicoFinanceiro<Movimento>(repos.movimentos, validarMovimento),
     despesas: new ServicoFinanceiro<Despesa>(repos.despesas, validarDespesa),

@@ -227,6 +227,22 @@ h3 em {
   gap: 6px;
   justify-content: flex-end;
 }
+.aviso-faixa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: rgba(230, 194, 102, 0.1);
+  border: 1px solid rgba(230, 194, 102, 0.45);
+  border-left: 3px solid var(--warning);
+}
+.aviso-faixa a {
+  color: var(--gold-light);
+  font-weight: 500;
+}
 .span-todo {
   grid-column: 1 / -1;
 }

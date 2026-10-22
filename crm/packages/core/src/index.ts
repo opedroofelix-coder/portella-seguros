@@ -1,5 +1,6 @@
 export * from './domain/cliente';
-export * from './domain/comissao';
+export * from './domain/proposta';
+export * from './domain/relatorios';
 export * from './domain/datas';
 export * from './domain/dinheiro';
 export * from './domain/documento';
@@ -11,7 +12,8 @@ export * from './domain/registro';
 export * from './domain/usuario';
 export * from './application/autenticacao';
 export * from './application/carteira';
-export * from './application/comissoes';
+export * from './application/catalogos';
+export * from './application/propostas';
 export * from './application/importacao';
 export * from './application/permissoes';
 export * from './application/usuarios';

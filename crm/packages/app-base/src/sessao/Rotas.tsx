@@ -2,6 +2,7 @@ import type { Acao } from '@portella/core';
 import { Carregando, EstadoVazio } from '@portella/ui';
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { TrocaObrigatoria } from '../paginas/MinhaConta';
 import { useSessao } from './Sessao';
 
 export function RotaProtegida({ children }: { children: ReactNode }) {
@@ -9,6 +10,7 @@ export function RotaProtegida({ children }: { children: ReactNode }) {
   const local = useLocation();
   if (carregando) return <Carregando />;
   if (!usuario) return <Navigate to="/entrar" replace state={{ de: local.pathname }} />;
+  if (usuario.trocarSenha) return <TrocaObrigatoria />;
   return <>{children}</>;
 }
 

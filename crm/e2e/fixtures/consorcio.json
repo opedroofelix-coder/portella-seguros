@@ -43,7 +43,7 @@
    "tipoBem": "Imóvel",
    "valorCredito": 80000,
    "prazoMeses": 120,
-   "valorParcela": 900.0,
+   "valorParcela": 900,
    "dataAdesao": "2025-12-26",
    "parcelasPagas": 10,
    "status": "Ativa",
@@ -77,7 +77,7 @@
    "tipoBem": "Moto",
    "valorCredito": 130000,
    "prazoMeses": 120,
-   "valorParcela": 1121.0,
+   "valorParcela": 1121,
    "dataAdesao": "2025-12-26",
    "parcelasPagas": 12,
    "status": "Ativa",
@@ -111,7 +111,7 @@
    "tipoBem": "Imóvel",
    "valorCredito": 180000,
    "prazoMeses": 120,
-   "valorParcela": 1342.0,
+   "valorParcela": 1342,
    "dataAdesao": "2025-12-26",
    "parcelasPagas": 14,
    "status": "Ativa",
@@ -145,7 +145,7 @@
    "tipoBem": "Moto",
    "valorCredito": 230000,
    "prazoMeses": 120,
-   "valorParcela": 1563.0,
+   "valorParcela": 1563,
    "dataAdesao": "2025-12-26",
    "parcelasPagas": 16,
    "status": "Ativa",
@@ -181,162 +181,230 @@
    "responsavel": ""
   }
  ],
- "comissoes": [
+ "propostas": [
   {
    "chave": "k0",
    "clienteChave": "q0",
    "vendaChave": "c0",
    "clienteNome": "Consorciado Teste Um",
-   "produto": "Consorcio",
+   "data": "2025-12-26",
    "companhia": "Administradora Teste A",
-   "numeroProposta": null,
-   "dataProposta": "2025-12-26",
-   "parcela": "1/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 80000,
-   "comissaoReceber": 320.0,
-   "comissaoRecebida": 320.0,
-   "vendaDaCorretora": true
+   "produto": "Consorcio",
+   "premioLiquido": 80000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 320,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k0|r",
+     "data": "2026-10-18",
+     "valor": 320,
+     "parcela": "1/12"
+    }
+   ]
   },
   {
    "chave": "k1",
    "clienteChave": "q1",
    "vendaChave": "c1",
    "clienteNome": "Consorciado Teste Dois",
-   "produto": "Consorcio",
+   "data": "2025-12-26",
    "companhia": "Administradora Teste B",
-   "numeroProposta": null,
-   "dataProposta": "2025-12-26",
-   "parcela": "2/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 105000,
-   "comissaoReceber": 420.0,
-   "comissaoRecebida": 420.0,
-   "repasse": 126.0,
-   "repassePago": 0,
-   "percentualRepasse": 30,
-   "responsavel": "Corretor Teste"
+   "produto": "Consorcio",
+   "premioLiquido": 105000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 420,
+   "produtores": [
+    {
+     "nome": "Corretor Teste",
+     "percentual": 30
+    }
+   ],
+   "recebimentos": [
+    {
+     "chave": "k1|r",
+     "data": "2026-10-18",
+     "valor": 420,
+     "parcela": "2/12",
+     "repasses": {
+      "Corretor Teste": 126
+     }
+    }
+   ]
   },
   {
    "chave": "k2",
    "clienteChave": "q2",
    "vendaChave": "c2",
    "clienteNome": "Consorciado Teste Três",
-   "produto": "Consorcio",
+   "data": "2025-12-26",
    "companhia": "Administradora Teste A",
-   "numeroProposta": null,
-   "dataProposta": "2025-12-26",
-   "parcela": "3/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 130000,
-   "comissaoReceber": 520.0,
-   "comissaoRecebida": 520.0,
-   "vendaDaCorretora": true
+   "produto": "Consorcio",
+   "premioLiquido": 130000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 520,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k2|r",
+     "data": "2026-10-18",
+     "valor": 520,
+     "parcela": "3/12"
+    }
+   ]
   },
   {
    "chave": "k3",
    "clienteChave": "q3",
    "vendaChave": "c3",
    "clienteNome": "Empresa Consórcio Teste Ltda.",
-   "produto": "Consorcio",
+   "data": "2025-12-26",
    "companhia": "Administradora Teste B",
-   "numeroProposta": null,
-   "dataProposta": "2025-12-26",
-   "parcela": "4/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 155000,
-   "comissaoReceber": 620.0,
-   "comissaoRecebida": 620.0,
-   "repasse": 186.0,
-   "repassePago": 0,
-   "percentualRepasse": 30,
-   "responsavel": "Corretor Teste"
+   "produto": "Consorcio",
+   "premioLiquido": 155000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 620,
+   "produtores": [
+    {
+     "nome": "Corretor Teste",
+     "percentual": 30
+    }
+   ],
+   "recebimentos": [
+    {
+     "chave": "k3|r",
+     "data": "2026-10-18",
+     "valor": 620,
+     "parcela": "4/12",
+     "repasses": {
+      "Corretor Teste": 186
+     }
+    }
+   ]
   },
   {
    "chave": "k4",
    "clienteChave": "q0",
    "vendaChave": "c4",
    "clienteNome": "Consorciado Teste Um",
-   "produto": "Consorcio",
+   "data": "2025-12-26",
    "companhia": "Administradora Teste A",
-   "numeroProposta": null,
-   "dataProposta": "2025-12-26",
-   "parcela": "5/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 180000,
-   "comissaoReceber": 720.0,
-   "comissaoRecebida": 720.0,
-   "vendaDaCorretora": true
+   "produto": "Consorcio",
+   "premioLiquido": 180000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 720,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k4|r",
+     "data": "2026-10-18",
+     "valor": 720,
+     "parcela": "5/12"
+    }
+   ]
   },
   {
    "chave": "k5",
    "clienteChave": "q1",
    "vendaChave": "c5",
    "clienteNome": "Consorciado Teste Dois",
-   "produto": "Consorcio",
+   "data": "2025-12-26",
    "companhia": "Administradora Teste B",
-   "numeroProposta": null,
-   "dataProposta": "2025-12-26",
-   "parcela": "6/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 205000,
-   "comissaoReceber": 820.0,
-   "comissaoRecebida": 820.0,
-   "repasse": 246.0,
-   "repassePago": 0,
-   "percentualRepasse": 30,
-   "responsavel": "Corretor Teste"
+   "produto": "Consorcio",
+   "premioLiquido": 205000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 820,
+   "produtores": [
+    {
+     "nome": "Corretor Teste",
+     "percentual": 30
+    }
+   ],
+   "recebimentos": [
+    {
+     "chave": "k5|r",
+     "data": "2026-10-18",
+     "valor": 820,
+     "parcela": "6/12",
+     "repasses": {
+      "Corretor Teste": 246
+     }
+    }
+   ]
   },
   {
    "chave": "k6",
    "clienteChave": "q2",
    "vendaChave": "c6",
    "clienteNome": "Consorciado Teste Três",
-   "produto": "Consorcio",
+   "data": "2025-12-26",
    "companhia": "Administradora Teste A",
-   "numeroProposta": null,
-   "dataProposta": "2025-12-26",
-   "parcela": "7/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 230000,
-   "comissaoReceber": 920.0,
-   "comissaoRecebida": 920.0,
-   "vendaDaCorretora": true
+   "produto": "Consorcio",
+   "premioLiquido": 230000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 920,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k6|r",
+     "data": "2026-10-18",
+     "valor": 920,
+     "parcela": "7/12"
+    }
+   ]
   },
   {
    "chave": "k7",
    "clienteChave": "q3",
    "vendaChave": "c7",
    "clienteNome": "Empresa Consórcio Teste Ltda.",
-   "produto": "Consorcio",
+   "data": "2025-12-26",
    "companhia": "Administradora Teste B",
-   "numeroProposta": null,
-   "dataProposta": "2025-12-26",
-   "parcela": "8/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 255000,
-   "comissaoReceber": 1020.0,
-   "comissaoRecebida": 1020.0,
-   "repasse": 306.0,
-   "repassePago": 0,
-   "percentualRepasse": 30,
-   "responsavel": "Corretor Teste"
+   "produto": "Consorcio",
+   "premioLiquido": 255000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 1020,
+   "produtores": [
+    {
+     "nome": "Corretor Teste",
+     "percentual": 30
+    }
+   ],
+   "recebimentos": [
+    {
+     "chave": "k7|r",
+     "data": "2026-10-18",
+     "valor": 1020,
+     "parcela": "8/12",
+     "repasses": {
+      "Corretor Teste": 306
+     }
+    }
+   ]
   },
   {
    "chave": "k8",
    "clienteChave": "q0",
    "vendaChave": "pend1",
    "clienteNome": "Consorciado Teste Um",
-   "produto": "Consorcio",
+   "numero": "9000001",
+   "data": "2026-08-23",
    "companhia": "Administradora Teste A",
-   "numeroProposta": "9000001",
-   "dataProposta": "2026-08-23",
-   "parcela": "9/12",
-   "dataRecebimento": "2026-10-18",
-   "premio": 300000,
-   "comissaoReceber": 1200.0,
-   "comissaoRecebida": 1200.0,
-   "vendaDaCorretora": true
+   "produto": "Consorcio",
+   "premioLiquido": 300000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 1200,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k8|r",
+     "data": "2026-10-18",
+     "valor": 1200,
+     "parcela": "9/12"
+    }
+   ]
   }
- ]
+ ],
+ "estornos": [],
+ "pagamentos": []
 }

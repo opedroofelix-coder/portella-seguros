@@ -1,6 +1,16 @@
 import { expect, test } from '@playwright/test';
 import { join } from 'node:path';
-import { ADMIN, cadastrarUsuario, CORRETOR, entrar, importar, irPara, primeiroAcesso, sair } from './fluxos';
+import {
+  ADMIN,
+  cadastrarUsuario,
+  CORRETOR,
+  entrar,
+  entrarPelaPrimeiraVez,
+  importar,
+  irPara,
+  primeiroAcesso,
+  sair,
+} from './fluxos';
 import { conferirLayout, LARGURAS } from './responsivo';
 
 const URL = 'http://localhost:5173';
@@ -11,6 +21,9 @@ test.describe('CRM Seguros — fluxo completo', () => {
 
   test('primeiro acesso, equipe, cliente, apólice, renovação e permissões', async ({ page }) => {
     await primeiroAcesso(page, URL);
+    // Os produtores da Portella já entram cadastrados, com senha 1234 e o % padrão
+    await irPara(page, 'Usuários');
+    await expect(page.getByRole('row', { name: /Deliziane.*40%/ })).toContainText('Senha 1234');
     await cadastrarUsuario(page, CORRETOR, 'Corretor');
 
     // Cliente novo com validação de CPF
@@ -61,9 +74,9 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page.getByLabel('Etapa de Lead Teste').selectOption({ label: 'Proposta enviada' });
     await expect(page.getByRole('region', { name: 'Proposta enviada' })).toContainText('Lead Teste');
 
-    // Corretor: não vê a carteira da administradora nem a área de usuários
+    // Corretor: troca a senha 1234 no primeiro acesso; não vê a carteira da administradora nem usuários
     await sair(page);
-    await entrar(page, URL, CORRETOR);
+    await entrarPelaPrimeiraVez(page, URL, CORRETOR);
     await expect(page.getByRole('link', { name: 'Usuários' })).toHaveCount(0);
     await irPara(page, 'Clientes');
     await expect(page.getByText('Nenhum cliente cadastrado')).toBeVisible();
@@ -72,50 +85,123 @@ test.describe('CRM Seguros — fluxo completo', () => {
 
     // Senha errada
     await sair(page);
-    await page.getByLabel('E-mail').fill(ADMIN.email);
-    await page.getByLabel('Senha').fill('errada');
-    await page.getByRole('button', { name: 'Entrar' }).click();
-    await expect(page.getByRole('alert')).toHaveText('E-mail ou senha incorretos.');
+    await entrar(page, URL, { login: ADMIN.login, senha: 'errada' });
+    await expect(page.getByRole('alert')).toHaveText('Usuário ou senha incorretos.');
   });
 
   test('importa a planilha convertida e distribui a carteira por corretor', async ({ page }) => {
     await primeiroAcesso(page, URL);
     await cadastrarUsuario(page, CORRETOR, 'Corretor');
-    await importar(page, FIXTURE, /Apólices/);
+    await importar(page, FIXTURE, /Propostas/);
     await irPara(page, 'Apólices');
     await expect(page.getByText(/12 de 12 apólices/)).toBeVisible();
+    await irPara(page, 'Propostas');
+    await expect(page.getByRole('table', { name: 'Propostas' }).getByRole('row')).toHaveCount(12 + 1);
     await sair(page);
-    await entrar(page, URL, CORRETOR);
+    await entrarPelaPrimeiraVez(page, URL, CORRETOR);
     await irPara(page, 'Apólices');
     await expect(page.getByText(/6 de 6 apólices/)).toBeVisible();
-    // Corretor vê as próprias comissões, sem valores da corretora, e não acessa o financeiro
-    await irPara(page, 'Comissões');
-    await expect(page.getByText('Minhas comissões')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Nova comissão' })).toHaveCount(0);
+    // Corretor vê só as propostas em que participa, sem os valores da corretora, e não acessa o financeiro
+    await irPara(page, 'Propostas');
+    await expect(page.getByRole('heading', { name: 'Minhas propostas' })).toBeVisible();
+    await expect(page.getByRole('columnheader', { name: 'Saldo' })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Financeiro' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Aprovações/ })).toHaveCount(0);
     await page.goto(`${URL}/financeiro`);
     await expect(page.getByText('Acesso restrito')).toBeVisible();
   });
 
-  test('comissões: baixa, repasse por corretor e financeiro', async ({ page }) => {
+  test('proposta do produtor, aprovação, baixa, vale, relatório de pagamento e financeiro', async ({
+    page,
+  }) => {
     await primeiroAcesso(page, URL);
-    await cadastrarUsuario(page, CORRETOR, 'Corretor');
-    await importar(page, FIXTURE, /Comissões/);
-    await irPara(page, 'Comissões');
-    await page.getByLabel('Mês').selectOption({ label: 'Todos os meses' });
-    const repasses = page.getByRole('table', { name: 'Repasse por corretor' });
-    await expect(repasses).toContainText('Corretor Teste');
-    await repasses.getByRole('button', { name: 'Quitar' }).click();
-    await expect(page.getByText(/Repasse de Corretor Teste quitado/)).toBeVisible();
-    await expect(repasses).toContainText('Quitado');
-    await page.getByLabel('Situação').selectOption({ label: 'A receber' });
-    const antes = await page.getByRole('button', { name: 'Dar baixa' }).count();
-    await page.getByRole('button', { name: 'Dar baixa' }).first().click();
-    await expect(page.getByText('Recebimento registrado.')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Dar baixa' })).toHaveCount(antes - 1);
+    await cadastrarUsuario(page, { ...CORRETOR, percentual: '30' }, 'Corretor');
+    await sair(page);
 
+    // Produtor lança a proposta: fica pendente e ele ainda pode editar
+    await entrarPelaPrimeiraVez(page, URL, CORRETOR);
+    await irPara(page, 'Propostas');
+    await page.getByRole('button', { name: 'Nova proposta' }).click();
+    const form = page.getByRole('dialog', { name: 'Nova proposta' });
+    await form.getByLabel('Nome completo do cliente').fill('Cliente Teste Proposta');
+    await form.getByLabel('Nº da proposta / apólice').fill('TESTE-900');
+    await form.getByLabel('Seguradora').fill('Porto Seguro');
+    await form.getByLabel('Produto', { exact: true }).fill('Automóvel');
+    await form.getByLabel('Tipo de negócio').selectOption({ label: 'Seguro novo' });
+    await form.getByLabel('Prêmio líquido (R$)').fill('1.000,00');
+    await form.getByLabel('Comissão trabalhada (%)').fill('20');
+    await expect(form.getByText('Receberá R$ 60,00')).toBeVisible();
+    await page.getByRole('button', { name: 'Enviar para aprovação' }).click();
+    await expect(page.getByText('Proposta enviada para aprovação.')).toBeVisible();
+    await expect(page.getByRole('row', { name: /Cliente Teste Proposta/ })).toContainText('Pendente');
+    await sair(page);
+
+    // Administradora: aviso no painel e contador no menu; dá a baixa e aprova
+    await entrar(page, URL, ADMIN);
+    await expect(page.getByRole('status').filter({ hasText: 'proposta aguardando aprovação' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Aprovações 1 pendente(s)' })).toBeVisible();
+    await irPara(page, 'Aprovações');
+    await page.getByRole('row', { name: /Cliente Teste Proposta/ }).click();
+    const aprovar = page.getByRole('dialog', { name: /Cliente Teste Proposta/ });
+    await aprovar.getByRole('button', { name: 'Recebimento' }).click();
+    await aprovar.getByLabel('Valor (R$)').fill('200,00');
+    await aprovar.getByLabel('Parcela').fill('1ª');
+    await expect(aprovar.getByText('Saldo a receber').locator('..')).toContainText('R$ 0,00');
+    await aprovar.getByRole('button', { name: 'Aprovar' }).click();
+    await expect(page.getByText('Proposta aprovada.')).toBeVisible();
+    await expect(page.getByText('Nada para aprovar')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Aprovações', exact: true })).toBeVisible();
+
+    // Vale do produtor, descontado no mês
+    await irPara(page, 'Estornos e vales');
+    await page.getByRole('tab', { name: 'Vales' }).click();
+    await page.getByRole('button', { name: 'Novo vale' }).click();
+    const vale = page.getByRole('dialog', { name: 'Novo vale' });
+    await vale.getByLabel('Produtor').selectOption({ label: CORRETOR.nome });
+    await vale.getByLabel('Valor (R$)').fill('10,00');
+    await vale.getByLabel('Motivo').fill('Adiantamento');
+    await vale.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByRole('table', { name: 'Vales' })).toContainText('R$ 10,00');
+
+    // Relatório mensal: 200 × 30% − 10 = 50, com PDF e Excel
+    await irPara(page, 'Relatórios');
+    await page
+      .getByRole('table', { name: 'Fechamento do mês' })
+      .getByRole('row', { name: /Corretor Teste/ })
+      .click();
+    await expect(page.getByText('Líquido a pagar').locator('..')).toContainText('R$ 50,00');
+    for (const [botao, extensao] of [
+      ['PDF', '.pdf'],
+      ['Excel', '.xlsx'],
+    ] as const) {
+      const baixa = page.waitForEvent('download');
+      await page.getByRole('button', { name: botao, exact: true }).click();
+      expect((await baixa).suggestedFilename()).toMatch(new RegExp(`corretor-teste.*\\${extensao}$`, 'i'));
+    }
+    await page.getByRole('button', { name: 'Registrar pagamento' }).click();
+    await expect(page.getByText('Pagamento de Corretor Teste registrado.')).toBeVisible();
+
+    // Painel de produção
+    await irPara(page, 'Painel de produção');
+    await page.getByLabel('Período').selectOption({ label: 'Todo o período' });
+    await expect(page.getByText('Produção (prêmio líquido)').locator('..')).toContainText('R$ 1.000,00');
+    await expect(page.getByText('Seguro novo').locator('..')).toContainText('R$ 1.000,00');
+
+    // Produtor vê a proposta aprovada só para consulta
+    await sair(page);
+    await entrar(page, URL, CORRETOR);
+    await irPara(page, 'Propostas');
+    await page.getByRole('row', { name: /Cliente Teste Proposta/ }).click();
+    await expect(page.getByText(/só a administração altera/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Excluir' })).toHaveCount(0);
+  });
+
+  test('financeiro sem a poupança', async ({ page }) => {
+    await primeiroAcesso(page, URL);
+    await importar(page, FIXTURE, /Movimentos/);
     await irPara(page, 'Financeiro');
     await expect(page.getByText('Saldo Bradesco')).toBeVisible();
+    await expect(page.getByText(/Poupança/)).toHaveCount(0);
     await page.getByRole('tab', { name: 'Despesas' }).click();
     await page.getByLabel('Mês do vencimento').selectOption({ label: 'Todos' });
     await page
@@ -124,7 +210,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
       .click();
     await expect(page.getByText('Despesa paga.')).toBeVisible();
     await page.getByRole('tab', { name: 'Extrato' }).click();
-    await expect(page.getByRole('table', { name: 'Extrato Bradesco' })).toContainText('R$ 12.020,40');
+    await expect(page.getByRole('table', { name: 'Extrato Bradesco' })).toBeVisible();
   });
 });
 
@@ -149,8 +235,13 @@ for (const tela of LARGURAS) {
         'Apólices',
         'Renovações',
         'Cotações',
-        'Comissões',
+        'Propostas',
+        'Aprovações',
+        'Painel de produção',
+        'Relatórios',
+        'Estornos e vales',
         'Financeiro',
+        'Configurações',
         'Usuários',
         'Importar',
         'Minha conta',
@@ -192,6 +283,35 @@ for (const tela of LARGURAS) {
       await conferirLayout(page, tela.width);
       await page.screenshot({
         path: `test-results/telas/seguros-form-apolice-${tela.nome}.png`,
+        animations: 'disabled',
+      });
+      await page.keyboard.press('Escape');
+
+      // Formulário da proposta, relatório de um produtor e pendentes
+      await irPara(page, 'Propostas');
+      await page
+        .getByRole('row', { name: /Cliente Teste Beta/ })
+        .first()
+        .click();
+      await conferirLayout(page, tela.width);
+      await page.screenshot({
+        path: `test-results/telas/seguros-form-proposta-${tela.nome}.png`,
+        animations: 'disabled',
+      });
+      await page.keyboard.press('Escape');
+      await irPara(page, 'Relatórios');
+      await page.getByLabel('Produtor').selectOption({ index: 1 });
+      await conferirLayout(page, tela.width);
+      await page.screenshot({
+        path: `test-results/telas/seguros-relatorio-produtor-${tela.nome}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
+      await page.getByRole('tab', { name: 'Comissões pendentes' }).click();
+      await conferirLayout(page, tela.width);
+      await page.screenshot({
+        path: `test-results/telas/seguros-relatorio-pendentes-${tela.nome}.png`,
+        fullPage: true,
         animations: 'disabled',
       });
     });

@@ -1,4 +1,11 @@
-import { ROTA_FUNIL, useColecao, useIndice, useServicos, useUsuario } from '@portella/app-base';
+import {
+  AvisoAprovacoes,
+  ROTA_FUNIL,
+  useColecao,
+  useIndice,
+  useServicos,
+  useUsuario,
+} from '@portella/app-base';
 import { formatarData, formatarDinheiro, hojeISO, resumirFunil } from '@portella/core';
 import { Barras, CabecalhoPagina, Cartao, Carregando, EstadoVazio, Indicador } from '@portella/ui';
 import { useMemo } from 'react';
@@ -42,6 +49,7 @@ export function PaginaPainel() {
         }
         descricao={`Resumo do consórcio em ${formatarData(hoje)}.`}
       />
+      <AvisoAprovacoes />
       <div className="grade">
         <div className="grade-4">
           <Indicador

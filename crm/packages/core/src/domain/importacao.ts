@@ -68,29 +68,54 @@ export interface CotaImportada {
   responsavel?: string;
 }
 
-/** Parcela de comissão (abas "A Receber" e "Comissões <corretor>"); valores em reais. */
-export interface ComissaoImportada {
+/** Proposta com a comissão controlada por saldo (abas "A Receber" e "Comissões <produtor>"); valores em reais. */
+export interface PropostaImportada {
   chave: string;
   clienteChave: string;
-  /** Chave da apólice ou cota a que a parcela pertence. */
+  /** Chave da apólice ou cota criada para a mesma venda. */
   vendaChave?: string;
   clienteNome: string;
-  produto: string;
+  numero?: string;
+  data: string;
   companhia: string;
-  numeroProposta?: string;
-  dataProposta?: string;
-  parcela?: string;
-  dataRecebimento?: string;
-  premio?: number;
+  produto: string;
+  tipoNegocio?: 'novo' | 'renovacao';
+  premioLiquido?: number;
+  comissaoPercentual?: number;
   comissaoReceber: number;
-  comissaoRecebida: number;
-  percentualRepasse?: number;
-  repasse?: number;
-  repassePago?: number;
-  estorno?: boolean;
-  vendaDaCorretora?: boolean;
+  percentualVitalicio?: number;
+  /** Produtores pelo nome que aparece na planilha, com o % de repasse. */
+  produtores: Array<{ nome: string; percentual: number }>;
+  recebimentos: Array<{
+    chave: string;
+    data: string;
+    valor: number;
+    parcela?: string;
+    repasses?: Record<string, number>;
+  }>;
   observacoes?: string;
-  responsavel?: string;
+}
+
+/** Estorno (seção "Controle de Estornos" das abas de produtor); valores em reais, positivos. */
+export interface EstornoImportado {
+  chave: string;
+  produtor?: string;
+  segurado: string;
+  numeroApolice?: string;
+  companhia: string;
+  produto: string;
+  data: string;
+  valor: number;
+  descontoProdutor: number;
+}
+
+/** Pagamento já feito ao produtor no mês ("Comissão Paga"); valor em reais. */
+export interface PagamentoImportado {
+  chave: string;
+  produtor: string;
+  mes: string;
+  data: string;
+  valor: number;
 }
 
 /** Movimento de conta (extrato bancário, poupança); valor em reais, sempre positivo. */

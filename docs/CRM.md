@@ -121,25 +121,24 @@ produtor envolvido (ranking de vendas), e não o prêmio dividido pelo % de cada
 
 ### 0.9 O que já existe no CRM e o que falta
 
-| Requisito | Situação no CRM atual |
+| Requisito | Situação no CRM |
 |---|---|
-| Login por usuário, perfis administrador e corretor (produtor) | ✔ existe (também há o perfil gestor) |
-| Senha padrão `1234` com troca obrigatória no 1º acesso | ✘ falta: hoje o administrador define a senha inicial, com no mínimo 8 caracteres |
-| Produtor vê só as próprias propostas | ✔ existe |
-| Fluxo de aprovação de propostas, com aviso para a administradora | ✘ falta |
-| Proposta com tipo de negócio (novo × renovação) | ✘ falta |
-| Comissão trabalhada (%) e comissão a receber calculada | ◐ parcial: a apólice tem prêmio e %, mas a comissão a receber fica nas parcelas |
-| Recebimentos por saldo, com parcela em texto livre | ◐ parcial: cada parcela é um lançamento separado; falta o saldo por proposta |
-| Comissão acima de 100% e % vitalício | ✘ falta |
-| Vários produtores por proposta, cada um com o seu % e "Receberá R$ X" | ◐ parcial: há o "repasse adicional" da importação, mas o formulário só tem um responsável |
-| % de repasse padrão por produtor | ✘ falta |
-| Listas editáveis de produtos e seguradoras | ✘ falta: listas fixas no código (seguradora fora da lista entra pelo nome) |
-| Estornos com segurado, nº da apólice, seguradora e produto | ◐ parcial: estorno é um tipo de lançamento de comissão |
-| Vales | ✘ falta |
-| Relatório de pagamento mensal (recebido − estornos − vales) com PDF e Excel | ◐ parcial: há o "Repasse por corretor" na tela; faltam vales e exportação |
-| Relatório de comissões pendentes por produtor | ◐ parcial: filtro "a receber" na tela de Comissões |
-| Painel: novo × renovação, por produto e seguradora em R$, crescimento mês a mês e ano a ano | ◐ parcial: há gráficos por seguradora e ramo (em quantidade); faltam o resto |
-| Consórcio | ✔ CRM separado (na conversa, consórcio era um produto do mesmo sistema) |
+| Login por usuário, perfis administrador e corretor (produtor) | ✔ (também há o perfil gestor) |
+| Senha padrão `1234` com troca obrigatória no 1º acesso; administradora redefine para `1234` | ✔ |
+| Produtores da conversa e da planilha já cadastrados, com o % padrão | ✔ no primeiro acesso (ver seção 2) |
+| Produtor vê só as propostas em que participa | ✔ |
+| Fluxo de aprovação, com contador no menu e aviso no painel | ✔ menu **Aprovações** |
+| Proposta com tipo de negócio (novo × renovação) | ✔ |
+| Comissão trabalhada (%) e comissão a receber calculada | ✔ (pode passar de 100%) |
+| Recebimentos por saldo, com parcela em texto livre | ✔ saldo = comissão − recebido |
+| Regra vitalício com % sobre o prêmio líquido | ✔ recebimentos depois de quitada a comissão viram vitalício |
+| Vários produtores por proposta, cada um com o seu % e "Receberá R$ X" | ✔ |
+| Listas editáveis de produtos e seguradoras | ✔ menu **Configurações** |
+| Estornos (segurado, nº da apólice, seguradora, produto, produtor, valor) e vales | ✔ menu **Estornos e vales** |
+| Relatório de pagamento mensal (repasse − estornos − vales) com PDF e Excel | ✔ menu **Relatórios**, com "Registrar pagamento" |
+| Relatório de comissões pendentes por produtor | ✔ PDF e Excel |
+| Painel: produção por produtor (proporcional ao %), novo × renovação, por produto e seguradora em R$, recebida × repassada, pendente por produtor, crescimento mês a mês e ano a ano | ✔ menu **Painel de produção** |
+| Consórcio | ✔ CRM separado, com as mesmas telas de propostas e relatórios |
 | Dados compartilhados entre computadores | ✘ falta: depende da escolha do backend |
 
 ## 2. Perfis de usuário
@@ -153,15 +152,22 @@ produtor envolvido (ranking de vendas), e não o prêmio dividido pelo % de cada
 | Editar registros | ✔ | ✔ | só os próprios |
 | Remover registros | ✔ | ✔ | – |
 | Transferir registros entre corretores | ✔ | ✔ | – |
-| Lançar comissões, dar baixa e pagar repasses | ✔ | ✔ | – (consulta as próprias) |
+| Lançar propostas | ✔ (já aprovadas) | ✔ (já aprovadas) | ✔ (ficam pendentes) |
+| Aprovar propostas, dar baixa, lançar estornos, vales e pagamentos | ✔ | ✔ | – (consulta os próprios) |
+| Editar listas de produtos e seguradoras | ✔ | ✔ | – |
 | Financeiro da corretora | ✔ | ✔ | – |
 
 Regras extras:
-- No primeiro acesso, o sistema pede para criar o administrador. Hoje não existe senha padrão
-  (a seção 0.2 pede senha inicial `1234` com troca obrigatória; ainda não implementado).
+- Entra-se com **usuário** (ex.: `deliziane`), não com e-mail.
+- No primeiro acesso, o sistema pede para criar o administrador e já cadastra os produtores
+  Deliziane (40%), Mary (15%), Gisele (50%), Gabriel, Danila (50%), Luana (50%), Renata,
+  Carla (20%), Felippe e Silvana, com usuário igual ao primeiro nome e senha `1234`. Os % vêm da
+  conversa com a Portella (Carla: o % mais usado na planilha); quem está sem % recebe o padrão em
+  **Usuários**. A lista se edita em Usuários (incluir, desativar).
+- Usuário novo entra com a senha `1234` e, no primeiro login, só segue depois de criar a própria
+  senha (mínimo de 6 caracteres, diferente de `1234`). O administrador pode **redefinir a senha para 1234**.
 - O sistema sempre mantém pelo menos um administrador ativo.
 - Um usuário desativado não entra mais e perde a sessão aberta.
-- Senha com no mínimo 8 caracteres. Cada pessoa pode trocar a própria senha em "Minha conta".
 
 ## 3. CRM de Seguros
 
@@ -219,28 +225,32 @@ As vendas de consórcio da planilha não têm grupo, cota nem prazo. A cota é c
 administradora, nº da proposta, crédito e data, e aparece com o selo **Completar cadastro**
 (há filtro "Cadastro: a completar" e o total no painel).
 
-## 4.1 Comissões (nos dois CRMs)
+## 4.1 Propostas, aprovações, estornos, vales e relatórios (nos dois CRMs)
 
-Substitui as abas "A Receber" e "Comissões <corretor>".
+Substitui as abas "A Receber" e "Comissões <corretor>". Segue a seção 0.
 
-- Cada linha é uma **parcela de comissão** de uma venda: cliente, produto, seguradora/administradora,
-  nº da proposta, parcela (ex.: 8/10), data do recebimento, prêmio (ou crédito), comissão a receber,
-  comissão recebida, % e valor do **repasse ao corretor** e repasse pago.
-- Tipos: venda de corretor (com repasse), **venda da corretora** (sem repasse) e **estorno** (valores negativos).
-- Quando dois corretores recebem sobre a mesma parcela (ex.: supervisão), o segundo vira um
-  **repasse adicional** ligado à parcela, sem repetir o valor da seguradora.
-- Tela com filtro por mês, corretor e situação (a receber, recebida, estorno); indicadores de
-  recebido, a receber, repasse a pagar e líquido da corretora; quadro **Repasse por corretor** com
-  botão **Quitar**; botão **Dar baixa** nas parcelas a receber.
-- O corretor vê só as próprias parcelas e só os valores do repasse.
+- **Propostas**: cada venda com cliente, nº, data, seguradora, produto (listas editáveis), tipo de
+  negócio, prêmio líquido, comissão trabalhada (%), comissão a receber, regra normal ou vitalício,
+  produtores com o % e o "Receberá R$ X", e os **recebimentos** (data, valor, parcela em texto livre).
+  Saldo a receber = comissão − recebido. Filtros por situação, produtor, tipo e saldo.
+- **Aprovação**: a proposta do produtor fica **pendente**; ele pode editar ou excluir enquanto
+  ela está pendente. A administradora vê o contador no menu **Aprovações** e a faixa no painel,
+  revisa, lança recebimentos e aprova. Depois disso só a administração altera.
+- **Repasse**: em cada recebimento, o produtor recebe o seu % (ou o valor fixo que veio da planilha).
+- **Estornos e vales**: descontam do pagamento do produtor no mês da data.
+- **Relatórios**: pagamento mensal por produtor (repasse dos recebimentos do mês − estornos −
+  vales = líquido), com **PDF**, **Excel** e **Registrar pagamento**; fechamento do mês com todos
+  os produtores; **comissões pendentes** por produtor (saldo a receber e repasse previsto).
+- **Painel de produção**: por ano, mês ou todo o período (seção 0.7).
+- O produtor vê só as propostas em que participa, só o próprio repasse e os próprios relatórios.
 
 ## 4.2 Financeiro (CRM de Seguros, administrador e gestor)
 
-Substitui as abas "Bradesco", "Demonstrativo", "Poupança" e "Faturamento".
+Substitui as abas "Bradesco", "Demonstrativo" e "Faturamento". A poupança ficou de fora, a pedido da Portella.
 
 - **Resumo do mês**: saldo da conta corrente, entradas, saídas, despesas em aberto, saldos por
   conta, faturamento mensal e próximas despesas.
-- **Extrato**: movimentos por conta (Bradesco, Poupança Portella, Tracker) com saldo acumulado.
+- **Extrato**: movimentos da conta (Bradesco) com saldo acumulado.
 - **Despesas**: contas a pagar com vencimento, pagamento e situação (paga, em aberto, vencida); botão **Pagar**.
 - **Faturamento**: fechamento mensal (comissões recebidas e crédito de consórcio vendido).
 
@@ -257,20 +267,20 @@ nunca vão para o Git. Os arquivos gerados ficam em `crm/dados/` (fora do Git):
 **Importar**, confere o resumo e os avisos e confirma. Reimportar o mesmo arquivo **atualiza**
 os registros, sem duplicar.
 
-**Antes de importar, cadastre os corretores em Usuários** com o nome que aparece na planilha
-(Carla, Deliziane, Gabriel, Gisele, Silvana, Renata, Felippe). O importador liga cada venda ao
-usuário de mesmo nome. Sem correspondência, a venda fica com quem importou e aparece um aviso.
+Os produtores da planilha (Carla, Deliziane, Gabriel, Gisele, Silvana, Renata, Felippe) já são
+cadastrados no primeiro acesso. O importador liga cada venda ao usuário de mesmo nome (ou mesmo
+primeiro nome). Sem correspondência, a venda fica com quem importou e aparece um aviso.
 
 ### Como cada aba é usada (planilha de dezembro/2024)
 
 | Aba | Vai para |
 |---|---|
-| A Receber | clientes, apólices/cotas e parcelas de comissão (produtor, comissão a receber e recebida) |
-| Comissoes Carla, Deliziane, Felippe, Gabriel, Gisele, Silvana | repasse ao corretor (%, valor e pago) e estornos |
+| A Receber | clientes, apólices/cotas e **propostas** (parcelas recebidas viram recebimentos) |
+| Comissoes Carla, Deliziane, Felippe, Gabriel, Gisele, Silvana | produtores e % de cada proposta, repasse de cada recebimento, estornos e pagamentos (Comissão Paga) |
 | Essencial Allianz / Renata | ignoradas: detalhamento da assessoria; os valores líquidos já estão em "A Receber" |
 | Bradesco | extrato da conta corrente |
 | Demonstrativo de Receitas e Despesas | despesas da empresa (receitas e repasses o CRM calcula) |
-| Poupanca Portella | depósitos da poupança e do Tracker |
+| Poupanca Portella | ignorada: a poupança não entra no CRM |
 | Faturamento | faturamento mensal de 2024 e crédito de consórcio vendido |
 
 Colunas usadas: Data Proposta, Nr. Proposta, Nome/Razão Social, Produto, Cia Seguradora,
@@ -282,8 +292,19 @@ Regras:
 - A mesma parcela nas abas "A Receber" e "Comissões <corretor>" é reconhecida por seguradora +
   nº da proposta + parcela. A data de recebimento não entra na comparação, porque na aba do corretor
   ela é a data do repasse.
-- Produtor "Corretora" → venda da corretora, sem repasse.
-- "Endosso" e "Estorno" geram só a comissão, sem nova apólice.
+- **Uma proposta por venda** (seguradora + nº da proposta): a comissão a receber é a soma das
+  parcelas; cada parcela com valor recebido vira um **recebimento**, com o repasse de cada produtor
+  em reais, exatamente como na planilha. Parcelas ainda não recebidas ficam no saldo.
+- O % de cada produtor é o repasse ÷ a comissão das parcelas que já têm o repasse preenchido. Sem
+  nenhum repasse na planilha, vale o % padrão do produtor em Usuários.
+- Quando dois corretores recebem sobre a mesma parcela (ex.: supervisão), os dois entram como
+  produtores da proposta, sem repetir o valor da seguradora.
+- **Pagamentos**: a coluna "Comissão Paga" vira o pagamento do produtor no mês do recebimento
+  (já descontados os estornos, como na planilha).
+- Estornos sem data são ignorados, com aviso (2 da Silvana na planilha de dezembro/2024).
+- Produtor "Corretora" → venda da corretora, sem produtor.
+- "Endosso" e "Estorno" geram só a proposta, sem nova apólice.
+- Seguradoras e produtos que não estão nas listas entram nelas na importação.
 - A planilha não tem CPF, telefone nem e-mail: os clientes entram só com o nome e os demais dados
   são completados no CRM.
 
@@ -291,22 +312,25 @@ Regras:
 
 | Item | CRM | Planilha |
 |---|---|---|
-| Repasse Carla / pago após estornos | 3.257,34 / 3.142,54 | 3.257,31 / 3.142,51 |
-| Repasse Deliziane / pago | 14.461,28 / 14.154,72 | 14.461,25 / 14.154,68 |
-| Repasse Gabriel | 2.216,21 | 2.216,21 |
-| Repasse Gisele / pago | 9.995,31 / 9.310,81 | 9.995,17 / 9.310,66 |
-| Repasse Silvana | 348,31 | 348,33 |
+| Pago a Carla, após estornos | 3.142,54 | 3.142,51 |
+| Pago a Deliziane | 14.154,72 | 14.154,68 |
+| Pago a Gabriel | 2.216,21 | 2.216,21 |
+| Pago a Gisele | 9.310,81 | 9.310,66 |
 | Despesas da empresa | 24.646,07 | 24.646,07 |
 | Faturamento 2024 / crédito de consórcio | 630.584,19 / 4.389.500,00 | iguais |
-| Poupança / Tracker | 65.000,00 / 19.000,00 | iguais |
 | Saldo final Bradesco | 18.234,66 | 18.235,07 |
 
 As diferenças de centavos vêm do arredondamento: o CRM guarda cada parcela em centavos, e a planilha
 soma valores com várias casas decimais. A diferença de R$ 0,41 no Bradesco já está na planilha: na
 linha 100 do extrato, o saldo digitado (34.533,18) não bate com o saldo anterior + o crédito (34.532,77).
 
-Há parcelas que aparecem só nas abas dos corretores e não em "A Receber" (ex.: as 9 da Silvana).
-Elas entram no CRM, mas por isso o total "a receber" do CRM fica maior que o da aba "A Receber".
+Há parcelas que aparecem só nas abas dos corretores e não em "A Receber" (ex.: as 9 da Silvana,
+ainda sem data de recebimento). Elas entram no CRM como saldo a receber, por isso o total "a receber"
+do CRM fica maior que o da aba "A Receber". O repasse dessas parcelas aparece no relatório de
+**comissões pendentes** e entra no pagamento quando a baixa for lançada.
+
+Na planilha de dezembro/2024 há uma parcela com recebimento digitado em 2012 (provável erro de
+digitação de 2024); o pagamento correspondente aparece em dezembro de 2012 no relatório.
 
 ## 6. Arquitetura
 
@@ -316,7 +340,8 @@ crm/
     core/          domínio + casos de uso + portas (TypeScript puro, sem React)
     infra-local/   adaptadores: IndexedDB e login local (PBKDF2-SHA-256)
     ui/            design system React "Noir Dourado" + catálogo de componentes
-    app-base/      telas comuns aos dois CRMs (login, usuários, clientes, funil, importação)
+    app-base/      telas comuns aos dois CRMs (login, usuários, clientes, funil, propostas,
+                   aprovações, estornos e vales, relatórios, painel de produção, importação)
     importer/      planilha → JSON (CLI em Node)
   apps/
     crm-seguros/   domain/ application/ infrastructure/ presentation/

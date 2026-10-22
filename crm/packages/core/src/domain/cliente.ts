@@ -1,7 +1,6 @@
-import { cnpjValido, cpfValido, somenteDigitos, telefoneValido } from './documento';
+import { cnpjValido, cpfValido, emailValido, somenteDigitos, telefoneValido } from './documento';
 import { ErroValidacao } from './erros';
 import type { DataISO, Registro } from './registro';
-import { emailValido } from './usuario';
 
 export type TipoPessoa = 'PF' | 'PJ';
 

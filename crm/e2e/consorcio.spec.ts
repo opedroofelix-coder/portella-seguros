@@ -1,6 +1,14 @@
 import { expect, test } from '@playwright/test';
 import { join } from 'node:path';
-import { cadastrarUsuario, CORRETOR, entrar, importar, irPara, primeiroAcesso, sair } from './fluxos';
+import {
+  cadastrarUsuario,
+  CORRETOR,
+  entrarPelaPrimeiraVez,
+  importar,
+  irPara,
+  primeiroAcesso,
+  sair,
+} from './fluxos';
 import { conferirLayout, LARGURAS } from './responsivo';
 
 const URL = 'http://localhost:5174';
@@ -55,9 +63,13 @@ test.describe('CRM Consórcio — fluxo completo', () => {
 
     // Corretor vê só as cotas dele
     await sair(page);
-    await entrar(page, URL, CORRETOR);
+    await entrarPelaPrimeiraVez(page, URL, CORRETOR);
     await irPara(page, 'Cotas');
     await expect(page.getByText('4 de 4 cotas.')).toBeVisible();
+    // Propostas (comissões) do consórcio: só as do corretor
+    await irPara(page, 'Propostas');
+    await expect(page.getByRole('heading', { name: 'Minhas propostas' })).toBeVisible();
+    await expect(page.getByRole('table', { name: 'Propostas' }).getByRole('row')).toHaveCount(4 + 1);
     await expect(page.getByRole('link', { name: 'Importar' })).toHaveCount(0);
   });
 });
@@ -74,8 +86,13 @@ for (const tela of LARGURAS) {
         'Clientes',
         'Cotas',
         'Lances',
+        'Funil de vendas',
         'Propostas',
-        'Comissões',
+        'Aprovações',
+        'Painel de produção',
+        'Relatórios',
+        'Estornos e vales',
+        'Configurações',
         'Usuários',
         'Importar',
         'Minha conta',

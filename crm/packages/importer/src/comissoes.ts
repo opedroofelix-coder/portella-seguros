@@ -3,17 +3,22 @@
  *  - "A Receber": todas as vendas com produtor, comissão a receber e recebida;
  *  - "Comissoes <corretor>": as vendas de cada corretor com o repasse, e a seção "Controle de Estornos";
  *  - "Essencial <…>": detalhamento da assessoria (os valores líquidos já estão em "A Receber");
- *  - "Bradesco", "Poupanca Portella", "Demonstrativo…" e "Faturamento": financeiro da empresa.
+ *  - "Bradesco", "Demonstrativo…" e "Faturamento": financeiro da empresa ("Poupanca" não é importada).
+ *
+ * Cada venda vira uma proposta: as parcelas recebidas são os recebimentos, com o repasse de cada
+ * produtor; o "Comissão Paga" das abas de corretor vira o pagamento do produtor no mês.
  */
 import type {
   ApoliceImportada,
   ArquivoImportacao,
   ClienteImportado,
-  ComissaoImportada,
   CotaImportada,
   DespesaImportada,
+  EstornoImportado,
   FechamentoImportado,
   MovimentoImportado,
+  PagamentoImportado,
+  PropostaImportada,
 } from '@portella/core';
 import type { Aba } from './converter';
 import type { Celula } from './valores';
@@ -100,7 +105,15 @@ export interface Venda {
   observacoes?: string;
   /** Corretor cujo repasse já foi aplicado à parcela. */
   repasseDe?: string;
+  /** Repasses de outros corretores sobre a mesma parcela (ex.: supervisão). */
+  adicionais?: Array<{ produtor: string; repasse?: number; repassePago?: number; dataRepasse?: string }>;
   origem: string;
+}
+
+/** 0,4001 → 40 (arredondamento da planilha); 0,3083 → 30,83. */
+function percentual(fracao: number): number {
+  const p = Math.round(fracao * 10000) / 100;
+  return Math.abs(p - Math.round(p)) < 0.05 ? Math.round(p) : p;
 }
 
 const chaveCliente = (nome: string) => `n:${normalizarCabecalho(nome)}`;
@@ -341,21 +354,21 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
           par && !PRODUTORES_CORRETORA.test(norm(par.produtor)) ? norm(par.produtor) : undefined;
         if (
           par &&
+          v.produtor &&
           (par.repasseDe != null || (corretorDaParcela != null && corretorDaParcela !== norm(v.produtor)))
         ) {
-          // A mesma parcela já tem repasse de outro corretor (ex.: supervisão): vira um repasse adicional,
-          // sem repetir o valor recebido da seguradora.
+          // A mesma parcela já tem repasse de outro corretor (ex.: supervisão): o corretor desta aba
+          // entra como mais um produtor da proposta, sem repetir o valor recebido da seguradora.
           casadas.add(par);
-          incluir(
+          par.adicionais = [
+            ...(par.adicionais ?? []),
             {
-              ...v,
-              premio: undefined,
-              comissaoReceber: 0,
-              comissaoRecebida: 0,
-              observacoes: `Repasse adicional sobre a parcela de ${par.repasseDe ?? par.produtor}.`,
+              produtor: v.produtor,
+              repasse: v.repasse,
+              repassePago: v.repassePago,
+              dataRepasse: v.dataRecebimento,
             },
-            `${norm(aba.nome)}|adicional|`,
-          );
+          ];
           adicionais++;
         } else if (par) {
           casadas.add(par);
@@ -386,22 +399,7 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
       movimentos.push(...m);
       relatorio.push({ nome: aba.nome, uso: 'extrato da conta corrente', linhas: m.length });
     } else if (/poupanca/.test(nome)) {
-      let n = 0;
-      for (const par of lerPares(aba)) {
-        const conta = /tracker/i.test(par.titulo) ? 'Tracker' : 'Poupança Portella';
-        par.itens.forEach((it, i) => {
-          movimentos.push({
-            chave: `${conta}|${it.data}|${i}`,
-            conta,
-            data: it.data,
-            descricao: it.valor < 0 ? 'Resgate' : 'Depósito',
-            tipo: it.valor < 0 ? 'saida' : 'entrada',
-            valor: Math.abs(it.valor),
-          });
-          n++;
-        });
-      }
-      relatorio.push({ nome: aba.nome, uso: 'depósitos da poupança', linhas: n });
+      relatorio.push({ nome: aba.nome, uso: 'ignorada: a poupança não entra no CRM', linhas: 0 });
     } else if (/faturamento/.test(nome)) {
       const [fat, cons] = lerPares(aba);
       for (const it of fat?.itens ?? [])
@@ -430,25 +428,21 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
     }
   }
 
-  // 2) Clientes, vendas (apólices/cotas) e comissões de cada sistema.
-  const sistemas = {
-    seguros: {
-      clientes: new Map<string, ClienteImportado>(),
-      vendas: new Map<string, ApoliceImportada>(),
-      comissoes: [] as ComissaoImportada[],
-    },
-    consorcio: {
-      clientes: new Map<string, ClienteImportado>(),
-      vendas: new Map<string, CotaImportada>(),
-      comissoes: [] as ComissaoImportada[],
-    },
-  };
+  // 2) Clientes, vendas (apólices/cotas), propostas, estornos e pagamentos de cada sistema.
+  const novoSistema = <V>() => ({
+    clientes: new Map<string, ClienteImportado>(),
+    vendas: new Map<string, V>(),
+    parcelas: new Map<string, Array<{ chave: string; venda: Venda }>>(),
+    estornos: [] as EstornoImportado[],
+    pagamentos: new Map<string, PagamentoImportado>(),
+  });
+  const sistemas = { seguros: novoSistema<ApoliceImportada>(), consorcio: novoSistema<CotaImportada>() };
+  const doProdutor = (nome?: string) => (nome && !PRODUTORES_CORRETORA.test(norm(nome)) ? nome : undefined);
 
   for (const { chave, venda: v } of parcelas) {
     const consorcio = ehConsorcio(v.produto, v.companhia);
     const s = consorcio ? sistemas.consorcio : sistemas.seguros;
-    const daCorretora = !v.produtor || PRODUTORES_CORRETORA.test(norm(v.produtor));
-    const responsavel = daCorretora ? undefined : v.produtor;
+    const responsavel = doProdutor(v.produtor);
     const clienteChave = chaveCliente(v.nome);
     if (!s.clientes.has(clienteChave)) {
       s.clientes.set(clienteChave, {
@@ -459,9 +453,51 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
       });
     }
 
+    // Comissão paga a cada produtor, pelo mês em que a seguradora pagou a parcela.
+    const pagos = [
+      { produtor: responsavel, valor: v.repassePago, data: v.dataRepasse ?? v.dataRecebimento },
+      ...(v.adicionais ?? []).map((a) => ({
+        produtor: doProdutor(a.produtor),
+        valor: a.repassePago,
+        data: a.dataRepasse ?? v.dataRecebimento,
+      })),
+    ];
+    for (const pago of pagos) {
+      const mes = (v.dataRecebimento ?? pago.data)?.slice(0, 7);
+      if (!pago.produtor || !pago.valor || !mes || !pago.data) continue;
+      const k = `${normalizarCabecalho(pago.produtor)}|${mes}`;
+      const atual = s.pagamentos.get(k);
+      s.pagamentos.set(k, {
+        chave: k,
+        produtor: pago.produtor,
+        mes,
+        data: atual && atual.data > pago.data ? atual.data : pago.data,
+        valor: Math.round(((atual?.valor ?? 0) + pago.valor) * 100) / 100,
+      });
+    }
+
+    if (v.estorno) {
+      const dataEstorno = v.dataRecebimento ?? v.dataProposta;
+      if (!dataEstorno) {
+        avisos.push(`Estorno de "${v.nome}" (${v.origem}) sem data; não importado.`);
+        continue;
+      }
+      s.estornos.push({
+        chave,
+        produtor: responsavel,
+        segurado: v.nome,
+        numeroApolice: v.numeroProposta,
+        companhia: v.companhia,
+        produto: v.produto,
+        data: dataEstorno,
+        valor: Math.abs(v.comissaoRecebida || v.comissaoReceber),
+        descontoProdutor: Math.abs(v.repasse ?? 0),
+      });
+      continue;
+    }
+
     const vendaChave = chaveVenda(v);
-    let vendaImportada: string | undefined;
-    if (consorcio && !v.estorno) {
+    if (consorcio) {
       if (!sistemas.consorcio.vendas.has(vendaChave) && v.premio && v.dataProposta) {
         sistemas.consorcio.vendas.set(vendaChave, {
           chave: vendaChave,
@@ -474,8 +510,7 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
           responsavel,
         });
       }
-      vendaImportada = sistemas.consorcio.vendas.has(vendaChave) ? vendaChave : undefined;
-    } else if (!consorcio && !v.estorno && !NAO_SAO_APOLICES.test(norm(v.produto))) {
+    } else if (!NAO_SAO_APOLICES.test(norm(v.produto))) {
       if (!sistemas.seguros.vendas.has(vendaChave) && v.dataProposta) {
         const anual = ANUAIS.test(norm(v.produto));
         sistemas.seguros.vendas.set(vendaChave, {
@@ -493,34 +528,94 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
           responsavel,
         });
       }
-      vendaImportada = sistemas.seguros.vendas.has(vendaChave) ? vendaChave : undefined;
     }
-
-    s.comissoes.push({
-      chave,
-      clienteChave,
-      vendaChave: vendaImportada,
-      clienteNome: v.nome,
-      produto: v.produto,
-      companhia: v.companhia,
-      numeroProposta: v.numeroProposta,
-      dataProposta: v.dataProposta,
-      parcela: v.parcela,
-      dataRecebimento: v.dataRecebimento,
-      premio: v.premio,
-      comissaoReceber: v.comissaoReceber,
-      comissaoRecebida: v.comissaoRecebida,
-      percentualRepasse:
-        v.repasse && v.comissaoReceber ? Math.round((v.repasse / v.comissaoReceber) * 100) : undefined,
-      repasse: daCorretora ? undefined : v.repasse,
-      repassePago: daCorretora ? undefined : v.repassePago,
-      estorno: v.estorno,
-      vendaDaCorretora: daCorretora || undefined,
-      observacoes: v.observacoes,
-      responsavel,
-    });
+    s.parcelas.set(vendaChave, [...(s.parcelas.get(vendaChave) ?? []), { chave, venda: v }]);
   }
 
+  const paraPropostas = (s: (typeof sistemas)['seguros'] | (typeof sistemas)['consorcio']) => {
+    const propostas: PropostaImportada[] = [];
+    for (const [vendaChave, itens] of s.parcelas) {
+      const vendas = itens.map((i) => i.venda);
+      const primeira = vendas[0]!;
+      const dataProposta =
+        vendas.find((v) => v.dataProposta)?.dataProposta ??
+        vendas
+          .map((v) => v.dataRecebimento)
+          .filter((d): d is string => !!d)
+          .sort()[0];
+      if (!dataProposta) {
+        avisos.push(`Venda de "${primeira.nome}" (${primeira.origem}) sem data; não importada.`);
+        continue;
+      }
+      const soma = (f: (v: Venda) => number | undefined) =>
+        Math.round(vendas.reduce((t, v) => t + (f(v) ?? 0), 0) * 100) / 100;
+      const comissaoReceber = soma((v) => v.comissaoReceber);
+      const premio = soma((v) => v.premio);
+
+      // Produtores com o % de repasse, calculado só nas parcelas que já têm o repasse preenchido.
+      const repasses = new Map<string, { valor: number; base: number }>();
+      const somar = (nome: string | undefined, repasse: number | undefined, base: number) => {
+        const p = doProdutor(nome);
+        if (!p) return;
+        const atual = repasses.get(p) ?? { valor: 0, base: 0 };
+        if (repasse && base) {
+          atual.valor += repasse;
+          atual.base += base;
+        }
+        repasses.set(p, atual);
+      };
+      for (const v of vendas) {
+        somar(v.produtor, v.repasse, v.comissaoReceber);
+        for (const a of v.adicionais ?? []) somar(a.produtor, a.repasse, v.comissaoReceber);
+      }
+      const produtores = [...repasses].map(([nome, { valor, base }]) => ({
+        nome,
+        percentual: base > 0 ? percentual(valor / base) : 0,
+      }));
+
+      const recebimentos = itens
+        .filter(({ venda: v }) => v.comissaoRecebida !== 0)
+        .map(({ chave, venda: v }) => {
+          const porProdutor: Record<string, number> = {};
+          const p = doProdutor(v.produtor);
+          if (p && v.repasse != null) porProdutor[p] = v.repasse;
+          for (const a of v.adicionais ?? []) {
+            const pa = doProdutor(a.produtor);
+            if (pa && a.repasse != null) porProdutor[pa] = (porProdutor[pa] ?? 0) + a.repasse;
+          }
+          return {
+            chave,
+            data: v.dataRecebimento ?? v.dataRepasse ?? dataProposta,
+            valor: v.comissaoRecebida,
+            parcela: v.parcela,
+            repasses: Object.keys(porProdutor).length ? porProdutor : undefined,
+          };
+        });
+
+      const observacoes = [...new Set(vendas.map((v) => v.observacoes).filter(Boolean))].join(' ');
+      propostas.push({
+        chave: vendaChave,
+        clienteChave: chaveCliente(primeira.nome),
+        vendaChave: s.vendas.has(vendaChave) ? vendaChave : undefined,
+        clienteNome: primeira.nome,
+        numero: primeira.numeroProposta,
+        data: dataProposta,
+        companhia: primeira.companhia,
+        produto: primeira.produto,
+        premioLiquido: premio || undefined,
+        comissaoPercentual:
+          premio > 0 && comissaoReceber > 0 ? percentual(comissaoReceber / premio) : undefined,
+        comissaoReceber,
+        produtores,
+        recebimentos,
+        observacoes: observacoes || undefined,
+      });
+    }
+    return propostas;
+  };
+
+  const ordenarPagamentos = (m: Map<string, PagamentoImportado>) =>
+    [...m.values()].sort((a, b) => a.mes.localeCompare(b.mes) || a.produtor.localeCompare(b.produtor));
   const base = { versao: 1 as const, origem, geradoEm: agora.toISOString() };
   return {
     seguros: {
@@ -528,7 +623,9 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
       sistema: 'seguros',
       clientes: [...sistemas.seguros.clientes.values()],
       apolices: [...sistemas.seguros.vendas.values()],
-      comissoes: sistemas.seguros.comissoes,
+      propostas: paraPropostas(sistemas.seguros),
+      estornos: sistemas.seguros.estornos,
+      pagamentos: ordenarPagamentos(sistemas.seguros.pagamentos),
       movimentos,
       despesas,
       fechamentos: [...fechamentos.values()].sort((a, b) => a.mes.localeCompare(b.mes)),
@@ -538,7 +635,9 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
       sistema: 'consorcio',
       clientes: [...sistemas.consorcio.clientes.values()],
       cotas: [...sistemas.consorcio.vendas.values()],
-      comissoes: sistemas.consorcio.comissoes,
+      propostas: paraPropostas(sistemas.consorcio),
+      estornos: sistemas.consorcio.estornos,
+      pagamentos: ordenarPagamentos(sistemas.consorcio.pagamentos),
     },
     relatorio: { abas: relatorio, avisos },
   };

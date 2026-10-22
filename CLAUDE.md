@@ -58,6 +58,11 @@
   Os testes usam só dados fictícios ("Cliente Teste…").
 - Backend ainda não escolhido: os dados ficam no navegador.
 - A planilha da Portella é um "Controle de Comissões" (abas A Receber, Comissoes <corretor>, Bradesco,
-  Demonstrativo, Poupanca, Faturamento). O leitor é `packages/importer/src/comissoes.ts`; conferência dos
-  totais em `docs/CRM.md`. Comissões nos dois CRMs (app-base); Financeiro só no de seguros (admin e gestor).
+  Demonstrativo, Poupanca, Faturamento). O leitor é `packages/importer/src/comissoes.ts` (uma proposta por
+  venda, recebimentos com o repasse de cada produtor, estornos e pagamentos); conferência dos totais em
+  `docs/CRM.md`. A Poupança não entra no CRM. Financeiro só no de seguros (admin e gestor).
+- Especificação de negócio: seção 0 de `docs/CRM.md` (conversa com a Deliziane, administradora). Login por
+  usuário, senha padrão 1234 com troca obrigatória, proposta do produtor fica pendente até a aprovação.
+  Propostas, Aprovações, Estornos e vales, Relatórios (PDF/Excel), Painel de produção e Configurações ficam
+  em `packages/app-base` (nos dois CRMs). Produtores iniciais e listas padrão: `app-base/src/padroes.ts`.
 - Verificação com dados reais: `E2E_LOCAL=1 npx playwright test e2e/real.tmp.spec.ts` (arquivo local, fora do Git).

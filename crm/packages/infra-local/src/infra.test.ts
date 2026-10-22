@@ -29,13 +29,13 @@ describe('BancoLocal', () => {
 describe('AutenticacaoLocal', () => {
   it('guarda hash (não a senha), confere credenciais e controla a sessão', async () => {
     const banco = await abrir();
-    const credenciais = banco.repositorio<{ id: string; email: string; sal: string; hash: string }>(
+    const credenciais = banco.repositorio<{ id: string; login: string; sal: string; hash: string }>(
       COLECAO_CREDENCIAIS,
     );
     let agora = 1_000;
     const auth = new AutenticacaoLocal(credenciais, new ArmazenamentoMemoria(), 'sessao', () => agora);
 
-    await auth.definirSenha({ id: 'u1', email: 'a@x.com' }, 'senha-forte');
+    await auth.definirSenha({ id: 'u1', login: 'a@x.com' }, 'senha-forte');
     const [c] = await credenciais.listar();
     expect(c?.hash).toBeTruthy();
     expect(JSON.stringify(c)).not.toContain('senha-forte');

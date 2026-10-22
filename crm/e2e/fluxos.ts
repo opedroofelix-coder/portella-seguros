@@ -1,25 +1,34 @@
 import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
-export const ADMIN = { nome: 'Administradora Teste', email: 'admin@teste.com', senha: 'senha-admin-1' };
-export const CORRETOR = { nome: 'Corretor Teste', email: 'corretor@teste.com', senha: 'senha-corretor-1' };
+export const ADMIN = { nome: 'Administradora Teste', login: 'admteste', senha: 'senha-admin-1' };
+export const CORRETOR = { nome: 'Corretor Teste', login: 'corretor', senha: 'senha-corretor-1' };
 
 export async function primeiroAcesso(page: Page, url: string) {
   await page.goto(url);
   await expect(page.getByRole('heading', { name: 'Primeiro acesso' })).toBeVisible();
   await page.getByLabel('Nome').fill(ADMIN.nome);
-  await page.getByLabel('E-mail').fill(ADMIN.email);
+  await page.getByLabel('Usuário').fill(ADMIN.login);
   await page.getByLabel('Senha', { exact: true }).fill(ADMIN.senha);
   await page.getByLabel('Confirme a senha').fill(ADMIN.senha);
   await page.getByRole('button', { name: 'Criar administrador' }).click();
   await expect(page.getByRole('heading', { name: /Olá/ })).toBeVisible();
 }
 
-export async function entrar(page: Page, url: string, u: { email: string; senha: string }) {
+export async function entrar(page: Page, url: string, u: { login: string; senha: string }) {
   await page.goto(`${url}/entrar`);
-  await page.getByLabel('E-mail').fill(u.email);
+  await page.getByLabel('Usuário').fill(u.login);
   await page.getByLabel('Senha').fill(u.senha);
   await page.getByRole('button', { name: 'Entrar' }).click();
+}
+
+/** Primeiro login de um usuário cadastrado com a senha 1234: troca obrigatória antes de entrar. */
+export async function entrarPelaPrimeiraVez(page: Page, url: string, u: { login: string; senha: string }) {
+  await entrar(page, url, { login: u.login, senha: '1234' });
+  await expect(page.getByRole('heading', { name: 'Crie sua senha' })).toBeVisible();
+  await page.getByLabel('Nova senha', { exact: true }).fill(u.senha);
+  await page.getByLabel('Confirme a nova senha').fill(u.senha);
+  await page.getByRole('button', { name: 'Salvar nova senha' }).click();
   await expect(page.getByRole('heading', { name: /Olá/ })).toBeVisible();
 }
 
@@ -29,7 +38,8 @@ export async function irPara(page: Page, rotulo: string) {
   const movel = await abrir.isVisible();
   if (movel) await abrir.click();
   const menu = page.getByRole('complementary', { name: 'Menu principal' });
-  await menu.getByRole('link', { name: rotulo, exact: true }).click();
+  // O item pode ter um contador ("Aprovações 2 pendente(s)").
+  await menu.getByRole('link', { name: new RegExp(`^${rotulo}( \\d+ pendente\\(s\\))?$`) }).click();
   if (movel) await expect(menu).not.toBeInViewport();
 }
 
@@ -40,20 +50,21 @@ export async function sair(page: Page) {
   await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible();
 }
 
+/** Cadastra com a senha provisória 1234. */
 export async function cadastrarUsuario(
   page: Page,
-  u: { nome: string; email: string; senha: string },
+  u: { nome: string; login: string; percentual?: string },
   perfil: string,
 ) {
   await irPara(page, 'Usuários');
   await page.getByRole('button', { name: 'Novo usuário' }).click();
   const dialogo = page.getByRole('dialog', { name: 'Novo usuário' });
   await dialogo.getByLabel('Nome').fill(u.nome);
-  await dialogo.getByLabel('E-mail').fill(u.email);
+  await dialogo.getByLabel('Usuário (para entrar)').fill(u.login);
   await dialogo.getByLabel('Perfil').selectOption({ label: perfil });
-  await dialogo.getByLabel('Senha inicial').fill(u.senha);
+  if (u.percentual) await dialogo.getByLabel('Repasse padrão (%)').fill(u.percentual);
   await page.getByRole('button', { name: 'Cadastrar' }).click();
-  await expect(page.getByText(`${u.nome} foi cadastrado.`)).toBeVisible();
+  await expect(page.getByText(`${u.nome} foi cadastrado.`, { exact: false })).toBeVisible();
 }
 
 export async function importar(page: Page, arquivo: string, esperado: RegExp) {

@@ -42,11 +42,12 @@ async function principal() {
       );
   }
   console.log(
-    `\nSeguros:   ${seguros.clientes.length} clientes, ${n(seguros.apolices)} apólices, ${n(seguros.comissoes)} comissões, ` +
-      `${n(seguros.movimentos)} movimentos, ${n(seguros.despesas)} despesas, ${n(seguros.fechamentos)} meses de faturamento`,
+    `\nSeguros:   ${seguros.clientes.length} clientes, ${n(seguros.apolices)} apólices, ${n(seguros.propostas)} propostas, ` +
+      `${n(seguros.estornos)} estornos, ${n(seguros.pagamentos)} pagamentos, ${n(seguros.movimentos)} movimentos, ${n(seguros.despesas)} despesas, ${n(seguros.fechamentos)} meses de faturamento`,
   );
   console.log(
-    `Consórcio: ${consorcio.clientes.length} clientes, ${n(consorcio.cotas)} cotas, ${n(consorcio.comissoes)} comissões`,
+    `Consórcio: ${consorcio.clientes.length} clientes, ${n(consorcio.cotas)} cotas, ${n(consorcio.propostas)} propostas, ` +
+      `${n(consorcio.estornos)} estornos, ${n(consorcio.pagamentos)} pagamentos`,
   );
   console.log(`${relatorio.avisos.length} aviso(s) em relatorio.json. Arquivos em ${saida}`);
 }

@@ -33,14 +33,14 @@ export class AutenticacaoMemoria implements GatewayAutenticacao {
   private readonly senhas = new Map<string, { id: string; senha: string }>();
   private sessao: string | null = null;
 
-  async verificarCredenciais(email: string, senha: string) {
-    const c = this.senhas.get(email);
+  async verificarCredenciais(login: string, senha: string) {
+    const c = this.senhas.get(login);
     if (!c || c.senha !== senha) throw new ErroAutenticacao();
     return c.id;
   }
-  async definirSenha(usuario: Pick<Usuario, 'id' | 'email'>, senha: string) {
-    for (const [email, c] of this.senhas) if (c.id === usuario.id) this.senhas.delete(email);
-    this.senhas.set(usuario.email, { id: usuario.id, senha });
+  async definirSenha(usuario: Pick<Usuario, 'id' | 'login'>, senha: string) {
+    for (const [login, c] of this.senhas) if (c.id === usuario.id) this.senhas.delete(login);
+    this.senhas.set(usuario.login, { id: usuario.id, senha });
   }
   async iniciarSessao(id: string) {
     this.sessao = id;

@@ -1,6 +1,6 @@
 import { ErroAutenticacao } from '../domain/erros';
 import type { Usuario } from '../domain/usuario';
-import { normalizarEmail } from '../domain/usuario';
+import { normalizarLogin } from '../domain/usuario';
 import type { GatewayAutenticacao } from '../ports/autenticacao';
 import type { Repositorio } from '../ports/repositorio';
 
@@ -10,8 +10,8 @@ export class ServicoAutenticacao {
     private readonly usuarios: Repositorio<Usuario>,
   ) {}
 
-  async entrar(email: string, senha: string): Promise<Usuario> {
-    const id = await this.auth.verificarCredenciais(normalizarEmail(email), senha);
+  async entrar(login: string, senha: string): Promise<Usuario> {
+    const id = await this.auth.verificarCredenciais(normalizarLogin(login), senha);
     const usuario = await this.usuarios.obter(id);
     if (!usuario) throw new ErroAutenticacao();
     if (!usuario.ativo) throw new ErroAutenticacao('Usuário desativado. Fale com o administrador.');

@@ -1,12 +1,12 @@
 import type { Importacao } from '@portella/app-base';
-import type { ComissaoImportada, CotaImportada, Usuario } from '@portella/core';
+import { prepararComissoesImportadas } from '@portella/app-base';
+import type { CotaImportada, Usuario } from '@portella/core';
 import {
   idImportado,
   lerArquivoImportacao,
   normalizar,
   paraCentavos,
   prepararClientes,
-  prepararComissoes,
   resolverResponsavel,
 } from '@portella/core';
 import type { Cota, StatusCota, TipoBem } from '../domain/cota';
@@ -83,14 +83,7 @@ export function criarImportacao(servicos: ServicosConsorcio): Importacao {
           );
         }
       }
-      const comissoes = prepararComissoes(
-        (arquivo.comissoes as ComissaoImportada[] | undefined) ?? [],
-        ator,
-        resolver,
-        idPorChave,
-        idCota,
-        agora,
-      );
+      const comissoes = prepararComissoesImportadas(arquivo, ator, equipe, resolver, idPorChave, agora);
       const pendentes = cotas.filter((c) => !c.grupo || !c.cota || !c.prazoMeses).length;
       if (pendentes)
         avisos.push(`${pendentes} cota(s) sem grupo, cota ou prazo: complete o cadastro na tela de cotas.`);
@@ -98,16 +91,12 @@ export function criarImportacao(servicos: ServicosConsorcio): Importacao {
         avisos.push(`Corretor "${nome}" não cadastrado: os registros ficaram com ${ator.nome}.`);
 
       return {
-        resumo: [
-          ['Clientes', clientes.length],
-          ['Cotas', cotas.length],
-          ['Comissões', comissoes.length],
-        ],
+        resumo: [['Clientes', clientes.length], ['Cotas', cotas.length], ...comissoes.resumo],
         avisos,
         confirmar: async () => {
           await servicos.clientes.importar(ator, clientes);
           await servicos.cotas.importar(ator, cotas);
-          await servicos.comissoes.importar(ator, comissoes);
+          await comissoes.confirmar(servicos);
         },
       };
     },

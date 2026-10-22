@@ -1,4 +1,14 @@
-import type { Cliente, LancamentoComissao, Oportunidade, Usuario } from '@portella/core';
+import { COLECOES_BASE } from '@portella/app-base';
+import type {
+  Catalogo,
+  Cliente,
+  Estorno,
+  Oportunidade,
+  PagamentoProdutor,
+  Proposta,
+  Usuario,
+  Vale,
+} from '@portella/core';
 import type { Credencial } from '@portella/infra-local';
 import {
   armazenamentoDoNavegador,
@@ -21,8 +31,8 @@ const NOME_BANCO = 'portella-crm-seguros';
 export async function criarServicos(): Promise<ServicosSeguros> {
   const banco = await BancoLocal.abrir(
     NOME_BANCO,
-    ['clientes', 'oportunidades', 'apolices', 'comissoes', 'movimentos', 'despesas', 'fechamentos'],
-    2,
+    [...COLECOES_BASE, 'apolices', 'movimentos', 'despesas', 'fechamentos'],
+    3,
   );
   return montarServicos({
     auth: new AutenticacaoLocal(
@@ -34,7 +44,11 @@ export async function criarServicos(): Promise<ServicosSeguros> {
     clientes: banco.repositorio<Cliente>('clientes'),
     oportunidades: banco.repositorio<Oportunidade>('oportunidades'),
     apolices: banco.repositorio<Apolice>('apolices'),
-    comissoes: banco.repositorio<LancamentoComissao>('comissoes'),
+    propostas: banco.repositorio<Proposta>('propostas'),
+    estornos: banco.repositorio<Estorno>('estornos'),
+    vales: banco.repositorio<Vale>('vales'),
+    pagamentos: banco.repositorio<PagamentoProdutor>('pagamentos'),
+    catalogos: banco.repositorio<Catalogo>('catalogos'),
     movimentos: banco.repositorio<Movimento>('movimentos'),
     despesas: banco.repositorio<Despesa>('despesas'),
     fechamentos: banco.repositorio<Fechamento>('fechamentos'),

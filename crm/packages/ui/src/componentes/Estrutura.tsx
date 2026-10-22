@@ -10,6 +10,8 @@ export interface ItemMenu {
   para: string;
   rotulo: string;
   icone: NomeIcone;
+  /** Número em destaque ao lado do item (ex.: pendências). */
+  contador?: number;
 }
 
 export interface EstruturaProps {
@@ -75,6 +77,11 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
             >
               <Icone nome={item.icone} />
               {item.rotulo}
+              {item.contador ? (
+                <span className={styles.contador} aria-label={`${item.contador} pendente(s)`}>
+                  {item.contador}
+                </span>
+              ) : null}
             </NavLink>
           ))}
         </nav>

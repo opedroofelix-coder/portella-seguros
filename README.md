@@ -76,10 +76,10 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 
 ### Pendências do CRM
 
-- [x] Importador ajustado à planilha de dezembro (comissões, financeiro e consórcio). Conferência dos totais em `docs/CRM.md`.
-- [ ] Cadastrar os corretores em Usuários antes de importar (Carla, Deliziane, Gabriel, Gisele, Silvana, Renata, Felippe).
+- [x] Importador ajustado à planilha de dezembro (propostas, estornos, pagamentos, financeiro e consórcio). Conferência dos totais em `docs/CRM.md`.
+- [x] Requisitos da conversa com a Portella (seção 0 do `docs/CRM.md`): login por usuário com senha 1234, aprovação de propostas, saldo e vitalício, vários produtores, estornos e vales, relatórios em PDF/Excel e painel de produção.
+- [ ] Confirmar o % de repasse padrão de Gabriel, Renata, Felippe e Silvana (em Usuários).
 - [ ] Completar nos CRMs o que a planilha não tem: CPF, telefone e e-mail dos clientes; fim real da vigência das apólices; grupo, cota e prazo das cotas de consórcio.
-- [ ] **Texto da especificação** combinado na conversa anterior, para incorporar ao `docs/CRM.md`.
 - [ ] **Backend**: hoje os dados ficam só no navegador, sem sincronizar entre pessoas e sem backup. Escolher entre Supabase, Firebase ou API própria e trocar o `container.ts` de cada app.
 - [ ] Hospedagem dos dois apps, com redirecionamento de todas as rotas para o `index.html` (SPA).
 
