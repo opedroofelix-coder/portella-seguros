@@ -153,6 +153,22 @@
     var label = select.closest('label');
     var placeholder = select.options[0].text;
     var uid = 0;
+    var ICONS = {
+      auto: '<path d="M3 15l2-5.5A2 2 0 0 1 6.9 8h10.2a2 2 0 0 1 1.9 1.5L21 15v3h-2.5M3 15v3h2.5M3 15h18M8.5 18h7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>',
+      vida: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+      saude: '<path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z"/>',
+      dental: '<path d="M7 3.5c2 0 3 1 5 1s3-1 5-1c2.5 0 3.5 2.5 3 5-.6 3-1.8 4.4-2.3 7.5-.4 2.5-1 4.5-2.2 4.5-1.6 0-1.3-6-3.5-6s-1.9 6-3.5 6c-1.2 0-1.8-2-2.2-4.5C5.8 12.9 4.6 11.5 4 8.5c-.5-2.5.5-5 3-5z"/>',
+      prev: '<path d="M6 3h12M6 21h12M7 3c0 5 5 6 5 9s-5 4-5 9M17 3c0 5-5 6-5 9s5 4 5 9"/>',
+      casa: '<path d="M4 11l8-7 8 7M6 9.5V20h12V9.5M10 20v-6h4v6"/>',
+      chave: '<circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l2.5 2.5M14 9l2 2"/>',
+      celular: '<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
+      empresa: '<path d="M4 21V7l6-3v17M10 9h10v12M4 21h17M7 10v.01M7 13v.01M7 16v.01M14 13h2M14 16h2"/>',
+      rc: '<path d="M12 3l7 3v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"/><path d="M9 12l2 2 4-4"/>',
+      consorcio: '<path d="M4 9.5h16M5 9.5V19h14V9.5M3 19.5h18M12 3l9 5H3z"/><path d="M8.5 12.5v4M12 12.5v4M15.5 12.5v4"/>'
+    };
+    function icon(key) {
+      return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[key] || ICONS.rc) + '</svg>';
+    }
 
     var wrap = document.createElement('div');
     wrap.className = 'qs';
@@ -193,8 +209,10 @@
         item.setAttribute('role', 'option');
         item.setAttribute('aria-selected', 'false');
         item.dataset.value = opt.value || opt.text;
-        item.innerHTML = '<span></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>';
-        item.firstChild.textContent = opt.text;
+        item.innerHTML = '<span class="qs__icon">' + icon(opt.dataset.icon) + '</span><span class="qs__text"><span class="qs__name"></span><span class="qs__desc"></span></span>' +
+          '<svg class="qs__check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>';
+        $('.qs__name', item).textContent = opt.text;
+        $('.qs__desc', item).textContent = opt.dataset.desc || '';
         item.addEventListener('mousedown', function (e) { e.preventDefault(); });
         item.addEventListener('click', function () { choose(item); });
         item.addEventListener('mousemove', function () { setActive(items.indexOf(item)); });
