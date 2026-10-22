@@ -50,9 +50,10 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 
 A seção Depoimentos mostra as avaliações do Google da Portella e se atualiza sozinha:
 a função da Vercel `api/avaliacoes.js` consulta a API do Google Places (New) e guarda a resposta
-por 1 dia, então avaliações novas aparecem no site em até 24 h. A API devolve a nota, o total e
-até 5 avaliações (as que o Google considera mais relevantes). Sem a chave, o site mostra só o botão
-"Ver avaliações no Google".
+por 1 dia, então avaliações novas aparecem no site em até 24 h.
+Enquanto a chave não estiver cadastrada, o site mostra 5 avaliações reais copiadas do Google em
+22/10/2026 (fixas no `index.html`). A API devolve a nota, o total e
+até 5 avaliações (as que o Google considera mais relevantes).
 
 Para ativar:
 

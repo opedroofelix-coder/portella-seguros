@@ -186,10 +186,17 @@
           <p class="lead">A confiança de quem já protege o que tem valor com a Portella.</p>
         </div>
       </div>
-      <!-- Avaliações do Google carregadas de /api/avaliacoes (assets/js/main.js); sem resposta, a faixa fica oculta -->
-      <p class="reviews-summary" data-reviews-summary hidden></p>
-      <div class="reviews" data-reviews hidden>
-        <div class="marquee__track" data-reviews-track></div>
+      <!-- Avaliações reais do Google (copiadas em 22/10/2026). Com GOOGLE_PLACES_API_KEY na Vercel,
+           o main.js troca estas pelas que vierem de /api/avaliacoes -->
+      <p class="reviews-summary" data-reviews-summary>4,9 de 5 no Google · 260 avaliações</p>
+      <div class="reviews" data-reviews>
+        <div class="marquee__track" data-marquee data-reviews-track>
+          <figure class="review"><blockquote>Eu não tenho palavras pra falar dessa empresa e de todos que lá se encontra sempre fui muito bem atendido e sempre bem respeitado vcs estão de parabéns tudo de bom pra vcs</blockquote><figcaption><span class="avatar">F</span><span class="review__name">Flavio Silva<small>Avaliação no Google</small></span></figcaption></figure>
+          <figure class="review"><blockquote>Ótimo atendimento, clareza nas informações, agilidade nos momentos de necessidade, gostaria de agradecer o excelente serviço prestado, estou muito satisfeito em ser cliente da Portella Corretora, e com certeza recomento o trabalho de vocês.</blockquote><figcaption><span class="avatar">D</span><span class="review__name">David Santos<small>Avaliação no Google</small></span></figcaption></figure>
+          <figure class="review"><blockquote>Equipe Top<br>Super atenciosa. Fez as correria das minhas necessidades só tenho a agradecer obrigado</blockquote><figcaption><span class="avatar">D</span><span class="review__name">Dayson Novaes<small>Avaliação no Google</small></span></figcaption></figure>
+          <figure class="review"><blockquote>Eu recomendo, pois, já faço seguro com eles a uns anos e nunca tive problema. Muito atenciosos e dão retorno rápido. Atendeu minha necessidade.</blockquote><figcaption><span class="avatar">N</span><span class="review__name">Neimar Alves<small>Avaliação no Google</small></span></figcaption></figure>
+          <figure class="review"><blockquote>Profissionais de extrema competência e confiança, conheço a portella a vários anos, todo seguro é sempre com eles, tanto é que tenho um plano odontológico do Bradesco feito com eles desde 2020.<br>Super recomendo.</blockquote><figcaption><span class="avatar">F</span><span class="review__name">Fábio Martins da Cunha Ramos<small>Avaliação no Google</small></span></figcaption></figure>
+        </div>
       </div>
       <div class="container reviews-cta">
         <a class="btn btn-outline-light" href="https://www.google.com/maps/search/?api=1&amp;query=Portella+Corretora+de+Seguros+em+Osasco" target="_blank" rel="noopener" data-reviews-link>Ver avaliações no Google</a>

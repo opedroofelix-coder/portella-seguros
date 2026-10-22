@@ -76,12 +76,13 @@
         summary.hidden = false;
       }
       if (!d.avaliacoes || !d.avaliacoes.length) return;
-      // duas cópias para o loop contínuo do marquee (a segunda fica oculta para leitores de tela)
+      // troca as avaliações fixas do HTML; duas cópias para o loop contínuo do marquee
+      // (a segunda fica oculta para leitores de tela)
+      track.textContent = '';
       [false, true].forEach(function (copy) {
         d.avaliacoes.forEach(function (a) { var c = card(a); if (copy) c.setAttribute('aria-hidden', 'true'); track.appendChild(c); });
       });
-      box.hidden = false;
-    }).catch(function () { /* sem avaliações: fica só o botão para o Google */ });
+    }).catch(function () { /* sem a API: ficam as avaliações fixas do HTML */ });
   })();
 
   /* ---------- Carrossel de seguros: autoplay, setas, arrastar e progresso ---------- */
