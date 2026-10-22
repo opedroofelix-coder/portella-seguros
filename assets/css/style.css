@@ -334,12 +334,16 @@ a.contact__row:hover span { color: var(--gold-text); }
   .nav a { padding: 14px 0; border-bottom: 1px solid rgba(217, 188, 126, .1); }
   .header-cta { display: none; }
   .hero__grid { grid-template-columns: minmax(0, 1fr); min-height: 0; }
-  .hero__text { padding: 56px 0 0; }
-  .hero__visual { min-height: 560px; }
-  .hero__photo { height: 540px; }
-  .arch { width: 300px; height: 460px; margin-left: -150px; border-radius: 150px 150px 0 0; }
+  /* foto logo depois do título e do texto: os itens do texto entram direto na grade para poder reordenar */
+  .hero__grid { padding-top: 48px; padding-bottom: 56px; row-gap: 26px; }
+  .hero__text { display: contents; }
+  .hero__text > .eyebrow, .hero__title, .hero__sub { order: 1; }
+  .hero__visual { order: 2; min-height: 470px; margin: 4px -20px 0; }
+  .quote-bar, .hero__stats { order: 3; }
+  .hero__photo { height: 460px; }
+  .arch { width: 270px; height: 390px; margin-left: -135px; border-radius: 135px 135px 0 0; }
   .arch-line { display: none; }
-  .crest { bottom: 300px; width: 64px; height: 64px; margin-left: 118px; box-shadow: 0 0 0 6px var(--navy-deep); }
+  .crest { bottom: 250px; width: 64px; height: 64px; margin-left: 100px; box-shadow: 0 0 0 6px var(--navy-deep); }
   .crest img { height: 38px; }
   .hero__tag { bottom: 40px; }
   .hero__mark { display: none; }
@@ -354,7 +358,8 @@ a.contact__row:hover span { color: var(--gold-text); }
   .qs__button { padding-left: 4px; }
   .qs__panel { left: -13px; right: -13px; width: auto; max-width: none; }
   .qs__title, .qs__option { padding-left: 18px; padding-right: 18px; }
-  .hero__stats { gap: 24px; }
+  .hero__stats { gap: 12px; flex-wrap: nowrap; justify-content: space-between; }
+  .hero__stat > span { letter-spacing: .1em; }
   .hero__tag { display: none; }
   .why { padding: 40px 28px; }
   .contact-form { padding: 36px 24px; }
