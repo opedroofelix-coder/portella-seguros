@@ -1,5 +1,6 @@
 export * from './componentes/Abas';
 export * from './componentes/Avisos';
+export * from './componentes/Barras';
 export * from './componentes/Botao';
 export * from './componentes/Campo';
 export * from './componentes/Cartao';

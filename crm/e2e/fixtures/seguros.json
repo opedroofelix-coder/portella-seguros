@@ -1,0 +1,244 @@
+{
+ "versao": 1,
+ "sistema": "seguros",
+ "origem": "fixture-e2e",
+ "geradoEm": "2026-10-22",
+ "clientes": [
+  {
+   "chave": "k0",
+   "nome": "Cliente Teste Alfa",
+   "tipoPessoa": "PF",
+   "telefone": "11999990000",
+   "endereco": {
+    "cidade": "Osasco",
+    "uf": "SP"
+   },
+   "responsavel": ""
+  },
+  {
+   "chave": "k1",
+   "nome": "Cliente Teste Beta",
+   "tipoPessoa": "PF",
+   "telefone": "11999990001",
+   "endereco": {
+    "cidade": "Osasco",
+    "uf": "SP"
+   },
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "k2",
+   "nome": "Cliente Teste Gama",
+   "tipoPessoa": "PF",
+   "telefone": "11999990002",
+   "endereco": {
+    "cidade": "Osasco",
+    "uf": "SP"
+   },
+   "responsavel": ""
+  },
+  {
+   "chave": "k3",
+   "nome": "Empresa Teste Delta Ltda.",
+   "tipoPessoa": "PJ",
+   "telefone": "11999990003",
+   "endereco": {
+    "cidade": "Osasco",
+    "uf": "SP"
+   },
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "k4",
+   "nome": "Cliente Teste Épsilon",
+   "tipoPessoa": "PF",
+   "telefone": "11999990004",
+   "endereco": {
+    "cidade": "Osasco",
+    "uf": "SP"
+   },
+   "responsavel": ""
+  },
+  {
+   "chave": "k5",
+   "nome": "Cliente Teste Zeta",
+   "tipoPessoa": "PF",
+   "telefone": "11999990005",
+   "endereco": {
+    "cidade": "Osasco",
+    "uf": "SP"
+   },
+   "responsavel": "Corretor Teste"
+  }
+ ],
+ "apolices": [
+  {
+   "chave": "a0",
+   "clienteChave": "k0",
+   "seguradora": "Porto Seguro",
+   "ramo": "Auto",
+   "numero": "TESTE-1000",
+   "item": "ABC1D23 · Modelo teste",
+   "inicioVigencia": "2025-11-01",
+   "fimVigencia": "2026-11-01",
+   "premioLiquido": 1500.0,
+   "premioTotal": 1610.0,
+   "comissaoPercentual": 15,
+   "responsavel": ""
+  },
+  {
+   "chave": "a1",
+   "clienteChave": "k1",
+   "seguradora": "HDI",
+   "ramo": "Residencial",
+   "numero": "TESTE-1001",
+   "item": null,
+   "inicioVigencia": "2025-11-16",
+   "fimVigencia": "2026-11-16",
+   "premioLiquido": 1730.5,
+   "premioTotal": 1857.3,
+   "comissaoPercentual": 15,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "a2",
+   "clienteChave": "k2",
+   "seguradora": "Tokio Marine",
+   "ramo": "Vida",
+   "numero": "TESTE-1002",
+   "item": null,
+   "inicioVigencia": "2025-12-06",
+   "fimVigencia": "2026-12-06",
+   "premioLiquido": 1961.0,
+   "premioTotal": 2104.6,
+   "comissaoPercentual": 15,
+   "responsavel": ""
+  },
+  {
+   "chave": "a3",
+   "clienteChave": "k3",
+   "seguradora": "Bradesco Seguros",
+   "ramo": "Empresarial",
+   "numero": "TESTE-1003",
+   "item": null,
+   "inicioVigencia": "2026-01-10",
+   "fimVigencia": "2027-01-10",
+   "premioLiquido": 2191.5,
+   "premioTotal": 2351.9,
+   "comissaoPercentual": 15,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "a4",
+   "clienteChave": "k4",
+   "seguradora": "Allianz",
+   "ramo": "Auto",
+   "numero": "TESTE-1004",
+   "item": "ABC1D23 · Modelo teste",
+   "inicioVigencia": "2026-05-10",
+   "fimVigencia": "2027-05-10",
+   "premioLiquido": 2422.0,
+   "premioTotal": 2599.2,
+   "comissaoPercentual": 15,
+   "responsavel": ""
+  },
+  {
+   "chave": "a5",
+   "clienteChave": "k5",
+   "seguradora": "Mapfre",
+   "ramo": "Fiança Locatícia",
+   "numero": "TESTE-1005",
+   "item": null,
+   "inicioVigencia": "2025-10-17",
+   "fimVigencia": "2026-10-17",
+   "premioLiquido": 2652.5,
+   "premioTotal": 2846.5,
+   "comissaoPercentual": 15,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "a6",
+   "clienteChave": "k0",
+   "seguradora": "Porto Seguro",
+   "ramo": "Auto",
+   "numero": "TESTE-1006",
+   "item": "ABC1D23 · Modelo teste",
+   "inicioVigencia": "2025-11-01",
+   "fimVigencia": "2026-11-01",
+   "premioLiquido": 2883.0,
+   "premioTotal": 3093.8,
+   "comissaoPercentual": 15,
+   "responsavel": ""
+  },
+  {
+   "chave": "a7",
+   "clienteChave": "k1",
+   "seguradora": "HDI",
+   "ramo": "Residencial",
+   "numero": "TESTE-1007",
+   "item": null,
+   "inicioVigencia": "2025-11-16",
+   "fimVigencia": "2026-11-16",
+   "premioLiquido": 3113.5,
+   "premioTotal": 3341.1000000000004,
+   "comissaoPercentual": 15,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "a8",
+   "clienteChave": "k2",
+   "seguradora": "Tokio Marine",
+   "ramo": "Vida",
+   "numero": "TESTE-1008",
+   "item": null,
+   "inicioVigencia": "2025-12-06",
+   "fimVigencia": "2026-12-06",
+   "premioLiquido": 3344.0,
+   "premioTotal": 3588.4,
+   "comissaoPercentual": 15,
+   "responsavel": ""
+  },
+  {
+   "chave": "a9",
+   "clienteChave": "k3",
+   "seguradora": "Bradesco Seguros",
+   "ramo": "Empresarial",
+   "numero": "TESTE-1009",
+   "item": null,
+   "inicioVigencia": "2026-01-10",
+   "fimVigencia": "2027-01-10",
+   "premioLiquido": 3574.5,
+   "premioTotal": 3835.7000000000003,
+   "comissaoPercentual": 15,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "a10",
+   "clienteChave": "k4",
+   "seguradora": "Allianz",
+   "ramo": "Auto",
+   "numero": "TESTE-1010",
+   "item": "ABC1D23 · Modelo teste",
+   "inicioVigencia": "2026-05-10",
+   "fimVigencia": "2027-05-10",
+   "premioLiquido": 3805.0,
+   "premioTotal": 4083.0,
+   "comissaoPercentual": 15,
+   "responsavel": ""
+  },
+  {
+   "chave": "a11",
+   "clienteChave": "k5",
+   "seguradora": "Mapfre",
+   "ramo": "Fiança Locatícia",
+   "numero": "TESTE-1011",
+   "item": null,
+   "inicioVigencia": "2025-10-17",
+   "fimVigencia": "2026-10-17",
+   "premioLiquido": 4035.5,
+   "premioTotal": 4330.3,
+   "comissaoPercentual": 15,
+   "responsavel": "Corretor Teste"
+  }
+ ]
+}

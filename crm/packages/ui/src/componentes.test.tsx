@@ -181,3 +181,15 @@ describe('Estrutura', () => {
     expect(sair).toHaveBeenCalled();
   });
 });
+
+describe('Barras', () => {
+  it('mostra rótulo e valor de cada item com largura proporcional', async () => {
+    const { Barras } = await import('./index');
+    render(<Barras rotulo="Por seguradora" itens={[{ rotulo: 'Porto Seguro', valor: 10 }, { rotulo: 'HDI', valor: 5, valorTexto: 'cinco' }]} />);
+    const lista = screen.getByRole('list', { name: 'Por seguradora' });
+    expect(within(lista).getAllByRole('listitem')).toHaveLength(2);
+    expect(screen.getByText('cinco')).toBeInTheDocument();
+    const barras = lista.querySelectorAll<HTMLElement>('[aria-hidden] > div');
+    expect([...barras].map((b) => b.style.width)).toEqual(['100%', '50%']);
+  });
+});

@@ -78,6 +78,13 @@ describe('usuários e autenticação', () => {
     await expect(sessao.entrar('cid@x.com', 'novasenha')).resolves.toBeTruthy();
     await expect(usuarios.redefinirSenha(c, admin.id, 'outrasenha')).rejects.toThrow(ErroPermissao);
   });
+
+  it('troca a própria senha só com a senha atual correta', async () => {
+    const admin = await usuarios.configurarAdministrador({ nome: 'Ana', email: 'ana@x.com', senha: '12345678' });
+    await expect(usuarios.alterarPropriaSenha(admin, 'errada', 'nova-senha')).rejects.toThrow(ErroAutenticacao);
+    await usuarios.alterarPropriaSenha(admin, '12345678', 'nova-senha');
+    await expect(sessao.entrar('ana@x.com', 'nova-senha')).resolves.toBeTruthy();
+  });
 });
 
 describe('carteira', () => {

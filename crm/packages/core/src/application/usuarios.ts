@@ -71,6 +71,13 @@ export class ServicoUsuarios {
     await this.auth.definirSenha(usuario, senha);
   }
 
+  /** Troca da própria senha, conferindo a senha atual. */
+  async alterarPropriaSenha(ator: Usuario, senhaAtual: string, novaSenha: string): Promise<void> {
+    await this.auth.verificarCredenciais(ator.email, senhaAtual);
+    validarSenha(novaSenha);
+    await this.auth.definirSenha(ator, novaSenha);
+  }
+
   private async registrar(dados: NovoUsuario): Promise<Usuario> {
     const email = normalizarEmail(dados.email);
     validarUsuario({ ...dados, email });

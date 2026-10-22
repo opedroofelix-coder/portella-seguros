@@ -64,6 +64,19 @@ h1 em, h2 em, h3 em { font-style: italic; color: var(--gold-light); }
   .grade-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .grade-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+.lista-dados { display: grid; gap: 12px 24px; grid-template-columns: 1fr; margin: 0; }
+@media (min-width: 720px) { .lista-dados { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
+.lista-dados div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lista-dados dt { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--text-faint); }
+.lista-dados dd { margin: 0; overflow-wrap: anywhere; }
+.lista-simples { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.lista-simples li + li { border-top: 1px solid var(--line); }
+.lista-simples button { width: 100%; min-height: var(--touch); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 4px; background: none; border: 0; text-align: left; cursor: pointer; }
+.lista-simples button:hover { background: rgba(217, 188, 126, .05); }
+.lista-simples button > span:first-child { display: flex; flex-direction: column; min-width: 0; }
+.lista-simples strong { font-weight: 500; overflow-wrap: anywhere; }
+.lista-simples small { color: var(--text-muted); font-size: 13px; }
+.acoes-linha { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
 .span-todo { grid-column: 1 / -1; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }

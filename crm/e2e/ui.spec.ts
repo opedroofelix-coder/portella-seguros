@@ -17,7 +17,7 @@ for (const tela of LARGURAS) {
     test('tabela vira cartões no celular e o menu abre/fecha', async ({ page }) => {
       await page.goto(URL);
       const cabecalho = page.locator('thead');
-      if (tela.width < 720) await expect(cabecalho).not.toBeInViewport();
+      if (tela.width < 900) await expect(cabecalho).not.toBeInViewport();
       else await expect(cabecalho).toBeVisible();
 
       const menu = page.getByRole('complementary', { name: 'Menu principal' });
