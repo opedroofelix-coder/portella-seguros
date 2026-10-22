@@ -11,8 +11,8 @@
   - Instagram: @portellacorretora; Facebook: PortellaCorretoraDeSeguros
 - Seguradoras parceiras (12): Porto Seguro, HDI, Ituran, Azul, Suhai, Tokio Marine, SulAmérica,
   Liberty, Bradesco Seguros, Mapfre, Allianz, Sompo.
-  São as 12 da faixa de logos; a Portella trabalha com mais de 30 (lista completa em `docs/CRM.md`, seção 0.4,
-  no branch do CRM). O site diz "mais de 30 seguradoras".
+  São as 12 da faixa de logos. No total a Portella trabalha com **22 seguradoras** (confirmado em 22/10/2026);
+  o site diz "22 seguradoras". A lista de opções do CRM (`docs/CRM.md`) não é a lista de parceiras.
 - A Portella também vende consórcio (imóvel, automóvel, moto, pesados, serviços). Nada do CRM interno
   (produtores, comissões, valores, faturamento) vai para o site.
 - Cores e fonte ficam em `:root` no `assets/css/style.css`.
