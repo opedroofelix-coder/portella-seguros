@@ -29,10 +29,17 @@ npm run dev:consorcio     # http://localhost:5174
 npm test                  # testes unitários e de componentes
 npm run test:e2e          # fluxos e responsividade (Playwright)
 PLANILHA_SENHA='…' npm run importar --silent -- planilha.xlsx   # gera crm/dados/*.seed.json
+npm run build:demo        # demonstração com dados fictícios em apps/*/dist-demo e packages/ui/catalogo/dist-demo
 ```
 
 No primeiro acesso, cada CRM pede para criar o administrador. Os dados ficam no navegador
 até a escolha do backend (veja as pendências).
+
+**Demonstração** (`VITE_DEMO=1`): os apps abrem já com a administradora conectada e dados
+fictícios ("Cliente Teste …", gerados em `packages/app-base/src/demo/`), num banco separado do
+navegador. A faixa no rodapé troca para a visão da produtora (Gisele) e **Recomeçar** volta ao início.
+O build usa caminhos relativos e rotas com `#`, para rodar dentro de outra página (vitrine de design).
+Nunca use dados reais na demonstração.
 
 ## Estrutura do site
 

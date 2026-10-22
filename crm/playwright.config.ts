@@ -8,6 +8,13 @@ const todos = [
   { nome: 'catalogo', comando: 'npm run catalogo', porta: 5180 },
   { nome: 'seguros', comando: 'npm run dev:seguros', porta: 5173 },
   { nome: 'consorcio', comando: 'npm run dev:consorcio', porta: 5174 },
+  // Modo demonstração (dados fictícios, entrada direta), o mesmo do build publicado na vitrine.
+  { nome: 'demo', comando: 'VITE_DEMO=1 npm run dev -w @portella/crm-seguros -- --port 5185', porta: 5185 },
+  {
+    nome: 'demo-consorcio',
+    comando: 'VITE_DEMO=1 npm run dev -w @portella/crm-consorcio -- --port 5186',
+    porta: 5186,
+  },
 ];
 const filtro = process.env.E2E_SERVIDORES?.split(',');
 const servidores = filtro ? todos.filter((s) => filtro.includes(s.nome)) : todos;

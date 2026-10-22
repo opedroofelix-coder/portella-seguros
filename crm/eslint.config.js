@@ -4,7 +4,16 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/node_modules/**', 'playwright-report/**', 'test-results/**', 'dados/**'] },
+  {
+    ignores: [
+      '**/dist/**',
+      '**/dist-demo/**',
+      '**/node_modules/**',
+      'playwright-report/**',
+      'test-results/**',
+      'dados/**',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -21,7 +30,10 @@ export default tseslint.config(
     // Arquitetura limpa: o domínio e os casos de uso do core não conhecem React nem infraestrutura.
     files: ['packages/core/src/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: ['react', 'react-*', '@portella/infra-*', '@portella/ui', 'idb'] }],
+      'no-restricted-imports': [
+        'error',
+        { patterns: ['react', 'react-*', '@portella/infra-*', '@portella/ui', 'idb'] },
+      ],
     },
   },
 );

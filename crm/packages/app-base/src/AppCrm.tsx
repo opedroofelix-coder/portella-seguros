@@ -4,7 +4,7 @@ import { Estrutura, ProvedorAvisos } from '@portella/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { BrowserRouter, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import type { ConfigApp, ItemMenuApp } from './config';
 import { ProvedorConfig, useConfig as useConfigInterno } from './config';
 import { PaginaCliente, PaginaClientes } from './paginas/Clientes';
@@ -55,11 +55,18 @@ export function AppCrm<S extends ServicosBase>({
   config,
   servicos,
   rotas,
+  roteador = 'navegador',
+  extra,
 }: {
   config: ConfigApp;
   servicos: S;
   rotas: RotaApp[];
+  /** 'hash' quando o app roda dentro de outra página (demonstração), sem controle das URLs. */
+  roteador?: 'navegador' | 'hash';
+  /** Conteúdo fixo dentro da sessão e do roteador (ex.: faixa da demonstração). */
+  extra?: ReactNode;
 }) {
+  const Roteador = roteador === 'hash' ? HashRouter : BrowserRouter;
   const [clienteQuery] = useState(
     () =>
       new QueryClient({
@@ -71,7 +78,7 @@ export function AppCrm<S extends ServicosBase>({
       <ProvedorConfig config={config}>
         <ProvedorServicos servicos={servicos}>
           <ProvedorAvisos>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Roteador future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <ProvedorSessao>
                 <Routes>
                   <Route path="/entrar" element={<PaginaEntrar />} />
@@ -134,8 +141,9 @@ export function AppCrm<S extends ServicosBase>({
                     <Route path="*" element={<p>Página não encontrada.</p>} />
                   </Route>
                 </Routes>
+                {extra}
               </ProvedorSessao>
-            </BrowserRouter>
+            </Roteador>
           </ProvedorAvisos>
         </ProvedorServicos>
       </ProvedorConfig>

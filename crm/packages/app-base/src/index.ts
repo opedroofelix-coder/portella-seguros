@@ -11,3 +11,4 @@ export * from './paginas/Propostas';
 export * from './exportar';
 export * from './padroes';
 export * from './importacaoComissoes';
+export * from './demo';

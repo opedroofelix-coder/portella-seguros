@@ -146,6 +146,7 @@ export function PaginaProducao() {
               <Barras
                 rotulo="Prêmio líquido por produtor (proporcional ao %)"
                 itens={painel.porProdutor.map((g) => ({
+                  chave: g.chave,
                   rotulo: nomeProdutor(g.chave),
                   valor: g.premio,
                   valorTexto: formatarDinheiro(g.premio),

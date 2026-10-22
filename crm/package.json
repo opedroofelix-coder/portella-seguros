@@ -10,6 +10,7 @@
     "dev:seguros": "npm run dev -w @portella/crm-seguros",
     "dev:consorcio": "npm run dev -w @portella/crm-consorcio",
     "build": "npm run build -w @portella/crm-seguros && npm run build -w @portella/crm-consorcio",
+    "build:demo": "VITE_DEMO=1 npm run build -w @portella/crm-seguros && VITE_DEMO=1 npm run build -w @portella/crm-consorcio && VITE_DEMO=1 vite build --config packages/ui/catalogo/vite.config.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",

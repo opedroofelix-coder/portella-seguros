@@ -255,4 +255,17 @@ describe('Barras', () => {
     const barras = lista.querySelectorAll<HTMLElement>('[aria-hidden] > div');
     expect([...barras].map((b) => b.style.width)).toEqual(['100%', '50%']);
   });
+
+  it('não duplica itens quando os rótulos se repetem e depois mudam (nomes carregando)', async () => {
+    const { Barras } = await import('./index');
+    const itens = (nomes: string[]) => nomes.map((rotulo, i) => ({ chave: `p${i}`, rotulo, valor: 10 - i }));
+    const { rerender } = render(<Barras rotulo="Por produtor" itens={itens(['—', '—', '—'])} />);
+    rerender(<Barras rotulo="Por produtor" itens={itens(['Ana', 'Bia', 'Caio'])} />);
+    const lista = screen.getByRole('list', { name: 'Por produtor' });
+    expect(
+      within(lista)
+        .getAllByRole('listitem')
+        .map((li) => li.querySelector('span')?.textContent),
+    ).toEqual(['Ana', 'Bia', 'Caio']);
+  });
 });

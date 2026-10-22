@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { ConfigApp, RotaApp } from '@portella/app-base';
 import { AppCrm, MENU_COMUM, PRODUTORES_INICIAIS, ROTA_FUNIL } from '@portella/app-base';
 import { criarImportacao } from '../application/importacao';
@@ -14,10 +15,18 @@ const rotas: RotaApp[] = [
   { caminho: '/lances', elemento: <PaginaLances /> },
 ];
 
-export function App({ servicos }: { servicos: ServicosConsorcio }) {
+export function App({
+  servicos,
+  roteador,
+  extra,
+}: {
+  servicos: ServicosConsorcio;
+  roteador?: 'navegador' | 'hash';
+  extra?: ReactNode;
+}) {
   const config: ConfigApp = {
     sistema: 'Consórcio',
-    logo: '/logo.svg',
+    logo: `${import.meta.env.BASE_URL}logo.svg`,
     nomeFunil: 'Funil de vendas',
     produtos: TIPOS_BEM.map((t) => `Consórcio · ${t.nome}`),
     menu: [
@@ -46,5 +55,5 @@ export function App({ servicos }: { servicos: ServicosConsorcio }) {
       },
     ],
   };
-  return <AppCrm config={config} servicos={servicos} rotas={rotas} />;
+  return <AppCrm config={config} servicos={servicos} rotas={rotas} roteador={roteador} extra={extra} />;
 }
