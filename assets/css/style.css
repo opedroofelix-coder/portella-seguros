@@ -325,6 +325,8 @@ a.contact__row:hover span { color: var(--gold-text); }
   .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
+  .cta__frame { inset: 24px 14px; }
+  .cta .cta__inner { padding: 0 34px; }
   .insurers .carousel__nav, .testimonials .carousel__nav { margin: 0 0 16px; }
   .menu-toggle { display: inline-flex; }
   .nav { display: none; position: absolute; top: 92px; left: 0; right: 0; flex-direction: column; gap: 0; background: var(--navy-deep); border-bottom: 1px solid rgba(217, 188, 126, .2); padding: 8px 24px 20px; }
