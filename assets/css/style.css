@@ -152,10 +152,10 @@ input, select, textarea, button { font: inherit; }
 .insurer { flex: none; width: 190px; height: 84px; padding: 12px 20px; background: #F7F3EC; border: 1px solid rgba(217, 188, 126, .6); border-radius: 2px; display: flex; align-items: center; justify-content: center; transition: transform .4s, border-color .4s; }
 .insurer:hover { transform: scale(1.06); border-color: var(--gold); }
 .insurer:hover img { filter: none; opacity: 1; }
-/* logos em cores claras (laranja da Youse, rosa da Pier): em cinza ficavam apagados na placa marfim */
-.insurer img[src*="youse"], .insurer img[src*="pier"] { filter: grayscale(1) sepia(.25) brightness(.62) contrast(1.5); }
+/* logos em cores claras (laranja da Youse e da Única, rosa da Pier): em cinza ficavam apagados na placa marfim */
+.insurer img[src*="youse"], .insurer img[src*="pier"], .insurer img[src*="unica"] { filter: grayscale(1) sepia(.25) brightness(.62) contrast(1.5); }
 .insurer img[src*="youse"] { filter: grayscale(1) sepia(.25) brightness(.5) contrast(1.7); }
-.insurer:hover img[src*="youse"], .insurer:hover img[src*="pier"] { filter: none; }
+.insurer:hover img[src*="youse"], .insurer:hover img[src*="pier"], .insurer:hover img[src*="unica"] { filter: none; }
 .insurer img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(1) sepia(.25); opacity: .78; transition: filter .4s, opacity .4s; }
 
 /* ---------- 4. Sobre ---------- */
