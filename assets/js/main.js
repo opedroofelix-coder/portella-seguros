@@ -4,7 +4,7 @@
 
   // TODO: preencher com o WhatsApp da Portella (só números, com DDI e DDD), ex.: '5511999999999'
   var WHATSAPP_NUMBER = '';
-  var PHONE_FALLBACK = 'tel:+551135925216';
+  var PHONE_FALLBACK = 'tel:+5511947841580';
 
   var $ = function (s, ctx) { return (ctx || document).querySelector(s); };
   var $$ = function (s, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(s)); };
