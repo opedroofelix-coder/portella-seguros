@@ -19,7 +19,10 @@ export interface Apolice extends Registro {
   /** Bem segurado: placa e modelo do veículo, endereço do imóvel etc. */
   item?: string;
   inicioVigencia: DataISO;
-  fimVigencia: DataISO;
+  /** Vazio em contratos contínuos (vida, saúde, dental…). */
+  fimVigencia?: DataISO;
+  /** Fim calculado (início + 12 meses) na importação; precisa ser confirmado. */
+  vigenciaEstimada?: boolean;
   premioLiquido?: Centavos;
   premioTotal?: Centavos;
   comissaoPercentual?: number;
@@ -42,6 +45,7 @@ export const JANELA_A_VENCER = 30;
 
 export function situacao(a: Pick<Apolice, 'fimVigencia' | 'cancelada'>, hoje: DataISO): Situacao {
   if (a.cancelada) return 'cancelada';
+  if (!a.fimVigencia) return 'vigente';
   const dias = diasEntre(hoje, a.fimVigencia);
   if (dias < 0) return 'vencida';
   return dias <= JANELA_A_VENCER ? 'a_vencer' : 'vigente';
@@ -59,8 +63,8 @@ export function validarApolice(a: Partial<Apolice>): void {
   if (!a.seguradora?.trim()) campos.seguradora = 'Informe a seguradora.';
   if (!a.ramo) campos.ramo = 'Escolha o ramo.';
   if (!a.inicioVigencia || !dataValida(a.inicioVigencia)) campos.inicioVigencia = 'Data inválida.';
-  if (!a.fimVigencia || !dataValida(a.fimVigencia)) campos.fimVigencia = 'Data inválida.';
-  else if (a.inicioVigencia && diasEntre(a.inicioVigencia, a.fimVigencia) <= 0) {
+  if (a.fimVigencia && !dataValida(a.fimVigencia)) campos.fimVigencia = 'Data inválida.';
+  else if (a.fimVigencia && a.inicioVigencia && diasEntre(a.inicioVigencia, a.fimVigencia) <= 0) {
     campos.fimVigencia = 'O fim precisa ser depois do início.';
   }
   if (a.comissaoPercentual != null && (a.comissaoPercentual < 0 || a.comissaoPercentual > 100)) {
@@ -74,7 +78,8 @@ export function validarApolice(a: Partial<Apolice>): void {
 export function filaRenovacao(apolices: Apolice[], hoje: DataISO, dias: number): Apolice[] {
   return apolices
     .filter((a) => !a.cancelada && (a.renovacao === 'pendente' || a.renovacao === 'em_contato'))
-    .filter((a) => {
+    .filter((a): a is Apolice & { fimVigencia: DataISO } => {
+      if (!a.fimVigencia) return false;
       const d = diasEntre(hoje, a.fimVigencia);
       return d <= dias && d >= -30;
     })
@@ -97,8 +102,8 @@ export function resumirCarteira(apolices: Apolice[], hoje: DataISO): ResumoCarte
     const s = situacao(a, hoje);
     return s === 'vigente' || s === 'a_vencer';
   });
-  const pendentes = filaRenovacao(apolices, hoje, 90).filter((a) => diasEntre(hoje, a.fimVigencia) >= 0);
-  const dentro = (n: number) => pendentes.filter((a) => diasEntre(hoje, a.fimVigencia) <= n).length;
+  const pendentes = filaRenovacao(apolices, hoje, 90).filter((a) => diasEntre(hoje, a.fimVigencia!) >= 0);
+  const dentro = (n: number) => pendentes.filter((a) => diasEntre(hoje, a.fimVigencia!) <= n).length;
 
   const seg = new Map<string, { quantidade: number; premio: Centavos }>();
   const ramo = new Map<string, number>();

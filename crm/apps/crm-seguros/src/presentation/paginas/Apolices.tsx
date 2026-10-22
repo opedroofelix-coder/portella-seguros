@@ -44,7 +44,7 @@ export function PaginaApolices() {
         .filter((a) =>
           corresponde(busca, indice.get(a.clienteId)?.nome, a.numero, a.item, nomeSeguradora(a.seguradora)),
         )
-        .sort((a, b) => a.fimVigencia.localeCompare(b.fimVigencia)),
+        .sort((a, b) => (a.fimVigencia ?? '9999').localeCompare(b.fimVigencia ?? '9999')),
     [data, seguradora, ramo, sit, responsavel, busca, indice, hoje],
   );
 

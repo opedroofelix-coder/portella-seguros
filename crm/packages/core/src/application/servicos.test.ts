@@ -179,3 +179,20 @@ describe('carteira', () => {
     await expect(servico.importar(admin, [item])).resolves.toBe(1);
   });
 });
+
+describe('comissões', () => {
+  it('corretor consulta só as suas e não lança; gestor lança e dá baixa', async () => {
+    const { ServicoComissoes } = await import('./comissoes');
+    const servico = new ServicoComissoes(new RepositorioMemoria(), ambiente);
+    const gestor: Usuario = { id: 'g', nome: 'G', email: 'g@x', perfil: 'gestor', ativo: true, criadoEm: '' };
+    const carla: Usuario = { ...gestor, id: 'carla', perfil: 'corretor' };
+    const dados = { clienteNome: 'Cliente', produto: 'Auto', companhia: 'Suhai', comissaoReceber: 1000, comissaoRecebida: 0, responsavelId: 'carla' };
+    await expect(servico.salvar(carla, dados)).rejects.toThrow(ErroPermissao);
+    const lanc = await servico.salvar(gestor, dados);
+    await servico.salvar(gestor, { ...lanc, comissaoRecebida: 1000, dataRecebimento: '2026-10-22' });
+    expect((await servico.listar(carla))[0]?.comissaoRecebida).toBe(1000);
+    await servico.salvar(gestor, { ...dados, responsavelId: 'outro' });
+    expect(await servico.listar(carla)).toHaveLength(1);
+    await expect(servico.remover(carla, lanc.id)).rejects.toThrow(ErroPermissao);
+  });
+});

@@ -10,7 +10,8 @@ export type Acao =
   | 'registro:criar'
   | 'registro:editar'
   | 'registro:remover'
-  | 'registro:transferir';
+  | 'registro:transferir'
+  | 'financeiro:gerenciar';
 
 /** Ações liberadas por perfil, sem olhar para o dono do registro. */
 const REGRAS: Record<Perfil, ReadonlySet<Acao>> = {
@@ -23,6 +24,7 @@ const REGRAS: Record<Perfil, ReadonlySet<Acao>> = {
     'registro:editar',
     'registro:remover',
     'registro:transferir',
+    'financeiro:gerenciar',
   ]),
   gestor: new Set<Acao>([
     'carteira:ver_todos',
@@ -31,6 +33,7 @@ const REGRAS: Record<Perfil, ReadonlySet<Acao>> = {
     'registro:editar',
     'registro:remover',
     'registro:transferir',
+    'financeiro:gerenciar',
   ]),
   corretor: new Set<Acao>(['registro:criar']),
 };

@@ -8,6 +8,7 @@ import { BrowserRouter, Outlet, Route, Routes, useNavigate } from 'react-router-
 import type { ConfigApp, ItemMenuApp } from './config';
 import { ProvedorConfig, useConfig as useConfigInterno } from './config';
 import { PaginaCliente, PaginaClientes } from './paginas/Clientes';
+import { PaginaComissoes } from './paginas/Comissoes';
 import { PaginaEntrar } from './paginas/Entrar';
 import { PaginaFunil } from './paginas/Funil';
 import { PaginaImportar } from './paginas/Importar';
@@ -29,6 +30,7 @@ export const ROTA_FUNIL = '/oportunidades';
 
 export const MENU_COMUM = {
   clientes: { para: '/clientes', rotulo: 'Clientes', icone: 'clientes' },
+  comissoes: { para: '/comissoes', rotulo: 'Comissões', icone: 'moeda' },
   usuarios: { para: '/usuarios', rotulo: 'Usuários', icone: 'usuarios', acao: 'usuarios:gerenciar' },
   importar: { para: '/importar', rotulo: 'Importar', icone: 'importar', acao: 'dados:importar' },
   conta: { para: '/conta', rotulo: 'Minha conta', icone: 'editar' },
@@ -77,6 +79,7 @@ export function AppCrm<S extends ServicosBase>({
                     <Route path="/clientes" element={<PaginaClientes />} />
                     <Route path="/clientes/:id" element={<PaginaCliente />} />
                     <Route path={ROTA_FUNIL} element={<PaginaFunil />} />
+                    <Route path="/comissoes" element={<PaginaComissoes />} />
                     <Route
                       path="/usuarios"
                       element={

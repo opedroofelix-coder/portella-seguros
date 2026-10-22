@@ -37,7 +37,8 @@ const esquema = z.object({
   numero: z.string(),
   item: z.string(),
   inicioVigencia: z.string().min(1, 'Informe o início.'),
-  fimVigencia: z.string().min(1, 'Informe o fim.'),
+  fimVigencia: z.string(),
+  vigenciaEstimada: z.enum(['sim', 'nao']),
   premioLiquido: dinheiro,
   premioTotal: dinheiro,
   comissaoPercentual: z.string().refine((v) => !v.trim() || paraCentavos(v) != null, 'Percentual inválido.'),
@@ -82,7 +83,8 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
       numero: base.numero ?? '',
       item: base.item ?? '',
       inicioVigencia: base.inicioVigencia ?? hoje,
-      fimVigencia: base.fimVigencia ?? somarMeses(hoje, 12),
+      fimVigencia: apolice ? (apolice.fimVigencia ?? '') : (base.fimVigencia ?? somarMeses(hoje, 12)),
+      vigenciaEstimada: base.vigenciaEstimada ? 'sim' : 'nao',
       premioLiquido: centavosParaTexto(base.premioLiquido),
       premioTotal: centavosParaTexto(base.premioTotal),
       comissaoPercentual:
@@ -107,11 +109,13 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
   );
 
   const enviar = handleSubmit(async (v) => {
-    const { outraSeguradora, ...d } = limparVazios(v);
+    const { outraSeguradora, vigenciaEstimada, ...d } = limparVazios(v);
     const dados: DadosRegistro<Apolice> = {
       ...(apolice ?? {}),
       ...d,
       seguradora: v.seguradora === OUTRA ? (outraSeguradora ?? '') : v.seguradora,
+      fimVigencia: d.fimVigencia,
+      vigenciaEstimada: (Boolean(d.fimVigencia) && vigenciaEstimada === 'sim') || undefined,
       premioLiquido: d.premioLiquido ? (paraCentavos(d.premioLiquido) ?? undefined) : undefined,
       premioTotal: d.premioTotal ? (paraCentavos(d.premioTotal) ?? undefined) : undefined,
       comissaoPercentual: d.comissaoPercentual ? (paraCentavos(d.comissaoPercentual) ?? 0) / 100 : undefined,
@@ -210,9 +214,17 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
         <Campo rotulo="Início da vigência" obrigatorio erro={erros.inicioVigencia?.message}>
           <Entrada type="date" {...register('inicioVigencia')} />
         </Campo>
-        <Campo rotulo="Fim da vigência" obrigatorio erro={erros.fimVigencia?.message}>
+        <Campo rotulo="Fim da vigência" dica="Em branco para contratos contínuos (vida, saúde…)." erro={erros.fimVigencia?.message}>
           <Entrada type="date" {...register('fimVigencia')} />
         </Campo>
+        {base.vigenciaEstimada && (
+          <Campo rotulo="Vigência" dica="Calculada na importação (proposta + 12 meses).">
+            <Selecao {...register('vigenciaEstimada')}>
+              <option value="sim">Estimada — confirmar</option>
+              <option value="nao">Confirmada</option>
+            </Selecao>
+          </Campo>
+        )}
         <Campo rotulo="Prêmio líquido (R$)" erro={erros.premioLiquido?.message}>
           <Entrada inputMode="decimal" placeholder="0,00" {...register('premioLiquido')} />
         </Campo>

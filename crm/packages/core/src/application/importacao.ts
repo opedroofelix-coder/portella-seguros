@@ -1,7 +1,9 @@
 import type { Cliente } from '../domain/cliente';
+import { paraCentavos } from '../domain/dinheiro';
 import { normalizar } from '../domain/cliente';
 import { ErroValidacao } from '../domain/erros';
-import type { ArquivoImportacao, ClienteImportado } from '../domain/importacao';
+import type { LancamentoComissao } from '../domain/comissao';
+import type { ArquivoImportacao, ClienteImportado, ComissaoImportada } from '../domain/importacao';
 import { idImportado } from '../domain/importacao';
 import type { Usuario } from '../domain/usuario';
 import { exigir } from './permissoes';
@@ -61,4 +63,32 @@ export function prepararClientes(
     };
   });
   return { clientes, idPorChave };
+}
+
+const centavos = (reais?: number) => (reais == null ? undefined : (paraCentavos(reais) ?? undefined));
+
+/** Converte as parcelas de comissão do arquivo, ligando-as aos clientes e às vendas já preparados. */
+export function prepararComissoes(
+  itens: ComissaoImportada[],
+  ator: Usuario,
+  resolver: (nome?: string) => string,
+  idClientePorChave: Map<string, string>,
+  idVendaPorChave: Map<string, string>,
+  agora: string,
+): LancamentoComissao[] {
+  exigir(ator, 'dados:importar');
+  return itens.map(({ chave, clienteChave, vendaChave, responsavel, ...c }) => ({
+    ...c,
+    id: idImportado('comissao', chave),
+    clienteId: idClientePorChave.get(clienteChave),
+    vendaId: vendaChave ? idVendaPorChave.get(vendaChave) : undefined,
+    premio: centavos(c.premio),
+    comissaoReceber: centavos(c.comissaoReceber) ?? 0,
+    comissaoRecebida: centavos(c.comissaoRecebida) ?? 0,
+    repasse: centavos(c.repasse),
+    repassePago: centavos(c.repassePago),
+    responsavelId: c.vendaDaCorretora ? ator.id : resolver(responsavel),
+    criadoEm: agora,
+    atualizadoEm: agora,
+  }));
 }

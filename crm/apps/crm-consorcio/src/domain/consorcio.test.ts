@@ -1,7 +1,7 @@
 import { ErroValidacao } from '@portella/core';
 import { describe, expect, it } from 'vitest';
 import type { Cota } from './cota';
-import { parcelasRestantes, progresso, resumirCotas, validarCota } from './cota';
+import { camposPendentes, identificacaoCota, parcelasRestantes, progresso, resumirCotas, validarCota } from './cota';
 import { validarLance } from './lance';
 
 let n = 0;
@@ -37,6 +37,16 @@ describe('cota', () => {
     expect(parcelasRestantes({ prazoMeses: 100, parcelasPagas: 30 })).toBe(70);
     expect(parcelasRestantes({ prazoMeses: 100 })).toBe(100);
     expect(progresso({ prazoMeses: 200, parcelasPagas: 50 })).toBe(0.25);
+    expect(parcelasRestantes({ prazoMeses: undefined })).toBeNull();
+  });
+
+  it('aceita cota com grupo, cota e prazo pendentes e os destaca', () => {
+    const pendente = cota({ grupo: undefined, cota: undefined, prazoMeses: undefined, numeroProposta: '9125116' });
+    expect(() => validarCota(pendente)).not.toThrow();
+    expect(camposPendentes(pendente)).toEqual(['grupo', 'cota', 'prazo']);
+    expect(identificacaoCota(pendente)).toBe('Proposta 9125116');
+    expect(identificacaoCota(cota({}))).toBe('1001 / 12');
+    expect(resumirCotas([pendente, cota({})]).pendentes).toBe(1);
   });
 
   it('resume a carteira por administradora e tipo de bem', () => {

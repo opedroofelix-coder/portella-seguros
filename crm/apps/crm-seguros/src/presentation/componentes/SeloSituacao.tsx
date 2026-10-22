@@ -10,7 +10,7 @@ export function SeloSituacao({ apolice }: { apolice: Apolice }) {
   const hoje = hojeISO();
   const s = situacao(apolice, hoje);
   if (s === 'a_vencer') {
-    const dias = diasEntre(hoje, apolice.fimVigencia);
+    const dias = diasEntre(hoje, apolice.fimVigencia!);
     return (
       <Selo tom="alerta">{dias === 0 ? 'Vence hoje' : `Vence em ${dias} dia${dias > 1 ? 's' : ''}`}</Selo>
     );

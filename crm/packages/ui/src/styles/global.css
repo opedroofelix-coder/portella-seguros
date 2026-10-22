@@ -200,6 +200,8 @@ h3 em {
 .lista-simples button:hover {
   background: rgba(217, 188, 126, 0.05);
 }
+.lista-simples .linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 4px; }
+.lista-simples .linha > span:first-child,
 .lista-simples button > span:first-child {
   display: flex;
   flex-direction: column;

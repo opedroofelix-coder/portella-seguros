@@ -15,6 +15,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { registrarResultado } from '../../application/lances';
+import { identificacaoCota } from '../../domain/cota';
 import type { Lance, ResultadoLance } from '../../domain/lance';
 import { RESULTADOS_LANCE, ROTULO_RESULTADO, ROTULO_TIPO_LANCE } from '../../domain/lance';
 import { FormularioLance } from '../componentes/FormularioLance';
@@ -56,7 +57,7 @@ export function PaginaLances() {
 
   const descricaoCota = (l: Lance) => {
     const c = indiceCotas.get(l.cotaId);
-    return c ? `${c.administradora} ${c.grupo}/${c.cota}` : '—';
+    return c ? `${c.administradora} ${identificacaoCota(c)}` : '—';
   };
 
   return (

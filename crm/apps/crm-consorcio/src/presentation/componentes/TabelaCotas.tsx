@@ -1,10 +1,10 @@
 import { useColecao, useEquipe, useIndice, useSessao } from '@portella/app-base';
 import { formatarDinheiro } from '@portella/core';
 import type { Coluna } from '@portella/ui';
-import { Tabela } from '@portella/ui';
+import { Selo, Tabela } from '@portella/ui';
 import type { ReactNode } from 'react';
 import type { Cota } from '../../domain/cota';
-import { nomeTipoBem } from '../../domain/cota';
+import { camposPendentes, identificacaoCota, nomeTipoBem } from '../../domain/cota';
 import { useServicosConsorcio } from '../hooks';
 import { SeloCota } from './Selos';
 
@@ -40,7 +40,14 @@ export function TabelaCotas({
       chave: 'gc',
       titulo: 'Grupo / cota',
       principal: !mostrarCliente,
-      render: (c) => `${c.grupo} / ${c.cota}`,
+      render: (c) =>
+        camposPendentes(c).length ? (
+          <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            {identificacaoCota(c)} <Selo tom="alerta">Completar cadastro</Selo>
+          </span>
+        ) : (
+          identificacaoCota(c)
+        ),
     },
     { chave: 'adm', titulo: 'Administradora', render: (c) => c.administradora },
     { chave: 'bem', titulo: 'Bem', render: (c) => nomeTipoBem(c.tipoBem) },
@@ -54,7 +61,7 @@ export function TabelaCotas({
       chave: 'parcelas',
       titulo: 'Parcelas',
       ocultarNoMobile: true,
-      render: (c) => `${c.parcelasPagas ?? 0} de ${c.prazoMeses}`,
+      render: (c) => `${c.parcelasPagas ?? 0} de ${c.prazoMeses ?? '?'}`,
     },
     { chave: 'status', titulo: 'Situação', render: (c) => <SeloCota status={c.status} /> },
     ...(pode('carteira:ver_todos')

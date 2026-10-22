@@ -11,6 +11,7 @@ import { centavosParaTexto, paraCentavos, somarDias, hojeISO } from '@portella/c
 import { AreaTexto, Botao, Campo, Entrada, Modal, Selecao, useAvisos } from '@portella/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { identificacaoCota } from '../../domain/cota';
 import type { Lance } from '../../domain/lance';
 import { ROTULO_TIPO_LANCE, TIPOS_LANCE } from '../../domain/lance';
 import { useCotas, useServicosConsorcio } from '../hooks';
@@ -90,7 +91,7 @@ export function FormularioLance({ lance, aoFechar }: { lance?: Lance; aoFechar: 
               <option
                 key={c.id}
                 value={c.id}
-              >{`${indice.get(c.clienteId)?.nome ?? '—'} · ${c.administradora} ${c.grupo}/${c.cota}`}</option>
+              >{`${indice.get(c.clienteId)?.nome ?? '—'} · ${c.administradora} ${identificacaoCota(c)}`}</option>
             ))}
           </Selecao>
         </Campo>

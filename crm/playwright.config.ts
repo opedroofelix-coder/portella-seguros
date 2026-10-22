@@ -14,6 +14,8 @@ const servidores = filtro ? todos.filter((s) => filtro.includes(s.nome)) : todos
 
 export default defineConfig({
   testDir: './e2e',
+  // Verificações locais com dados reais (*.tmp.*) só rodam com E2E_LOCAL=1.
+  testIgnore: process.env.E2E_LOCAL ? [] : ['**/*.tmp.*'],
   fullyParallel: false,
   workers: 1,
   reporter: [['list']],

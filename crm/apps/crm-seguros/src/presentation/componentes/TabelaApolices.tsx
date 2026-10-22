@@ -47,7 +47,11 @@ export function TabelaApolices({
       render: (a) => `${nomeRamo(a.ramo)}${a.item ? ` · ${a.item}` : ''}`,
     },
     { chave: 'seg', titulo: 'Seguradora', render: (a) => nomeSeguradora(a.seguradora) },
-    { chave: 'fim', titulo: 'Fim da vigência', render: (a) => formatarData(a.fimVigencia) },
+    {
+      chave: 'fim',
+      titulo: 'Fim da vigência',
+      render: (a) => (a.fimVigencia ? `${formatarData(a.fimVigencia)}${a.vigenciaEstimada ? ' (estimada)' : ''}` : 'Contínua'),
+    },
     { chave: 'sit', titulo: 'Situação', render: (a) => <SeloSituacao apolice={a} /> },
     ...(mostrarRenovacao
       ? [

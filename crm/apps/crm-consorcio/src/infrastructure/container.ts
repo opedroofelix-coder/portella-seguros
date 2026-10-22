@@ -1,4 +1,4 @@
-import type { Cliente, Oportunidade, Usuario } from '@portella/core';
+import type { Cliente, LancamentoComissao, Oportunidade, Usuario } from '@portella/core';
 import type { Credencial } from '@portella/infra-local';
 import {
   armazenamentoDoNavegador,
@@ -19,7 +19,7 @@ const NOME_BANCO = 'portella-crm-consorcio';
  * Para usar um backend (Supabase, API própria…), troque apenas este arquivo.
  */
 export async function criarServicos(): Promise<ServicosConsorcio> {
-  const banco = await BancoLocal.abrir(NOME_BANCO, ['clientes', 'oportunidades', 'cotas', 'lances']);
+  const banco = await BancoLocal.abrir(NOME_BANCO, ['clientes', 'oportunidades', 'cotas', 'lances', 'comissoes'], 2);
   return montarServicos({
     auth: new AutenticacaoLocal(
       banco.repositorio<Credencial>(COLECAO_CREDENCIAIS),
@@ -29,6 +29,7 @@ export async function criarServicos(): Promise<ServicosConsorcio> {
     usuarios: banco.repositorio<Usuario>(COLECAO_USUARIOS),
     clientes: banco.repositorio<Cliente>('clientes'),
     oportunidades: banco.repositorio<Oportunidade>('oportunidades'),
+    comissoes: banco.repositorio<LancamentoComissao>('comissoes'),
     cotas: banco.repositorio<Cota>('cotas'),
     lances: banco.repositorio<Lance>('lances'),
   });

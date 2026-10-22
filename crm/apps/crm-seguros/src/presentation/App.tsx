@@ -5,6 +5,7 @@ import type { ServicosSeguros } from '../application/servicos';
 import { RAMOS } from '../domain/catalogo';
 import { ApolicesDoCliente } from './componentes/ApolicesDoCliente';
 import { PaginaApolices } from './paginas/Apolices';
+import { PaginaFinanceiro } from './paginas/Financeiro';
 import { PaginaPainel } from './paginas/Painel';
 import { PaginaRenovacoes } from './paginas/Renovacoes';
 
@@ -12,6 +13,7 @@ const rotas: RotaApp[] = [
   { caminho: '/', elemento: <PaginaPainel /> },
   { caminho: '/apolices', elemento: <PaginaApolices /> },
   { caminho: '/renovacoes', elemento: <PaginaRenovacoes /> },
+  { caminho: '/financeiro', elemento: <PaginaFinanceiro />, acao: 'financeiro:gerenciar' },
 ];
 
 export function App({ servicos }: { servicos: ServicosSeguros }) {
@@ -26,6 +28,8 @@ export function App({ servicos }: { servicos: ServicosSeguros }) {
       { para: '/apolices', rotulo: 'Apólices', icone: 'documento' },
       { para: '/renovacoes', rotulo: 'Renovações', icone: 'calendario' },
       { para: ROTA_FUNIL, rotulo: 'Cotações', icone: 'funil' },
+      MENU_COMUM.comissoes,
+      { para: '/financeiro', rotulo: 'Financeiro', icone: 'carteira', acao: 'financeiro:gerenciar' },
       MENU_COMUM.usuarios,
       MENU_COMUM.importar,
       MENU_COMUM.conta,

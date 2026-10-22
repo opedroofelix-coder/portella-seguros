@@ -26,6 +26,7 @@ describe('apólice', () => {
     expect(situacao(apolice({ fimVigencia: '2026-10-22' }), HOJE)).toBe('a_vencer');
     expect(situacao(apolice({ fimVigencia: '2026-10-21' }), HOJE)).toBe('vencida');
     expect(situacao(apolice({ cancelada: true }), HOJE)).toBe('cancelada');
+    expect(situacao(apolice({ ramo: 'saude', fimVigencia: undefined }), HOJE)).toBe('vigente');
   });
 
   it('calcula a comissão sobre o prêmio líquido', () => {
@@ -38,6 +39,7 @@ describe('apólice', () => {
     expect(() => validarApolice(apolice({ fimVigencia: '2025-12-31' }))).toThrow(ErroValidacao);
     expect(() => validarApolice(apolice({ comissaoPercentual: 120 }))).toThrow(ErroValidacao);
     expect(() => validarApolice({})).toThrow(ErroValidacao);
+    expect(() => validarApolice(apolice({ ramo: 'vida', fimVigencia: undefined }))).not.toThrow();
   });
 
   it('monta a fila de renovação na ordem de vencimento, sem renovadas nem canceladas', () => {
@@ -50,6 +52,7 @@ describe('apólice', () => {
         apolice({ id: 'z', fimVigencia: '2027-05-01' }),
         apolice({ id: 'v', fimVigencia: '2026-10-10' }),
         apolice({ id: 'antiga', fimVigencia: '2026-08-01' }),
+        apolice({ id: 'continua', ramo: 'saude', fimVigencia: undefined }),
       ],
       HOJE,
       60,

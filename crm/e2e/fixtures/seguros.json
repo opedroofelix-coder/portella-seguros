@@ -240,5 +240,315 @@
    "comissaoPercentual": 15,
    "responsavel": "Corretor Teste"
   }
+ ],
+ "comissoes": [
+  {
+   "chave": "c0",
+   "clienteChave": "k0",
+   "vendaChave": "a0",
+   "clienteNome": "Cliente Teste Alfa",
+   "produto": "Auto",
+   "companhia": "Porto Seguro",
+   "numeroProposta": "TESTE-1000",
+   "dataProposta": "2026-10-19",
+   "parcela": "1/10",
+   "premio": 1500.0,
+   "comissaoReceber": 22.5,
+   "comissaoRecebida": 0,
+   "vendaDaCorretora": true
+  },
+  {
+   "chave": "c1",
+   "clienteChave": "k1",
+   "vendaChave": "a1",
+   "clienteNome": "Cliente Teste Beta",
+   "produto": "Residencial",
+   "companhia": "HDI",
+   "numeroProposta": "TESTE-1001",
+   "dataProposta": "2025-11-16",
+   "parcela": "2/10",
+   "dataRecebimento": "2026-10-19",
+   "premio": 1730.5,
+   "comissaoReceber": 25.96,
+   "comissaoRecebida": 25.96,
+   "repasse": 5.19,
+   "repassePago": 5.19,
+   "percentualRepasse": 20,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "c2",
+   "clienteChave": "k2",
+   "vendaChave": "a2",
+   "clienteNome": "Cliente Teste Gama",
+   "produto": "Vida",
+   "companhia": "Tokio Marine",
+   "numeroProposta": "TESTE-1002",
+   "dataProposta": "2025-12-06",
+   "parcela": "3/10",
+   "dataRecebimento": "2026-10-19",
+   "premio": 1961.0,
+   "comissaoReceber": 29.41,
+   "comissaoRecebida": 29.41,
+   "vendaDaCorretora": true
+  },
+  {
+   "chave": "c3",
+   "clienteChave": "k3",
+   "vendaChave": "a3",
+   "clienteNome": "Empresa Teste Delta Ltda.",
+   "produto": "Empresarial",
+   "companhia": "Bradesco Seguros",
+   "numeroProposta": "TESTE-1003",
+   "dataProposta": "2026-10-19",
+   "parcela": "4/10",
+   "premio": 2191.5,
+   "comissaoReceber": 32.87,
+   "comissaoRecebida": 0,
+   "repasse": 6.57,
+   "repassePago": 0,
+   "percentualRepasse": 20,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "c4",
+   "clienteChave": "k4",
+   "vendaChave": "a4",
+   "clienteNome": "Cliente Teste Épsilon",
+   "produto": "Auto",
+   "companhia": "Allianz",
+   "numeroProposta": "TESTE-1004",
+   "dataProposta": "2026-05-10",
+   "parcela": "5/10",
+   "dataRecebimento": "2026-10-19",
+   "premio": 2422.0,
+   "comissaoReceber": 36.33,
+   "comissaoRecebida": 36.33,
+   "vendaDaCorretora": true
+  },
+  {
+   "chave": "c5",
+   "clienteChave": "k5",
+   "vendaChave": "a5",
+   "clienteNome": "Cliente Teste Zeta",
+   "produto": "Fiança Locatícia",
+   "companhia": "Mapfre",
+   "numeroProposta": "TESTE-1005",
+   "dataProposta": "2025-10-17",
+   "parcela": "6/10",
+   "dataRecebimento": "2026-10-19",
+   "premio": 2652.5,
+   "comissaoReceber": 39.79,
+   "comissaoRecebida": 39.79,
+   "repasse": 7.96,
+   "repassePago": 7.96,
+   "percentualRepasse": 20,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "c6",
+   "clienteChave": "k0",
+   "vendaChave": "a6",
+   "clienteNome": "Cliente Teste Alfa",
+   "produto": "Auto",
+   "companhia": "Porto Seguro",
+   "numeroProposta": "TESTE-1006",
+   "dataProposta": "2026-10-19",
+   "parcela": "7/10",
+   "premio": 2883.0,
+   "comissaoReceber": 43.24,
+   "comissaoRecebida": 0,
+   "vendaDaCorretora": true
+  },
+  {
+   "chave": "c7",
+   "clienteChave": "k1",
+   "vendaChave": "a7",
+   "clienteNome": "Cliente Teste Beta",
+   "produto": "Residencial",
+   "companhia": "HDI",
+   "numeroProposta": "TESTE-1007",
+   "dataProposta": "2025-11-16",
+   "parcela": "8/10",
+   "dataRecebimento": "2026-10-19",
+   "premio": 3113.5,
+   "comissaoReceber": 46.7,
+   "comissaoRecebida": 46.7,
+   "repasse": 9.34,
+   "repassePago": 0,
+   "percentualRepasse": 20,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "c8",
+   "clienteChave": "k2",
+   "vendaChave": "a8",
+   "clienteNome": "Cliente Teste Gama",
+   "produto": "Vida",
+   "companhia": "Tokio Marine",
+   "numeroProposta": "TESTE-1008",
+   "dataProposta": "2025-12-06",
+   "parcela": "9/10",
+   "dataRecebimento": "2026-10-19",
+   "premio": 3344.0,
+   "comissaoReceber": 50.16,
+   "comissaoRecebida": 50.16,
+   "vendaDaCorretora": true
+  },
+  {
+   "chave": "c9",
+   "clienteChave": "k3",
+   "vendaChave": "a9",
+   "clienteNome": "Empresa Teste Delta Ltda.",
+   "produto": "Empresarial",
+   "companhia": "Bradesco Seguros",
+   "numeroProposta": "TESTE-1009",
+   "dataProposta": "2026-10-19",
+   "parcela": "10/10",
+   "premio": 3574.5,
+   "comissaoReceber": 53.62,
+   "comissaoRecebida": 0,
+   "repasse": 10.72,
+   "repassePago": 10.72,
+   "percentualRepasse": 20,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "c10",
+   "clienteChave": "k4",
+   "vendaChave": "a10",
+   "clienteNome": "Cliente Teste Épsilon",
+   "produto": "Auto",
+   "companhia": "Allianz",
+   "numeroProposta": "TESTE-1010",
+   "dataProposta": "2026-05-10",
+   "parcela": "1/10",
+   "dataRecebimento": "2026-10-19",
+   "premio": 3805.0,
+   "comissaoReceber": 57.08,
+   "comissaoRecebida": 57.08,
+   "vendaDaCorretora": true
+  },
+  {
+   "chave": "c11",
+   "clienteChave": "k5",
+   "vendaChave": "a11",
+   "clienteNome": "Cliente Teste Zeta",
+   "produto": "Fiança Locatícia",
+   "companhia": "Mapfre",
+   "numeroProposta": "TESTE-1011",
+   "dataProposta": "2025-10-17",
+   "parcela": "2/10",
+   "dataRecebimento": "2026-10-19",
+   "premio": 4035.5,
+   "comissaoReceber": 60.53,
+   "comissaoRecebida": 60.53,
+   "repasse": 12.11,
+   "repassePago": 0,
+   "percentualRepasse": 20,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "est1",
+   "clienteChave": "k1",
+   "clienteNome": "Cliente Teste Beta",
+   "produto": "Estorno",
+   "companhia": "HDI",
+   "dataProposta": "2026-10-20",
+   "dataRecebimento": "2026-10-20",
+   "comissaoReceber": -120.5,
+   "comissaoRecebida": -120.5,
+   "repasse": -24.1,
+   "repassePago": -24.1,
+   "estorno": true,
+   "responsavel": "Corretor Teste"
+  }
+ ],
+ "movimentos": [
+  {
+   "chave": "m0",
+   "conta": "Bradesco",
+   "data": "2026-09-12",
+   "descricao": "Saldo anterior",
+   "tipo": "saldo_inicial",
+   "valor": 10000
+  },
+  {
+   "chave": "m1",
+   "conta": "Bradesco",
+   "data": "2026-10-19",
+   "descricao": "Recebimento Seguradora Teste",
+   "tipo": "entrada",
+   "valor": 2500.4
+  },
+  {
+   "chave": "m2",
+   "conta": "Bradesco",
+   "data": "2026-10-20",
+   "descricao": "Transferência Corretor Teste",
+   "tipo": "saida",
+   "valor": 480
+  },
+  {
+   "chave": "m3",
+   "conta": "Poupança Portella",
+   "data": "2026-10-17",
+   "descricao": "Depósito",
+   "tipo": "entrada",
+   "valor": 1000
+  }
+ ],
+ "despesas": [
+  {
+   "chave": "d1",
+   "descricao": "Aluguel sala (teste)",
+   "vencimento": "2026-10-21",
+   "pagamento": "2026-10-21",
+   "valor": 3000,
+   "pago": 3000
+  },
+  {
+   "chave": "d2",
+   "descricao": "Provedor de internet (teste)",
+   "vencimento": "2026-10-27",
+   "valor": 100,
+   "pago": 0
+  },
+  {
+   "chave": "d3",
+   "descricao": "Contador (teste)",
+   "vencimento": "2026-10-20",
+   "valor": 320,
+   "pago": 0
+  }
+ ],
+ "fechamentos": [
+  {
+   "mes": "2026-10",
+   "faturamento": 40000
+  },
+  {
+   "mes": "2026-09",
+   "faturamento": 41500,
+   "creditoConsorcio": 100000
+  },
+  {
+   "mes": "2026-08",
+   "faturamento": 43000
+  },
+  {
+   "mes": "2026-07",
+   "faturamento": 44500,
+   "creditoConsorcio": 100000
+  },
+  {
+   "mes": "2026-06",
+   "faturamento": 46000
+  },
+  {
+   "mes": "2026-05",
+   "faturamento": 47500,
+   "creditoConsorcio": 100000
+  }
  ]
 }

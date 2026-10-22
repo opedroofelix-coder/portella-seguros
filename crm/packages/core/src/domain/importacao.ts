@@ -37,7 +37,8 @@ export interface ApoliceImportada {
   numero?: string;
   item?: string;
   inicioVigencia: string;
-  fimVigencia: string;
+  fimVigencia?: string;
+  vigenciaEstimada?: boolean;
   premioLiquido?: number;
   premioTotal?: number;
   comissaoPercentual?: number;
@@ -51,11 +52,12 @@ export interface CotaImportada {
   chave: string;
   clienteChave: string;
   administradora: string;
-  grupo: string;
-  cota: string;
+  numeroProposta?: string;
+  grupo?: string;
+  cota?: string;
   tipoBem?: string;
   valorCredito: number;
-  prazoMeses: number;
+  prazoMeses?: number;
   valorParcela?: number;
   dataAdesao: string;
   parcelasPagas?: number;
@@ -64,6 +66,60 @@ export interface CotaImportada {
   formaContemplacao?: string;
   observacoes?: string;
   responsavel?: string;
+}
+
+/** Parcela de comissão (abas "A Receber" e "Comissões <corretor>"); valores em reais. */
+export interface ComissaoImportada {
+  chave: string;
+  clienteChave: string;
+  /** Chave da apólice ou cota a que a parcela pertence. */
+  vendaChave?: string;
+  clienteNome: string;
+  produto: string;
+  companhia: string;
+  numeroProposta?: string;
+  dataProposta?: string;
+  parcela?: string;
+  dataRecebimento?: string;
+  premio?: number;
+  comissaoReceber: number;
+  comissaoRecebida: number;
+  percentualRepasse?: number;
+  repasse?: number;
+  repassePago?: number;
+  estorno?: boolean;
+  vendaDaCorretora?: boolean;
+  observacoes?: string;
+  responsavel?: string;
+}
+
+/** Movimento de conta (extrato bancário, poupança); valor em reais, sempre positivo. */
+export interface MovimentoImportado {
+  chave: string;
+  conta: string;
+  data: string;
+  descricao: string;
+  tipo: 'entrada' | 'saida' | 'saldo_inicial';
+  valor: number;
+  documento?: string;
+}
+
+/** Despesa da empresa (contas a pagar); valores em reais. */
+export interface DespesaImportada {
+  chave: string;
+  descricao: string;
+  vencimento?: string;
+  pagamento?: string;
+  valor: number;
+  pago: number;
+  categoria?: string;
+}
+
+/** Totais mensais da aba "Faturamento"; valores em reais. */
+export interface FechamentoImportado {
+  mes: string;
+  faturamento?: number;
+  creditoConsorcio?: number;
 }
 
 /** Id determinístico: reimportar a mesma planilha atualiza os registros em vez de duplicar. */

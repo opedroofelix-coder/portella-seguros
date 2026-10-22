@@ -1,4 +1,4 @@
-import type { Cliente, Oportunidade, Usuario } from '@portella/core';
+import type { Cliente, LancamentoComissao, Oportunidade, Usuario } from '@portella/core';
 import { AutenticacaoMemoria, RepositorioMemoria } from '@portella/core';
 import { describe, expect, it } from 'vitest';
 import type { Cota } from '../domain/cota';
@@ -23,6 +23,7 @@ const servicos = () =>
     usuarios: new RepositorioMemoria<Usuario>([admin, corretor]),
     clientes: new RepositorioMemoria<Cliente>(),
     oportunidades: new RepositorioMemoria<Oportunidade>(),
+    comissoes: new RepositorioMemoria<LancamentoComissao>(),
     cotas: new RepositorioMemoria<Cota>(),
     lances: new RepositorioMemoria<Lance>(),
   });
@@ -77,7 +78,11 @@ describe('importação de consórcio', () => {
       origem: 'x',
       geradoEm: '',
       clientes: [{ chave: 'k1', nome: 'Maria', responsavel: 'Carlos Souza' }],
+      comissoes: [
+        { chave: 'x1', clienteChave: 'k1', vendaChave: 'q1', clienteNome: 'Maria', produto: 'Consorcio', companhia: 'Magalu', comissaoReceber: 1680, comissaoRecebida: 1680, repasse: 504, responsavel: 'Carlos Souza' },
+      ],
       cotas: [
+        { chave: 'q3', clienteChave: 'k1', administradora: 'Magalu', numeroProposta: '9125116', tipoBem: 'Consorcio', valorCredito: 420000, dataAdesao: '2024-07-19' },
         {
           chave: 'q1',
           clienteChave: 'k1',
@@ -110,11 +115,16 @@ describe('importação de consórcio', () => {
     const previa = await criarImportacao(s).analisar(arquivo, admin, [admin, corretor]);
     expect(previa.resumo).toEqual([
       ['Clientes', 1],
-      ['Cotas', 1],
+      ['Cotas', 2],
+      ['Comissões', 1],
     ]);
-    expect(previa.avisos[0]).toMatch(/1020\/34/);
+    expect(previa.avisos.join('\n')).toMatch(/1020\/34/);
+    expect(previa.avisos.join('\n')).toMatch(/1 cota\(s\) sem grupo/);
     await previa.confirmar();
-    const [cota] = await s.cotas.listar(corretor);
+    const cotas = await s.cotas.listar(admin);
+    expect(cotas.find((c) => c.numeroProposta === '9125116')).toMatchObject({ grupo: undefined, cota: undefined, prazoMeses: undefined, valorCredito: 42000000, status: 'ativa' });
+    expect((await s.comissoes.listar(corretor))[0]).toMatchObject({ vendaId: 'imp:cota:q1', repasse: 50400 });
+    const cota = (await s.cotas.listar(corretor)).find((c) => c.grupo === '1020');
     expect(cota).toMatchObject({
       grupo: '1020',
       cota: '33',

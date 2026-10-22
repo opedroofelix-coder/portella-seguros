@@ -13,7 +13,7 @@ import {
 } from '@portella/ui';
 import { useMemo, useState } from 'react';
 import type { Cota, StatusCota } from '../../domain/cota';
-import { ROTULO_STATUS_COTA, STATUS_COTA, TIPOS_BEM } from '../../domain/cota';
+import { camposPendentes, ROTULO_STATUS_COTA, STATUS_COTA, TIPOS_BEM } from '../../domain/cota';
 import { FormularioCota } from '../componentes/FormularioCota';
 import { TabelaCotas } from '../componentes/TabelaCotas';
 import { useCotas, useServicosConsorcio } from '../hooks';
@@ -30,6 +30,7 @@ export function PaginaCotas() {
   const [tipo, setTipo] = useState('');
   const [status, setStatus] = useState<StatusCota | ''>('');
   const [responsavel, setResponsavel] = useState('');
+  const [pendencia, setPendencia] = useState<'' | 'pendente' | 'completo'>('');
   const [editando, setEditando] = useState<Cota | 'nova' | null>(null);
   const administradoras = useMemo(
     () => [...new Set((data ?? []).map((c) => c.administradora))].sort(),
@@ -43,13 +44,14 @@ export function PaginaCotas() {
         .filter((c) => !tipo || c.tipoBem === tipo)
         .filter((c) => !status || c.status === status)
         .filter((c) => !responsavel || c.responsavelId === responsavel)
-        .filter((c) => corresponde(busca, indice.get(c.clienteId)?.nome, c.grupo, c.cota, c.administradora))
+        .filter((c) => corresponde(busca, indice.get(c.clienteId)?.nome, c.grupo, c.cota, c.administradora, c.numeroProposta))
+        .filter((c) => !pendencia || (pendencia === 'pendente') === camposPendentes(c).length > 0)
         .sort(
           (a, b) =>
             a.administradora.localeCompare(b.administradora) ||
-            a.grupo.localeCompare(b.grupo, 'pt-BR', { numeric: true }),
+            (a.grupo ?? '').localeCompare(b.grupo ?? '', 'pt-BR', { numeric: true }),
         ),
-    [data, administradora, tipo, status, responsavel, busca, indice],
+    [data, administradora, tipo, status, responsavel, busca, indice, pendencia],
   );
 
   return (
@@ -99,6 +101,13 @@ export function PaginaCotas() {
                   {ROTULO_STATUS_COTA[s]}
                 </option>
               ))}
+            </Selecao>
+          </Campo>
+          <Campo rotulo="Cadastro">
+            <Selecao value={pendencia} onChange={(e) => setPendencia(e.target.value as '' | 'pendente' | 'completo')}>
+              <option value="">Todos</option>
+              <option value="pendente">A completar</option>
+              <option value="completo">Completo</option>
             </Selecao>
           </Campo>
           {pode('carteira:ver_todos') && (

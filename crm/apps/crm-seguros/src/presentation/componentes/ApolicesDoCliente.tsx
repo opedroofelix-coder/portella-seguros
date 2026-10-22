@@ -12,7 +12,7 @@ export function ApolicesDoCliente({ cliente }: { cliente: Cliente }) {
   const [editando, setEditando] = useState<Apolice | 'nova' | null>(null);
   const doCliente = data
     .filter((a) => a.clienteId === cliente.id)
-    .sort((a, b) => b.fimVigencia.localeCompare(a.fimVigencia));
+    .sort((a, b) => (b.fimVigencia ?? b.inicioVigencia).localeCompare(a.fimVigencia ?? a.inicioVigencia));
 
   return (
     <>

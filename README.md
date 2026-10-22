@@ -76,7 +76,9 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 
 ### Pendências do CRM
 
-- [ ] **Senha da planilha** de dezembro, para rodar o importador e conferir o mapeamento das colunas.
+- [x] Importador ajustado à planilha de dezembro (comissões, financeiro e consórcio). Conferência dos totais em `docs/CRM.md`.
+- [ ] Cadastrar os corretores em Usuários antes de importar (Carla, Deliziane, Gabriel, Gisele, Silvana, Renata, Felippe).
+- [ ] Completar nos CRMs o que a planilha não tem: CPF, telefone e e-mail dos clientes; fim real da vigência das apólices; grupo, cota e prazo das cotas de consórcio.
 - [ ] **Texto da especificação** combinado na conversa anterior, para incorporar ao `docs/CRM.md`.
 - [ ] **Backend**: hoje os dados ficam só no navegador, sem sincronizar entre pessoas e sem backup. Escolher entre Supabase, Firebase ou API própria e trocar o `container.ts` de cada app.
 - [ ] Hospedagem dos dois apps, com redirecionamento de todas as rotas para o `index.html` (SPA).

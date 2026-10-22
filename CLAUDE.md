@@ -57,3 +57,7 @@
 - Dados reais de clientes, a planilha e a senha **nunca** vão para o Git (`crm/dados/` e `*.xlsx` estão no .gitignore).
   Os testes usam só dados fictícios ("Cliente Teste…").
 - Backend ainda não escolhido: os dados ficam no navegador.
+- A planilha da Portella é um "Controle de Comissões" (abas A Receber, Comissoes <corretor>, Bradesco,
+  Demonstrativo, Poupanca, Faturamento). O leitor é `packages/importer/src/comissoes.ts`; conferência dos
+  totais em `docs/CRM.md`. Comissões nos dois CRMs (app-base); Financeiro só no de seguros (admin e gestor).
+- Verificação com dados reais: `E2E_LOCAL=1 npx playwright test e2e/real.tmp.spec.ts` (arquivo local, fora do Git).

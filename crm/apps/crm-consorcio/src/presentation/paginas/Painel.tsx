@@ -3,7 +3,7 @@ import { formatarData, formatarDinheiro, hojeISO, resumirFunil } from '@portella
 import { Barras, CabecalhoPagina, Cartao, Carregando, EstadoVazio, Indicador } from '@portella/ui';
 import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { nomeTipoBem, resumirCotas } from '../../domain/cota';
+import { identificacaoCota, nomeTipoBem, resumirCotas } from '../../domain/cota';
 import { SeloLance } from '../componentes/Selos';
 import { useCotas, useLances } from '../hooks';
 
@@ -47,7 +47,11 @@ export function PaginaPainel() {
           <Indicador
             rotulo="Cotas ativas"
             valor={resumo.ativas.toLocaleString('pt-BR')}
-            detalhe={`${listaClientes.length.toLocaleString('pt-BR')} clientes`}
+            detalhe={
+              resumo.pendentes
+                ? `${resumo.pendentes} com cadastro a completar`
+                : `${listaClientes.length.toLocaleString('pt-BR')} clientes`
+            }
           />
           <Indicador
             rotulo="Contempladas"
@@ -75,7 +79,7 @@ export function PaginaPainel() {
                       <span>
                         <strong>{indiceClientes.get(cota?.clienteId ?? '')?.nome ?? '—'}</strong>
                         <small>
-                          {cota ? `${cota.administradora} ${cota.grupo}/${cota.cota}` : '—'} ·{' '}
+                          {cota ? `${cota.administradora} ${identificacaoCota(cota)}` : '—'} ·{' '}
                           {formatarData(l.assembleia)}
                         </small>
                       </span>

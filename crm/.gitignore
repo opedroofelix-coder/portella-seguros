@@ -7,3 +7,6 @@ test-results/
 dados/
 *.xlsx
 *.seed.json
+
+# Scripts temporários de verificação local
+*.tmp.*

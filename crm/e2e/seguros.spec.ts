@@ -88,6 +88,40 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await entrar(page, URL, CORRETOR);
     await irPara(page, 'Apólices');
     await expect(page.getByText(/6 de 6 apólices/)).toBeVisible();
+    // Corretor vê as próprias comissões, sem valores da corretora, e não acessa o financeiro
+    await irPara(page, 'Comissões');
+    await expect(page.getByText('Minhas comissões')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Nova comissão' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Financeiro' })).toHaveCount(0);
+    await page.goto(`${URL}/financeiro`);
+    await expect(page.getByText('Acesso restrito')).toBeVisible();
+  });
+
+  test('comissões: baixa, repasse por corretor e financeiro', async ({ page }) => {
+    await primeiroAcesso(page, URL);
+    await cadastrarUsuario(page, CORRETOR, 'Corretor');
+    await importar(page, FIXTURE, /Comissões/);
+    await irPara(page, 'Comissões');
+    await page.getByLabel('Mês').selectOption({ label: 'Todos os meses' });
+    const repasses = page.getByRole('table', { name: 'Repasse por corretor' });
+    await expect(repasses).toContainText('Corretor Teste');
+    await repasses.getByRole('button', { name: 'Quitar' }).click();
+    await expect(page.getByText(/Repasse de Corretor Teste quitado/)).toBeVisible();
+    await expect(repasses).toContainText('Quitado');
+    await page.getByLabel('Situação').selectOption({ label: 'A receber' });
+    const antes = await page.getByRole('button', { name: 'Dar baixa' }).count();
+    await page.getByRole('button', { name: 'Dar baixa' }).first().click();
+    await expect(page.getByText('Recebimento registrado.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Dar baixa' })).toHaveCount(antes - 1);
+
+    await irPara(page, 'Financeiro');
+    await expect(page.getByText('Saldo Bradesco')).toBeVisible();
+    await page.getByRole('tab', { name: 'Despesas' }).click();
+    await page.getByLabel('Mês do vencimento').selectOption({ label: 'Todos' });
+    await page.getByRole('row', { name: /Contador \(teste\)/ }).getByRole('button', { name: 'Pagar' }).click();
+    await expect(page.getByText('Despesa paga.')).toBeVisible();
+    await page.getByRole('tab', { name: 'Extrato' }).click();
+    await expect(page.getByRole('table', { name: 'Extrato Bradesco' })).toContainText('R$ 12.020,40');
   });
 });
 
@@ -112,6 +146,8 @@ for (const tela of LARGURAS) {
         'Apólices',
         'Renovações',
         'Cotações',
+        'Comissões',
+        'Financeiro',
         'Usuários',
         'Importar',
         'Minha conta',
@@ -123,6 +159,17 @@ for (const tela of LARGURAS) {
         await conferirLayout(page, tela.width);
         await page.screenshot({
           path: `test-results/telas/seguros-${nome.toLowerCase().replace(/\s/g, '-')}-${tela.nome}.png`,
+          fullPage: true,
+          animations: 'disabled',
+        });
+      }
+
+      await irPara(page, 'Financeiro');
+      for (const aba of ['Extrato', 'Despesas', 'Faturamento']) {
+        await page.getByRole('tab', { name: aba }).click();
+        await conferirLayout(page, tela.width);
+        await page.screenshot({
+          path: `test-results/telas/seguros-financeiro-${aba.toLowerCase()}-${tela.nome}.png`,
           fullPage: true,
           animations: 'disabled',
         });

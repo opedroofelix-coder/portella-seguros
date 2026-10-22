@@ -27,11 +27,13 @@ export type FormaContemplacao = 'sorteio' | 'lance';
 export interface Cota extends Registro {
   clienteId: string;
   administradora: string;
-  grupo: string;
-  cota: string;
+  numeroProposta?: string;
+  /** Grupo, cota e prazo podem ficar pendentes (vendas importadas da planilha de comissões). */
+  grupo?: string;
+  cota?: string;
   tipoBem: TipoBem;
   valorCredito: Centavos;
-  prazoMeses: number;
+  prazoMeses?: number;
   valorParcela?: Centavos;
   dataAdesao: DataISO;
   parcelasPagas?: number;
@@ -44,11 +46,10 @@ export function validarCota(c: Partial<Cota>): void {
   const campos: Record<string, string> = {};
   if (!c.clienteId) campos.clienteId = 'Escolha o cliente.';
   if (!c.administradora?.trim()) campos.administradora = 'Informe a administradora.';
-  if (!c.grupo?.trim()) campos.grupo = 'Informe o grupo.';
-  if (!c.cota?.trim()) campos.cota = 'Informe a cota.';
   if (!c.valorCredito || c.valorCredito <= 0) campos.valorCredito = 'Informe o crédito.';
-  if (!c.prazoMeses || c.prazoMeses <= 0 || !Number.isInteger(c.prazoMeses))
+  if (c.prazoMeses != null && (c.prazoMeses <= 0 || !Number.isInteger(c.prazoMeses))) {
     campos.prazoMeses = 'Prazo inválido.';
+  }
   if (!c.dataAdesao || !dataValida(c.dataAdesao)) campos.dataAdesao = 'Data inválida.';
   if (c.parcelasPagas != null && (c.parcelasPagas < 0 || (c.prazoMeses && c.parcelasPagas > c.prazoMeses))) {
     campos.parcelasPagas = 'Não pode passar do prazo.';
@@ -58,8 +59,19 @@ export function validarCota(c: Partial<Cota>): void {
   if (Object.keys(campos).length) throw new ErroValidacao('Confira os dados da cota.', campos);
 }
 
-export function parcelasRestantes(c: Pick<Cota, 'prazoMeses' | 'parcelasPagas'>): number {
-  return Math.max(0, c.prazoMeses - (c.parcelasPagas ?? 0));
+/** Campos que faltam para completar o cadastro da cota. */
+export function camposPendentes(c: Pick<Cota, 'grupo' | 'cota' | 'prazoMeses'>): string[] {
+  return [!c.grupo?.trim() && 'grupo', !c.cota?.trim() && 'cota', !c.prazoMeses && 'prazo'].filter(Boolean) as string[];
+}
+
+/** "1020 / 33", ou o nº da proposta enquanto grupo e cota estão pendentes. */
+export function identificacaoCota(c: Pick<Cota, 'grupo' | 'cota' | 'numeroProposta'>): string {
+  if (c.grupo || c.cota) return `${c.grupo ?? '?'} / ${c.cota ?? '?'}`;
+  return c.numeroProposta ? `Proposta ${c.numeroProposta}` : 'A completar';
+}
+
+export function parcelasRestantes(c: Pick<Cota, 'prazoMeses' | 'parcelasPagas'>): number | null {
+  return c.prazoMeses ? Math.max(0, c.prazoMeses - (c.parcelasPagas ?? 0)) : null;
 }
 
 /** Percentual do prazo já pago (0 a 1). */
@@ -70,6 +82,7 @@ export function progresso(c: Pick<Cota, 'prazoMeses' | 'parcelasPagas'>): number
 export interface ResumoCotas {
   ativas: number;
   contempladas: number;
+  pendentes: number;
   creditoAtivo: Centavos;
   creditoContemplado: Centavos;
   porAdministradora: Array<{ administradora: string; quantidade: number; credito: Centavos }>;
@@ -92,6 +105,7 @@ export function resumirCotas(cotas: Cota[]): ResumoCotas {
   return {
     ativas: ativas.length,
     contempladas: contempladas.length,
+    pendentes: emCarteira.filter((c) => camposPendentes(c).length > 0).length,
     creditoAtivo: soma(ativas),
     creditoContemplado: soma(contempladas),
     porAdministradora: [...adm]

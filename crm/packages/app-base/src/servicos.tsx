@@ -1,7 +1,15 @@
-import type { Cliente, GatewayAutenticacao, Oportunidade, Repositorio, Usuario } from '@portella/core';
+import type {
+  Cliente,
+  GatewayAutenticacao,
+  LancamentoComissao,
+  Oportunidade,
+  Repositorio,
+  Usuario,
+} from '@portella/core';
 import {
   ServicoAutenticacao,
   ServicoCarteira,
+  ServicoComissoes,
   ServicoUsuarios,
   validarCliente,
   validarOportunidade,
@@ -15,6 +23,7 @@ export interface ServicosBase {
   usuarios: ServicoUsuarios;
   clientes: ServicoCarteira<Cliente>;
   oportunidades: ServicoCarteira<Oportunidade>;
+  comissoes: ServicoComissoes;
 }
 
 export interface RepositoriosBase {
@@ -22,6 +31,7 @@ export interface RepositoriosBase {
   usuarios: Repositorio<Usuario>;
   clientes: Repositorio<Cliente>;
   oportunidades: Repositorio<Oportunidade>;
+  comissoes: Repositorio<LancamentoComissao>;
 }
 
 export function montarServicosBase(r: RepositoriosBase): ServicosBase {
@@ -30,6 +40,7 @@ export function montarServicosBase(r: RepositoriosBase): ServicosBase {
     usuarios: new ServicoUsuarios(r.usuarios, r.auth),
     clientes: new ServicoCarteira<Cliente>(r.clientes, validarCliente),
     oportunidades: new ServicoCarteira<Oportunidade>(r.oportunidades, validarOportunidade),
+    comissoes: new ServicoComissoes(r.comissoes),
   };
 }
 

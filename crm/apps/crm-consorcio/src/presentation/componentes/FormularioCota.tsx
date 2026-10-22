@@ -15,7 +15,7 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { Cota } from '../../domain/cota';
-import { ROTULO_STATUS_COTA, STATUS_COTA, TIPOS_BEM } from '../../domain/cota';
+import { camposPendentes, identificacaoCota, ROTULO_STATUS_COTA, STATUS_COTA, TIPOS_BEM } from '../../domain/cota';
 import { useCotas, useServicosConsorcio } from '../hooks';
 
 const dinheiro = z.string().refine((v) => !v.trim() || paraCentavos(v) != null, 'Valor inválido.');
@@ -23,11 +23,12 @@ const inteiro = z.string().refine((v) => !v.trim() || /^\d+$/.test(v.trim()), 'N
 const esquema = z.object({
   clienteId: z.string().min(1, 'Escolha o cliente.'),
   administradora: z.string().trim().min(1, 'Informe a administradora.'),
-  grupo: z.string().trim().min(1, 'Informe o grupo.'),
-  cota: z.string().trim().min(1, 'Informe a cota.'),
+  numeroProposta: z.string(),
+  grupo: z.string().trim(),
+  cota: z.string().trim(),
   tipoBem: z.enum(TIPOS_BEM.map((t) => t.id) as [Cota['tipoBem'], ...Cota['tipoBem'][]]),
   valorCredito: dinheiro.refine((v) => v.trim() !== '', 'Informe o crédito.'),
-  prazoMeses: inteiro.refine((v) => v.trim() !== '', 'Informe o prazo.'),
+  prazoMeses: inteiro,
   valorParcela: dinheiro,
   dataAdesao: z.string().min(1, 'Informe a data.'),
   parcelasPagas: inteiro,
@@ -60,12 +61,14 @@ export function FormularioCota({
     [todasCotas],
   );
   const clienteFixo = Boolean(clienteId && !cota);
+  const pendentes = cota ? camposPendentes(cota) : [];
 
   const { register, handleSubmit, formState, setError, watch } = useForm<Valores>({
     resolver: zodResolver(esquema),
     defaultValues: {
       clienteId: cota?.clienteId ?? clienteId ?? '',
       administradora: cota?.administradora ?? '',
+      numeroProposta: cota?.numeroProposta ?? '',
       grupo: cota?.grupo ?? '',
       cota: cota?.cota ?? '',
       tipoBem: cota?.tipoBem ?? 'imovel',
@@ -98,7 +101,7 @@ export function FormularioCota({
       ...(cota ?? {}),
       ...d,
       valorCredito: paraCentavos(v.valorCredito) ?? 0,
-      prazoMeses: Number(v.prazoMeses),
+      prazoMeses: d.prazoMeses ? Number(d.prazoMeses) : undefined,
       valorParcela: d.valorParcela ? (paraCentavos(d.valorParcela) ?? undefined) : undefined,
       parcelasPagas: d.parcelasPagas ? Number(d.parcelasPagas) : undefined,
       contemplacao:
@@ -121,7 +124,7 @@ export function FormularioCota({
     <Modal
       aberto
       largura={800}
-      titulo={cota ? `Cota ${cota.grupo}/${cota.cota}` : 'Nova cota'}
+      titulo={cota ? `Cota ${identificacaoCota(cota)}` : 'Nova cota'}
       aoFechar={aoFechar}
       rodape={
         <>
@@ -166,10 +169,11 @@ export function FormularioCota({
             <option key={a} value={a} />
           ))}
         </datalist>
-        <Campo rotulo="Grupo" obrigatorio erro={erros.grupo?.message}>
+        <Campo rotulo="Nº da proposta"><Entrada {...register('numeroProposta')} /></Campo>
+        <Campo rotulo="Grupo" erro={erros.grupo?.message} dica={pendentes.includes('grupo') ? 'A completar' : undefined}>
           <Entrada {...register('grupo')} />
         </Campo>
-        <Campo rotulo="Cota" obrigatorio erro={erros.cota?.message}>
+        <Campo rotulo="Cota" erro={erros.cota?.message} dica={pendentes.includes('cota') ? 'A completar' : undefined}>
           <Entrada {...register('cota')} />
         </Campo>
         <Campo rotulo="Tipo de bem">
@@ -184,7 +188,7 @@ export function FormularioCota({
         <Campo rotulo="Crédito (R$)" obrigatorio erro={erros.valorCredito?.message}>
           <Entrada inputMode="decimal" placeholder="0,00" {...register('valorCredito')} />
         </Campo>
-        <Campo rotulo="Prazo (meses)" obrigatorio erro={erros.prazoMeses?.message}>
+        <Campo rotulo="Prazo (meses)" erro={erros.prazoMeses?.message} dica={pendentes.includes('prazo') ? 'A completar' : undefined}>
           <Entrada inputMode="numeric" {...register('prazoMeses')} />
         </Campo>
         <Campo rotulo="Parcela (R$)" erro={erros.valorParcela?.message}>

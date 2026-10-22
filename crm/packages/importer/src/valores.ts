@@ -7,7 +7,7 @@ export type Celula =
   | Date
   | null
   | undefined
-  | { text?: string; result?: unknown; richText?: Array<{ text: string }> };
+  | { text?: string; result?: unknown; formula?: string; richText?: Array<{ text: string }> };
 
 export function semAcento(texto: string): string {
   return texto.normalize('NFD').replace(/[̀-ͯ]/g, '');

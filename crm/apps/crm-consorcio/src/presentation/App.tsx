@@ -26,6 +26,7 @@ export function App({ servicos }: { servicos: ServicosConsorcio }) {
       { para: '/cotas', rotulo: 'Cotas', icone: 'documento' },
       { para: '/lances', rotulo: 'Lances', icone: 'moeda' },
       { para: ROTA_FUNIL, rotulo: 'Propostas', icone: 'funil' },
+      MENU_COMUM.comissoes,
       MENU_COMUM.usuarios,
       MENU_COMUM.importar,
       MENU_COMUM.conta,

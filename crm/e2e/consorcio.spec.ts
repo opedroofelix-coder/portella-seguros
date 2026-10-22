@@ -37,7 +37,7 @@ test.describe('CRM Consórcio — fluxo completo', () => {
     const lance = page.getByRole('dialog', { name: 'Novo lance' });
     await lance
       .getByLabel('Cota')
-      .selectOption({ label: 'Consorciada Manual · Administradora Manual 2020/7' });
+      .selectOption({ label: 'Consorciada Manual · Administradora Manual 2020 / 7' });
     await lance.getByLabel('Percentual do crédito (%)').fill('30');
     await page.getByRole('button', { name: 'Salvar' }).click();
     await page.getByRole('button', { name: 'Contemplado', exact: true }).click();
@@ -48,7 +48,8 @@ test.describe('CRM Consórcio — fluxo completo', () => {
     // Importação separada do CRM de seguros
     await importar(page, FIXTURE, /Cotas/);
     await irPara(page, 'Cotas');
-    await expect(page.getByText('9 de 9 cotas.')).toBeVisible();
+    await expect(page.getByText('10 de 10 cotas.')).toBeVisible();
+    await expect(page.getByText('Completar cadastro')).toBeVisible();
     await irPara(page, 'Painel');
     await expect(page.getByText('Contempladas').locator('..')).toContainText('2');
 
@@ -74,6 +75,7 @@ for (const tela of LARGURAS) {
         'Cotas',
         'Lances',
         'Propostas',
+        'Comissões',
         'Usuários',
         'Importar',
         'Minha conta',
