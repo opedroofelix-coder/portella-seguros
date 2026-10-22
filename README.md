@@ -26,6 +26,7 @@ assets/js/main.js              # pó dourado, menu mobile, carrosséis, contador
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
 assets/img/seguradoras/*.png   # logos das 12 seguradoras parceiras
+assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratadas em marinho e dourado)
 ```
 
 ## Seções (na ordem)
@@ -34,7 +35,7 @@ assets/img/seguradoras/*.png   # logos das 12 seguradoras parceiras
 2. Hero: consultora num arco com fio dourado, brasão com o ícone, seletor de seguro
 3. Seguradoras parceiras: faixa contínua com os logos
 4. Sobre: texto, contadores, "Por que escolher a Portella" e Missão, Visão e Valores
-5. Seguros: carrossel com 8 produtos (autoplay, setas, arrastar e barra de progresso)
+5. Seguros: carrossel com 10 produtos (autoplay, setas, arrastar e barra de progresso)
 6. Depoimentos: carrossel contínuo
 7. Dúvidas frequentes: acordeão
 8. Chamada para cotação
@@ -47,7 +48,8 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 ## Pendências
 
 - [ ] **Logos das seguradoras em alta qualidade.** Os atuais foram recortados de uma imagem pequena. Trocar pelos SVG/PNG oficiais em `assets/img/seguradoras/`, mantendo os nomes dos arquivos.
-- [ ] Fotos dos 8 seguros e das matérias do blog.
+- [x] Fotos dos 10 seguros: Unsplash (licença livre), em `assets/img/seguros/`.
+- [ ] Fotos das matérias do blog.
 - [x] Número de WhatsApp: (11) 94784-1580 em `WHATSAPP_NUMBER` (`assets/js/main.js`) e nos links `wa.me` do site.
 - [ ] Horário de atendimento (seção Contato).
 - [ ] CNPJ e SUSEP (footer).
