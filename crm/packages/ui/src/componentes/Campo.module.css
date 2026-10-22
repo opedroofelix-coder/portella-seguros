@@ -5,9 +5,9 @@
   min-width: 0;
 }
 .rotulo {
-  font-size: 11px;
+  font-size: var(--campo-rotulo-tamanho, 11px);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--campo-rotulo-espaco, 0.06em);
   text-transform: uppercase;
   color: var(--texto-suave);
 }
@@ -25,7 +25,7 @@
   padding: 9px 12px;
   background: var(--superficie-2);
   border: 1px solid var(--borda-forte);
-  border-radius: 7px;
+  border-radius: min(7px, var(--raio-max, 7px));
   color: var(--texto);
   font-size: 16px; /* 16px evita zoom automático no iOS */
   transition:
@@ -46,9 +46,10 @@
   border-color: var(--destaque-fio);
 }
 .controle:focus {
-  outline: none;
-  border-color: var(--destaque);
-  box-shadow: 0 0 0 3px var(--destaque-fundo);
+  outline: var(--campo-foco-contorno, none);
+  outline-offset: var(--campo-foco-afastamento, 0px);
+  border-color: var(--campo-foco-borda, var(--destaque));
+  box-shadow: var(--campo-foco-anel, 0 0 0 3px var(--destaque-fundo));
   background: var(--superficie);
 }
 .controle:disabled,

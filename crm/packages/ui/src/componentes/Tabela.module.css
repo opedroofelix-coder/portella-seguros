@@ -21,14 +21,14 @@
   text-transform: uppercase;
   color: var(--texto-suave);
   background: var(--superficie-2);
-  border-bottom: 1px solid var(--borda);
+  border-bottom: var(--tabela-cabecalho-fio, 1px solid var(--borda));
   white-space: nowrap;
 }
 .tabela th:first-child {
-  border-radius: 7px 0 0 0;
+  border-radius: min(7px, var(--raio-max, 7px)) 0 0 0;
 }
 .tabela th:last-child {
-  border-radius: 0 7px 0 0;
+  border-radius: 0 min(7px, var(--raio-max, 7px)) 0 0;
 }
 .tabela td {
   padding: 10px 12px;
@@ -47,7 +47,7 @@
 }
 .clicavel:hover,
 .clicavel:focus-visible {
-  background: var(--superficie-2);
+  background: var(--linha-hover, var(--superficie-2));
 }
 .direita {
   text-align: right !important;
@@ -86,8 +86,8 @@
     padding: 12px 14px;
     background: var(--superficie);
     border: 1px solid var(--borda);
-    border-left: 3px solid var(--destaque);
-    border-radius: 10px;
+    border-left: var(--tabela-cartao-faixa, 3px solid var(--destaque));
+    border-radius: min(10px, var(--raio-max, 10px));
     box-shadow: var(--sombra);
   }
   .tabela td {

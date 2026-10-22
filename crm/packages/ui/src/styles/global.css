@@ -379,7 +379,7 @@ h3 em {
   padding: 12px 16px;
   background: var(--alerta-fundo);
   border: 1px solid var(--alerta-borda);
-  border-radius: 9px;
+  border-radius: min(9px, var(--raio-max, 9px));
   color: var(--texto);
 }
 .aviso-faixa a {

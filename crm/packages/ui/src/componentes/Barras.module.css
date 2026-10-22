@@ -36,16 +36,16 @@
   grid-column: 1 / -1;
   height: 9px;
   background: var(--superficie-3);
-  border-radius: 20px;
+  border-radius: min(20px, var(--raio-max, 20px));
   overflow: hidden;
 }
 .barra {
   height: 100%;
   min-width: 3px;
   background: var(--primaria);
-  border-radius: 20px;
+  border-radius: min(20px, var(--raio-max, 20px));
   transition: width 0.4s var(--ease);
 }
 .item:first-child .barra {
-  background: var(--destaque);
+  background: var(--barras-destaque, var(--destaque));
 }

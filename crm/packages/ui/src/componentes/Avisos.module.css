@@ -26,7 +26,7 @@
   padding: 8px 8px 8px 14px;
   background: var(--toast-fundo);
   color: var(--toast-texto);
-  border-radius: 10px;
+  border-radius: min(10px, var(--raio-max, 10px));
   box-shadow: var(--sombra-forte);
   animation: entrar 0.25s var(--ease);
 }

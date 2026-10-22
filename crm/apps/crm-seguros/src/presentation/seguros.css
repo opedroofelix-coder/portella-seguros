@@ -1,0 +1,120 @@
+/*
+ * CRM Seguros: direção Noir Dourado aprovada pela Portella (marfim, cantos retos, fios dourados,
+ * botão dourado com texto marinho). Vale só com <html data-app="seguros">; o Consórcio continua com
+ * os valores padrão do design system. Os componentes leem estes tokens com o valor antigo de reserva.
+ */
+:root[data-app='seguros'] {
+  --radius: 2px;
+  --raio-cartao: 2px;
+  --raio-max: 2px;
+  --botao-fundo: #c9a85e;
+  --botao-fundo-hover: #b8924a;
+  --botao-borda: #b8924a;
+  --botao-texto: #0f1e3c;
+  --campo-rotulo-tamanho: 12px;
+  --campo-rotulo-espaco: 0.08em;
+  --campo-foco-contorno: 2px solid var(--foco);
+  --campo-foco-afastamento: 1px;
+  --campo-foco-borda: var(--foco);
+  --campo-foco-anel: none;
+  --abas-espaco: 0 2px;
+  --abas-fundo: transparent;
+  --abas-borda: 0;
+  --abas-fio: 1px solid var(--borda);
+  --aba-hover-fundo: transparent;
+  --aba-ativa-fundo: transparent;
+  --aba-ativa-texto: var(--texto);
+  --aba-ativa-marca: inset 0 -2px 0 var(--destaque-fio);
+  --indicador-faixa: 2px;
+  --indicador-rotulo-tamanho: 13px;
+  --indicador-valor-fonte: var(--serif);
+  --indicador-valor-peso: 500;
+  --barras-destaque: var(--primaria);
+  --selo-borda-forca: 38%;
+  --tabela-cabecalho-fio: 1px solid var(--destaque-fio);
+  --tabela-cartao-faixa: 1px solid var(--borda);
+  --linha-hover: var(--destaque-fundo);
+  --sombra-menu: none;
+  --menu-fio: 1px solid var(--destaque-fio);
+  --menu-grupo: rgba(244, 238, 226, 0.66);
+  --menu-link-altura: 44px;
+  --menu-ativo-marca: inset 2px 0 0 var(--menu-ativo);
+  --sair-altura: 40px;
+  --topo-fio: var(--destaque-fio);
+  --modal-borda: var(--destaque-fio);
+  --modal-fio: 2px solid var(--destaque-fio);
+}
+
+/* Claro (padrão, ou Automático com o aparelho no claro). */
+:root[data-app='seguros'][data-tema='claro'] {
+  --fundo: #f2ece1;
+  --superficie: #fbf9f4;
+  --superficie-2: #f7f3ec;
+  --superficie-3: #efe8db;
+  --borda: #e3d9c6;
+  --borda-forte: #8a7a5a;
+  --texto-suave: #44506a;
+  --texto-fraco: #5a6479;
+  --destaque-fundo: #f7efdc;
+  --destaque-borda: #c9a85e;
+  --topo-fundo: #fbf9f4;
+  --sucesso: #05683f;
+  --sucesso-fundo: #eaf5ee;
+  --sucesso-borda: #9ed3b7;
+  --alerta: #8a4b05;
+  --alerta-fundo: #fbf1de;
+  --alerta-borda: #e0b97a;
+  --perigo: #a61b1b;
+  --perigo-fundo: #faecec;
+  --perigo-borda: #e6b9b9;
+  --info-fundo: #ecf1fb;
+  --sombra: none;
+  --sombra-forte: 0 24px 48px -28px rgba(15, 30, 60, 0.45);
+  --foco: #1a2b4b;
+}
+@media (prefers-color-scheme: light) {
+  :root[data-app='seguros']:not([data-tema]) {
+    --fundo: #f2ece1;
+    --superficie: #fbf9f4;
+    --superficie-2: #f7f3ec;
+    --superficie-3: #efe8db;
+    --borda: #e3d9c6;
+    --borda-forte: #8a7a5a;
+    --texto-suave: #44506a;
+    --texto-fraco: #5a6479;
+    --destaque-fundo: #f7efdc;
+    --destaque-borda: #c9a85e;
+    --topo-fundo: #fbf9f4;
+    --sucesso: #05683f;
+    --sucesso-fundo: #eaf5ee;
+    --sucesso-borda: #9ed3b7;
+    --alerta: #8a4b05;
+    --alerta-fundo: #fbf1de;
+    --alerta-borda: #e0b97a;
+    --perigo: #a61b1b;
+    --perigo-fundo: #faecec;
+    --perigo-borda: #e6b9b9;
+    --info-fundo: #ecf1fb;
+    --sombra: none;
+    --sombra-forte: 0 24px 48px -28px rgba(15, 30, 60, 0.45);
+    --foco: #1a2b4b;
+  }
+}
+
+/* Escuro: já é marinho e dourado; só as bordas dos campos ganham contraste e as sombras saem. */
+:root[data-app='seguros'][data-tema='escuro'] {
+  --borda-forte: rgba(217, 188, 126, 0.6);
+  --texto-fraco: #a9b2c2;
+  --sombra: none;
+  --sombra-forte: 0 24px 48px -28px rgba(0, 0, 0, 0.75);
+  --barras-destaque: var(--destaque);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-app='seguros']:not([data-tema]) {
+    --borda-forte: rgba(217, 188, 126, 0.6);
+    --texto-fraco: #a9b2c2;
+    --sombra: none;
+    --sombra-forte: 0 24px 48px -28px rgba(0, 0, 0, 0.75);
+    --barras-destaque: var(--destaque);
+  }
+}

@@ -1,4 +1,5 @@
 import '@portella/ui/styles.css';
+import './presentation/seguros.css';
 import { BarraDemo, limparDemoSePedido, prepararDemo, recomecarDemo } from '@portella/app-base';
 import type { ReactNode } from 'react';
 import { StrictMode } from 'react';

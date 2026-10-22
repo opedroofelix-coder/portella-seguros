@@ -25,11 +25,12 @@
   transform: translateY(1px);
 }
 .primario {
-  background: var(--primaria);
-  color: var(--primaria-texto);
+  background: var(--botao-fundo, var(--primaria));
+  border-color: var(--botao-borda, transparent);
+  color: var(--botao-texto, var(--primaria-texto));
 }
 .primario:not(:disabled):hover {
-  background: var(--primaria-hover);
+  background: var(--botao-fundo-hover, var(--primaria-hover));
 }
 .secundario {
   background: var(--superficie);
