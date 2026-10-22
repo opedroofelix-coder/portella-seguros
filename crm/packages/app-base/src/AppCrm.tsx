@@ -34,21 +34,45 @@ export interface RotaApp {
 export const ROTA_FUNIL = '/oportunidades';
 
 export const MENU_COMUM = {
-  clientes: { para: '/clientes', rotulo: 'Clientes', icone: 'clientes' },
-  producao: { para: '/producao', rotulo: 'Painel de produção', icone: 'painel' },
-  propostas: { para: '/propostas', rotulo: 'Propostas', icone: 'documento' },
-  aprovacoes: { para: ROTA_APROVACOES, rotulo: 'Aprovações', icone: 'funil', acao: 'financeiro:gerenciar' },
-  relatorios: { para: '/relatorios', rotulo: 'Relatórios', icone: 'moeda' },
-  estornosVales: { para: '/estornos-vales', rotulo: 'Estornos e vales', icone: 'lixeira' },
+  clientes: { para: '/clientes', rotulo: 'Clientes', icone: 'clientes', grupo: 'Principal' },
+  propostas: { para: '/propostas', rotulo: 'Propostas', icone: 'documento', grupo: 'Principal' },
+  aprovacoes: {
+    para: ROTA_APROVACOES,
+    rotulo: 'Aprovações',
+    icone: 'aprovar',
+    grupo: 'Principal',
+    acao: 'financeiro:gerenciar',
+  },
+  producao: { para: '/producao', rotulo: 'Painel de produção', icone: 'tendencia', grupo: 'Relatórios' },
+  relatorios: { para: '/relatorios', rotulo: 'Relatórios', icone: 'moeda', grupo: 'Relatórios' },
+  estornosVales: {
+    para: '/estornos-vales',
+    rotulo: 'Estornos e vales',
+    icone: 'estorno',
+    grupo: 'Relatórios',
+  },
   configuracoes: {
     para: '/configuracoes',
     rotulo: 'Configurações',
-    icone: 'editar',
+    icone: 'ajustes',
+    grupo: 'Sistema',
     acao: 'financeiro:gerenciar',
   },
-  usuarios: { para: '/usuarios', rotulo: 'Usuários', icone: 'usuarios', acao: 'usuarios:gerenciar' },
-  importar: { para: '/importar', rotulo: 'Importar', icone: 'importar', acao: 'dados:importar' },
-  conta: { para: '/conta', rotulo: 'Minha conta', icone: 'editar' },
+  usuarios: {
+    para: '/usuarios',
+    rotulo: 'Usuários',
+    icone: 'usuarios',
+    grupo: 'Sistema',
+    acao: 'usuarios:gerenciar',
+  },
+  importar: {
+    para: '/importar',
+    rotulo: 'Importar',
+    icone: 'importar',
+    grupo: 'Sistema',
+    acao: 'dados:importar',
+  },
+  conta: { para: '/conta', rotulo: 'Minha conta', icone: 'editar', grupo: 'Sistema' },
 } satisfies Record<string, ItemMenuApp>;
 
 export function AppCrm<S extends ServicosBase>({

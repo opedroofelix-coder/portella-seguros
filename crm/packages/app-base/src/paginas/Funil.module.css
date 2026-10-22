@@ -3,8 +3,10 @@
   flex-direction: column;
   gap: 6px;
   padding: 12px;
-  background: var(--navy-2);
-  border: 1px solid var(--line);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 9px;
+  box-shadow: var(--sombra);
 }
 .cartao strong {
   font-weight: 500;
@@ -15,7 +17,7 @@
   flex-wrap: wrap;
   gap: 4px 12px;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--texto-suave);
 }
 .acoes {
   display: flex;

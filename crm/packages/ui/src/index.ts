@@ -10,3 +10,4 @@ export * from './componentes/Modal';
 export * from './componentes/Quadro';
 export * from './componentes/Selo';
 export * from './componentes/Tabela';
+export * from './componentes/Tema';

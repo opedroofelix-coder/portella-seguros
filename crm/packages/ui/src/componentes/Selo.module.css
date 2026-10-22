@@ -1,13 +1,15 @@
 .selo {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  border: 1px solid currentColor;
+  gap: 5px;
+  padding: 2px 10px;
+  border: 1px solid var(--borda-selo, transparent);
   border-radius: 999px;
+  background: var(--fundo-selo);
+  color: var(--cor-selo);
   font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
+  font-weight: 600;
+  line-height: 1.5;
   white-space: nowrap;
 }
 .selo::before {
@@ -18,20 +20,27 @@
   background: currentColor;
 }
 .neutro {
-  color: var(--text-muted);
+  --cor-selo: var(--texto-suave);
+  --fundo-selo: var(--superficie-3);
+  --borda-selo: var(--borda);
 }
 .sucesso {
-  color: var(--success);
+  --cor-selo: var(--sucesso);
+  --fundo-selo: var(--sucesso-fundo);
 }
 .alerta {
-  color: var(--warning);
+  --cor-selo: var(--alerta);
+  --fundo-selo: var(--alerta-fundo);
 }
 .perigo {
-  color: var(--danger);
+  --cor-selo: var(--perigo);
+  --fundo-selo: var(--perigo-fundo);
 }
 .info {
-  color: var(--info);
+  --cor-selo: var(--info);
+  --fundo-selo: var(--info-fundo);
 }
 .dourado {
-  color: var(--gold-light);
+  --cor-selo: var(--destaque-texto);
+  --fundo-selo: var(--destaque-fundo);
 }

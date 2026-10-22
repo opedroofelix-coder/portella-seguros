@@ -53,6 +53,8 @@ export function PaginaPainel() {
       <div className="grade">
         <div className="grade-4">
           <Indicador
+            tom="primaria"
+            icone="documento"
             rotulo="Cotas ativas"
             valor={resumo.ativas.toLocaleString('pt-BR')}
             detalhe={
@@ -62,12 +64,21 @@ export function PaginaPainel() {
             }
           />
           <Indicador
+            tom="sucesso"
+            icone="aprovar"
             rotulo="Contempladas"
             valor={resumo.contempladas.toLocaleString('pt-BR')}
             detalhe={formatarDinheiro(resumo.creditoContemplado)}
           />
-          <Indicador rotulo="Crédito em andamento" valor={formatarDinheiro(resumo.creditoAtivo)} />
           <Indicador
+            tom="destaque"
+            icone="carteira"
+            rotulo="Crédito em andamento"
+            valor={formatarDinheiro(resumo.creditoAtivo)}
+          />
+          <Indicador
+            tom="alerta"
+            icone="calendario"
             rotulo="Lances aguardando"
             valor={lances.filter((l) => l.resultado === 'aguardando').length}
           />

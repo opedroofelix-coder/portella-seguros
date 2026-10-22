@@ -39,17 +39,28 @@ export function PaginaPainel() {
       <div className="grade">
         <div className="grade-4">
           <Indicador
+            tom="primaria"
+            icone="documento"
             rotulo="Apólices ativas"
             valor={resumo.ativas.toLocaleString('pt-BR')}
             detalhe={`${listaClientes.length.toLocaleString('pt-BR')} clientes`}
           />
           <Indicador
+            tom="alerta"
+            icone="calendario"
             rotulo="Renovar em 30 dias"
             valor={resumo.aVencer30}
             detalhe={`${resumo.aVencer60} em 60 · ${resumo.aVencer90} em 90 dias`}
           />
-          <Indicador rotulo="Prêmio ativo" valor={formatarDinheiro(resumo.premioAtivo)} />
           <Indicador
+            tom="destaque"
+            icone="carteira"
+            rotulo="Prêmio ativo"
+            valor={formatarDinheiro(resumo.premioAtivo)}
+          />
+          <Indicador
+            tom="sucesso"
+            icone="moeda"
             rotulo="Comissão prevista"
             valor={formatarDinheiro(resumo.comissaoAtiva)}
             detalhe="sobre o prêmio líquido"

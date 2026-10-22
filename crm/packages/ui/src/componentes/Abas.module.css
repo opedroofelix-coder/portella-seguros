@@ -2,26 +2,35 @@
   display: flex;
   gap: 4px;
   overflow-x: auto;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  padding: 4px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borda);
+  border-radius: 9px;
   scrollbar-width: none;
 }
 .aba {
   flex-shrink: 0;
-  min-height: var(--touch);
-  padding: 8px 16px;
+  min-height: 38px;
+  padding: 6px 14px;
   background: none;
   border: 0;
-  border-bottom: 2px solid transparent;
-  color: var(--text-muted);
+  border-radius: 6px;
+  color: var(--texto-suave);
   cursor: pointer;
   font-size: 14px;
-  letter-spacing: 0.04em;
+  font-weight: 600;
 }
 .aba:hover {
-  color: var(--text);
+  color: var(--texto);
+  background: var(--superficie-3);
 }
 .aba[aria-selected='true'] {
-  color: var(--gold-light);
-  border-bottom-color: var(--gold);
+  background: var(--primaria);
+  color: var(--primaria-texto);
+}
+@media (pointer: coarse), (max-width: 719px) {
+  .aba {
+    min-height: var(--touch);
+  }
 }

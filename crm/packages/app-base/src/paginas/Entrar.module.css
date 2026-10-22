@@ -3,7 +3,8 @@
   display: grid;
   place-items: center;
   padding: 24px 16px;
-  background: radial-gradient(ellipse at top, var(--navy) 0%, var(--navy-deep) 65%);
+  /* Sempre marinho, como o menu: a marca entra antes do tema. */
+  background: linear-gradient(135deg, #0f1e3c, #1a2b4b 55%, #22365c);
 }
 .caixa {
   width: 100%;
@@ -12,9 +13,11 @@
   flex-direction: column;
   gap: 22px;
   padding: 28px 20px;
-  background: var(--navy-2);
-  border: 1px solid var(--line);
-  border-top: 2px solid var(--gold);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-top: 3px solid var(--destaque);
+  border-radius: 18px;
+  box-shadow: var(--sombra-forte);
 }
 @media (min-width: 480px) {
   .caixa {
@@ -33,13 +36,13 @@
   width: auto;
 }
 .titulo {
-  font-size: 28px;
+  font-size: 26px;
   text-align: center;
 }
 .texto {
   margin: -8px 0 0;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--texto-suave);
   font-size: 14px;
 }
 .form {
@@ -50,8 +53,9 @@
 .erro {
   margin: 0;
   padding: 10px 12px;
-  border-left: 2px solid var(--danger);
-  background: rgba(238, 143, 134, 0.08);
-  color: var(--danger);
+  border: 1px solid var(--perigo-borda);
+  border-radius: 8px;
+  background: var(--perigo-fundo);
+  color: var(--perigo);
   font-size: 14px;
 }

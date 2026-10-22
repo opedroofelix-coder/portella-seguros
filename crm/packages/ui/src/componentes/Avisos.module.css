@@ -1,9 +1,9 @@
 .pilha {
   position: fixed;
-  z-index: 60;
+  z-index: 70;
   left: 16px;
   right: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -22,23 +22,37 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  background: var(--navy-3);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--gold);
-  box-shadow: 0 16px 32px -18px rgba(0, 0, 0, 0.7);
+  gap: 10px;
+  padding: 8px 8px 8px 14px;
+  background: var(--toast-fundo);
+  color: var(--toast-texto);
+  border-radius: 10px;
+  box-shadow: var(--sombra-forte);
   animation: entrar 0.25s var(--ease);
 }
+.aviso::before {
+  content: '';
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 18px;
+  border-radius: 50%;
+  background: var(--destaque);
+}
 .aviso p {
+  flex: 1;
   margin: 0;
   padding-top: 10px;
+  font-size: 14px;
 }
-.sucesso {
-  border-left-color: var(--success);
+.aviso button {
+  color: inherit;
 }
-.erro {
-  border-left-color: var(--danger);
+.sucesso::before {
+  background: #34d399;
+}
+.erro::before {
+  background: #f87171;
 }
 @keyframes entrar {
   from {

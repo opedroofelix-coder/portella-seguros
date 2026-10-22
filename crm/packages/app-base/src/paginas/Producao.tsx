@@ -100,17 +100,28 @@ export function PaginaProducao() {
         </BarraFiltros>
         <div className="grade-4">
           <Indicador
+            tom="primaria"
+            icone="tendencia"
             rotulo="Produção (prêmio líquido)"
             valor={formatarDinheiro(painel.producao)}
             detalhe={`${painel.quantidade} proposta(s)`}
           />
           <Indicador
+            tom="sucesso"
+            icone="moeda"
             rotulo="Comissão recebida"
             valor={formatarDinheiro(painel.comissaoRecebida)}
             detalhe="pela data do recebimento"
           />
-          <Indicador rotulo="Repassada aos produtores" valor={formatarDinheiro(painel.comissaoRepassada)} />
           <Indicador
+            tom="info"
+            icone="usuarios"
+            rotulo="Repassada aos produtores"
+            valor={formatarDinheiro(painel.comissaoRepassada)}
+          />
+          <Indicador
+            tom="alerta"
+            icone="moeda"
             rotulo="Saldo a receber"
             valor={formatarDinheiro(painel.saldoReceber)}
             detalhe="todas as propostas, sem filtro"
@@ -126,16 +137,21 @@ export function PaginaProducao() {
         <div className="grade">
           <div className="grade-3">
             <Indicador
+              tom="destaque"
+              icone="mais"
               rotulo="Seguro novo"
               valor={formatarDinheiro(painel.porTipo.novo.premio)}
               detalhe={`${painel.porTipo.novo.quantidade} proposta(s)`}
             />
             <Indicador
+              tom="info"
+              icone="calendario"
               rotulo="Renovação da carteira"
               valor={formatarDinheiro(painel.porTipo.renovacao.premio)}
               detalhe={`${painel.porTipo.renovacao.quantidade} proposta(s)`}
             />
             <Indicador
+              tom="primaria"
               rotulo="Tipo não informado"
               valor={formatarDinheiro(painel.porTipo.nao_informado.premio)}
               detalhe={`${painel.porTipo.nao_informado.quantidade} proposta(s)`}

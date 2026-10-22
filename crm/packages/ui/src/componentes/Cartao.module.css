@@ -1,13 +1,14 @@
 .cartao {
-  background: var(--navy-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-cartao);
+  box-shadow: var(--sombra);
   padding: 16px;
   min-width: 0;
 }
 @media (min-width: 720px) {
   .cartao {
-    padding: 20px 24px;
+    padding: 18px 20px;
   }
 }
 .cabecalho {
@@ -16,52 +17,106 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .titulo {
-  font-size: 20px;
+  font-size: 17px;
 }
+
+/* Indicador: faixa colorida de 3px no topo, ícone em caixa tonal e valor em negrito na cor do tom. */
 .indicador {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  border-top: 1px solid var(--gold-line);
+  gap: 4px;
   container-type: inline-size;
+  --cor: var(--primaria);
+  --tom-fundo: var(--primaria-fundo);
+}
+.indicador::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--cor);
+}
+.primaria {
+  --cor: var(--primaria);
+  --tom-fundo: var(--primaria-fundo);
+}
+.destaque {
+  --cor: var(--destaque-texto);
+  --tom-fundo: var(--destaque-fundo);
+}
+.sucesso {
+  --cor: var(--sucesso);
+  --tom-fundo: var(--sucesso-fundo);
+}
+.alerta {
+  --cor: var(--alerta);
+  --tom-fundo: var(--alerta-fundo);
+}
+.perigo {
+  --cor: var(--perigo);
+  --tom-fundo: var(--perigo-fundo);
+}
+.info {
+  --cor: var(--info);
+  --tom-fundo: var(--info-fundo);
+}
+.indicadorIcone {
+  order: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  margin-bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tom-fundo);
+  color: var(--cor);
 }
 .indicadorRotulo {
-  font-size: 11px;
+  order: 2;
+  font-size: 12.5px;
   font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--texto-suave);
 }
 /* O valor encolhe conforme a largura do cartão para nunca quebrar no meio de um número. */
 .indicadorValor {
-  font-family: var(--serif);
-  font-size: clamp(24px, 22cqi, 38px);
+  order: 1;
+  font-size: clamp(20px, 15cqi, 28px);
+  font-weight: 700;
   line-height: 1.15;
-  color: var(--text);
+  color: var(--cor);
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .indicadorValor[data-longo] {
-  font-size: clamp(17px, 12cqi, 34px);
+  font-size: clamp(17px, 11cqi, 26px);
 }
 .indicadorDetalhe {
-  font-size: 13px;
-  color: var(--text-faint);
+  order: 3;
+  font-size: 12px;
+  color: var(--texto-fraco);
 }
 .vazio {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   text-align: center;
-  padding: 40px 16px;
-  color: var(--text-muted);
+  padding: 36px 16px;
+  color: var(--texto-suave);
 }
 .vazio h3 {
-  font-size: 20px;
-  color: var(--text);
+  font-size: 18px;
+  color: var(--texto);
+}
+.vazio p {
+  margin: 0;
+  max-width: 48ch;
 }
 .carregando {
   display: flex;
@@ -69,12 +124,12 @@
   justify-content: center;
   gap: 12px;
   padding: 40px;
-  color: var(--text-muted);
+  color: var(--texto-suave);
 }
 .spinner {
   width: 22px;
   height: 22px;
-  border: 2px solid var(--gold-light);
+  border: 2px solid var(--destaque);
   border-right-color: transparent;
   border-radius: 50%;
   animation: giro 0.8s linear infinite;

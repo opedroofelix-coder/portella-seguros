@@ -1,8 +1,8 @@
-/* Ranking de uma única série: barra fina dourada, rótulo e valor em tinta de texto. */
+/* Ranking de uma série: rótulo e valor em tinta de texto, barra arredondada na cor do tema. */
 .lista {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 11px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -13,35 +13,39 @@
   gap: 4px 12px;
   align-items: baseline;
   padding: 2px 0;
-  border-radius: var(--radius);
-}
-.item:hover {
-  background: rgba(217, 188, 126, 0.05);
+  font-size: 14px;
 }
 .rotulo {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--texto);
 }
 .valor {
   font-variant-numeric: tabular-nums;
-  color: var(--text);
+  font-weight: 600;
+  color: var(--texto);
 }
 .detalhe {
-  color: var(--text-faint);
-  font-size: 13px;
+  color: var(--texto-fraco);
+  font-size: 12px;
+  font-weight: 400;
   margin-left: 6px;
 }
 .trilho {
   grid-column: 1 / -1;
-  height: 8px;
-  background: rgba(217, 188, 126, 0.08);
-  border-radius: 0 4px 4px 0;
+  height: 9px;
+  background: var(--superficie-3);
+  border-radius: 20px;
+  overflow: hidden;
 }
 .barra {
   height: 100%;
-  min-width: 2px;
-  background: var(--gold);
-  border-radius: 0 4px 4px 0;
+  min-width: 3px;
+  background: var(--primaria);
+  border-radius: 20px;
   transition: width 0.4s var(--ease);
+}
+.item:first-child .barra {
+  background: var(--destaque);
 }

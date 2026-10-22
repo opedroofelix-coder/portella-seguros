@@ -271,7 +271,7 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                 className={styles.aviso}
                 style={
                   proposta.status === 'aprovada'
-                    ? { borderLeftColor: 'var(--success)', background: 'rgba(124,199,160,.08)' }
+                    ? { borderColor: 'var(--sucesso-borda)', background: 'var(--sucesso-fundo)' }
                     : undefined
                 }
               >

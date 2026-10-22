@@ -1,5 +1,9 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import styles from './Cartao.module.css';
+import type { NomeIcone } from './Icone';
+import { Icone } from './Icone';
+
+export type TomIndicador = 'primaria' | 'destaque' | 'sucesso' | 'alerta' | 'perigo' | 'info';
 
 export function Cartao({
   titulo,
@@ -21,17 +25,27 @@ export function Cartao({
   );
 }
 
+/** Número de destaque com faixa e ícone na cor do tom. O valor aparece acima do rótulo. */
 export function Indicador({
   rotulo,
   valor,
   detalhe,
+  tom = 'primaria',
+  icone,
 }: {
   rotulo: string;
   valor: ReactNode;
   detalhe?: ReactNode;
+  tom?: TomIndicador;
+  icone?: NomeIcone;
 }) {
   return (
-    <div className={`${styles.cartao} ${styles.indicador}`}>
+    <div className={`${styles.cartao} ${styles.indicador} ${styles[tom]}`}>
+      {icone && (
+        <span className={styles.indicadorIcone} aria-hidden="true">
+          <Icone nome={icone} tamanho={18} />
+        </span>
+      )}
       <span className={styles.indicadorRotulo}>{rotulo}</span>
       <strong
         className={styles.indicadorValor}

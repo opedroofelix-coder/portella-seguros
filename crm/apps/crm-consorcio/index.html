@@ -10,7 +10,19 @@
     <link rel="apple-touch-icon" href="/icone-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Aplica o tema escolhido antes da primeira pintura (sem piscar). Padrão: claro.
+      try {
+        var t = localStorage.getItem('portella-crm:tema');
+        if (t !== 'auto') document.documentElement.dataset.tema = t === 'escuro' ? 'escuro' : 'claro';
+      } catch (e) {
+        document.documentElement.dataset.tema = 'claro';
+      }
+    </script>
   </head>
   <body>
     <div id="raiz"></div>

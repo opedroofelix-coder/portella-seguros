@@ -55,17 +55,29 @@ export function ResumoFinanceiro() {
       </BarraFiltros>
       <div className="grade-4">
         <Indicador
+          tom="primaria"
+          icone="carteira"
           rotulo={`Saldo ${CONTA_PRINCIPAL}`}
           valor={formatarDinheiro(saldoPrincipal ?? 0)}
           detalhe={`no fim de ${rotuloMesCurto(mesAtivo)}`}
         />
-        <Indicador rotulo="Entradas" valor={formatarDinheiro(resumo.entradas)} detalhe="na conta principal" />
         <Indicador
+          tom="sucesso"
+          icone="tendencia"
+          rotulo="Entradas"
+          valor={formatarDinheiro(resumo.entradas)}
+          detalhe="na conta principal"
+        />
+        <Indicador
+          tom="perigo"
+          icone="carteira"
           rotulo="Saídas"
           valor={formatarDinheiro(resumo.saidas)}
           detalhe={`resultado ${formatarDinheiro(resumo.entradas - resumo.saidas)}`}
         />
         <Indicador
+          tom="alerta"
+          icone="carteira"
           rotulo="Despesas em aberto"
           valor={formatarDinheiro(resumo.despesasAbertas)}
           detalhe={`de ${formatarDinheiro(resumo.despesas)} no mês`}

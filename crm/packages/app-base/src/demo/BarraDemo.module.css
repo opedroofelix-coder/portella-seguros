@@ -6,21 +6,22 @@
   align-items: center;
   gap: 10px;
   padding: 6px 12px calc(6px + env(safe-area-inset-bottom));
-  background: var(--navy-deep);
-  border-top: 1px solid var(--gold-line);
+  background: var(--menu-fundo);
+  color: var(--menu-texto-forte);
+  border-top: 2px solid var(--destaque);
   font-size: 13px;
 }
 .selo {
   flex: 1;
   min-width: 0;
-  color: var(--text-muted);
+  color: var(--menu-texto);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .selo strong {
-  color: var(--gold-light);
-  font-weight: 500;
+  color: var(--menu-ativo);
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 11px;
@@ -32,33 +33,34 @@
 }
 .visao span {
   display: none;
-  color: var(--text-muted);
+  color: var(--menu-texto);
 }
 .visao select,
 .recomecar {
   min-height: var(--touch);
   padding: 0 12px;
   background: transparent;
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 2px;
+  color: var(--menu-texto-forte);
+  border: 1px solid var(--menu-linha);
+  border-radius: 7px;
   font: inherit;
 }
 .visao select {
   max-width: 46vw;
-  background: var(--navy);
+  background: var(--menu-fundo);
 }
 .recomecar {
   cursor: pointer;
-  color: var(--gold-light);
+  color: var(--menu-ativo);
 }
 .recomecar:hover,
 .visao select:hover {
-  border-color: var(--gold-line);
+  border-color: var(--menu-ativo);
 }
 /* Espaço para a faixa não cobrir o fim da página. */
 :global(body.com-demo) {
-  padding-bottom: calc(58px + env(safe-area-inset-bottom));
+  --reserva-inferior: calc(58px + env(safe-area-inset-bottom));
+  padding-bottom: var(--reserva-inferior);
 }
 @media (min-width: 720px) {
   .visao span {

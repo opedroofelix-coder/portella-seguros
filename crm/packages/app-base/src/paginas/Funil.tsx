@@ -61,10 +61,17 @@ export function PaginaFunil() {
         }
       />
       <div className="grade-4" style={{ marginBottom: 20 }}>
-        <Indicador rotulo="Em aberto" valor={resumo.emAberto} />
-        <Indicador rotulo="Propostas enviadas" valor={resumo.porEtapa.proposta} />
-        <Indicador rotulo="Fechadas" valor={resumo.porEtapa.ganho} />
+        <Indicador tom="primaria" icone="funil" rotulo="Em aberto" valor={resumo.emAberto} />
         <Indicador
+          tom="info"
+          icone="documento"
+          rotulo="Propostas enviadas"
+          valor={resumo.porEtapa.proposta}
+        />
+        <Indicador tom="sucesso" icone="aprovar" rotulo="Fechadas" valor={resumo.porEtapa.ganho} />
+        <Indicador
+          tom="destaque"
+          icone="tendencia"
           rotulo="Conversão"
           valor={resumo.taxaConversao == null ? '—' : `${Math.round(resumo.taxaConversao * 100)}%`}
           detalhe="fechadas ÷ encerradas"

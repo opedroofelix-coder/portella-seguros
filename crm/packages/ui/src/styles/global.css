@@ -1,30 +1,166 @@
 /* Design system do CRM Portella — direção "Noir Dourado" (mesmas cores do site). */
+/*
+ * Design system do CRM Portella: marinho e dourado do site, no layout de painel claro.
+ * Tema claro é o padrão; o escuro vale com data-tema="escuro" no <html> ou, em "Automático"
+ * (sem data-tema), quando o aparelho está no modo escuro. Componentes usam só estes papéis.
+ */
 :root {
-  --navy-deep: #0f1e3c;
-  --navy: #1a2b4b;
-  --navy-2: #15274a;
-  --navy-3: #22365c;
-  --gold: #c9a85e;
-  --gold-light: #d9bc7e;
-  --gold-line: #b8924a;
-  --text: #f4eee2;
-  --text-muted: #b9c1cf;
-  --text-faint: #9aa4b5;
-  --line: rgba(217, 188, 126, 0.2);
-  --line-strong: rgba(217, 188, 126, 0.45);
-  --success: #7cc7a0;
-  --warning: #e6c266;
-  --danger: #ee8f86;
-  --info: #93b7ea;
+  --fundo: #f3f4f7;
+  --superficie: #ffffff;
+  --superficie-2: #f7f8fb;
+  --superficie-3: #eef1f6;
+  --borda: #e2e6ee;
+  --borda-forte: #c9d0dc;
+  --texto: #0f1e3c;
+  --texto-suave: #4a5672;
+  --texto-fraco: #6b7590;
+  --primaria: #1a2b4b;
+  --primaria-hover: #0f1e3c;
+  --primaria-texto: #ffffff;
+  --primaria-fundo: #eef2f8;
+  --primaria-borda: #c8d3e6;
+  --destaque: #c9a85e;
+  --destaque-hover: #b8924a;
+  --destaque-sobre: #0f1e3c;
+  --destaque-texto: #7a5c24;
+  --destaque-fio: #b8924a;
+  --destaque-fundo: #fbf6ea;
+  --destaque-borda: #e8d6ac;
+  --menu-fundo: #1a2b4b;
+  --menu-texto: rgba(244, 238, 226, 0.74);
+  --menu-texto-forte: #f4eee2;
+  --menu-ativo: #d9bc7e;
+  --menu-ativo-fundo: rgba(217, 188, 126, 0.16);
+  --menu-linha: rgba(217, 188, 126, 0.18);
+  --topo-fundo: #ffffff;
+  --sucesso: #047857;
+  --sucesso-fundo: #ecfdf5;
+  --sucesso-borda: #a7f3d0;
+  --alerta: #a35a06;
+  --alerta-fundo: #fffbeb;
+  --alerta-borda: #fcd34d;
+  --perigo: #b91c1c;
+  --perigo-fundo: #fef2f2;
+  --perigo-borda: #fecaca;
+  --info: #1d4ed8;
+  --info-fundo: #eff6ff;
+  --info-borda: #bfdbfe;
+  --sombra: 0 1px 3px rgba(15, 30, 60, 0.07);
+  --sombra-forte: 0 12px 40px rgba(15, 30, 60, 0.16);
+  --veu: rgba(15, 30, 60, 0.5);
+  --toast-fundo: #0f1e3c;
+  --toast-texto: #f4eee2;
+  --foco: #c9a85e;
+  color-scheme: light;
   --serif: 'Lora', Georgia, 'Times New Roman', serif;
   --sans: 'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --radius: 2px;
+  --radius: 8px;
+  --raio-cartao: 11px;
   --touch: 44px;
-  --sidebar: 248px;
+  --sidebar: 256px;
   --topbar: 64px;
   --gutter: 16px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+:root[data-tema='escuro'] {
+  --fundo: #0e1729;
+  --superficie: #15274a;
+  --superficie-2: #1a2b4b;
+  --superficie-3: #22365c;
+  --borda: rgba(217, 188, 126, 0.18);
+  --borda-forte: rgba(217, 188, 126, 0.42);
+  --texto: #f4eee2;
+  --texto-suave: #b9c1cf;
+  --texto-fraco: #9aa4b5;
+  --primaria: #c9a85e;
+  --primaria-hover: #d9bc7e;
+  --primaria-texto: #0f1e3c;
+  --primaria-fundo: rgba(201, 168, 94, 0.12);
+  --primaria-borda: rgba(201, 168, 94, 0.4);
+  --destaque: #c9a85e;
+  --destaque-hover: #d9bc7e;
+  --destaque-sobre: #0f1e3c;
+  --destaque-texto: #d9bc7e;
+  --destaque-fio: #b8924a;
+  --destaque-fundo: rgba(201, 168, 94, 0.12);
+  --destaque-borda: rgba(201, 168, 94, 0.4);
+  --menu-fundo: #0f1e3c;
+  --menu-texto: rgba(244, 238, 226, 0.72);
+  --menu-texto-forte: #f4eee2;
+  --menu-ativo: #d9bc7e;
+  --menu-ativo-fundo: rgba(217, 188, 126, 0.14);
+  --menu-linha: rgba(217, 188, 126, 0.16);
+  --topo-fundo: #15274a;
+  --sucesso: #7cc7a0;
+  --sucesso-fundo: rgba(124, 199, 160, 0.12);
+  --sucesso-borda: rgba(124, 199, 160, 0.38);
+  --alerta: #e6c266;
+  --alerta-fundo: rgba(230, 194, 102, 0.1);
+  --alerta-borda: rgba(230, 194, 102, 0.42);
+  --perigo: #ee8f86;
+  --perigo-fundo: rgba(238, 143, 134, 0.1);
+  --perigo-borda: rgba(238, 143, 134, 0.42);
+  --info: #93b7ea;
+  --info-fundo: rgba(147, 183, 234, 0.1);
+  --info-borda: rgba(147, 183, 234, 0.4);
+  --sombra: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --sombra-forte: 0 18px 44px rgba(0, 0, 0, 0.5);
+  --veu: rgba(6, 12, 26, 0.72);
+  --toast-fundo: #22365c;
+  --toast-texto: #f4eee2;
+  --foco: #d9bc7e;
   color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema]) {
+    --fundo: #0e1729;
+    --superficie: #15274a;
+    --superficie-2: #1a2b4b;
+    --superficie-3: #22365c;
+    --borda: rgba(217, 188, 126, 0.18);
+    --borda-forte: rgba(217, 188, 126, 0.42);
+    --texto: #f4eee2;
+    --texto-suave: #b9c1cf;
+    --texto-fraco: #9aa4b5;
+    --primaria: #c9a85e;
+    --primaria-hover: #d9bc7e;
+    --primaria-texto: #0f1e3c;
+    --primaria-fundo: rgba(201, 168, 94, 0.12);
+    --primaria-borda: rgba(201, 168, 94, 0.4);
+    --destaque: #c9a85e;
+    --destaque-hover: #d9bc7e;
+    --destaque-sobre: #0f1e3c;
+    --destaque-texto: #d9bc7e;
+    --destaque-fio: #b8924a;
+    --destaque-fundo: rgba(201, 168, 94, 0.12);
+    --destaque-borda: rgba(201, 168, 94, 0.4);
+    --menu-fundo: #0f1e3c;
+    --menu-texto: rgba(244, 238, 226, 0.72);
+    --menu-texto-forte: #f4eee2;
+    --menu-ativo: #d9bc7e;
+    --menu-ativo-fundo: rgba(217, 188, 126, 0.14);
+    --menu-linha: rgba(217, 188, 126, 0.16);
+    --topo-fundo: #15274a;
+    --sucesso: #7cc7a0;
+    --sucesso-fundo: rgba(124, 199, 160, 0.12);
+    --sucesso-borda: rgba(124, 199, 160, 0.38);
+    --alerta: #e6c266;
+    --alerta-fundo: rgba(230, 194, 102, 0.1);
+    --alerta-borda: rgba(230, 194, 102, 0.42);
+    --perigo: #ee8f86;
+    --perigo-fundo: rgba(238, 143, 134, 0.1);
+    --perigo-borda: rgba(238, 143, 134, 0.42);
+    --info: #93b7ea;
+    --info-fundo: rgba(147, 183, 234, 0.1);
+    --info-borda: rgba(147, 183, 234, 0.4);
+    --sombra: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --sombra-forte: 0 18px 44px rgba(0, 0, 0, 0.5);
+    --veu: rgba(6, 12, 26, 0.72);
+    --toast-fundo: #22365c;
+    --toast-texto: #f4eee2;
+    --foco: #d9bc7e;
+    color-scheme: dark;
+  }
 }
 
 @media (min-width: 720px) {
@@ -52,8 +188,8 @@ body {
   font-family: var(--sans);
   font-size: 15px;
   line-height: 1.5;
-  color: var(--text);
-  background: var(--navy-deep);
+  color: var(--texto);
+  background: var(--fundo);
   -webkit-font-smoothing: antialiased;
 }
 img,
@@ -62,7 +198,7 @@ svg {
   max-width: 100%;
 }
 a {
-  color: var(--gold-light);
+  color: var(--destaque-texto);
 }
 input,
 select,
@@ -75,7 +211,7 @@ h1,
 h2,
 h3 {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 500;
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -83,10 +219,10 @@ h1 em,
 h2 em,
 h3 em {
   font-style: italic;
-  color: var(--gold-light);
+  color: var(--destaque-texto);
 }
 :focus-visible {
-  outline: 2px solid var(--gold-light);
+  outline: 2px solid var(--foco);
   outline-offset: 2px;
 }
 .sr-only {
@@ -101,13 +237,16 @@ h3 em {
 }
 .rotulo {
   font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.28em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--gold-light);
+  color: var(--destaque-texto);
+}
+.num {
+  font-variant-numeric: tabular-nums;
 }
 .texto-suave {
-  color: var(--text-muted);
+  color: var(--texto-suave);
 }
 .grade {
   display: grid;
@@ -168,7 +307,7 @@ h3 em {
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--texto-fraco);
 }
 .lista-dados dd {
   margin: 0;
@@ -182,7 +321,7 @@ h3 em {
   flex-direction: column;
 }
 .lista-simples li + li {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--borda);
 }
 .lista-simples > li > button {
   width: 100%;
@@ -198,7 +337,7 @@ h3 em {
   cursor: pointer;
 }
 .lista-simples > li > button:hover {
-  background: rgba(217, 188, 126, 0.05);
+  background: var(--superficie-2);
 }
 .lista-simples .linha {
   display: flex;
@@ -221,7 +360,7 @@ h3 em {
   overflow-wrap: anywhere;
 }
 .lista-simples small {
-  color: var(--text-muted);
+  color: var(--texto-suave);
   font-size: 13px;
 }
 .acoes-linha {
@@ -236,15 +375,16 @@ h3 em {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   padding: 12px 16px;
-  background: rgba(230, 194, 102, 0.1);
-  border: 1px solid rgba(230, 194, 102, 0.45);
-  border-left: 3px solid var(--warning);
+  background: var(--alerta-fundo);
+  border: 1px solid var(--alerta-borda);
+  border-radius: 9px;
+  color: var(--texto);
 }
 .aviso-faixa a {
-  color: var(--gold-light);
-  font-weight: 500;
+  color: var(--alerta);
+  font-weight: 600;
 }
 .span-todo {
   grid-column: 1 / -1;

@@ -340,13 +340,22 @@ function DetalhePagamento({
       >
         <div className="grade-4">
           <Indicador
+            tom="primaria"
+            icone="moeda"
             rotulo="Comissões"
             valor={formatarDinheiro(p.totalRepasse)}
             detalhe={`${p.itens.length} recebimento(s)`}
           />
-          <Indicador rotulo="Estornos" valor={formatarDinheiro(-p.totalEstornos)} />
-          <Indicador rotulo="Vales" valor={formatarDinheiro(-p.totalVales)} />
           <Indicador
+            tom="perigo"
+            icone="estorno"
+            rotulo="Estornos"
+            valor={formatarDinheiro(-p.totalEstornos)}
+          />
+          <Indicador tom="alerta" icone="carteira" rotulo="Vales" valor={formatarDinheiro(-p.totalVales)} />
+          <Indicador
+            tom="sucesso"
+            icone="carteira"
             rotulo="Líquido a pagar"
             valor={formatarDinheiro(p.liquido)}
             detalhe={

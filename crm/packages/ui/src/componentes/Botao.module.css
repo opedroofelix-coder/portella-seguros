@@ -2,23 +2,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
   min-height: var(--touch);
-  padding: 10px 18px;
+  padding: 9px 16px;
   border: 1px solid transparent;
   border-radius: var(--radius);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   transition:
-    background-color 0.2s,
-    border-color 0.2s,
-    color 0.2s,
-    transform 0.2s;
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 .botao:disabled {
   opacity: 0.55;
@@ -28,49 +25,55 @@
   transform: translateY(1px);
 }
 .primario {
-  background: var(--gold);
-  color: var(--navy-deep);
+  background: var(--primaria);
+  color: var(--primaria-texto);
 }
 .primario:not(:disabled):hover {
-  background: var(--gold-light);
+  background: var(--primaria-hover);
 }
 .secundario {
-  background: transparent;
-  border-color: var(--line-strong);
-  color: var(--text);
+  background: var(--superficie);
+  border-color: var(--borda-forte);
+  color: var(--texto);
 }
 .secundario:not(:disabled):hover {
-  border-color: var(--gold-light);
-  color: var(--gold-light);
+  border-color: var(--destaque);
+  color: var(--destaque-texto);
 }
 .fantasma {
   background: transparent;
-  color: var(--text-muted);
+  color: var(--texto-suave);
   padding-inline: 10px;
 }
 .fantasma:not(:disabled):hover {
-  color: var(--gold-light);
-  background: rgba(217, 188, 126, 0.08);
+  color: var(--texto);
+  background: var(--superficie-3);
 }
 .perigo {
-  background: transparent;
-  border-color: rgba(238, 143, 134, 0.5);
-  color: var(--danger);
+  background: var(--perigo-fundo);
+  border-color: var(--perigo-borda);
+  color: var(--perigo);
 }
 .perigo:not(:disabled):hover {
-  background: rgba(238, 143, 134, 0.12);
+  border-color: var(--perigo);
 }
 .pequeno {
-  padding: 6px 12px;
-  font-size: 11px;
+  padding: 5px 11px;
+  font-size: 13px;
 }
 /* No toque o alvo continua com 44px; com mouse o botão pequeno pode ser mais baixo. */
 @media (min-width: 720px) and (pointer: fine) {
+  .botao {
+    min-height: 40px;
+  }
   .pequeno {
-    min-height: 36px;
+    min-height: 34px;
   }
   .pequeno.soIcone {
-    width: 36px;
+    width: 34px;
+  }
+  .soIcone {
+    width: 40px;
   }
 }
 .blocoInteiro {

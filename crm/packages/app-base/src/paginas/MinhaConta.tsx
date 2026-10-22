@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ROTULO_PERFIL, SENHA_PADRAO, SENHA_TAMANHO_MINIMO } from '@portella/core';
-import { Botao, CabecalhoPagina, Campo, Cartao, Entrada, useAvisos } from '@portella/ui';
+import { Botao, CabecalhoPagina, Campo, Cartao, Entrada, SeletorTema, useAvisos } from '@portella/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useConfig } from '../config';
@@ -79,9 +79,19 @@ export function PaginaMinhaConta() {
         }
         descricao={`Usuário ${usuario.login} · ${ROTULO_PERFIL[usuario.perfil]}${usuario.percentualRepasse != null ? ` · repasse padrão ${usuario.percentualRepasse}%` : ''}`}
       />
-      <Cartao titulo="Trocar senha" style={{ maxWidth: 560 }}>
-        <FormularioTrocarSenha />
-      </Cartao>
+      <div className="grade-2" style={{ alignItems: 'start' }}>
+        <Cartao titulo="Trocar senha">
+          <FormularioTrocarSenha />
+        </Cartao>
+        <Cartao titulo="Aparência">
+          <div className="grade">
+            <p className="texto-suave" style={{ margin: 0 }}>
+              Escolha o tema da tela. Automático segue o modo claro ou escuro do seu aparelho.
+            </p>
+            <SeletorTema />
+          </div>
+        </Cartao>
+      </div>
     </>
   );
 }

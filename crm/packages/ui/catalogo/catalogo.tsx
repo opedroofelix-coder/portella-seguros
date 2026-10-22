@@ -18,6 +18,7 @@ import {
   ProvedorAvisos,
   Quadro,
   Selecao,
+  SeletorTema,
   Selo,
   Tabela,
   useAvisos,
@@ -43,12 +44,13 @@ function Pagina() {
       usuario={{ nome: 'Administradora Portella', perfil: 'Administrador' }}
       aoSair={() => avisar('Saiu.')}
       menu={[
-        { para: '/', rotulo: 'Painel', icone: 'painel' },
-        { para: '/clientes', rotulo: 'Clientes', icone: 'clientes' },
-        { para: '/apolices', rotulo: 'Apólices', icone: 'documento' },
-        { para: '/renovacoes', rotulo: 'Renovações', icone: 'calendario' },
-        { para: '/cotacoes', rotulo: 'Cotações', icone: 'funil' },
-        { para: '/usuarios', rotulo: 'Usuários', icone: 'usuarios' },
+        { para: '/', rotulo: 'Painel', icone: 'painel', grupo: 'Principal' },
+        { para: '/clientes', rotulo: 'Clientes', icone: 'clientes', grupo: 'Principal' },
+        { para: '/apolices', rotulo: 'Apólices', icone: 'documento', grupo: 'Principal' },
+        { para: '/aprovacoes', rotulo: 'Aprovações', icone: 'aprovar', grupo: 'Principal', contador: 3 },
+        { para: '/renovacoes', rotulo: 'Renovações', icone: 'calendario', grupo: 'Relatórios' },
+        { para: '/cotacoes', rotulo: 'Cotações', icone: 'funil', grupo: 'Relatórios' },
+        { para: '/usuarios', rotulo: 'Usuários', icone: 'usuarios', grupo: 'Sistema' },
       ]}
     >
       <CabecalhoPagina
@@ -71,11 +73,17 @@ function Pagina() {
       />
       <div className="grade">
         <div className="grade-4">
-          <Indicador rotulo="Apólices vigentes" valor="1.248" detalhe="+12 este mês" />
-          <Indicador rotulo="Renovações em 30 dias" valor="37" />
-          <Indicador rotulo="Prêmio da carteira" valor="R$ 2.345.678,90" />
-          <Indicador rotulo="Comissão prevista" valor="R$ 351.851,83" />
+          <Indicador rotulo="Apólices vigentes" valor="1.248" detalhe="+12 este mês" icone="documento" />
+          <Indicador rotulo="Renovações em 30 dias" valor="37" tom="alerta" icone="calendario" />
+          <Indicador rotulo="Prêmio da carteira" valor="R$ 2.345.678,90" tom="destaque" icone="carteira" />
+          <Indicador rotulo="Comissão prevista" valor="R$ 351.851,83" tom="sucesso" icone="moeda" />
         </div>
+        <Cartao titulo="Tema">
+          <p style={{ marginTop: 0, color: 'var(--texto-suave)' }}>
+            Claro (padrão), escuro ou automático (segue o aparelho). Também fica no rodapé do menu.
+          </p>
+          <SeletorTema />
+        </Cartao>
         <Cartao titulo="Selos e botões">
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
             <Selo tom="sucesso">Vigente</Selo>

@@ -359,7 +359,13 @@ crm/
   as portas (`Repositorio`, `GatewayAutenticacao`) e é ligada só em
   `apps/*/src/infrastructure/container.ts`. O ESLint impede que o `core` importe React ou infraestrutura.
 - **Stack**: React 18, TypeScript estrito, Vite, React Router, TanStack Query, React Hook Form + Zod, CSS Modules.
-- **Visual**: as mesmas cores e fontes do site (marinho, dourado, Lora e Jost).
+- **Visual**: layout de painel de gestão (menu lateral marinho com grupos Principal, Relatórios e
+  Sistema; barra superior branca com título e ações; indicadores com faixa colorida e ícone), nas cores
+  do site: marinho #1A2B4B e dourado #C9A85E, Lora nos títulos e Jost no resto.
+- **Tema**: claro (padrão), escuro ou automático (segue o aparelho), no rodapé do menu e em Minha conta.
+  A escolha fica no navegador (`portella-crm:tema`) e um script no `index.html` aplica o tema antes da
+  primeira pintura. As cores são tokens semânticos em `packages/ui/src/styles/global.css`
+  (`--fundo`, `--superficie`, `--texto`, `--primaria`, `--destaque`, `--sucesso`…); os componentes só usam tokens.
 - **Responsividade**: menu lateral fixo no desktop e menu deslizante no celular. Tabelas
   viram cartões abaixo de 900 px, formulários viram painel inferior no celular e alvos de toque têm ≥ 44 px.
 

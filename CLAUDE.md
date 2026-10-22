@@ -65,4 +65,9 @@
   usuário, senha padrão 1234 com troca obrigatória, proposta do produtor fica pendente até a aprovação.
   Propostas, Aprovações, Estornos e vales, Relatórios (PDF/Excel), Painel de produção e Configurações ficam
   em `packages/app-base` (nos dois CRMs). Produtores iniciais e listas padrão: `app-base/src/padroes.ts`.
+- Visual dos CRMs (22/10/2026): padrão de painel do protótipo "Gestão de Consórcio" aplicado nos dois CRMs
+  com as cores do site (marinho + dourado, Lora nos títulos, Jost no resto). Tema claro (padrão), escuro e
+  automático (`SeletorTema`/`useTema` em `packages/ui`, chave `portella-crm:tema`). Cores só por tokens
+  semânticos de `ui/src/styles/global.css` (cor literal só onde o fundo é sempre marinho, como o menu e a tela de entrada). Testes: `ui/src/tema.test.tsx`
+  e `e2e/tema.spec.ts`.
 - Verificação com dados reais: `E2E_LOCAL=1 npx playwright test e2e/real.tmp.spec.ts` (arquivo local, fora do Git).
