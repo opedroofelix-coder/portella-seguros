@@ -48,7 +48,7 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 
 - [ ] **Logos das seguradoras em alta qualidade.** Os atuais foram recortados de uma imagem pequena. Trocar pelos SVG/PNG oficiais em `assets/img/seguradoras/`, mantendo os nomes dos arquivos.
 - [ ] Fotos dos 8 seguros e das matérias do blog.
-- [ ] Número de WhatsApp: `WHATSAPP_NUMBER` em `assets/js/main.js` e o `href` do botão `.fab`.
+- [x] Número de WhatsApp: (11) 94784-1580 em `WHATSAPP_NUMBER` (`assets/js/main.js`) e nos links `wa.me` do site.
 - [ ] Horário de atendimento (seção Contato).
 - [ ] CNPJ e SUSEP (footer).
 - [ ] Depoimentos reais (ex.: avaliações do Google) e o link "Ver avaliações no Google".

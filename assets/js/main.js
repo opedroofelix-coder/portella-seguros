@@ -2,8 +2,8 @@
 (function () {
   'use strict';
 
-  // TODO: preencher com o WhatsApp da Portella (só números, com DDI e DDD), ex.: '5511999999999'
-  var WHATSAPP_NUMBER = '';
+  // WhatsApp da Portella (só números, com DDI e DDD)
+  var WHATSAPP_NUMBER = '5511947841580';
   var PHONE_FALLBACK = 'tel:+5511947841580';
 
   var $ = function (s, ctx) { return (ctx || document).querySelector(s); };

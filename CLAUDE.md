@@ -5,7 +5,7 @@
 - Estrutura e animações seguem a referência https://lcedcorretora.com.br/ (só a estrutura).
   Não copiar logo, fotos nem textos da LC&D.
 - Conteúdo oficial da Portella: https://www.portellacorretora.com.br/
-  - Telefone principal (divulgar no site): (11) 94784-1580. Fixo (11) 3592-5216 só no rodapé.
+  - Telefone principal (divulgar no site): (11) 94784-1580, que é WhatsApp (links `wa.me/5511947841580`). Fixo (11) 3592-5216 só no rodapé.
   - E-mail: contato@portellacorretora.com.br
   - Endereço: Av. Padre Vicente Melillo, 1399 – Umuarama, Osasco – SP, 06036-016
   - Instagram: @portellacorretora; Facebook: PortellaCorretoraDeSeguros
