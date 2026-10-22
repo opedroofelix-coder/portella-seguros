@@ -26,7 +26,7 @@ assets/js/main.js              # pó dourado, menu mobile, carrosséis, contador
 api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
-assets/img/seguradoras/*.png   # logos da faixa Seguradoras & Operadoras (22)
+assets/img/seguradoras/*.png   # logos da faixa Seguradoras & Operadoras (23)
 assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratadas em marinho e dourado)
 ```
 
@@ -70,7 +70,7 @@ Com o cache de 1 dia são cerca de 30 consultas por mês.
 ## Pendências
 
 - [ ] **Nossa equipe:** fotos, nomes e cargos (a Portella vai enviar). Hoje os cards mostram `[Nome]` e `[Cargo]`.
-- [ ] **Logos de São Cristóvão e Única Saúde** para a faixa "Seguradoras & Operadoras": o site da São Cristóvão tem certificado inválido e não achei o site da Única Saúde. Pedir os logos à Portella.
+- [ ] **Logo da Única Saúde** para a faixa "Seguradoras & Operadoras": não achei o site oficial. Pedir o logo à Portella.
 
 - [x] **Logos das seguradoras em alta qualidade:** versões oficiais (sites das seguradoras e Wikimedia Commons), em PNG 600x240 transparente. A Liberty virou Yelum (`yelum.png`).
 - [ ] Nomes das outras 10 seguradoras parceiras (das 22), para incluir os logos na faixa.
