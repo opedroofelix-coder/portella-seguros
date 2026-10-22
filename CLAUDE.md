@@ -11,6 +11,10 @@
   - Instagram: @portellacorretora; Facebook: PortellaCorretoraDeSeguros
 - Seguradoras parceiras (12): Porto Seguro, HDI, Ituran, Azul, Suhai, Tokio Marine, SulAmérica,
   Liberty, Bradesco Seguros, Mapfre, Allianz, Sompo.
+  São as 12 da faixa de logos; a Portella trabalha com mais de 30 (lista completa em `docs/CRM.md`, seção 0.4,
+  no branch do CRM). O site diz "mais de 30 seguradoras".
+- A Portella também vende consórcio (imóvel, automóvel, moto, pesados, serviços). Nada do CRM interno
+  (produtores, comissões, valores, faturamento) vai para o site.
 - Cores e fonte ficam em `:root` no `assets/css/style.css`.
 - **Direção escolhida pela cliente (21/10/2026): Premium A "Noir Dourado".** O site inteiro (index.html, style.css, main.js) já segue essa direção: predominantemente azul e dourado (pedido da cliente: sem seções marfim; seções alternam #0F1E3C, #1A2B4B e #15274A; logos das seguradoras em placas marfim com fio dourado), Lora nos títulos e Jost nos textos, consultora num arco com fio dourado e brasão com o ícone.
 - Não inventar números, depoimentos ou dados (CNPJ, SUSEP, horário). Usar `[inserir]` até a Portella informar.
