@@ -83,6 +83,7 @@ input, select, textarea, button { font: inherit; }
 .nav a::after { content: ""; position: absolute; left: 0; bottom: -8px; width: 0; height: 1px; background: var(--gold-light); transition: width .35s; }
 .nav a:hover { color: var(--gold-light); }
 .nav a:hover::after { width: 100%; }
+.nav__cta { display: none; }
 .menu-toggle { display: none; width: 46px; height: 46px; border: 1px solid rgba(217, 188, 126, .45); background: transparent; color: var(--gold-light); cursor: pointer; align-items: center; justify-content: center; }
 
 /* ---------- 2. Hero ---------- */
@@ -223,6 +224,9 @@ input, select, textarea, button { font: inherit; }
 
 /* ---------- 7. FAQ ---------- */
 .faq__grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 80px; align-items: start; }
+.inline-link { color: var(--gold-light); text-decoration: none; border-bottom: 1px solid rgba(217, 188, 126, .4); overflow-wrap: anywhere; }
+.inline-link:hover { border-bottom-color: var(--gold-light); }
+.nowrap { white-space: nowrap; }
 .faq__intro { display: flex; flex-direction: column; gap: 22px; position: sticky; top: 130px; }
 .faq { border-top: 1px solid #CDBA92; }
 .faq details { border-bottom: 1px solid #CDBA92; }
@@ -250,10 +254,11 @@ a.contact__row:hover span { color: var(--gold-text); }
 .contact-form { background: #FFFFFF; border-top: 2px solid var(--gold); padding: 48px 44px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 50px 80px -50px rgba(26, 43, 75, .45); }
 .contact-form h3 { margin: 0 0 14px; font-family: var(--serif); font-weight: 400; font-size: 28px; }
 .contact-form label { display: block; }
-.contact-form input, .contact-form select, .contact-form textarea { width: 100%; border: 0; border-bottom: 1px solid #DCD2BE; background: transparent; padding: 16px 2px; font-size: 15px; color: var(--text-on-light); border-radius: 0; }
+.contact-form input, .contact-form select, .contact-form textarea { width: 100%; border: 0; border-bottom: 1px solid #DCD2BE; background: transparent; padding: 16px 2px; font-size: 16px; font-family: inherit; color: var(--text-on-light); border-radius: 0; }
 .contact-form textarea { resize: vertical; }
 .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { outline: none; border-bottom-color: var(--gold-line); }
 .contact-form .btn { margin-top: 20px; }
+.form-note { margin: 4px 0 0; font-size: 13px; line-height: 1.5; text-align: center; color: var(--text-faint-dark); }
 
 /* ---------- 10. Footer ---------- */
 .site-footer { background: var(--navy-deep); color: var(--text-light); padding: 96px 0 36px; border-top: 1px solid rgba(217, 188, 126, .2); }
@@ -284,8 +289,14 @@ a.contact__row:hover span { color: var(--gold-text); }
 .modal__step { display: flex; flex-direction: column; gap: 14px; }
 .modal__step[hidden] { display: none; }
 .field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--text-faint-dark); }
-.field input { border: 0; border-bottom: 1px solid rgba(217, 188, 126, .4); background: transparent; color: var(--text-light); padding: 12px 2px; font-size: 16px; letter-spacing: normal; text-transform: none; border-radius: 0; width: 100%; }
-.field input:focus { outline: none; border-bottom-color: var(--gold-light); }
+.field input, .field select, .field textarea { border: 0; border-bottom: 1px solid rgba(217, 188, 126, .4); background: transparent; color: var(--text-light); padding: 12px 2px; font-size: 16px; letter-spacing: normal; text-transform: none; border-radius: 0; width: 100%; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-bottom-color: var(--gold-light); }
+.field select option { color: var(--navy-deep); }
+.field textarea { resize: vertical; font-family: inherit; line-height: 1.5; }
+.field ::placeholder { color: var(--text-faint-dark); opacity: .8; }
+.field[hidden], .step-group[hidden] { display: none; }
+.step-group { display: flex; flex-direction: column; gap: 14px; }
+.modal__lead { margin: -4px 0 6px; font-size: 15px; line-height: 1.6; color: var(--text-muted-dark); }
 .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .plans { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .plans legend { padding: 0; margin-bottom: 10px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--text-faint-dark); }
@@ -331,6 +342,7 @@ a.contact__row:hover span { color: var(--gold-text); }
   .menu-toggle { display: inline-flex; }
   .nav { display: none; position: absolute; top: 92px; left: 0; right: 0; flex-direction: column; gap: 0; background: var(--navy-deep); border-bottom: 1px solid rgba(217, 188, 126, .2); padding: 8px 24px 20px; }
   .nav.is-open { display: flex; }
+  .nav .nav__cta { display: inline-flex; justify-content: center; margin: 20px 0 6px; }
   .nav a { padding: 14px 0; border-bottom: 1px solid rgba(217, 188, 126, .1); }
   .header-cta { display: none; }
   .hero__grid { grid-template-columns: minmax(0, 1fr); min-height: 0; }
@@ -351,6 +363,9 @@ a.contact__row:hover span { color: var(--gold-text); }
   .pillar + .pillar { padding-left: 0; border-left: 0; border-top: 1px solid var(--cream-line); }
 }
 @media (max-width: 560px) {
+  .modal h3 { font-size: 28px; }
+  .eyebrow, .insurers__label { letter-spacing: .26em; }
+  .reviews-summary { letter-spacing: .14em; padding: 0 20px; line-height: 1.7; }
   .container, .hero__grid, .site-header__inner { padding: 0 20px; }
   .section { padding: 84px 0; }
   .brand__word { height: 26px; }

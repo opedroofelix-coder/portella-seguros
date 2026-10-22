@@ -29,7 +29,7 @@
       var open = menu.classList.toggle('is-open');
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-    $$('a', menu).forEach(function (a) {
+    $$('a, button', menu).forEach(function (a) {
       a.addEventListener('click', function () { menu.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); });
     });
   }
@@ -351,10 +351,42 @@
   var typeSelect = $('[data-type-select]');
   var tagEl = $('[data-modal-tag]'), stepEl = $('[data-modal-step]');
   var step1 = $('[data-step="1"]', modal), step2 = $('[data-step="2"]', modal);
-  var lastFocus = null, currentType = '', plan = 'Individual', lead = {};
+  var lastFocus = null, currentType = '', plan = 'Individual ou familiar', lead = {};
+  var modalType = $('[data-modal-type]', modal), details = $('[data-modal-details]', modal);
+  // dica do campo "Algum detalhe?" para cada seguro
+  var HINTS = {
+    'Auto': 'Ex.: modelo e ano do veículo e o CEP onde ele fica à noite',
+    'Vida': 'Ex.: sua idade e para quem é o seguro',
+    'Saúde': 'Ex.: já tem plano? Prefere algum hospital ou rede?',
+    'Odontológico': 'Ex.: para quantas pessoas e se já tem plano',
+    'Previdência': 'Ex.: quanto pretende guardar por mês',
+    'Residencial': 'Ex.: casa ou apartamento e o CEP do imóvel',
+    'Fiança Locatícia': 'Ex.: valor do aluguel e a cidade do imóvel',
+    'Celular e Portáteis': 'Ex.: aparelho, modelo e valor aproximado',
+    'Empresarial': 'Ex.: ramo da empresa e cidade',
+    'Responsabilidade Civil': 'Ex.: sua profissão ou atividade',
+    'Consórcio': 'Ex.: imóvel, veículo ou serviço, e o valor da carta'
+  };
+  if (modalType && typeSelect) modalType.innerHTML = typeSelect.innerHTML;
+  function isHealth(t) { return /^(Saúde|Odontológico)$/.test(t); }
+  function show(group, on) {
+    $$('[data-only="' + group + '"]', modal).forEach(function (el) {
+      el.hidden = !on;
+      $$('input, select, textarea', el).forEach(function (f) { f.disabled = !on; });
+    });
+  }
+  function configStep2() {
+    var t = currentType || (modalType && modalType.value) || '';
+    show('sem-tipo', !currentType);
+    show('saude', isHealth(t));
+    if (details) details.placeholder = HINTS[t] || 'Conte rapidamente o que você precisa';
+  }
+  if (modalType) modalType.addEventListener('change', configStep2);
 
   function setStep(n) {
     step1.hidden = n !== 1; step2.hidden = n !== 2; stepEl.textContent = n;
+    var lead1 = $('.modal__lead', modal); if (lead1) lead1.hidden = n !== 1;
+    if (n === 2) configStep2();
     var first = $('input, button.plan', n === 1 ? step1 : step2); if (first) first.focus();
   }
   function openQuote(type) {
@@ -394,30 +426,38 @@
 
   step2.addEventListener('submit', function (e) {
     e.preventDefault();
+    var t = currentType || (modalType && modalType.value) || '', health = isHealth(t);
     var msg = [
       'Olá, Portella! Gostaria de uma cotação.',
-      currentType ? 'Seguro: ' + currentType : '',
+      t ? 'Interesse: ' + t : '',
       'Nome: ' + (lead.nome || ''),
-      'Telefone: ' + (lead.telefone || ''),
-      'Plano: ' + plan,
-      step2.profissao.value ? 'Profissão: ' + step2.profissao.value : '',
-      step2.idade.value ? 'Idade: ' + step2.idade.value : '',
-      step2.pessoas.value ? 'Nº de pessoas: ' + step2.pessoas.value : ''
+      'WhatsApp: ' + (lead.telefone || ''),
+      health ? 'Plano: ' + plan : '',
+      health && step2.profissao.value ? 'Profissão: ' + step2.profissao.value : '',
+      health && step2.idade.value ? 'Idade do titular: ' + step2.idade.value : '',
+      health && step2.pessoas.value ? 'Nº de pessoas: ' + step2.pessoas.value : '',
+      details && details.value.trim() ? 'Detalhes: ' + details.value.trim() : ''
     ].filter(Boolean).join('\n');
     var url = WHATSAPP_NUMBER ? 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg) : PHONE_FALLBACK;
     window.open(url, WHATSAPP_NUMBER ? '_blank' : '_self');
     closeQuote();
   });
 
-  /* ---------- Formulário de contato (provisório: abre o e-mail) ---------- */
+  /* ---------- Formulário de contato: abre o WhatsApp com a mensagem pronta ---------- */
   var contactForm = $('[data-contact-form]');
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
       var d = contactForm;
-      var body = 'Nome: ' + d.nome.value + '\nE-mail: ' + d.email.value + '\nTelefone: ' + d.telefone.value + '\n\n' + d.mensagem.value;
-      window.location.href = 'mailto:contato@portellacorretora.com.br?subject=' +
-        encodeURIComponent(d.assunto.value || 'Contato pelo site') + '&body=' + encodeURIComponent(body);
+      var msg = [
+        'Olá, Portella! Vim pelo site.',
+        'Nome: ' + d.nome.value.trim(),
+        d.email.value.trim() ? 'E-mail: ' + d.email.value.trim() : '',
+        d.assunto.value ? 'Assunto: ' + d.assunto.value : '',
+        '',
+        d.mensagem.value.trim()
+      ].filter(function (l, i) { return l || i === 4; }).join('\n');
+      window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
     });
   }
 

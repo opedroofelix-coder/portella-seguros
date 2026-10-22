@@ -39,6 +39,7 @@
         <a href="#depoimentos">Depoimentos</a>
         <a href="#duvidas">Dúvidas</a>
         <a href="#contato">Contato</a>
+        <button class="btn btn-gold nav__cta" type="button" data-open-quote>Fazer cotação</button>
       </nav>
       <button class="btn btn-gold header-cta" type="button" data-open-quote>Cotar Agora</button>
       <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-controls="menu" aria-expanded="false" data-menu-toggle>
@@ -55,7 +56,7 @@
         <div class="hero__text">
           <span class="eyebrow fu" style="color: var(--gold-light)">Corretora de Seguros · Osasco – SP</span>
           <h1 class="hero__title fu d1">Proteção <em class="gold-shine">sob medida</em> para o que é seu.</h1>
-          <p class="hero__sub fu d2">Seguros e consórcio para você, sua família e sua empresa. Comparamos as opções de 22 seguradoras parceiras e acompanhamos cada etapa, da cotação à renovação.</p>
+          <p class="hero__sub fu d2">Seguros e consórcio para você, sua família e sua empresa. Comparamos 22 seguradoras parceiras e acompanhamos cada etapa, da cotação à renovação.</p>
           <form class="quote-bar fu d3" data-quote-bar>
             <label>
               <span class="sr-only">Seguro ou consórcio</span>
@@ -234,7 +235,7 @@
         <div class="faq__intro reveal">
           <span class="eyebrow">Dúvidas</span>
           <h2 class="h-section">Perguntas <em>frequentes</em></h2>
-          <p class="lead">Não encontrou o que procura? Fale com a nossa equipe pelo WhatsApp (11) 94784-1580 ou pelo e-mail contato@portellacorretora.com.br.</p>
+          <p class="lead">Não encontrou sua dúvida? Fale com a gente pelo <a class="inline-link" href="https://wa.me/5511947841580" target="_blank" rel="noopener">WhatsApp <span class="nowrap">(11) 94784-1580</span></a> ou pelo e-mail <a class="inline-link" href="mailto:contato@portellacorretora.com.br">contato@portellacorretora.com.br</a>.</p>
         </div>
         <div class="faq reveal reveal-d1">
           <details><summary>Por que contratar com uma corretora e não direto no banco?<span class="faq__icon" aria-hidden="true">+</span></summary><p>A corretora trabalha com várias seguradoras e compara condições para você, orienta na escolha das coberturas e acompanha todo o atendimento, inclusive em caso de sinistro.</p></details>
@@ -257,7 +258,7 @@
       <div class="container cta__inner reveal">
         <span class="eyebrow">Cotação</span>
         <h2 class="h-section">Pronto para se <em>proteger?</em></h2>
-        <p class="lead">Conte o que você precisa proteger. Comparamos as opções das seguradoras e administradoras parceiras e apresentamos uma proposta pensada para o seu momento.</p>
+        <p class="lead">Conte o que você quer proteger. Nós comparamos as opções e trazemos uma proposta pensada para o seu momento.</p>
         <button class="btn btn-gold btn-lg" type="button" data-open-quote>Solicitar cotação</button>
       </div>
     </section>
@@ -279,29 +280,28 @@
         <!-- TODO: conectar o formulário a um serviço de envio (ex.: Formspree, e-mail ou WhatsApp) -->
         <form class="contact-form reveal reveal-d1" data-contact-form>
           <h3>Envie uma mensagem</h3>
-          <label><span class="sr-only">Nome</span><input type="text" name="nome" placeholder="Nome" required></label>
-          <label><span class="sr-only">E-mail</span><input type="email" name="email" placeholder="E-mail" required></label>
-          <label><span class="sr-only">Telefone</span><input type="tel" name="telefone" placeholder="Telefone / WhatsApp"></label>
+          <label><span class="sr-only">Nome</span><input type="text" name="nome" placeholder="Seu nome" autocomplete="name" required></label>
+          <label><span class="sr-only">E-mail (opcional)</span><input type="email" name="email" placeholder="E-mail (opcional)" autocomplete="email"></label>
           <label><span class="sr-only">Assunto</span>
             <select name="assunto">
-              <option value="">Assunto</option>
+              <option value="">Sobre o que quer falar?</option>
               <option>Seguro Auto</option>
               <option>Seguro de Vida</option>
+              <option>Saúde e Odontológico</option>
               <option>Previdência</option>
-              <option>Seguro Saúde</option>
               <option>Seguro Residencial</option>
               <option>Fiança Locatícia</option>
+              <option>Celular e Portáteis</option>
               <option>Responsabilidade Civil</option>
               <option>Seguro Empresarial</option>
-              <option>Odontológico</option>
-              <option>Celular e Portáteis</option>
               <option>Consórcio</option>
-              <option>Sinistro</option>
-              <option>Outros assuntos</option>
+              <option>Sinistro (já sou cliente)</option>
+              <option>Outro assunto</option>
             </select>
           </label>
-          <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="4" placeholder="Mensagem"></textarea></label>
-          <button class="btn btn-gold btn-lg" type="submit">Enviar mensagem</button>
+          <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="4" placeholder="Como podemos ajudar?" required></textarea></label>
+          <button class="btn btn-gold btn-lg" type="submit">Enviar pelo WhatsApp</button>
+          <p class="form-note">Abrimos o WhatsApp com a sua mensagem pronta. É só tocar em enviar.</p>
         </form>
       </div>
     </section>
@@ -362,23 +362,28 @@
       </button>
       <span class="modal__tag"><span data-modal-tag>Cotação</span> · Etapa <span data-modal-step>1</span> de 2</span>
       <h3 id="modal-title">Solicitar cotação</h3>
+      <p class="modal__lead">São 2 etapas rápidas. No fim, abrimos o WhatsApp com tudo preenchido.</p>
       <form class="modal__step" data-step="1">
-        <label class="field">Nome<input type="text" name="nome" required></label>
-        <label class="field">Telefone / WhatsApp<input type="tel" name="telefone" required></label>
+        <label class="field">Seu nome<input type="text" name="nome" autocomplete="name" required></label>
+        <label class="field">WhatsApp com DDD<input type="tel" name="telefone" inputmode="tel" autocomplete="tel" placeholder="(11) 90000-0000" required></label>
         <button class="btn btn-gold btn-lg" type="submit">Continuar</button>
       </form>
       <form class="modal__step" data-step="2" hidden>
-        <fieldset class="plans">
-          <legend>Tipo de plano</legend>
-          <button class="plan" type="button" aria-pressed="true">Individual</button>
-          <button class="plan" type="button" aria-pressed="false">Adesão (por profissão)</button>
-          <button class="plan" type="button" aria-pressed="false">PME (empresarial)</button>
-        </fieldset>
-        <label class="field">Profissão<input type="text" name="profissao"></label>
-        <div class="field-row">
-          <label class="field">Idade<input type="number" name="idade" min="0"></label>
-          <label class="field">Nº de pessoas<input type="number" name="pessoas" min="1"></label>
+        <label class="field" data-only="sem-tipo">Qual seguro ou consórcio?<select name="tipo" data-modal-type required></select></label>
+        <div class="step-group" data-only="saude">
+          <fieldset class="plans">
+            <legend>Tipo de plano</legend>
+            <button class="plan" type="button" aria-pressed="true">Individual ou familiar</button>
+            <button class="plan" type="button" aria-pressed="false">Por adesão (pela profissão)</button>
+            <button class="plan" type="button" aria-pressed="false">Empresarial (PME)</button>
+          </fieldset>
+          <label class="field">Profissão (para planos por adesão)<input type="text" name="profissao"></label>
+          <div class="field-row">
+            <label class="field">Idade do titular<input type="number" name="idade" min="0" inputmode="numeric"></label>
+            <label class="field">Nº de pessoas<input type="number" name="pessoas" min="1" inputmode="numeric"></label>
+          </div>
         </div>
+        <label class="field">Algum detalhe? (opcional)<textarea name="detalhes" rows="3" data-modal-details></textarea></label>
         <button class="btn btn-gold btn-lg" type="submit">Enviar pelo WhatsApp</button>
       </form>
     </div>
