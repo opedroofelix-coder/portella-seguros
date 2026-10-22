@@ -9,12 +9,12 @@
   - E-mail: contato@portellacorretora.com.br
   - Endereço (atualizado pela cliente em 22/10/2026): Rua Ana Pereira Melo, 253 – Vila Campesina, Osasco – SP, 06023-080
   - Instagram: @portellacorretora; Facebook: PortellaCorretoraDeSeguros
-- Faixa "Seguradoras & Operadoras" (24 logos): Porto Seguro, Allianz, Bradesco Seguros, SulAmérica, Tokio Marine,
+- Faixa "Seguradoras & Operadoras" (26 logos): Porto Seguro, Allianz, Bradesco Seguros, SulAmérica, Tokio Marine,
   HDI, Mapfre, Yelum (antiga Liberty), Azul, Suhai, Ituran, Justos, Youse, Pier. A Sompo saiu (não faz mais
   automóvel). Operadoras de saúde (lista da cliente, 22/10/2026): Alice, Amil, Bradesco, Hapvida, Omint,
   Porto Seguro, Trasmontano, Prevent Senior, MedSênior, Sagrada Família, São Cristóvão, Única Saúde e
-  SulAmérica Saúde. Bradesco, Porto e SulAmérica já estão na faixa pela marca do grupo; na faixa entraram
-  Alice, Amil, Hapvida, Omint, Trasmontano, Prevent Senior, MedSênior, Sagrada Família, São Cristóvão e
+  SulAmérica Saúde. SulAmérica está na faixa pela marca do grupo; Bradesco Saúde e Porto Saúde têm logos próprios
+  (bradesco-saude.png, porto-saude.png); entraram também Alice, Amil, Hapvida, Omint, Trasmontano, Prevent Senior, MedSênior, Sagrada Família, São Cristóvão e
   Única Saúde. Todas as operadoras da lista da cliente estão na faixa. O FAQ "Com quais
   seguradoras" não cita SulAmérica nem Sompo. No total a Portella trabalha com **22 seguradoras** (confirmado em 22/10/2026);
   o site diz "22 seguradoras". A lista de opções do CRM (`docs/CRM.md`) não é a lista de parceiras.

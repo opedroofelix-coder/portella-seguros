@@ -26,7 +26,7 @@ assets/js/main.js              # pó dourado, menu mobile, carrosséis, contador
 api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
-assets/img/seguradoras/*.png   # logos da faixa Seguradoras & Operadoras (24)
+assets/img/seguradoras/*.png   # logos da faixa Seguradoras & Operadoras (26)
 assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratadas em marinho e dourado)
 ```
 
