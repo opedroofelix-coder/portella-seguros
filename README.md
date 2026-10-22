@@ -47,7 +47,8 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 
 ## Pendências
 
-- [ ] **Logos das seguradoras em alta qualidade.** Os atuais foram recortados de uma imagem pequena. Trocar pelos SVG/PNG oficiais em `assets/img/seguradoras/`, mantendo os nomes dos arquivos.
+- [x] **Logos das seguradoras em alta qualidade:** versões oficiais (sites das seguradoras e Wikimedia Commons), em PNG 600x240 transparente. A Liberty virou Yelum (`yelum.png`).
+- [ ] Nomes das outras 10 seguradoras parceiras (das 22), para incluir os logos na faixa.
 - [x] Fotos dos 10 seguros: Unsplash (licença livre), em `assets/img/seguros/`.
 - [ ] Fotos das matérias do blog.
 - [x] Número de WhatsApp: (11) 94784-1580 em `WHATSAPP_NUMBER` (`assets/js/main.js`) e nos links `wa.me` do site.

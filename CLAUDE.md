@@ -10,7 +10,7 @@
   - Endereço: Av. Padre Vicente Melillo, 1399 – Umuarama, Osasco – SP, 06036-016
   - Instagram: @portellacorretora; Facebook: PortellaCorretoraDeSeguros
 - Seguradoras parceiras (12): Porto Seguro, HDI, Ituran, Azul, Suhai, Tokio Marine, SulAmérica,
-  Liberty, Bradesco Seguros, Mapfre, Allianz, Sompo.
+  Yelum (antiga Liberty), Bradesco Seguros, Mapfre, Allianz, Sompo.
   São as 12 da faixa de logos. No total a Portella trabalha com **22 seguradoras** (confirmado em 22/10/2026);
   o site diz "22 seguradoras". A lista de opções do CRM (`docs/CRM.md`) não é a lista de parceiras.
 - A Portella também vende consórcio (imóvel, automóvel, moto, pesados, serviços). Nada do CRM interno
@@ -19,8 +19,8 @@
 - **Direção escolhida pela cliente (21/10/2026): Premium A "Noir Dourado".** O site inteiro (index.html, style.css, main.js) já segue essa direção: predominantemente azul e dourado (pedido da cliente: sem seções marfim; seções alternam #0F1E3C, #1A2B4B e #15274A; logos das seguradoras em placas marfim com fio dourado), Lora nos títulos e Jost nos textos, consultora num arco com fio dourado e brasão com o ícone.
 - Não inventar números, depoimentos ou dados (CNPJ, SUSEP, horário). Usar `[inserir]` até a Portella informar.
 - Lista de pendências: README.md.
-- Próximo passo combinado: trocar os logos das seguradoras por versões oficiais em alta qualidade
-  (ex.: SVGs do Wikimedia Commons), mantendo os nomes dos arquivos em `assets/img/seguradoras/`.
+- Logos das seguradoras: versões oficiais em `assets/img/seguradoras/` (PNG 600x240 transparente).
+  Faltam os nomes das outras 10 parceiras para completar a faixa.
 
 ## Identidade visual (recebida em 21/10/2026)
 - Cores: branco #FFFFFF, laranja #F49629, azul-marinho #1A2B4B.
