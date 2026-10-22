@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { cnpjValido, cpfValido, formatarDocumento, formatarTelefone, linkWhatsApp, telefoneValido } from './documento';
+import {
+  cnpjValido,
+  cpfValido,
+  formatarDocumento,
+  formatarTelefone,
+  linkWhatsApp,
+  telefoneValido,
+} from './documento';
 
 describe('documentos', () => {
   it('valida CPF', () => {

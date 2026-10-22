@@ -19,12 +19,22 @@ export async function semRolagemHorizontal(page: Page) {
 /** No celular, todo botão visível precisa ter pelo menos 44 × 44 px. */
 export async function alvosDeToque(page: Page) {
   const pequenos = await page.evaluate(() =>
-    [...document.querySelectorAll<HTMLElement>('button, select, input:not([type=checkbox]):not([type=radio])')]
+    [
+      ...document.querySelectorAll<HTMLElement>(
+        'button, select, input:not([type=checkbox]):not([type=radio])',
+      ),
+    ]
       .filter((el) => {
         const r = el.getBoundingClientRect();
         const s = getComputedStyle(el);
         const naTela = r.right > 0 && r.left < innerWidth; // ignora o menu fechado, fora da tela
-        return r.width > 0 && r.height > 0 && naTela && s.visibility !== 'hidden' && !el.closest('[aria-hidden=true]');
+        return (
+          r.width > 0 &&
+          r.height > 0 &&
+          naTela &&
+          s.visibility !== 'hidden' &&
+          !el.closest('[aria-hidden=true]')
+        );
       })
       .filter((el) => {
         const r = el.getBoundingClientRect();

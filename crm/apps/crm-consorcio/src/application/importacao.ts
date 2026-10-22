@@ -1,29 +1,16 @@
 import type { Importacao } from '@portella/app-base';
-import type { Usuario } from '@portella/core';
-import { idImportado, lerArquivoImportacao, normalizar, paraCentavos, prepararClientes, resolverResponsavel } from '@portella/core';
+import type { CotaImportada, Usuario } from '@portella/core';
+import {
+  idImportado,
+  lerArquivoImportacao,
+  normalizar,
+  paraCentavos,
+  prepararClientes,
+  resolverResponsavel,
+} from '@portella/core';
 import type { Cota, StatusCota, TipoBem } from '../domain/cota';
 import { validarCota } from '../domain/cota';
 import type { ServicosConsorcio } from './servicos';
-
-/** Cota como vem do importador; valores em reais (número) e datas AAAA-MM-DD. */
-export interface CotaImportada {
-  chave: string;
-  clienteChave: string;
-  administradora: string;
-  grupo: string;
-  cota: string;
-  tipoBem?: string;
-  valorCredito: number;
-  prazoMeses: number;
-  valorParcela?: number;
-  dataAdesao: string;
-  parcelasPagas?: number;
-  status?: string;
-  dataContemplacao?: string;
-  formaContemplacao?: string;
-  observacoes?: string;
-  responsavel?: string;
-}
 
 export function identificarTipoBem(texto = ''): TipoBem {
   const n = normalizar(texto);
@@ -45,7 +32,8 @@ export function identificarStatus(texto = '', temContemplacao = false): StatusCo
 
 export function criarImportacao(servicos: ServicosConsorcio): Importacao {
   return {
-    descricao: 'Clientes e cotas de consórcio separados da planilha da Portella. Reimportar o mesmo arquivo atualiza os registros.',
+    descricao:
+      'Clientes e cotas de consórcio separados da planilha da Portella. Reimportar o mesmo arquivo atualiza os registros.',
     async analisar(dados: unknown, ator: Usuario, equipe: Usuario[]) {
       const arquivo = lerArquivoImportacao(dados, 'consorcio');
       const agora = new Date().toISOString();
@@ -71,7 +59,10 @@ export function criarImportacao(servicos: ServicosConsorcio): Importacao {
           status,
           contemplacao:
             status === 'contemplada' && c.dataContemplacao
-              ? { data: c.dataContemplacao, forma: /lance/i.test(c.formaContemplacao ?? '') ? 'lance' : 'sorteio' }
+              ? {
+                  data: c.dataContemplacao,
+                  forma: /lance/i.test(c.formaContemplacao ?? '') ? 'lance' : 'sorteio',
+                }
               : undefined,
           observacoes: c.observacoes,
           responsavelId: resolver(c.responsavel),
@@ -86,7 +77,8 @@ export function criarImportacao(servicos: ServicosConsorcio): Importacao {
           avisos.push(`Cota ${c.grupo}/${c.cota} ignorada: ${campos || (e as Error).message}`);
         }
       }
-      for (const nome of naoEncontrados) avisos.push(`Corretor "${nome}" não cadastrado: os registros ficaram com ${ator.nome}.`);
+      for (const nome of naoEncontrados)
+        avisos.push(`Corretor "${nome}" não cadastrado: os registros ficaram com ${ator.nome}.`);
 
       return {
         resumo: [

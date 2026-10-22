@@ -11,7 +11,10 @@ describe('BancoLocal', () => {
     const banco = await abrir();
     const repo = banco.repositorio<{ id: string; nome: string }>('clientes');
     await repo.salvar({ id: '1', nome: 'A' });
-    await repo.salvarVarios([{ id: '2', nome: 'B' }, { id: '1', nome: 'A2' }]);
+    await repo.salvarVarios([
+      { id: '2', nome: 'B' },
+      { id: '1', nome: 'A2' },
+    ]);
     expect((await repo.listar()).map((x) => x.nome).sort()).toEqual(['A2', 'B']);
     expect(await repo.obter('2')).toEqual({ id: '2', nome: 'B' });
     expect(await repo.obter('9')).toBeNull();
@@ -26,7 +29,9 @@ describe('BancoLocal', () => {
 describe('AutenticacaoLocal', () => {
   it('guarda hash (não a senha), confere credenciais e controla a sessão', async () => {
     const banco = await abrir();
-    const credenciais = banco.repositorio<{ id: string; email: string; sal: string; hash: string }>(COLECAO_CREDENCIAIS);
+    const credenciais = banco.repositorio<{ id: string; email: string; sal: string; hash: string }>(
+      COLECAO_CREDENCIAIS,
+    );
     let agora = 1_000;
     const auth = new AutenticacaoLocal(credenciais, new ArmazenamentoMemoria(), 'sessao', () => agora);
 

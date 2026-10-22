@@ -40,7 +40,11 @@ export async function sair(page: Page) {
   await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible();
 }
 
-export async function cadastrarUsuario(page: Page, u: { nome: string; email: string; senha: string }, perfil: string) {
+export async function cadastrarUsuario(
+  page: Page,
+  u: { nome: string; email: string; senha: string },
+  perfil: string,
+) {
   await irPara(page, 'Usuários');
   await page.getByRole('button', { name: 'Novo usuário' }).click();
   const dialogo = page.getByRole('dialog', { name: 'Novo usuário' });

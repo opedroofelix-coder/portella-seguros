@@ -1,5 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { aplicarErros, limparVazios, mensagemErro, useColecao, useIndice, useSalvar } from '@portella/app-base';
+import {
+  aplicarErros,
+  limparVazios,
+  mensagemErro,
+  useColecao,
+  useIndice,
+  useSalvar,
+} from '@portella/app-base';
 import { centavosParaTexto, paraCentavos, somarDias, hojeISO } from '@portella/core';
 import { AreaTexto, Botao, Campo, Entrada, Modal, Selecao, useAvisos } from '@portella/ui';
 import { useForm } from 'react-hook-form';
@@ -66,8 +73,12 @@ export function FormularioLance({ lance, aoFechar }: { lance?: Lance; aoFechar: 
       aoFechar={aoFechar}
       rodape={
         <>
-          <Botao variante="secundario" onClick={aoFechar}>Cancelar</Botao>
-          <Botao type="submit" form="form-lance" carregando={formState.isSubmitting}>Salvar</Botao>
+          <Botao variante="secundario" onClick={aoFechar}>
+            Cancelar
+          </Botao>
+          <Botao type="submit" form="form-lance" carregando={formState.isSubmitting}>
+            Salvar
+          </Botao>
         </>
       }
     >
@@ -76,17 +87,34 @@ export function FormularioLance({ lance, aoFechar }: { lance?: Lance; aoFechar: 
           <Selecao {...register('cotaId')}>
             <option value="">Escolha…</option>
             {ativas.map((c) => (
-              <option key={c.id} value={c.id}>{`${indice.get(c.clienteId)?.nome ?? '—'} · ${c.administradora} ${c.grupo}/${c.cota}`}</option>
+              <option
+                key={c.id}
+                value={c.id}
+              >{`${indice.get(c.clienteId)?.nome ?? '—'} · ${c.administradora} ${c.grupo}/${c.cota}`}</option>
             ))}
           </Selecao>
         </Campo>
-        <Campo rotulo="Assembleia" obrigatorio erro={erros.assembleia?.message}><Entrada type="date" {...register('assembleia')} /></Campo>
-        <Campo rotulo="Tipo">
-          <Selecao {...register('tipo')}>{TIPOS_LANCE.map((t) => <option key={t} value={t}>{ROTULO_TIPO_LANCE[t]}</option>)}</Selecao>
+        <Campo rotulo="Assembleia" obrigatorio erro={erros.assembleia?.message}>
+          <Entrada type="date" {...register('assembleia')} />
         </Campo>
-        <Campo rotulo="Percentual do crédito (%)" erro={erros.percentual?.message}><Entrada inputMode="decimal" {...register('percentual')} /></Campo>
-        <Campo rotulo="Valor (R$)" erro={erros.valor?.message}><Entrada inputMode="decimal" placeholder="0,00" {...register('valor')} /></Campo>
-        <Campo rotulo="Observações" className="span-todo"><AreaTexto {...register('observacoes')} /></Campo>
+        <Campo rotulo="Tipo">
+          <Selecao {...register('tipo')}>
+            {TIPOS_LANCE.map((t) => (
+              <option key={t} value={t}>
+                {ROTULO_TIPO_LANCE[t]}
+              </option>
+            ))}
+          </Selecao>
+        </Campo>
+        <Campo rotulo="Percentual do crédito (%)" erro={erros.percentual?.message}>
+          <Entrada inputMode="decimal" {...register('percentual')} />
+        </Campo>
+        <Campo rotulo="Valor (R$)" erro={erros.valor?.message}>
+          <Entrada inputMode="decimal" placeholder="0,00" {...register('valor')} />
+        </Campo>
+        <Campo rotulo="Observações" className="span-todo">
+          <AreaTexto {...register('observacoes')} />
+        </Campo>
       </form>
     </Modal>
   );

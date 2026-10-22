@@ -44,3 +44,16 @@
   romanos e cartão de atendimento) e Premium F "Monograma" (padrão discreto com o ícone, medalhão com
   anel de texto girando, título revelado linha a linha).
 - Não escrever "premium", "grife" ou "luxo" nos textos do site: o requinte deve vir do visual.
+
+## CRM (pasta `crm/`, iniciado em 22/10/2026)
+- Dois webapps React separados: `apps/crm-seguros` e `apps/crm-consorcio`, em monorepo npm workspaces.
+  Especificação em `docs/CRM.md`.
+- Arquitetura limpa: `packages/core` (domínio, permissões e casos de uso, sem React), `packages/infra-local`
+  (IndexedDB + login PBKDF2), `packages/ui` (design system Noir Dourado), `packages/app-base` (telas comuns),
+  `packages/importer` (planilha → JSON). A infraestrutura só é ligada em `apps/*/src/infrastructure/container.ts`.
+- Perfis: admin, gestor e corretor (`core/src/application/permissoes.ts`). Corretor vê e edita só a própria carteira.
+- A cada componente ou tela: teste (Vitest/Testing Library) e responsividade (Playwright em 360, 768 e 1280 px,
+  sem rolagem horizontal e com alvos de toque ≥ 44 px no celular). Rodar `npm test` e `npm run test:e2e` em `crm/`.
+- Dados reais de clientes, a planilha e a senha **nunca** vão para o Git (`crm/dados/` e `*.xlsx` estão no .gitignore).
+  Os testes usam só dados fictícios ("Cliente Teste…").
+- Backend ainda não escolhido: os dados ficam no navegador.

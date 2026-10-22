@@ -52,7 +52,8 @@ export class ServicoUsuarios {
     const novo: Usuario = { ...atual, ...alteracao };
     validarUsuario(novo);
 
-    const deixaDeSerAdminAtivo = atual.perfil === 'admin' && atual.ativo && (novo.perfil !== 'admin' || !novo.ativo);
+    const deixaDeSerAdminAtivo =
+      atual.perfil === 'admin' && atual.ativo && (novo.perfil !== 'admin' || !novo.ativo);
     if (deixaDeSerAdminAtivo) {
       const adminsAtivos = (await this.repositorio.listar()).filter((u) => u.perfil === 'admin' && u.ativo);
       if (adminsAtivos.length <= 1) {

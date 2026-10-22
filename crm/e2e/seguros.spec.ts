@@ -25,7 +25,10 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await dialogo.getByLabel('Telefone / WhatsApp').fill('(11) 93592-5216');
     await page.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByRole('heading', { name: 'Maria Teste' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute('href', 'https://wa.me/5511935925216');
+    await expect(page.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute(
+      'href',
+      'https://wa.me/5511935925216',
+    );
 
     // Apólice que vence em 20 dias, cadastrada pela ficha do cliente
     await page.getByRole('button', { name: 'Nova apólice' }).click();
@@ -95,28 +98,52 @@ for (const tela of LARGURAS) {
     test('todas as telas sem rolagem horizontal', async ({ page }) => {
       await page.goto(URL);
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/seguros-entrar-${tela.nome}.png`, fullPage: true, animations: 'disabled' });
+      await page.screenshot({
+        path: `test-results/telas/seguros-entrar-${tela.nome}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
       await primeiroAcesso(page, URL);
       await importar(page, FIXTURE, /Apólices/);
 
-      const telas = ['Painel', 'Clientes', 'Apólices', 'Renovações', 'Cotações', 'Usuários', 'Importar', 'Minha conta'];
+      const telas = [
+        'Painel',
+        'Clientes',
+        'Apólices',
+        'Renovações',
+        'Cotações',
+        'Usuários',
+        'Importar',
+        'Minha conta',
+      ];
       for (const nome of telas) {
         await irPara(page, nome);
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
         await page.waitForLoadState('networkidle');
         await conferirLayout(page, tela.width);
-        await page.screenshot({ path: `test-results/telas/seguros-${nome.toLowerCase().replace(/\s/g, '-')}-${tela.nome}.png`, fullPage: true, animations: 'disabled' });
+        await page.screenshot({
+          path: `test-results/telas/seguros-${nome.toLowerCase().replace(/\s/g, '-')}-${tela.nome}.png`,
+          fullPage: true,
+          animations: 'disabled',
+        });
       }
 
       await irPara(page, 'Clientes');
       await page.getByText('Cliente Teste Alfa').click();
       await expect(page.getByRole('heading', { name: 'Cliente Teste Alfa' })).toBeVisible();
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/seguros-ficha-${tela.nome}.png`, fullPage: true, animations: 'disabled' });
+      await page.screenshot({
+        path: `test-results/telas/seguros-ficha-${tela.nome}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
 
       await page.getByRole('button', { name: 'Nova apólice' }).click();
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/seguros-form-apolice-${tela.nome}.png`, animations: 'disabled' });
+      await page.screenshot({
+        path: `test-results/telas/seguros-form-apolice-${tela.nome}.png`,
+        animations: 'disabled',
+      });
     });
   });
 }

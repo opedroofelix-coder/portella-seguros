@@ -57,6 +57,9 @@ export function exigir(
 }
 
 /** O registro aparece para o usuário? (admin e gestor veem tudo; corretor, só a própria carteira) */
-export function enxerga(usuario: Pick<Usuario, 'id' | 'perfil' | 'ativo'>, recurso: { responsavelId: string }) {
+export function enxerga(
+  usuario: Pick<Usuario, 'id' | 'perfil' | 'ativo'>,
+  recurso: { responsavelId: string },
+) {
   return pode(usuario, 'carteira:ver_todos') || (usuario.ativo && recurso.responsavelId === usuario.id);
 }

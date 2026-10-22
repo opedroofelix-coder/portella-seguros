@@ -16,5 +16,9 @@ criarServicos()
   )
   .catch((erro) => {
     console.error(erro);
-    raiz.render(<p style={{ padding: 24 }}>Não foi possível abrir o banco de dados deste navegador. Verifique se o modo privado está desativado.</p>);
+    raiz.render(
+      <p style={{ padding: 24 }}>
+        Não foi possível abrir o banco de dados deste navegador. Verifique se o modo privado está desativado.
+      </p>,
+    );
   });

@@ -50,18 +50,31 @@ export function PaginaClientes() {
       <CabecalhoPagina
         titulo="Clientes"
         descricao={verTodos ? 'Carteira completa da corretora.' : 'Sua carteira de clientes.'}
-        acoes={<Botao icone="mais" onClick={() => setNovo(true)}>Novo cliente</Botao>}
+        acoes={
+          <Botao icone="mais" onClick={() => setNovo(true)}>
+            Novo cliente
+          </Botao>
+        }
       />
       <Cartao>
         <BarraFiltros>
           <Campo rotulo="Buscar">
-            <Entrada type="search" placeholder="Nome, CPF/CNPJ, telefone, cidade" value={busca} onChange={(e) => setBusca(e.target.value)} />
+            <Entrada
+              type="search"
+              placeholder="Nome, CPF/CNPJ, telefone, cidade"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
           </Campo>
           {verTodos && (
             <Campo rotulo="Responsável">
               <Selecao value={responsavel} onChange={(e) => setResponsavel(e.target.value)}>
                 <option value="">Todos</option>
-                {equipe.map((u) => <option key={u.id} value={u.id}>{u.nome}</option>)}
+                {equipe.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.nome}
+                  </option>
+                ))}
               </Selecao>
             </Campo>
           )}
@@ -81,15 +94,32 @@ export function PaginaClientes() {
             }
             colunas={[
               { chave: 'nome', titulo: 'Cliente', principal: true, render: (c) => c.nome },
-              { chave: 'doc', titulo: 'CPF/CNPJ', render: (c) => (c.documento ? formatarDocumento(c.documento) : '—') },
-              { chave: 'tel', titulo: 'Telefone', render: (c) => (c.telefone ? formatarTelefone(c.telefone) : '—') },
-              { chave: 'cidade', titulo: 'Cidade', ocultarNoMobile: true, render: (c) => c.endereco?.cidade ?? '—' },
-              ...(verTodos ? [{ chave: 'resp', titulo: 'Responsável', render: (c: Cliente) => nomeDe(c.responsavelId) }] : []),
+              {
+                chave: 'doc',
+                titulo: 'CPF/CNPJ',
+                render: (c) => (c.documento ? formatarDocumento(c.documento) : '—'),
+              },
+              {
+                chave: 'tel',
+                titulo: 'Telefone',
+                render: (c) => (c.telefone ? formatarTelefone(c.telefone) : '—'),
+              },
+              {
+                chave: 'cidade',
+                titulo: 'Cidade',
+                ocultarNoMobile: true,
+                render: (c) => c.endereco?.cidade ?? '—',
+              },
+              ...(verTodos
+                ? [{ chave: 'resp', titulo: 'Responsável', render: (c: Cliente) => nomeDe(c.responsavelId) }]
+                : []),
             ]}
           />
         )}
       </Cartao>
-      {novo && <FormularioCliente aoFechar={() => setNovo(false)} aoSalvar={(c) => navegar(`/clientes/${c.id}`)} />}
+      {novo && (
+        <FormularioCliente aoFechar={() => setNovo(false)} aoSalvar={(c) => navegar(`/clientes/${c.id}`)} />
+      )}
     </>
   );
 }
@@ -100,7 +130,12 @@ export function PaginaCliente() {
   const { data, isPending } = useColecao('clientes', clientes);
   const cliente = data?.find((c) => c.id === id);
   if (isPending) return <Carregando />;
-  if (!cliente) return <EstadoVazio titulo="Cliente não encontrado">Ele pode ter sido removido ou pertencer a outra carteira.</EstadoVazio>;
+  if (!cliente)
+    return (
+      <EstadoVazio titulo="Cliente não encontrado">
+        Ele pode ter sido removido ou pertencer a outra carteira.
+      </EstadoVazio>
+    );
   return <FichaCliente cliente={cliente} />;
 }
 
@@ -116,10 +151,23 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
   const [confirmar, setConfirmar] = useState(false);
   const whatsapp = cliente.telefone ? linkWhatsApp(cliente.telefone) : null;
   const e = cliente.endereco;
-  const endereco = e ? [e.logradouro && `${e.logradouro}${e.numero ? `, ${e.numero}` : ''}`, e.complemento, e.bairro, e.cidade && `${e.cidade}${e.uf ? ` – ${e.uf}` : ''}`, e.cep].filter(Boolean).join(' · ') : '';
+  const endereco = e
+    ? [
+        e.logradouro && `${e.logradouro}${e.numero ? `, ${e.numero}` : ''}`,
+        e.complemento,
+        e.bairro,
+        e.cidade && `${e.cidade}${e.uf ? ` – ${e.uf}` : ''}`,
+        e.cep,
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : '';
 
   const dados: Array<[string, string]> = [
-    [cliente.tipoPessoa === 'PF' ? 'CPF' : 'CNPJ', cliente.documento ? formatarDocumento(cliente.documento) : '—'],
+    [
+      cliente.tipoPessoa === 'PF' ? 'CPF' : 'CNPJ',
+      cliente.documento ? formatarDocumento(cliente.documento) : '—',
+    ],
     ['Telefone', cliente.telefone ? formatarTelefone(cliente.telefone) : '—'],
     ['E-mail', cliente.email ?? '—'],
     ['Endereço', endereco || '—'],
@@ -134,12 +182,25 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
         acoes={
           <>
             {whatsapp && (
-              <a className={classesBotao({ variante: 'secundario' })} href={whatsapp} target="_blank" rel="noreferrer">
+              <a
+                className={classesBotao({ variante: 'secundario' })}
+                href={whatsapp}
+                target="_blank"
+                rel="noreferrer"
+              >
                 <Icone nome="whatsapp" tamanho={18} /> WhatsApp
               </a>
             )}
-            {pode('registro:editar', cliente) && <Botao variante="secundario" icone="editar" onClick={() => setEditar(true)}>Editar</Botao>}
-            {pode('registro:remover', cliente) && <Botao variante="perigo" icone="lixeira" onClick={() => setConfirmar(true)}>Remover</Botao>}
+            {pode('registro:editar', cliente) && (
+              <Botao variante="secundario" icone="editar" onClick={() => setEditar(true)}>
+                Editar
+              </Botao>
+            )}
+            {pode('registro:remover', cliente) && (
+              <Botao variante="perigo" icone="lixeira" onClick={() => setConfirmar(true)}>
+                Remover
+              </Botao>
+            )}
           </>
         }
       />
@@ -147,13 +208,22 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
         <Cartao titulo="Dados">
           <dl className="lista-dados">
             {dados.map(([rotulo, valor]) => (
-              <div key={rotulo}><dt>{rotulo}</dt><dd>{valor}</dd></div>
+              <div key={rotulo}>
+                <dt>{rotulo}</dt>
+                <dd>{valor}</dd>
+              </div>
             ))}
           </dl>
-          {cliente.observacoes && <p className="texto-suave" style={{ whiteSpace: 'pre-line' }}>{cliente.observacoes}</p>}
+          {cliente.observacoes && (
+            <p className="texto-suave" style={{ whiteSpace: 'pre-line' }}>
+              {cliente.observacoes}
+            </p>
+          )}
         </Cartao>
         {abasCliente.map((aba) => (
-          <Cartao key={aba.id} titulo={aba.rotulo}>{aba.render(cliente)}</Cartao>
+          <Cartao key={aba.id} titulo={aba.rotulo}>
+            {aba.render(cliente)}
+          </Cartao>
         ))}
       </div>
       {editar && <FormularioCliente cliente={cliente} aoFechar={() => setEditar(false)} />}

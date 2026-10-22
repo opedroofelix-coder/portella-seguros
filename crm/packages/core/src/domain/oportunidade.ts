@@ -27,7 +27,9 @@ export interface Oportunidade extends Registro {
   observacoes?: string;
 }
 
-export function validarOportunidade(o: Pick<Oportunidade, 'nomeContato' | 'produto' | 'etapa' | 'telefone'>): void {
+export function validarOportunidade(
+  o: Pick<Oportunidade, 'nomeContato' | 'produto' | 'etapa' | 'telefone'>,
+): void {
   const campos: Record<string, string> = {};
   if (o.nomeContato.trim().length < 2) campos.nomeContato = 'Informe o nome do contato.';
   if (!o.produto.trim()) campos.produto = 'Informe o produto.';

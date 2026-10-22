@@ -10,7 +10,10 @@ export interface Registro {
 }
 
 /** Dados que o usuário informa ao criar ou editar um registro. */
-export type DadosRegistro<T extends Registro> = Omit<T, 'id' | 'criadoEm' | 'atualizadoEm' | 'responsavelId'> & {
+export type DadosRegistro<T extends Registro> = Omit<
+  T,
+  'id' | 'criadoEm' | 'atualizadoEm' | 'responsavelId'
+> & {
   id?: string;
   responsavelId?: string;
 };

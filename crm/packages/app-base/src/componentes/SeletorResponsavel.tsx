@@ -16,7 +16,9 @@ export const SeletorResponsavel = forwardRef<HTMLSelectElement, SelectHTMLAttrib
           {equipe
             .filter((u) => u.ativo)
             .map((u) => (
-              <option key={u.id} value={u.id}>{u.nome}</option>
+              <option key={u.id} value={u.id}>
+                {u.nome}
+              </option>
             ))}
         </Selecao>
       </Campo>

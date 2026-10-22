@@ -37,7 +37,14 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
   return (
     <div className={styles.estrutura}>
       <header className={styles.topo}>
-        <Botao variante="fantasma" soIcone icone="menu" aria-expanded={aberto} aria-controls="menu-lateral" onClick={() => setAberto(true)}>
+        <Botao
+          variante="fantasma"
+          soIcone
+          icone="menu"
+          aria-expanded={aberto}
+          aria-controls="menu-lateral"
+          onClick={() => setAberto(true)}
+        >
           Abrir menu
         </Botao>
         <Link to="/" aria-label={`Portella ${sistema}, início`}>
@@ -48,7 +55,11 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
 
       {aberto && <button className={styles.veu} aria-label="Fechar menu" onClick={() => setAberto(false)} />}
 
-      <aside id="menu-lateral" className={`${styles.lateral} ${aberto ? styles.lateralAberta : ''}`} aria-label="Menu principal">
+      <aside
+        id="menu-lateral"
+        className={`${styles.lateral} ${aberto ? styles.lateralAberta : ''}`}
+        aria-label="Menu principal"
+      >
         <Link to="/" className={styles.marca}>
           <img src={logo} alt="Portella Corretora de Seguros" />
           <span className={styles.sistema}>CRM {sistema}</span>
@@ -71,12 +82,16 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
             <strong>{usuario.nome}</strong>
             <span>{usuario.perfil}</span>
           </div>
-          <Botao variante="fantasma" soIcone icone="sair" onClick={aoSair}>Sair</Botao>
+          <Botao variante="fantasma" soIcone icone="sair" onClick={aoSair}>
+            Sair
+          </Botao>
         </div>
       </aside>
 
       <div className={styles.principal}>
-        <main className={styles.conteudo} id="conteudo">{children}</main>
+        <main className={styles.conteudo} id="conteudo">
+          {children}
+        </main>
       </div>
     </div>
   );

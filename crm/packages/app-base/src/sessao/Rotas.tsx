@@ -15,7 +15,9 @@ export function RotaProtegida({ children }: { children: ReactNode }) {
 export function ExigePermissao({ acao, children }: { acao: Acao; children: ReactNode }) {
   const { pode } = useSessao();
   if (!pode(acao)) {
-    return <EstadoVazio titulo="Acesso restrito">Esta área é exclusiva para outro perfil de usuário.</EstadoVazio>;
+    return (
+      <EstadoVazio titulo="Acesso restrito">Esta área é exclusiva para outro perfil de usuário.</EstadoVazio>
+    );
   }
   return <>{children}</>;
 }

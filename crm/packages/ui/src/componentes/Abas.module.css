@@ -1,4 +1,27 @@
-.abas { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 20px; scrollbar-width: none; }
-.aba { flex-shrink: 0; min-height: var(--touch); padding: 8px 16px; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--text-muted); cursor: pointer; font-size: 14px; letter-spacing: .04em; }
-.aba:hover { color: var(--text); }
-.aba[aria-selected='true'] { color: var(--gold-light); border-bottom-color: var(--gold); }
+.abas {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+  scrollbar-width: none;
+}
+.aba {
+  flex-shrink: 0;
+  min-height: var(--touch);
+  padding: 8px 16px;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+.aba:hover {
+  color: var(--text);
+}
+.aba[aria-selected='true'] {
+  color: var(--gold-light);
+  border-bottom-color: var(--gold);
+}

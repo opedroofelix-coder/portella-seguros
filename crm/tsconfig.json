@@ -19,5 +19,14 @@
     "noEmit": true,
     "types": ["vite/client", "node", "@testing-library/jest-dom/vitest"]
   },
-  "include": ["packages/ui/catalogo", "packages/*/src", "apps/*/src", "apps/*/vite.config.ts", "e2e", "vitest.config.ts", "playwright.config.ts", "vitest.setup.ts"]
+  "include": [
+    "packages/ui/catalogo",
+    "packages/*/src",
+    "apps/*/src",
+    "apps/*/vite.config.ts",
+    "e2e",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "vitest.setup.ts"
+  ]
 }

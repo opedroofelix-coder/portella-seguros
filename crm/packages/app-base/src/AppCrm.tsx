@@ -34,9 +34,20 @@ export const MENU_COMUM = {
   conta: { para: '/conta', rotulo: 'Minha conta', icone: 'editar' },
 } satisfies Record<string, ItemMenuApp>;
 
-export function AppCrm<S extends ServicosBase>({ config, servicos, rotas }: { config: ConfigApp; servicos: S; rotas: RotaApp[] }) {
+export function AppCrm<S extends ServicosBase>({
+  config,
+  servicos,
+  rotas,
+}: {
+  config: ConfigApp;
+  servicos: S;
+  rotas: RotaApp[];
+}) {
   const [clienteQuery] = useState(
-    () => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: false, refetchOnWindowFocus: false } } }),
+    () =>
+      new QueryClient({
+        defaultOptions: { queries: { staleTime: 30_000, retry: false, refetchOnWindowFocus: false } },
+      }),
   );
   return (
     <QueryClientProvider client={clienteQuery}>
@@ -47,15 +58,41 @@ export function AppCrm<S extends ServicosBase>({ config, servicos, rotas }: { co
               <ProvedorSessao>
                 <Routes>
                   <Route path="/entrar" element={<PaginaEntrar />} />
-                  <Route element={<RotaProtegida><Layout /></RotaProtegida>}>
+                  <Route
+                    element={
+                      <RotaProtegida>
+                        <Layout />
+                      </RotaProtegida>
+                    }
+                  >
                     {rotas.map((r) => (
-                      <Route key={r.caminho} path={r.caminho} element={r.acao ? <ExigePermissao acao={r.acao}>{r.elemento}</ExigePermissao> : r.elemento} />
+                      <Route
+                        key={r.caminho}
+                        path={r.caminho}
+                        element={
+                          r.acao ? <ExigePermissao acao={r.acao}>{r.elemento}</ExigePermissao> : r.elemento
+                        }
+                      />
                     ))}
                     <Route path="/clientes" element={<PaginaClientes />} />
                     <Route path="/clientes/:id" element={<PaginaCliente />} />
                     <Route path={ROTA_FUNIL} element={<PaginaFunil />} />
-                    <Route path="/usuarios" element={<ExigePermissao acao="usuarios:gerenciar"><PaginaUsuarios /></ExigePermissao>} />
-                    <Route path="/importar" element={<ExigePermissao acao="dados:importar"><PaginaImportar /></ExigePermissao>} />
+                    <Route
+                      path="/usuarios"
+                      element={
+                        <ExigePermissao acao="usuarios:gerenciar">
+                          <PaginaUsuarios />
+                        </ExigePermissao>
+                      }
+                    />
+                    <Route
+                      path="/importar"
+                      element={
+                        <ExigePermissao acao="dados:importar">
+                          <PaginaImportar />
+                        </ExigePermissao>
+                      }
+                    />
                     <Route path="/conta" element={<PaginaMinhaConta />} />
                     <Route path="*" element={<p>Página não encontrada.</p>} />
                   </Route>
@@ -97,4 +134,3 @@ function useConfigMenu() {
   const { pode } = useSessao();
   return { ...config, menu: config.menu.filter((i) => !i.acao || pode(i.acao)) };
 }
-

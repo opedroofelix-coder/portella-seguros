@@ -12,7 +12,9 @@ export interface ServicosConsorcio extends ServicosBase {
   lances: ServicoCarteira<Lance>;
 }
 
-export function montarServicos(repos: RepositoriosBase & { cotas: Repositorio<Cota>; lances: Repositorio<Lance> }): ServicosConsorcio {
+export function montarServicos(
+  repos: RepositoriosBase & { cotas: Repositorio<Cota>; lances: Repositorio<Lance> },
+): ServicosConsorcio {
   return {
     ...montarServicosBase(repos),
     cotas: new ServicoCarteira<Cota>(repos.cotas, validarCota),

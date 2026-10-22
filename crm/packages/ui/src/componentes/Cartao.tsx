@@ -21,11 +21,22 @@ export function Cartao({
   );
 }
 
-export function Indicador({ rotulo, valor, detalhe }: { rotulo: string; valor: ReactNode; detalhe?: ReactNode }) {
+export function Indicador({
+  rotulo,
+  valor,
+  detalhe,
+}: {
+  rotulo: string;
+  valor: ReactNode;
+  detalhe?: ReactNode;
+}) {
   return (
     <div className={`${styles.cartao} ${styles.indicador}`}>
       <span className={styles.indicadorRotulo}>{rotulo}</span>
-      <strong className={styles.indicadorValor} data-longo={typeof valor === 'string' && valor.length > 8 ? '' : undefined}>
+      <strong
+        className={styles.indicadorValor}
+        data-longo={typeof valor === 'string' && valor.length > 8 ? '' : undefined}
+      >
         {valor}
       </strong>
       {detalhe && <span className={styles.indicadorDetalhe}>{detalhe}</span>}
@@ -33,7 +44,15 @@ export function Indicador({ rotulo, valor, detalhe }: { rotulo: string; valor: R
   );
 }
 
-export function EstadoVazio({ titulo, children, acao }: { titulo: string; children?: ReactNode; acao?: ReactNode }) {
+export function EstadoVazio({
+  titulo,
+  children,
+  acao,
+}: {
+  titulo: string;
+  children?: ReactNode;
+  acao?: ReactNode;
+}) {
   return (
     <div className={styles.vazio}>
       <h3>{titulo}</h3>

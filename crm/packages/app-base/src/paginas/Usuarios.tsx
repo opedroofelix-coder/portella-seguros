@@ -1,7 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Perfil, Usuario } from '@portella/core';
 import { formatarData, PERFIS, ROTULO_PERFIL, SENHA_TAMANHO_MINIMO } from '@portella/core';
-import { Botao, CabecalhoPagina, Campo, Cartao, Carregando, Entrada, Modal, Selecao, Selo, Tabela, useAvisos } from '@portella/ui';
+import {
+  Botao,
+  CabecalhoPagina,
+  Campo,
+  Cartao,
+  Carregando,
+  Entrada,
+  Modal,
+  Selecao,
+  Selo,
+  Tabela,
+  useAvisos,
+} from '@portella/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -20,9 +32,17 @@ export function PaginaUsuarios() {
   return (
     <>
       <CabecalhoPagina
-        titulo={<>Usuários e <em>perfis</em></>}
+        titulo={
+          <>
+            Usuários e <em>perfis</em>
+          </>
+        }
         descricao="Administradores gerenciam a equipe; gestores veem toda a carteira; corretores, só a própria."
-        acoes={<Botao icone="mais" onClick={() => setEditando('novo')}>Novo usuário</Botao>}
+        acoes={
+          <Botao icone="mais" onClick={() => setEditando('novo')}>
+            Novo usuário
+          </Botao>
+        }
       />
       <Cartao>
         {isPending ? (
@@ -36,15 +56,31 @@ export function PaginaUsuarios() {
             colunas={[
               { chave: 'nome', titulo: 'Nome', principal: true, render: (u) => u.nome },
               { chave: 'email', titulo: 'E-mail', render: (u) => u.email },
-              { chave: 'perfil', titulo: 'Perfil', render: (u) => <Selo tom={TOM_PERFIL[u.perfil]}>{ROTULO_PERFIL[u.perfil]}</Selo> },
-              { chave: 'ativo', titulo: 'Situação', render: (u) => (u.ativo ? <Selo tom="sucesso">Ativo</Selo> : <Selo tom="perigo">Desativado</Selo>) },
-              { chave: 'criado', titulo: 'Desde', ocultarNoMobile: true, render: (u) => formatarData(u.criadoEm) },
+              {
+                chave: 'perfil',
+                titulo: 'Perfil',
+                render: (u) => <Selo tom={TOM_PERFIL[u.perfil]}>{ROTULO_PERFIL[u.perfil]}</Selo>,
+              },
+              {
+                chave: 'ativo',
+                titulo: 'Situação',
+                render: (u) =>
+                  u.ativo ? <Selo tom="sucesso">Ativo</Selo> : <Selo tom="perigo">Desativado</Selo>,
+              },
+              {
+                chave: 'criado',
+                titulo: 'Desde',
+                ocultarNoMobile: true,
+                render: (u) => formatarData(u.criadoEm),
+              },
             ]}
           />
         )}
       </Cartao>
       {editando === 'novo' && <ModalNovoUsuario aoFechar={() => setEditando(null)} />}
-      {editando && editando !== 'novo' && <ModalEditarUsuario usuario={editando} aoFechar={() => setEditando(null)} />}
+      {editando && editando !== 'novo' && (
+        <ModalEditarUsuario usuario={editando} aoFechar={() => setEditando(null)} />
+      )}
     </>
   );
 }
@@ -85,20 +121,37 @@ function ModalNovoUsuario({ aoFechar }: { aoFechar: () => void }) {
       aoFechar={aoFechar}
       rodape={
         <>
-          <Botao variante="secundario" onClick={aoFechar}>Cancelar</Botao>
-          <Botao type="submit" form="form-usuario" carregando={criar.isPending}>Cadastrar</Botao>
+          <Botao variante="secundario" onClick={aoFechar}>
+            Cancelar
+          </Botao>
+          <Botao type="submit" form="form-usuario" carregando={criar.isPending}>
+            Cadastrar
+          </Botao>
         </>
       }
     >
       <form id="form-usuario" className="grade-2" onSubmit={handleSubmit((d) => criar.mutate(d))} noValidate>
-        <Campo rotulo="Nome" obrigatorio erro={formState.errors.nome?.message}><Entrada {...register('nome')} /></Campo>
-        <Campo rotulo="E-mail" obrigatorio erro={formState.errors.email?.message}><Entrada type="email" {...register('email')} /></Campo>
+        <Campo rotulo="Nome" obrigatorio erro={formState.errors.nome?.message}>
+          <Entrada {...register('nome')} />
+        </Campo>
+        <Campo rotulo="E-mail" obrigatorio erro={formState.errors.email?.message}>
+          <Entrada type="email" {...register('email')} />
+        </Campo>
         <Campo rotulo="Perfil" obrigatorio>
           <Selecao {...register('perfil')}>
-            {PERFIS.map((p) => <option key={p} value={p}>{ROTULO_PERFIL[p]}</option>)}
+            {PERFIS.map((p) => (
+              <option key={p} value={p}>
+                {ROTULO_PERFIL[p]}
+              </option>
+            ))}
           </Selecao>
         </Campo>
-        <Campo rotulo="Senha inicial" obrigatorio erro={formState.errors.senha?.message} dica="Combine com a pessoa para trocá-la no primeiro acesso.">
+        <Campo
+          rotulo="Senha inicial"
+          obrigatorio
+          erro={formState.errors.senha?.message}
+          dica="Combine com a pessoa para trocá-la no primeiro acesso."
+        >
           <Entrada type="password" autoComplete="new-password" {...register('senha')} />
         </Campo>
       </form>
@@ -137,17 +190,29 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
       aoFechar={aoFechar}
       rodape={
         <>
-          <Botao variante="secundario" onClick={aoFechar}>Cancelar</Botao>
-          <Botao onClick={() => salvar.mutate()} carregando={salvar.isPending}>Salvar</Botao>
+          <Botao variante="secundario" onClick={aoFechar}>
+            Cancelar
+          </Botao>
+          <Botao onClick={() => salvar.mutate()} carregando={salvar.isPending}>
+            Salvar
+          </Botao>
         </>
       }
     >
       <div className="grade-2">
-        <Campo rotulo="Nome"><Entrada value={nome} onChange={(e) => setNome(e.target.value)} /></Campo>
-        <Campo rotulo="E-mail"><Entrada value={usuario.email} disabled /></Campo>
+        <Campo rotulo="Nome">
+          <Entrada value={nome} onChange={(e) => setNome(e.target.value)} />
+        </Campo>
+        <Campo rotulo="E-mail">
+          <Entrada value={usuario.email} disabled />
+        </Campo>
         <Campo rotulo="Perfil">
           <Selecao value={perfil} onChange={(e) => setPerfil(e.target.value as Perfil)}>
-            {PERFIS.map((p) => <option key={p} value={p}>{ROTULO_PERFIL[p]}</option>)}
+            {PERFIS.map((p) => (
+              <option key={p} value={p}>
+                {ROTULO_PERFIL[p]}
+              </option>
+            ))}
           </Selecao>
         </Campo>
         <Campo rotulo="Situação">
@@ -157,7 +222,12 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
           </Selecao>
         </Campo>
         <Campo rotulo="Nova senha" dica="Deixe em branco para manter a atual." className="span-todo">
-          <Entrada type="password" autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+          <Entrada
+            type="password"
+            autoComplete="new-password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
         </Campo>
       </div>
     </Modal>

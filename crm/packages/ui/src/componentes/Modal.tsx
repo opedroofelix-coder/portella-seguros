@@ -13,7 +13,8 @@ export interface ModalProps {
   largura?: number;
 }
 
-const FOCAVEIS = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FOCAVEIS =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /** Janela modal: vira painel inferior no celular, centraliza no desktop. Esc fecha e o foco fica preso. */
 export function Modal({ aberto, titulo, aoFechar, children, rodape, largura }: ModalProps) {
@@ -69,8 +70,12 @@ export function Modal({ aberto, titulo, aoFechar, children, rodape, largura }: M
         style={largura ? ({ '--largura': `${largura}px` } as CSSProperties) : undefined}
       >
         <header className={styles.cabecalho}>
-          <h2 id={idTitulo} className={styles.titulo}>{titulo}</h2>
-          <Botao variante="fantasma" soIcone icone="fechar" onClick={aoFechar}>Fechar</Botao>
+          <h2 id={idTitulo} className={styles.titulo}>
+            {titulo}
+          </h2>
+          <Botao variante="fantasma" soIcone icone="fechar" onClick={aoFechar}>
+            Fechar
+          </Botao>
         </header>
         <div className={styles.corpo}>{children}</div>
         {rodape && <footer className={styles.rodape}>{rodape}</footer>}
@@ -107,8 +112,15 @@ export function ConfirmarAcao({
       largura={460}
       rodape={
         <>
-          <Botao variante="secundario" onClick={aoCancelar}>Cancelar</Botao>
-          <Botao variante={perigo ? 'perigo' : 'primario'} carregando={carregando} onClick={aoConfirmar} data-autofoco>
+          <Botao variante="secundario" onClick={aoCancelar}>
+            Cancelar
+          </Botao>
+          <Botao
+            variante={perigo ? 'perigo' : 'primario'}
+            carregando={carregando}
+            onClick={aoConfirmar}
+            data-autofoco
+          >
             {textoConfirmar}
           </Botao>
         </>

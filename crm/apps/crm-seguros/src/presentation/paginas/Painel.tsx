@@ -27,13 +27,32 @@ export function PaginaPainel() {
 
   return (
     <>
-      <CabecalhoPagina titulo={<>Olá, <em>{primeiroNome}</em></>} descricao={`Resumo da carteira em ${formatarData(hoje)}.`} />
+      <CabecalhoPagina
+        titulo={
+          <>
+            Olá, <em>{primeiroNome}</em>
+          </>
+        }
+        descricao={`Resumo da carteira em ${formatarData(hoje)}.`}
+      />
       <div className="grade">
         <div className="grade-4">
-          <Indicador rotulo="Apólices ativas" valor={resumo.ativas.toLocaleString('pt-BR')} detalhe={`${listaClientes.length.toLocaleString('pt-BR')} clientes`} />
-          <Indicador rotulo="Renovar em 30 dias" valor={resumo.aVencer30} detalhe={`${resumo.aVencer60} em 60 · ${resumo.aVencer90} em 90 dias`} />
+          <Indicador
+            rotulo="Apólices ativas"
+            valor={resumo.ativas.toLocaleString('pt-BR')}
+            detalhe={`${listaClientes.length.toLocaleString('pt-BR')} clientes`}
+          />
+          <Indicador
+            rotulo="Renovar em 30 dias"
+            valor={resumo.aVencer30}
+            detalhe={`${resumo.aVencer60} em 60 · ${resumo.aVencer90} em 90 dias`}
+          />
           <Indicador rotulo="Prêmio ativo" valor={formatarDinheiro(resumo.premioAtivo)} />
-          <Indicador rotulo="Comissão prevista" valor={formatarDinheiro(resumo.comissaoAtiva)} detalhe="sobre o prêmio líquido" />
+          <Indicador
+            rotulo="Comissão prevista"
+            valor={formatarDinheiro(resumo.comissaoAtiva)}
+            detalhe="sobre o prêmio líquido"
+          />
         </div>
 
         <Cartao titulo="Próximas renovações" acoes={<Link to="/renovacoes">Ver todas</Link>}>
@@ -44,7 +63,9 @@ export function PaginaPainel() {
                   <button type="button" onClick={() => navegar(`/clientes/${a.clienteId}`)}>
                     <span>
                       <strong>{nomeCliente.get(a.clienteId) ?? '—'}</strong>
-                      <small>{nomeRamo(a.ramo)} · {nomeSeguradora(a.seguradora)} · {formatarData(a.fimVigencia)}</small>
+                      <small>
+                        {nomeRamo(a.ramo)} · {nomeSeguradora(a.seguradora)} · {formatarData(a.fimVigencia)}
+                      </small>
                     </span>
                     <SeloSituacao apolice={a} />
                   </button>
@@ -52,7 +73,9 @@ export function PaginaPainel() {
               ))}
             </ul>
           ) : (
-            <EstadoVazio titulo="Nenhuma renovação pendente">Nos próximos 30 dias não há apólices para renovar.</EstadoVazio>
+            <EstadoVazio titulo="Nenhuma renovação pendente">
+              Nos próximos 30 dias não há apólices para renovar.
+            </EstadoVazio>
           )}
         </Cartao>
 
@@ -61,7 +84,9 @@ export function PaginaPainel() {
             {resumo.porSeguradora.length ? (
               <Barras
                 rotulo="Apólices ativas por seguradora"
-                itens={resumo.porSeguradora.slice(0, 8).map((s) => ({ rotulo: nomeSeguradora(s.seguradora), valor: s.quantidade }))}
+                itens={resumo.porSeguradora
+                  .slice(0, 8)
+                  .map((s) => ({ rotulo: nomeSeguradora(s.seguradora), valor: s.quantidade }))}
               />
             ) : (
               <p className="texto-suave">Sem apólices ativas.</p>
@@ -69,17 +94,32 @@ export function PaginaPainel() {
           </Cartao>
           <Cartao titulo="Apólices por ramo">
             {resumo.porRamo.length ? (
-              <Barras rotulo="Apólices ativas por ramo" itens={resumo.porRamo.map((r) => ({ rotulo: nomeRamo(r.ramo), valor: r.quantidade }))} />
+              <Barras
+                rotulo="Apólices ativas por ramo"
+                itens={resumo.porRamo.map((r) => ({ rotulo: nomeRamo(r.ramo), valor: r.quantidade }))}
+              />
             ) : (
               <p className="texto-suave">Sem apólices ativas.</p>
             )}
           </Cartao>
           <Cartao titulo="Cotações" acoes={<Link to={ROTA_FUNIL}>Abrir funil</Link>}>
             <dl className="lista-dados">
-              <div><dt>Em aberto</dt><dd>{funil.emAberto}</dd></div>
-              <div><dt>Propostas enviadas</dt><dd>{funil.porEtapa.proposta}</dd></div>
-              <div><dt>Fechadas</dt><dd>{funil.porEtapa.ganho}</dd></div>
-              <div><dt>Conversão</dt><dd>{funil.taxaConversao == null ? '—' : `${Math.round(funil.taxaConversao * 100)}%`}</dd></div>
+              <div>
+                <dt>Em aberto</dt>
+                <dd>{funil.emAberto}</dd>
+              </div>
+              <div>
+                <dt>Propostas enviadas</dt>
+                <dd>{funil.porEtapa.proposta}</dd>
+              </div>
+              <div>
+                <dt>Fechadas</dt>
+                <dd>{funil.porEtapa.ganho}</dd>
+              </div>
+              <div>
+                <dt>Conversão</dt>
+                <dd>{funil.taxaConversao == null ? '—' : `${Math.round(funil.taxaConversao * 100)}%`}</dd>
+              </div>
             </dl>
           </Cartao>
         </div>

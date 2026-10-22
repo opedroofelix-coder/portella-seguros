@@ -35,7 +35,9 @@ test.describe('CRM Consórcio — fluxo completo', () => {
     await irPara(page, 'Lances');
     await page.getByRole('button', { name: 'Novo lance' }).click();
     const lance = page.getByRole('dialog', { name: 'Novo lance' });
-    await lance.getByLabel('Cota').selectOption({ label: 'Consorciada Manual · Administradora Manual 2020/7' });
+    await lance
+      .getByLabel('Cota')
+      .selectOption({ label: 'Consorciada Manual · Administradora Manual 2020/7' });
     await lance.getByLabel('Percentual do crédito (%)').fill('30');
     await page.getByRole('button', { name: 'Salvar' }).click();
     await page.getByRole('button', { name: 'Contemplado', exact: true }).click();
@@ -66,17 +68,33 @@ for (const tela of LARGURAS) {
     test('todas as telas sem rolagem horizontal', async ({ page }) => {
       await primeiroAcesso(page, URL);
       await importar(page, FIXTURE, /Cotas/);
-      for (const nome of ['Painel', 'Clientes', 'Cotas', 'Lances', 'Propostas', 'Usuários', 'Importar', 'Minha conta']) {
+      for (const nome of [
+        'Painel',
+        'Clientes',
+        'Cotas',
+        'Lances',
+        'Propostas',
+        'Usuários',
+        'Importar',
+        'Minha conta',
+      ]) {
         await irPara(page, nome);
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
         await conferirLayout(page, tela.width);
-        await page.screenshot({ path: `test-results/telas/consorcio-${nome.toLowerCase().replace(/\s/g, '-')}-${tela.nome}.png`, fullPage: true, animations: 'disabled' });
+        await page.screenshot({
+          path: `test-results/telas/consorcio-${nome.toLowerCase().replace(/\s/g, '-')}-${tela.nome}.png`,
+          fullPage: true,
+          animations: 'disabled',
+        });
       }
       await irPara(page, 'Cotas');
       await page.getByText('Consorciado Teste Um').first().click();
       await expect(page.getByRole('dialog')).toBeVisible();
       await conferirLayout(page, tela.width);
-      await page.screenshot({ path: `test-results/telas/consorcio-form-cota-${tela.nome}.png`, animations: 'disabled' });
+      await page.screenshot({
+        path: `test-results/telas/consorcio-form-cota-${tela.nome}.png`,
+        animations: 'disabled',
+      });
     });
   });
 }

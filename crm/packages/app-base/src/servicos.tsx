@@ -1,10 +1,4 @@
-import type {
-  Cliente,
-  GatewayAutenticacao,
-  Oportunidade,
-  Repositorio,
-  Usuario,
-} from '@portella/core';
+import type { Cliente, GatewayAutenticacao, Oportunidade, Repositorio, Usuario } from '@portella/core';
 import {
   ServicoAutenticacao,
   ServicoCarteira,
@@ -41,7 +35,13 @@ export function montarServicosBase(r: RepositoriosBase): ServicosBase {
 
 const Contexto = createContext<ServicosBase | null>(null);
 
-export function ProvedorServicos<S extends ServicosBase>({ servicos, children }: { servicos: S; children: ReactNode }) {
+export function ProvedorServicos<S extends ServicosBase>({
+  servicos,
+  children,
+}: {
+  servicos: S;
+  children: ReactNode;
+}) {
   return <Contexto.Provider value={servicos}>{children}</Contexto.Provider>;
 }
 

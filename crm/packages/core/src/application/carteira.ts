@@ -38,12 +38,25 @@ export class ServicoCarteira<T extends Registro> {
       exigir(usuario, 'registro:editar', existente);
       const responsavelId = dados.responsavelId ?? existente.responsavelId;
       if (responsavelId !== existente.responsavelId) exigir(usuario, 'registro:transferir');
-      item = { ...existente, ...dados, id: existente.id, responsavelId, criadoEm: existente.criadoEm, atualizadoEm: agora } as T;
+      item = {
+        ...existente,
+        ...dados,
+        id: existente.id,
+        responsavelId,
+        criadoEm: existente.criadoEm,
+        atualizadoEm: agora,
+      } as T;
     } else {
       exigir(usuario, 'registro:criar');
       const responsavelId = dados.responsavelId ?? usuario.id;
       if (responsavelId !== usuario.id) exigir(usuario, 'registro:transferir');
-      item = { ...dados, id: dados.id ?? this.ambiente.gerarId(), responsavelId, criadoEm: agora, atualizadoEm: agora } as T;
+      item = {
+        ...dados,
+        id: dados.id ?? this.ambiente.gerarId(),
+        responsavelId,
+        criadoEm: agora,
+        atualizadoEm: agora,
+      } as T;
     }
     await this.repositorio.salvar(item);
     return item;

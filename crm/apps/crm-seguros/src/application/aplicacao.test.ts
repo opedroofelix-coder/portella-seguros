@@ -6,7 +6,14 @@ import { criarImportacao, identificarRamo, identificarSeguradora } from './impor
 import { renovarApolice, sugerirRenovacao } from './renovacao';
 import { montarServicos } from './servicos';
 
-const admin: Usuario = { id: 'adm', nome: 'Ana Admin', email: 'a@x.com', perfil: 'admin', ativo: true, criadoEm: '' };
+const admin: Usuario = {
+  id: 'adm',
+  nome: 'Ana Admin',
+  email: 'a@x.com',
+  perfil: 'admin',
+  ativo: true,
+  criadoEm: '',
+};
 const carlos: Usuario = { ...admin, id: 'c1', nome: 'Carlos Souza', perfil: 'corretor' };
 
 function servicos() {
@@ -23,10 +30,21 @@ describe('renovação', () => {
   it('cria a apólice nova com 12 meses e marca a anterior como renovada', async () => {
     const s = servicos();
     const anterior = await s.apolices.salvar(carlos, {
-      clienteId: 'x', seguradora: 'porto', ramo: 'auto', inicioVigencia: '2025-11-10', fimVigencia: '2026-11-10', renovacao: 'em_contato', comissaoPercentual: 15,
+      clienteId: 'x',
+      seguradora: 'porto',
+      ramo: 'auto',
+      inicioVigencia: '2025-11-10',
+      fimVigencia: '2026-11-10',
+      renovacao: 'em_contato',
+      comissaoPercentual: 15,
     });
     const sugestao = sugerirRenovacao(anterior);
-    expect(sugestao).toMatchObject({ inicioVigencia: '2026-11-10', fimVigencia: '2027-11-10', comissaoPercentual: 15, responsavelId: 'c1' });
+    expect(sugestao).toMatchObject({
+      inicioVigencia: '2026-11-10',
+      fimVigencia: '2027-11-10',
+      comissaoPercentual: 15,
+      responsavelId: 'c1',
+    });
     const nova = await renovarApolice(s.apolices, carlos, anterior, { ...sugestao, seguradora: 'hdi' });
     const todas = await s.apolices.listar(carlos);
     expect(todas).toHaveLength(2);
@@ -51,16 +69,42 @@ describe('importação de seguros', () => {
   it('analisa o arquivo, avisa problemas e importa sem duplicar', async () => {
     const s = servicos();
     const arquivo = {
-      versao: 1, sistema: 'seguros', origem: 'planilha.xlsx', geradoEm: '',
-      clientes: [{ chave: 'k1', nome: 'Maria', responsavel: 'Carlos' }, { chave: 'k2', nome: 'João', responsavel: 'Pedro' }],
+      versao: 1,
+      sistema: 'seguros',
+      origem: 'planilha.xlsx',
+      geradoEm: '',
+      clientes: [
+        { chave: 'k1', nome: 'Maria', responsavel: 'Carlos' },
+        { chave: 'k2', nome: 'João', responsavel: 'Pedro' },
+      ],
       apolices: [
-        { chave: 'a1', clienteChave: 'k1', seguradora: 'Porto Seguro', ramo: 'Auto', inicioVigencia: '2026-01-01', fimVigencia: '2027-01-01', premioLiquido: 1500.5, comissaoPercentual: 20, responsavel: 'Carlos' },
-        { chave: 'a2', clienteChave: 'k9', seguradora: 'HDI', ramo: 'Auto', inicioVigencia: '2026-01-01', fimVigencia: '2025-01-01' },
+        {
+          chave: 'a1',
+          clienteChave: 'k1',
+          seguradora: 'Porto Seguro',
+          ramo: 'Auto',
+          inicioVigencia: '2026-01-01',
+          fimVigencia: '2027-01-01',
+          premioLiquido: 1500.5,
+          comissaoPercentual: 20,
+          responsavel: 'Carlos',
+        },
+        {
+          chave: 'a2',
+          clienteChave: 'k9',
+          seguradora: 'HDI',
+          ramo: 'Auto',
+          inicioVigencia: '2026-01-01',
+          fimVigencia: '2025-01-01',
+        },
       ],
     };
     const imp = criarImportacao(s);
     const previa = await imp.analisar(arquivo, admin, [admin, carlos]);
-    expect(previa.resumo).toEqual([['Clientes', 2], ['Apólices', 1]]);
+    expect(previa.resumo).toEqual([
+      ['Clientes', 2],
+      ['Apólices', 1],
+    ]);
     expect(previa.avisos.join('\n')).toMatch(/a2.*cliente/i);
     expect(previa.avisos.join('\n')).toMatch(/Pedro/);
     await previa.confirmar();

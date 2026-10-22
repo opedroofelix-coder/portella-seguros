@@ -51,7 +51,9 @@ function FormularioLogin({ destino }: { destino: string }) {
   const { entrar } = useSessao();
   const navegar = useNavigate();
   const [erro, setErro] = useState<string | null>(null);
-  const { register, handleSubmit, formState } = useForm<z.infer<typeof esquemaLogin>>({ resolver: zodResolver(esquemaLogin) });
+  const { register, handleSubmit, formState } = useForm<z.infer<typeof esquemaLogin>>({
+    resolver: zodResolver(esquemaLogin),
+  });
 
   const enviar = handleSubmit(async ({ email, senha }) => {
     setErro(null);
@@ -67,14 +69,20 @@ function FormularioLogin({ destino }: { destino: string }) {
     <>
       <h1 className={styles.titulo}>Entrar</h1>
       <form className={styles.form} onSubmit={enviar} noValidate>
-        {erro && <p className={styles.erro} role="alert">{erro}</p>}
+        {erro && (
+          <p className={styles.erro} role="alert">
+            {erro}
+          </p>
+        )}
         <Campo rotulo="E-mail" erro={formState.errors.email?.message}>
           <Entrada type="email" autoComplete="username" inputMode="email" {...register('email')} />
         </Campo>
         <Campo rotulo="Senha" erro={formState.errors.senha?.message}>
           <Entrada type="password" autoComplete="current-password" {...register('senha')} />
         </Campo>
-        <Botao type="submit" blocoInteiro carregando={formState.isSubmitting}>Entrar</Botao>
+        <Botao type="submit" blocoInteiro carregando={formState.isSubmitting}>
+          Entrar
+        </Botao>
       </form>
     </>
   );
@@ -102,22 +110,34 @@ function FormularioPrimeiroAcesso() {
   return (
     <>
       <h1 className={styles.titulo}>Primeiro acesso</h1>
-      <p className={styles.texto}>Crie a conta de administrador. Depois você cadastra a equipe em Usuários.</p>
+      <p className={styles.texto}>
+        Crie a conta de administrador. Depois você cadastra a equipe em Usuários.
+      </p>
       <form className={styles.form} onSubmit={enviar} noValidate>
-        {erro && <p className={styles.erro} role="alert">{erro}</p>}
+        {erro && (
+          <p className={styles.erro} role="alert">
+            {erro}
+          </p>
+        )}
         <Campo rotulo="Nome" erro={formState.errors.nome?.message}>
           <Entrada autoComplete="name" {...register('nome')} />
         </Campo>
         <Campo rotulo="E-mail" erro={formState.errors.email?.message}>
           <Entrada type="email" autoComplete="username" inputMode="email" {...register('email')} />
         </Campo>
-        <Campo rotulo="Senha" erro={formState.errors.senha?.message} dica={`Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres.`}>
+        <Campo
+          rotulo="Senha"
+          erro={formState.errors.senha?.message}
+          dica={`Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres.`}
+        >
           <Entrada type="password" autoComplete="new-password" {...register('senha')} />
         </Campo>
         <Campo rotulo="Confirme a senha" erro={formState.errors.confirmacao?.message}>
           <Entrada type="password" autoComplete="new-password" {...register('confirmacao')} />
         </Campo>
-        <Botao type="submit" blocoInteiro carregando={formState.isSubmitting}>Criar administrador</Botao>
+        <Botao type="submit" blocoInteiro carregando={formState.isSubmitting}>
+          Criar administrador
+        </Botao>
       </form>
     </>
   );

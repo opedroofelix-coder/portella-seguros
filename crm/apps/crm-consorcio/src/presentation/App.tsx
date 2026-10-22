@@ -31,7 +31,13 @@ export function App({ servicos }: { servicos: ServicosConsorcio }) {
       MENU_COMUM.conta,
     ],
     importacao: criarImportacao(servicos),
-    abasCliente: [{ id: 'cotas', rotulo: 'Cotas de consórcio', render: (cliente) => <CotasDoCliente cliente={cliente} /> }],
+    abasCliente: [
+      {
+        id: 'cotas',
+        rotulo: 'Cotas de consórcio',
+        render: (cliente) => <CotasDoCliente cliente={cliente} />,
+      },
+    ],
   };
   return <AppCrm config={config} servicos={servicos} rotas={rotas} />;
 }

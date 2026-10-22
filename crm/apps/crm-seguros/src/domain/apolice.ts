@@ -104,7 +104,10 @@ export function resumirCarteira(apolices: Apolice[], hoje: DataISO): ResumoCarte
   const ramo = new Map<string, number>();
   for (const a of ativas) {
     const s = seg.get(a.seguradora) ?? { quantidade: 0, premio: 0 };
-    seg.set(a.seguradora, { quantidade: s.quantidade + 1, premio: s.premio + (a.premioTotal ?? a.premioLiquido ?? 0) });
+    seg.set(a.seguradora, {
+      quantidade: s.quantidade + 1,
+      premio: s.premio + (a.premioTotal ?? a.premioLiquido ?? 0),
+    });
     ramo.set(a.ramo, (ramo.get(a.ramo) ?? 0) + 1);
   }
 
@@ -115,7 +118,11 @@ export function resumirCarteira(apolices: Apolice[], hoje: DataISO): ResumoCarte
     aVencer90: dentro(90),
     premioAtivo: ativas.reduce((t, a) => t + (a.premioTotal ?? a.premioLiquido ?? 0), 0),
     comissaoAtiva: ativas.reduce((t, a) => t + (comissao(a) ?? 0), 0),
-    porSeguradora: [...seg].map(([seguradora, v]) => ({ seguradora, ...v })).sort((a, b) => b.quantidade - a.quantidade),
-    porRamo: [...ramo].map(([r, quantidade]) => ({ ramo: r, quantidade })).sort((a, b) => b.quantidade - a.quantidade),
+    porSeguradora: [...seg]
+      .map(([seguradora, v]) => ({ seguradora, ...v }))
+      .sort((a, b) => b.quantidade - a.quantidade),
+    porRamo: [...ramo]
+      .map(([r, quantidade]) => ({ ramo: r, quantidade }))
+      .sort((a, b) => b.quantidade - a.quantidade),
   };
 }

@@ -60,8 +60,20 @@ describe('apólice', () => {
   it('resume a carteira ativa', () => {
     const r = resumirCarteira(
       [
-        apolice({ seguradora: 'porto', premioLiquido: 100000, premioTotal: 107380, comissaoPercentual: 20, fimVigencia: '2026-11-10' }),
-        apolice({ seguradora: 'porto', ramo: 'vida', premioLiquido: 50000, comissaoPercentual: 10, fimVigencia: '2027-08-01' }),
+        apolice({
+          seguradora: 'porto',
+          premioLiquido: 100000,
+          premioTotal: 107380,
+          comissaoPercentual: 20,
+          fimVigencia: '2026-11-10',
+        }),
+        apolice({
+          seguradora: 'porto',
+          ramo: 'vida',
+          premioLiquido: 50000,
+          comissaoPercentual: 10,
+          fimVigencia: '2027-08-01',
+        }),
         apolice({ seguradora: 'hdi', premioLiquido: 80000, fimVigencia: '2026-12-15' }),
         apolice({ seguradora: 'hdi', fimVigencia: '2026-01-01' }),
         apolice({ seguradora: 'hdi', cancelada: true }),
@@ -74,6 +86,9 @@ describe('apólice', () => {
     expect(r.premioAtivo).toBe(107380 + 50000 + 80000);
     expect(r.comissaoAtiva).toBe(20000 + 5000);
     expect(r.porSeguradora[0]).toEqual({ seguradora: 'porto', quantidade: 2, premio: 157380 });
-    expect(r.porRamo).toEqual([{ ramo: 'auto', quantidade: 2 }, { ramo: 'vida', quantidade: 1 }]);
+    expect(r.porRamo).toEqual([
+      { ramo: 'auto', quantidade: 2 },
+      { ramo: 'vida', quantidade: 1 },
+    ]);
   });
 });

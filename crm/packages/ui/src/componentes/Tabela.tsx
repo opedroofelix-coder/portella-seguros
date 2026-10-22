@@ -25,7 +25,15 @@ export interface TabelaProps<T> {
 }
 
 /** Tabela no desktop e lista de cartões no celular, com paginação simples. */
-export function Tabela<T>({ itens, colunas, chave, rotulo, aoClicar, porPagina = 25, vazio }: TabelaProps<T>) {
+export function Tabela<T>({
+  itens,
+  colunas,
+  chave,
+  rotulo,
+  aoClicar,
+  porPagina = 25,
+  vazio,
+}: TabelaProps<T>) {
   const [pagina, setPagina] = useState(0);
   const totalPaginas = Math.max(1, Math.ceil(itens.length / porPagina));
 
@@ -49,7 +57,9 @@ export function Tabela<T>({ itens, colunas, chave, rotulo, aoClicar, porPagina =
         <thead>
           <tr>
             {colunas.map((c) => (
-              <th key={c.chave} scope="col" className={c.alinharDireita ? styles.direita : undefined}>{c.titulo}</th>
+              <th key={c.chave} scope="col" className={c.alinharDireita ? styles.direita : undefined}>
+                {c.titulo}
+              </th>
             ))}
           </tr>
         </thead>
@@ -66,9 +76,15 @@ export function Tabela<T>({ itens, colunas, chave, rotulo, aoClicar, porPagina =
                 <td
                   key={c.chave}
                   data-rotulo={c.titulo}
-                  className={[c.principal && styles.principal, c.ocultarNoMobile && styles.ocultarMobile, c.alinharDireita && styles.direita]
-                    .filter(Boolean)
-                    .join(' ') || undefined}
+                  className={
+                    [
+                      c.principal && styles.principal,
+                      c.ocultarNoMobile && styles.ocultarMobile,
+                      c.alinharDireita && styles.direita,
+                    ]
+                      .filter(Boolean)
+                      .join(' ') || undefined
+                  }
                 >
                   {c.render(item)}
                 </td>
@@ -83,10 +99,20 @@ export function Tabela<T>({ itens, colunas, chave, rotulo, aoClicar, porPagina =
             {pagina * porPagina + 1}–{Math.min(itens.length, (pagina + 1) * porPagina)} de {itens.length}
           </span>
           <div>
-            <Botao variante="secundario" pequeno disabled={pagina === 0} onClick={() => setPagina((p) => p - 1)}>
+            <Botao
+              variante="secundario"
+              pequeno
+              disabled={pagina === 0}
+              onClick={() => setPagina((p) => p - 1)}
+            >
               Anterior
             </Botao>
-            <Botao variante="secundario" pequeno disabled={pagina >= totalPaginas - 1} onClick={() => setPagina((p) => p + 1)}>
+            <Botao
+              variante="secundario"
+              pequeno
+              disabled={pagina >= totalPaginas - 1}
+              onClick={() => setPagina((p) => p + 1)}
+            >
               Próxima
             </Botao>
           </div>

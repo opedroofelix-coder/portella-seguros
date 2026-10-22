@@ -10,7 +10,19 @@ import {
   ROTULO_ETAPA,
   somenteDigitos,
 } from '@portella/core';
-import { AreaTexto, Botao, CabecalhoPagina, Campo, Carregando, Entrada, Indicador, Modal, Quadro, Selecao, useAvisos } from '@portella/ui';
+import {
+  AreaTexto,
+  Botao,
+  CabecalhoPagina,
+  Campo,
+  Carregando,
+  Entrada,
+  Indicador,
+  Modal,
+  Quadro,
+  Selecao,
+  useAvisos,
+} from '@portella/ui';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -32,7 +44,9 @@ export function PaginaFunil() {
   const colunas = ETAPAS.map((etapa) => ({
     id: etapa,
     titulo: ROTULO_ETAPA[etapa],
-    itens: (data ?? []).filter((o) => o.etapa === etapa).sort((a, b) => b.atualizadoEm.localeCompare(a.atualizadoEm)),
+    itens: (data ?? [])
+      .filter((o) => o.etapa === etapa)
+      .sort((a, b) => b.atualizadoEm.localeCompare(a.atualizadoEm)),
   }));
 
   return (
@@ -40,7 +54,11 @@ export function PaginaFunil() {
       <CabecalhoPagina
         titulo={nomeFunil}
         descricao="Acompanhe cada negociação do primeiro contato ao fechamento."
-        acoes={<Botao icone="mais" onClick={() => setEditando('nova')}>Nova oportunidade</Botao>}
+        acoes={
+          <Botao icone="mais" onClick={() => setEditando('nova')}>
+            Nova oportunidade
+          </Botao>
+        }
       />
       <div className="grade-4" style={{ marginBottom: 20 }}>
         <Indicador rotulo="Em aberto" valor={resumo.emAberto} />
@@ -55,14 +73,30 @@ export function PaginaFunil() {
       {isPending ? (
         <Carregando />
       ) : (
-        <Quadro rotulo={nomeFunil} colunas={colunas} chave={(o) => o.id} renderItem={(o) => <CartaoOportunidade oportunidade={o} aoAbrir={() => setEditando(o)} />} />
+        <Quadro
+          rotulo={nomeFunil}
+          colunas={colunas}
+          chave={(o) => o.id}
+          renderItem={(o) => <CartaoOportunidade oportunidade={o} aoAbrir={() => setEditando(o)} />}
+        />
       )}
-      {editando && <FormularioOportunidade oportunidade={editando === 'nova' ? undefined : editando} aoFechar={() => setEditando(null)} />}
+      {editando && (
+        <FormularioOportunidade
+          oportunidade={editando === 'nova' ? undefined : editando}
+          aoFechar={() => setEditando(null)}
+        />
+      )}
     </>
   );
 }
 
-function CartaoOportunidade({ oportunidade: o, aoAbrir }: { oportunidade: Oportunidade; aoAbrir: () => void }) {
+function CartaoOportunidade({
+  oportunidade: o,
+  aoAbrir,
+}: {
+  oportunidade: Oportunidade;
+  aoAbrir: () => void;
+}) {
   const { oportunidades } = useServicos();
   const { pode } = useSessao();
   const { nomeDe } = useEquipe();
@@ -71,7 +105,13 @@ function CartaoOportunidade({ oportunidade: o, aoAbrir }: { oportunidade: Oportu
   const editavel = pode('registro:editar', o);
 
   const mover = (etapa: Etapa) =>
-    salvar.mutate({ ...o, etapa }, { onSuccess: () => avisar(`Movido para "${ROTULO_ETAPA[etapa]}".`), onError: (e) => avisar(mensagemErro(e), 'erro') });
+    salvar.mutate(
+      { ...o, etapa },
+      {
+        onSuccess: () => avisar(`Movido para "${ROTULO_ETAPA[etapa]}".`),
+        onError: (e) => avisar(mensagemErro(e), 'erro'),
+      },
+    );
 
   return (
     <article className={styles.cartao}>
@@ -84,11 +124,26 @@ function CartaoOportunidade({ oportunidade: o, aoAbrir }: { oportunidade: Oportu
       </div>
       <div className={styles.acoes}>
         {editavel && (
-          <Selecao aria-label={`Etapa de ${o.nomeContato}`} value={o.etapa} onChange={(e) => mover(e.target.value as Etapa)} disabled={salvar.isPending}>
-            {ETAPAS.map((e) => <option key={e} value={e}>{ROTULO_ETAPA[e]}</option>)}
+          <Selecao
+            aria-label={`Etapa de ${o.nomeContato}`}
+            value={o.etapa}
+            onChange={(e) => mover(e.target.value as Etapa)}
+            disabled={salvar.isPending}
+          >
+            {ETAPAS.map((e) => (
+              <option key={e} value={e}>
+                {ROTULO_ETAPA[e]}
+              </option>
+            ))}
           </Selecao>
         )}
-        <Botao variante="secundario" pequeno soIcone icone="editar" onClick={aoAbrir}>{`Abrir ${o.nomeContato}`}</Botao>
+        <Botao
+          variante="secundario"
+          pequeno
+          soIcone
+          icone="editar"
+          onClick={aoAbrir}
+        >{`Abrir ${o.nomeContato}`}</Botao>
       </div>
     </article>
   );
@@ -107,7 +162,13 @@ const esquema = z.object({
 });
 type Valores = z.infer<typeof esquema>;
 
-function FormularioOportunidade({ oportunidade, aoFechar }: { oportunidade?: Oportunidade; aoFechar: () => void }) {
+function FormularioOportunidade({
+  oportunidade,
+  aoFechar,
+}: {
+  oportunidade?: Oportunidade;
+  aoFechar: () => void;
+}) {
   const usuario = useUsuario();
   const { oportunidades } = useServicos();
   const { produtos } = useConfig();
@@ -160,35 +221,68 @@ function FormularioOportunidade({ oportunidade, aoFechar }: { oportunidade?: Opo
             <Botao
               variante="perigo"
               carregando={remover.isPending}
-              onClick={() => remover.mutate(oportunidade.id, { onSuccess: () => { avisar('Oportunidade removida.'); aoFechar(); } })}
+              onClick={() =>
+                remover.mutate(oportunidade.id, {
+                  onSuccess: () => {
+                    avisar('Oportunidade removida.');
+                    aoFechar();
+                  },
+                })
+              }
             >
               Remover
             </Botao>
           )}
-          <Botao variante="secundario" onClick={aoFechar}>{somenteLeitura ? 'Fechar' : 'Cancelar'}</Botao>
-          {!somenteLeitura && <Botao type="submit" form="form-oportunidade" carregando={formState.isSubmitting}>Salvar</Botao>}
+          <Botao variante="secundario" onClick={aoFechar}>
+            {somenteLeitura ? 'Fechar' : 'Cancelar'}
+          </Botao>
+          {!somenteLeitura && (
+            <Botao type="submit" form="form-oportunidade" carregando={formState.isSubmitting}>
+              Salvar
+            </Botao>
+          )}
         </>
       }
     >
       <form id="form-oportunidade" onSubmit={enviar} noValidate>
         <fieldset disabled={somenteLeitura} className="grade-2" style={{ border: 0, padding: 0, margin: 0 }}>
-          <Campo rotulo="Contato" obrigatorio erro={erros.nomeContato?.message}><Entrada {...register('nomeContato')} /></Campo>
-          <Campo rotulo="Telefone"><Entrada type="tel" inputMode="tel" {...register('telefone')} /></Campo>
-          <Campo rotulo="E-mail"><Entrada type="email" {...register('email')} /></Campo>
+          <Campo rotulo="Contato" obrigatorio erro={erros.nomeContato?.message}>
+            <Entrada {...register('nomeContato')} />
+          </Campo>
+          <Campo rotulo="Telefone">
+            <Entrada type="tel" inputMode="tel" {...register('telefone')} />
+          </Campo>
+          <Campo rotulo="E-mail">
+            <Entrada type="email" {...register('email')} />
+          </Campo>
           <Campo rotulo="Produto" obrigatorio erro={erros.produto?.message}>
             <Selecao {...register('produto')}>
-              {[...new Set([...produtos, oportunidade?.produto].filter(Boolean) as string[])].map((p) => <option key={p}>{p}</option>)}
+              {[...new Set([...produtos, oportunidade?.produto].filter(Boolean) as string[])].map((p) => (
+                <option key={p}>{p}</option>
+              ))}
             </Selecao>
           </Campo>
           <Campo rotulo="Etapa">
             <Selecao {...register('etapa')}>
-              {ETAPAS.map((e) => <option key={e} value={e}>{ROTULO_ETAPA[e]}</option>)}
+              {ETAPAS.map((e) => (
+                <option key={e} value={e}>
+                  {ROTULO_ETAPA[e]}
+                </option>
+              ))}
             </Selecao>
           </Campo>
-          <Campo rotulo="Valor estimado (R$)" erro={erros.valorEstimado?.message}><Entrada inputMode="decimal" placeholder="0,00" {...register('valorEstimado')} /></Campo>
-          {watch('etapa') === 'perdido' && <Campo rotulo="Motivo da perda" className="span-todo"><Entrada {...register('motivoPerda')} /></Campo>}
+          <Campo rotulo="Valor estimado (R$)" erro={erros.valorEstimado?.message}>
+            <Entrada inputMode="decimal" placeholder="0,00" {...register('valorEstimado')} />
+          </Campo>
+          {watch('etapa') === 'perdido' && (
+            <Campo rotulo="Motivo da perda" className="span-todo">
+              <Entrada {...register('motivoPerda')} />
+            </Campo>
+          )}
           <SeletorResponsavel {...register('responsavelId')} />
-          <Campo rotulo="Observações" className="span-todo"><AreaTexto {...register('observacoes')} /></Campo>
+          <Campo rotulo="Observações" className="span-todo">
+            <AreaTexto {...register('observacoes')} />
+          </Campo>
         </fieldset>
       </form>
     </Modal>

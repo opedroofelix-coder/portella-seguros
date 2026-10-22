@@ -26,7 +26,9 @@ export interface Cliente extends Registro {
   observacoes?: string;
 }
 
-export function validarCliente(c: Pick<Cliente, 'nome' | 'tipoPessoa' | 'documento' | 'email' | 'telefone'>): void {
+export function validarCliente(
+  c: Pick<Cliente, 'nome' | 'tipoPessoa' | 'documento' | 'email' | 'telefone'>,
+): void {
   const campos: Record<string, string> = {};
   if (c.nome.trim().length < 2) campos.nome = 'Informe o nome.';
   if (c.documento && somenteDigitos(c.documento)) {
@@ -47,11 +49,7 @@ export function textoBusca(...partes: Array<string | undefined>): string {
 }
 
 export function normalizar(texto: string): string {
-  return texto
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .trim();
+  return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
 
 export function corresponde(busca: string, ...partes: Array<string | undefined>): boolean {

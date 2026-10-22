@@ -11,7 +11,12 @@ describe('cliente', () => {
       expect.unreachable();
     } catch (e) {
       expect(e).toBeInstanceOf(ErroValidacao);
-      expect(Object.keys((e as ErroValidacao).campos).sort()).toEqual(['documento', 'email', 'nome', 'telefone']);
+      expect(Object.keys((e as ErroValidacao).campos).sort()).toEqual([
+        'documento',
+        'email',
+        'nome',
+        'telefone',
+      ]);
     }
   });
 

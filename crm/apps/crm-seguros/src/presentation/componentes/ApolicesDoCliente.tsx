@@ -10,12 +10,16 @@ import { TabelaApolices } from './TabelaApolices';
 export function ApolicesDoCliente({ cliente }: { cliente: Cliente }) {
   const { data = [] } = useApolices();
   const [editando, setEditando] = useState<Apolice | 'nova' | null>(null);
-  const doCliente = data.filter((a) => a.clienteId === cliente.id).sort((a, b) => b.fimVigencia.localeCompare(a.fimVigencia));
+  const doCliente = data
+    .filter((a) => a.clienteId === cliente.id)
+    .sort((a, b) => b.fimVigencia.localeCompare(a.fimVigencia));
 
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <Botao pequeno icone="mais" onClick={() => setEditando('nova')}>Nova apólice</Botao>
+        <Botao pequeno icone="mais" onClick={() => setEditando('nova')}>
+          Nova apólice
+        </Botao>
       </div>
       <TabelaApolices
         apolices={doCliente}

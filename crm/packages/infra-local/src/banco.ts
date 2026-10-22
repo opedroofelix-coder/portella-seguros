@@ -16,7 +16,8 @@ export class BancoLocal {
     const todas = [COLECAO_USUARIOS, COLECAO_CREDENCIAIS, ...colecoes];
     const db = await openDB(nome, versao, {
       upgrade(banco) {
-        for (const c of todas) if (!banco.objectStoreNames.contains(c)) banco.createObjectStore(c, { keyPath: 'id' });
+        for (const c of todas)
+          if (!banco.objectStoreNames.contains(c)) banco.createObjectStore(c, { keyPath: 'id' });
       },
     });
     return new BancoLocal(db);

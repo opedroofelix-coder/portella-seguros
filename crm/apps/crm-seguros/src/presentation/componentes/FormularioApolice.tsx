@@ -1,7 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { aplicarErros, limparVazios, mensagemErro, SeletorResponsavel, useColecao, useSalvar, useUsuario } from '@portella/app-base';
+import {
+  aplicarErros,
+  limparVazios,
+  mensagemErro,
+  SeletorResponsavel,
+  useColecao,
+  useSalvar,
+  useUsuario,
+} from '@portella/app-base';
 import type { DadosRegistro } from '@portella/core';
-import { centavosParaTexto, corresponde, hojeISO, normalizar, paraCentavos, somarMeses } from '@portella/core';
+import {
+  centavosParaTexto,
+  corresponde,
+  hojeISO,
+  normalizar,
+  paraCentavos,
+  somarMeses,
+} from '@portella/core';
 import { AreaTexto, Botao, Campo, Entrada, Modal, Selecao, useAvisos } from '@portella/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -70,7 +85,8 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
       fimVigencia: base.fimVigencia ?? somarMeses(hoje, 12),
       premioLiquido: centavosParaTexto(base.premioLiquido),
       premioTotal: centavosParaTexto(base.premioTotal),
-      comissaoPercentual: base.comissaoPercentual == null ? '' : String(base.comissaoPercentual).replace('.', ','),
+      comissaoPercentual:
+        base.comissaoPercentual == null ? '' : String(base.comissaoPercentual).replace('.', ','),
       formaPagamento: base.formaPagamento ?? '',
       renovacao: base.renovacao ?? 'pendente',
       cancelada: base.cancelada ?? false,
@@ -124,15 +140,24 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
       aoFechar={aoFechar}
       rodape={
         <>
-          <Botao variante="secundario" onClick={aoFechar}>Cancelar</Botao>
-          <Botao type="submit" form="form-apolice" carregando={formState.isSubmitting}>{renovando ? 'Registrar renovação' : 'Salvar'}</Botao>
+          <Botao variante="secundario" onClick={aoFechar}>
+            Cancelar
+          </Botao>
+          <Botao type="submit" form="form-apolice" carregando={formState.isSubmitting}>
+            {renovando ? 'Registrar renovação' : 'Salvar'}
+          </Botao>
         </>
       }
     >
       <form id="form-apolice" className="grade-2" onSubmit={enviar} noValidate>
         {!clienteFixo && listaClientes.length > 30 && (
           <Campo rotulo="Filtrar clientes">
-            <Entrada type="search" placeholder="Nome ou CPF" value={filtroCliente} onChange={(e) => setFiltroCliente(e.target.value)} />
+            <Entrada
+              type="search"
+              placeholder="Nome ou CPF"
+              value={filtroCliente}
+              onChange={(e) => setFiltroCliente(e.target.value)}
+            />
           </Campo>
         )}
         {clienteFixo ? (
@@ -143,34 +168,72 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
           <Campo rotulo="Cliente" obrigatorio erro={erros.clienteId?.message}>
             <Selecao {...register('clienteId')}>
               <option value="">Escolha…</option>
-              {opcoesClientes.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+              {opcoesClientes.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nome}
+                </option>
+              ))}
             </Selecao>
           </Campo>
         )}
         <Campo rotulo="Seguradora" obrigatorio erro={erros.seguradora?.message}>
           <Selecao {...register('seguradora')}>
             <option value="">Escolha…</option>
-            {SEGURADORAS.map((s) => <option key={s.id} value={s.id}>{s.nome}</option>)}
+            {SEGURADORAS.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nome}
+              </option>
+            ))}
             <option value={OUTRA}>Outra…</option>
           </Selecao>
         </Campo>
         {watch('seguradora') === OUTRA && (
-          <Campo rotulo="Nome da seguradora" obrigatorio><Entrada {...register('outraSeguradora')} /></Campo>
+          <Campo rotulo="Nome da seguradora" obrigatorio>
+            <Entrada {...register('outraSeguradora')} />
+          </Campo>
         )}
         <Campo rotulo="Ramo" obrigatorio>
-          <Selecao {...register('ramo')}>{RAMOS.map((r) => <option key={r.id} value={r.id}>{r.nome}</option>)}</Selecao>
+          <Selecao {...register('ramo')}>
+            {RAMOS.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.nome}
+              </option>
+            ))}
+          </Selecao>
         </Campo>
-        <Campo rotulo="Nº da apólice"><Entrada {...register('numero')} /></Campo>
-        <Campo rotulo="Bem segurado" dica="Placa e modelo, endereço do imóvel…"><Entrada {...register('item')} /></Campo>
-        <Campo rotulo="Início da vigência" obrigatorio erro={erros.inicioVigencia?.message}><Entrada type="date" {...register('inicioVigencia')} /></Campo>
-        <Campo rotulo="Fim da vigência" obrigatorio erro={erros.fimVigencia?.message}><Entrada type="date" {...register('fimVigencia')} /></Campo>
-        <Campo rotulo="Prêmio líquido (R$)" erro={erros.premioLiquido?.message}><Entrada inputMode="decimal" placeholder="0,00" {...register('premioLiquido')} /></Campo>
-        <Campo rotulo="Prêmio total (R$)" erro={erros.premioTotal?.message}><Entrada inputMode="decimal" placeholder="0,00" {...register('premioTotal')} /></Campo>
-        <Campo rotulo="Comissão (%)" erro={erros.comissaoPercentual?.message}><Entrada inputMode="decimal" placeholder="Ex.: 15" {...register('comissaoPercentual')} /></Campo>
-        <Campo rotulo="Forma de pagamento"><Entrada placeholder="Ex.: 10x no cartão" {...register('formaPagamento')} /></Campo>
+        <Campo rotulo="Nº da apólice">
+          <Entrada {...register('numero')} />
+        </Campo>
+        <Campo rotulo="Bem segurado" dica="Placa e modelo, endereço do imóvel…">
+          <Entrada {...register('item')} />
+        </Campo>
+        <Campo rotulo="Início da vigência" obrigatorio erro={erros.inicioVigencia?.message}>
+          <Entrada type="date" {...register('inicioVigencia')} />
+        </Campo>
+        <Campo rotulo="Fim da vigência" obrigatorio erro={erros.fimVigencia?.message}>
+          <Entrada type="date" {...register('fimVigencia')} />
+        </Campo>
+        <Campo rotulo="Prêmio líquido (R$)" erro={erros.premioLiquido?.message}>
+          <Entrada inputMode="decimal" placeholder="0,00" {...register('premioLiquido')} />
+        </Campo>
+        <Campo rotulo="Prêmio total (R$)" erro={erros.premioTotal?.message}>
+          <Entrada inputMode="decimal" placeholder="0,00" {...register('premioTotal')} />
+        </Campo>
+        <Campo rotulo="Comissão (%)" erro={erros.comissaoPercentual?.message}>
+          <Entrada inputMode="decimal" placeholder="Ex.: 15" {...register('comissaoPercentual')} />
+        </Campo>
+        <Campo rotulo="Forma de pagamento">
+          <Entrada placeholder="Ex.: 10x no cartão" {...register('formaPagamento')} />
+        </Campo>
         {!renovando && (
           <Campo rotulo="Renovação">
-            <Selecao {...register('renovacao')}>{STATUS_RENOVACAO.map((s) => <option key={s} value={s}>{ROTULO_RENOVACAO[s]}</option>)}</Selecao>
+            <Selecao {...register('renovacao')}>
+              {STATUS_RENOVACAO.map((s) => (
+                <option key={s} value={s}>
+                  {ROTULO_RENOVACAO[s]}
+                </option>
+              ))}
+            </Selecao>
           </Campo>
         )}
         {apolice && (
@@ -182,7 +245,9 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
           </Campo>
         )}
         <SeletorResponsavel {...register('responsavelId')} />
-        <Campo rotulo="Observações" className="span-todo"><AreaTexto {...register('observacoes')} /></Campo>
+        <Campo rotulo="Observações" className="span-todo">
+          <AreaTexto {...register('observacoes')} />
+        </Campo>
       </form>
     </Modal>
   );

@@ -52,12 +52,20 @@ function Pagina() {
       ]}
     >
       <CabecalhoPagina
-        titulo={<>Catálogo de <em>componentes</em></>}
+        titulo={
+          <>
+            Catálogo de <em>componentes</em>
+          </>
+        }
         descricao="Todos os componentes do CRM numa página."
         acoes={
           <>
-            <Botao variante="secundario" icone="importar">Importar</Botao>
-            <Botao icone="mais" onClick={() => setModal(true)}>Novo cliente</Botao>
+            <Botao variante="secundario" icone="importar">
+              Importar
+            </Botao>
+            <Botao icone="mais" onClick={() => setModal(true)}>
+              Novo cliente
+            </Botao>
           </>
         }
       />
@@ -87,18 +95,42 @@ function Pagina() {
         </Cartao>
         <Cartao titulo="Filtros e formulário">
           <BarraFiltros>
-            <Campo rotulo="Buscar"><Entrada type="search" placeholder="Nome, CPF ou telefone" /></Campo>
-            <Campo rotulo="Seguradora"><Selecao><option>Todas</option></Selecao></Campo>
-            <Campo rotulo="Situação"><Selecao><option>Todas</option></Selecao></Campo>
+            <Campo rotulo="Buscar">
+              <Entrada type="search" placeholder="Nome, CPF ou telefone" />
+            </Campo>
+            <Campo rotulo="Seguradora">
+              <Selecao>
+                <option>Todas</option>
+              </Selecao>
+            </Campo>
+            <Campo rotulo="Situação">
+              <Selecao>
+                <option>Todas</option>
+              </Selecao>
+            </Campo>
           </BarraFiltros>
           <div className="grade-2">
-            <Campo rotulo="Nome" obrigatorio><Entrada defaultValue="Maria Aparecida" /></Campo>
-            <Campo rotulo="CPF" erro="CPF inválido."><Entrada defaultValue="123.456.789-00" /></Campo>
-            <Campo rotulo="Observações" dica="Visível para toda a equipe" className="span-todo"><AreaTexto /></Campo>
+            <Campo rotulo="Nome" obrigatorio>
+              <Entrada defaultValue="Maria Aparecida" />
+            </Campo>
+            <Campo rotulo="CPF" erro="CPF inválido.">
+              <Entrada defaultValue="123.456.789-00" />
+            </Campo>
+            <Campo rotulo="Observações" dica="Visível para toda a equipe" className="span-todo">
+              <AreaTexto />
+            </Campo>
           </div>
         </Cartao>
         <Cartao>
-          <Abas rotulo="Ficha" ativa={aba} aoTrocar={setAba} abas={[{ id: 'dados', rotulo: 'Dados' }, { id: 'apolices', rotulo: 'Apólices' }]} />
+          <Abas
+            rotulo="Ficha"
+            ativa={aba}
+            aoTrocar={setAba}
+            abas={[
+              { id: 'dados', rotulo: 'Dados' },
+              { id: 'apolices', rotulo: 'Apólices' },
+            ]}
+          />
           <Tabela
             rotulo="Clientes"
             itens={clientes}
@@ -130,11 +162,22 @@ function Pagina() {
         aberto={modal}
         titulo="Novo cliente"
         aoFechar={() => setModal(false)}
-        rodape={<><Botao variante="secundario" onClick={() => setModal(false)}>Cancelar</Botao><Botao>Salvar</Botao></>}
+        rodape={
+          <>
+            <Botao variante="secundario" onClick={() => setModal(false)}>
+              Cancelar
+            </Botao>
+            <Botao>Salvar</Botao>
+          </>
+        }
       >
         <div className="grade-2">
-          <Campo rotulo="Nome" obrigatorio><Entrada /></Campo>
-          <Campo rotulo="Telefone"><Entrada /></Campo>
+          <Campo rotulo="Nome" obrigatorio>
+            <Entrada />
+          </Campo>
+          <Campo rotulo="Telefone">
+            <Entrada />
+          </Campo>
         </div>
       </Modal>
     </Estrutura>

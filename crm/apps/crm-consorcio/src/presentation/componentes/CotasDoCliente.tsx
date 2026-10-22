@@ -13,10 +13,23 @@ export function CotasDoCliente({ cliente }: { cliente: Cliente }) {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <Botao pequeno icone="mais" onClick={() => setEditando('nova')}>Nova cota</Botao>
+        <Botao pequeno icone="mais" onClick={() => setEditando('nova')}>
+          Nova cota
+        </Botao>
       </div>
-      <TabelaCotas cotas={doCliente} mostrarCliente={false} aoClicar={setEditando} vazio={<EstadoVazio titulo="Nenhuma cota">Cadastre a primeira cota deste cliente.</EstadoVazio>} />
-      {editando && <FormularioCota cota={editando === 'nova' ? undefined : editando} clienteId={cliente.id} aoFechar={() => setEditando(null)} />}
+      <TabelaCotas
+        cotas={doCliente}
+        mostrarCliente={false}
+        aoClicar={setEditando}
+        vazio={<EstadoVazio titulo="Nenhuma cota">Cadastre a primeira cota deste cliente.</EstadoVazio>}
+      />
+      {editando && (
+        <FormularioCota
+          cota={editando === 'nova' ? undefined : editando}
+          clienteId={cliente.id}
+          aoFechar={() => setEditando(null)}
+        />
+      )}
     </>
   );
 }

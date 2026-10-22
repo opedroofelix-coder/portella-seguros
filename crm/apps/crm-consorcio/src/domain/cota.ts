@@ -47,12 +47,14 @@ export function validarCota(c: Partial<Cota>): void {
   if (!c.grupo?.trim()) campos.grupo = 'Informe o grupo.';
   if (!c.cota?.trim()) campos.cota = 'Informe a cota.';
   if (!c.valorCredito || c.valorCredito <= 0) campos.valorCredito = 'Informe o crédito.';
-  if (!c.prazoMeses || c.prazoMeses <= 0 || !Number.isInteger(c.prazoMeses)) campos.prazoMeses = 'Prazo inválido.';
+  if (!c.prazoMeses || c.prazoMeses <= 0 || !Number.isInteger(c.prazoMeses))
+    campos.prazoMeses = 'Prazo inválido.';
   if (!c.dataAdesao || !dataValida(c.dataAdesao)) campos.dataAdesao = 'Data inválida.';
   if (c.parcelasPagas != null && (c.parcelasPagas < 0 || (c.prazoMeses && c.parcelasPagas > c.prazoMeses))) {
     campos.parcelasPagas = 'Não pode passar do prazo.';
   }
-  if (c.status === 'contemplada' && !c.contemplacao) campos.contemplacao = 'Informe a data e a forma da contemplação.';
+  if (c.status === 'contemplada' && !c.contemplacao)
+    campos.contemplacao = 'Informe a data e a forma da contemplação.';
   if (Object.keys(campos).length) throw new ErroValidacao('Confira os dados da cota.', campos);
 }
 
@@ -92,7 +94,11 @@ export function resumirCotas(cotas: Cota[]): ResumoCotas {
     contempladas: contempladas.length,
     creditoAtivo: soma(ativas),
     creditoContemplado: soma(contempladas),
-    porAdministradora: [...adm].map(([administradora, v]) => ({ administradora, ...v })).sort((a, b) => b.quantidade - a.quantidade),
-    porTipo: [...tipo].map(([t, quantidade]) => ({ tipo: t, quantidade })).sort((a, b) => b.quantidade - a.quantidade),
+    porAdministradora: [...adm]
+      .map(([administradora, v]) => ({ administradora, ...v }))
+      .sort((a, b) => b.quantidade - a.quantidade),
+    porTipo: [...tipo]
+      .map(([t, quantidade]) => ({ tipo: t, quantidade }))
+      .sort((a, b) => b.quantidade - a.quantidade),
   };
 }

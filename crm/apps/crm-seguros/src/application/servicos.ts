@@ -9,6 +9,11 @@ export interface ServicosSeguros extends ServicosBase {
   apolices: ServicoCarteira<Apolice>;
 }
 
-export function montarServicos(repos: RepositoriosBase & { apolices: Repositorio<Apolice> }): ServicosSeguros {
-  return { ...montarServicosBase(repos), apolices: new ServicoCarteira<Apolice>(repos.apolices, validarApolice) };
+export function montarServicos(
+  repos: RepositoriosBase & { apolices: Repositorio<Apolice> },
+): ServicosSeguros {
+  return {
+    ...montarServicosBase(repos),
+    apolices: new ServicoCarteira<Apolice>(repos.apolices, validarApolice),
+  };
 }

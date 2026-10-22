@@ -32,7 +32,10 @@ export function useRemover<T extends Registro>(chave: string, servico: ServicoCa
 export function useEquipe() {
   const { usuarios } = useServicos();
   const consulta = useQuery({ queryKey: ['usuarios'], queryFn: () => usuarios.listar() });
-  const nomes = useMemo(() => new Map((consulta.data ?? []).map((u: Usuario) => [u.id, u.nome])), [consulta.data]);
+  const nomes = useMemo(
+    () => new Map((consulta.data ?? []).map((u: Usuario) => [u.id, u.nome])),
+    [consulta.data],
+  );
   return { ...consulta, equipe: consulta.data ?? [], nomeDe: (id: string) => nomes.get(id) ?? '—' };
 }
 

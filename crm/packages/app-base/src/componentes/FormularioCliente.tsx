@@ -15,7 +15,10 @@ const esquema = z.object({
   nome: z.string().trim().min(2, 'Informe o nome.'),
   documento: z.string(),
   telefone: z.string(),
-  email: z.string().trim().refine((v) => !v || z.string().email().safeParse(v).success, 'E-mail inválido.'),
+  email: z
+    .string()
+    .trim()
+    .refine((v) => !v || z.string().email().safeParse(v).success, 'E-mail inválido.'),
   dataNascimento: z.string(),
   cep: z.string(),
   logradouro: z.string(),
@@ -71,7 +74,15 @@ export function FormularioCliente({
 
   const enviar = handleSubmit(async (v) => {
     const { cep, logradouro, numero, complemento, bairro, cidade, uf, ...resto } = limparVazios(v);
-    const endereco = limparVazios({ cep, logradouro, numero, complemento, bairro, cidade, uf: uf?.toUpperCase() });
+    const endereco = limparVazios({
+      cep,
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      uf: uf?.toUpperCase(),
+    });
     try {
       const salvo = await salvar.mutateAsync({
         ...(cliente ?? {}),
@@ -98,8 +109,12 @@ export function FormularioCliente({
       aoFechar={aoFechar}
       rodape={
         <>
-          <Botao variante="secundario" onClick={aoFechar}>Cancelar</Botao>
-          <Botao type="submit" form="form-cliente" carregando={formState.isSubmitting}>Salvar</Botao>
+          <Botao variante="secundario" onClick={aoFechar}>
+            Cancelar
+          </Botao>
+          <Botao type="submit" form="form-cliente" carregando={formState.isSubmitting}>
+            Salvar
+          </Botao>
         </>
       }
     >
@@ -110,7 +125,11 @@ export function FormularioCliente({
             <option value="PJ">Pessoa jurídica</option>
           </Selecao>
         </Campo>
-        <Campo rotulo={tipo === 'PF' ? 'Nome completo' : 'Razão social'} obrigatorio erro={erros.nome?.message}>
+        <Campo
+          rotulo={tipo === 'PF' ? 'Nome completo' : 'Razão social'}
+          obrigatorio
+          erro={erros.nome?.message}
+        >
           <Entrada autoComplete="off" {...register('nome')} />
         </Campo>
         <Campo rotulo={tipo === 'PF' ? 'CPF' : 'CNPJ'} erro={erros.documento?.message}>
@@ -127,15 +146,31 @@ export function FormularioCliente({
             <Entrada type="date" {...register('dataNascimento')} />
           </Campo>
         )}
-        <Campo rotulo="CEP"><Entrada inputMode="numeric" {...register('cep')} /></Campo>
-        <Campo rotulo="Endereço"><Entrada {...register('logradouro')} /></Campo>
-        <Campo rotulo="Número"><Entrada {...register('numero')} /></Campo>
-        <Campo rotulo="Complemento"><Entrada {...register('complemento')} /></Campo>
-        <Campo rotulo="Bairro"><Entrada {...register('bairro')} /></Campo>
-        <Campo rotulo="Cidade"><Entrada {...register('cidade')} /></Campo>
-        <Campo rotulo="UF" erro={erros.uf?.message}><Entrada maxLength={2} {...register('uf')} /></Campo>
+        <Campo rotulo="CEP">
+          <Entrada inputMode="numeric" {...register('cep')} />
+        </Campo>
+        <Campo rotulo="Endereço">
+          <Entrada {...register('logradouro')} />
+        </Campo>
+        <Campo rotulo="Número">
+          <Entrada {...register('numero')} />
+        </Campo>
+        <Campo rotulo="Complemento">
+          <Entrada {...register('complemento')} />
+        </Campo>
+        <Campo rotulo="Bairro">
+          <Entrada {...register('bairro')} />
+        </Campo>
+        <Campo rotulo="Cidade">
+          <Entrada {...register('cidade')} />
+        </Campo>
+        <Campo rotulo="UF" erro={erros.uf?.message}>
+          <Entrada maxLength={2} {...register('uf')} />
+        </Campo>
         <SeletorResponsavel {...register('responsavelId')} />
-        <Campo rotulo="Observações" className="span-todo"><AreaTexto {...register('observacoes')} /></Campo>
+        <Campo rotulo="Observações" className="span-todo">
+          <AreaTexto {...register('observacoes')} />
+        </Campo>
       </form>
     </Modal>
   );

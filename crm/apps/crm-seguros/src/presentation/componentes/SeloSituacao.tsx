@@ -11,12 +11,19 @@ export function SeloSituacao({ apolice }: { apolice: Apolice }) {
   const s = situacao(apolice, hoje);
   if (s === 'a_vencer') {
     const dias = diasEntre(hoje, apolice.fimVigencia);
-    return <Selo tom="alerta">{dias === 0 ? 'Vence hoje' : `Vence em ${dias} dia${dias > 1 ? 's' : ''}`}</Selo>;
+    return (
+      <Selo tom="alerta">{dias === 0 ? 'Vence hoje' : `Vence em ${dias} dia${dias > 1 ? 's' : ''}`}</Selo>
+    );
   }
   return <Selo tom={TOM[s]}>{ROTULO_SITUACAO[s]}</Selo>;
 }
 
-const TOM_RENOVACAO: Record<StatusRenovacao, TomSelo> = { pendente: 'neutro', em_contato: 'info', renovada: 'dourado', nao_renovada: 'perigo' };
+const TOM_RENOVACAO: Record<StatusRenovacao, TomSelo> = {
+  pendente: 'neutro',
+  em_contato: 'info',
+  renovada: 'dourado',
+  nao_renovada: 'perigo',
+};
 
 export function SeloRenovacao({ status }: { status: StatusRenovacao }) {
   return <Selo tom={TOM_RENOVACAO[status]}>{ROTULO_RENOVACAO[status]}</Selo>;

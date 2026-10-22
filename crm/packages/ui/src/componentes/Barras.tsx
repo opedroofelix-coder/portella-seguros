@@ -16,7 +16,11 @@ export function Barras({ itens, rotulo }: { itens: ItemBarra[]; rotulo: string }
       {itens.map((i) => {
         const texto = i.valorTexto ?? String(i.valor);
         return (
-          <li key={i.rotulo} className={styles.item} title={`${i.rotulo}: ${texto}${i.detalhe ? ` · ${i.detalhe}` : ''}`}>
+          <li
+            key={i.rotulo}
+            className={styles.item}
+            title={`${i.rotulo}: ${texto}${i.detalhe ? ` · ${i.detalhe}` : ''}`}
+          >
             <span className={styles.rotulo}>{i.rotulo}</span>
             <span className={styles.valor}>
               {texto}

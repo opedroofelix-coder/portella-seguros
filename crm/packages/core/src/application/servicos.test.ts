@@ -25,12 +25,16 @@ describe('usuários e autenticação', () => {
   });
 
   it('configura o administrador só no primeiro acesso', async () => {
-    const admin = await usuarios.configurarAdministrador({ nome: 'Ana', email: 'ANA@x.com ', senha: '12345678' });
+    const admin = await usuarios.configurarAdministrador({
+      nome: 'Ana',
+      email: 'ANA@x.com ',
+      senha: '12345678',
+    });
     expect(admin.perfil).toBe('admin');
     expect(admin.email).toBe('ana@x.com');
-    await expect(usuarios.configurarAdministrador({ nome: 'B', email: 'b@x.com', senha: '12345678' })).rejects.toThrow(
-      ErroValidacao,
-    );
+    await expect(
+      usuarios.configurarAdministrador({ nome: 'B', email: 'b@x.com', senha: '12345678' }),
+    ).rejects.toThrow(ErroValidacao);
   });
 
   it('entra, mantém a sessão e sai', async () => {
@@ -43,8 +47,17 @@ describe('usuários e autenticação', () => {
   });
 
   it('só administrador cria usuários; e-mail é único; senha curta é rejeitada', async () => {
-    const admin = await usuarios.configurarAdministrador({ nome: 'Ana', email: 'ana@x.com', senha: '12345678' });
-    const gestor = await usuarios.criar(admin, { nome: 'Gil', email: 'gil@x.com', perfil: 'gestor', senha: '12345678' });
+    const admin = await usuarios.configurarAdministrador({
+      nome: 'Ana',
+      email: 'ana@x.com',
+      senha: '12345678',
+    });
+    const gestor = await usuarios.criar(admin, {
+      nome: 'Gil',
+      email: 'gil@x.com',
+      perfil: 'gestor',
+      senha: '12345678',
+    });
     await expect(
       usuarios.criar(gestor, { nome: 'Cid', email: 'cid@x.com', perfil: 'corretor', senha: '12345678' }),
     ).rejects.toThrow(ErroPermissao);
@@ -57,8 +70,17 @@ describe('usuários e autenticação', () => {
   });
 
   it('usuário desativado não entra e perde a sessão', async () => {
-    const admin = await usuarios.configurarAdministrador({ nome: 'Ana', email: 'ana@x.com', senha: '12345678' });
-    const c = await usuarios.criar(admin, { nome: 'Cid', email: 'cid@x.com', perfil: 'corretor', senha: '12345678' });
+    const admin = await usuarios.configurarAdministrador({
+      nome: 'Ana',
+      email: 'ana@x.com',
+      senha: '12345678',
+    });
+    const c = await usuarios.criar(admin, {
+      nome: 'Cid',
+      email: 'cid@x.com',
+      perfil: 'corretor',
+      senha: '12345678',
+    });
     await sessao.entrar('cid@x.com', '12345678');
     await usuarios.atualizar(admin, c.id, { ativo: false });
     expect(await sessao.usuarioAtual()).toBeNull();
@@ -66,22 +88,41 @@ describe('usuários e autenticação', () => {
   });
 
   it('não permite ficar sem administrador ativo', async () => {
-    const admin = await usuarios.configurarAdministrador({ nome: 'Ana', email: 'ana@x.com', senha: '12345678' });
+    const admin = await usuarios.configurarAdministrador({
+      nome: 'Ana',
+      email: 'ana@x.com',
+      senha: '12345678',
+    });
     await expect(usuarios.atualizar(admin, admin.id, { perfil: 'gestor' })).rejects.toThrow(/administrador/);
     await expect(usuarios.atualizar(admin, admin.id, { ativo: false })).rejects.toThrow(/administrador/);
   });
 
   it('cada um troca a própria senha; só admin troca a dos outros', async () => {
-    const admin = await usuarios.configurarAdministrador({ nome: 'Ana', email: 'ana@x.com', senha: '12345678' });
-    const c = await usuarios.criar(admin, { nome: 'Cid', email: 'cid@x.com', perfil: 'corretor', senha: '12345678' });
+    const admin = await usuarios.configurarAdministrador({
+      nome: 'Ana',
+      email: 'ana@x.com',
+      senha: '12345678',
+    });
+    const c = await usuarios.criar(admin, {
+      nome: 'Cid',
+      email: 'cid@x.com',
+      perfil: 'corretor',
+      senha: '12345678',
+    });
     await usuarios.redefinirSenha(c, c.id, 'novasenha');
     await expect(sessao.entrar('cid@x.com', 'novasenha')).resolves.toBeTruthy();
     await expect(usuarios.redefinirSenha(c, admin.id, 'outrasenha')).rejects.toThrow(ErroPermissao);
   });
 
   it('troca a própria senha só com a senha atual correta', async () => {
-    const admin = await usuarios.configurarAdministrador({ nome: 'Ana', email: 'ana@x.com', senha: '12345678' });
-    await expect(usuarios.alterarPropriaSenha(admin, 'errada', 'nova-senha')).rejects.toThrow(ErroAutenticacao);
+    const admin = await usuarios.configurarAdministrador({
+      nome: 'Ana',
+      email: 'ana@x.com',
+      senha: '12345678',
+    });
+    await expect(usuarios.alterarPropriaSenha(admin, 'errada', 'nova-senha')).rejects.toThrow(
+      ErroAutenticacao,
+    );
     await usuarios.alterarPropriaSenha(admin, '12345678', 'nova-senha');
     await expect(sessao.entrar('ana@x.com', 'nova-senha')).resolves.toBeTruthy();
   });
@@ -126,7 +167,14 @@ describe('carteira', () => {
 
   it('valida antes de salvar e só admin importa', async () => {
     await expect(servico.salvar(admin, { nome: '', tipoPessoa: 'PF' })).rejects.toThrow(ErroValidacao);
-    const item: Cliente = { id: 'x', nome: 'Imp', tipoPessoa: 'PF', responsavelId: 'a', criadoEm: '', atualizadoEm: '' };
+    const item: Cliente = {
+      id: 'x',
+      nome: 'Imp',
+      tipoPessoa: 'PF',
+      responsavelId: 'a',
+      criadoEm: '',
+      atualizadoEm: '',
+    };
     await expect(servico.importar(gestor, [item])).rejects.toThrow(ErroPermissao);
     await expect(servico.importar(admin, [item])).resolves.toBe(1);
   });

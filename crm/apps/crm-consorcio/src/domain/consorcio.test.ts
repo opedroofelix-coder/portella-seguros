@@ -6,9 +6,20 @@ import { validarLance } from './lance';
 
 let n = 0;
 const cota = (p: Partial<Cota>): Cota => ({
-  id: String(++n), responsavelId: 'u', criadoEm: '', atualizadoEm: '',
-  clienteId: 'c', administradora: 'Adm Teste', grupo: '1001', cota: '12', tipoBem: 'imovel',
-  valorCredito: 30000000, prazoMeses: 200, dataAdesao: '2026-01-10', status: 'ativa', ...p,
+  id: String(++n),
+  responsavelId: 'u',
+  criadoEm: '',
+  atualizadoEm: '',
+  clienteId: 'c',
+  administradora: 'Adm Teste',
+  grupo: '1001',
+  cota: '12',
+  tipoBem: 'imovel',
+  valorCredito: 30000000,
+  prazoMeses: 200,
+  dataAdesao: '2026-01-10',
+  status: 'ativa',
+  ...p,
 });
 
 describe('cota', () => {
@@ -17,7 +28,9 @@ describe('cota', () => {
     expect(() => validarCota(cota({ valorCredito: 0 }))).toThrow(ErroValidacao);
     expect(() => validarCota(cota({ parcelasPagas: 201 }))).toThrow(ErroValidacao);
     expect(() => validarCota(cota({ status: 'contemplada' }))).toThrow(/contemplação|cota/);
-    expect(() => validarCota(cota({ status: 'contemplada', contemplacao: { data: '2026-05-01', forma: 'sorteio' } }))).not.toThrow();
+    expect(() =>
+      validarCota(cota({ status: 'contemplada', contemplacao: { data: '2026-05-01', forma: 'sorteio' } })),
+    ).not.toThrow();
   });
 
   it('calcula parcelas restantes e progresso', () => {
@@ -29,7 +42,13 @@ describe('cota', () => {
   it('resume a carteira por administradora e tipo de bem', () => {
     const r = resumirCotas([
       cota({ administradora: 'A', valorCredito: 100 }),
-      cota({ administradora: 'A', valorCredito: 200, status: 'contemplada', tipoBem: 'automovel', contemplacao: { data: '2026-01-01', forma: 'lance' } }),
+      cota({
+        administradora: 'A',
+        valorCredito: 200,
+        status: 'contemplada',
+        tipoBem: 'automovel',
+        contemplacao: { data: '2026-01-01', forma: 'lance' },
+      }),
       cota({ administradora: 'B', valorCredito: 300 }),
       cota({ administradora: 'B', status: 'cancelada' }),
     ]);
@@ -44,8 +63,26 @@ describe('cota', () => {
 
 describe('lance', () => {
   it('exige percentual ou valor', () => {
-    expect(() => validarLance({ cotaId: 'x', assembleia: '2026-11-10', tipo: 'livre', resultado: 'aguardando' })).toThrow(ErroValidacao);
-    expect(() => validarLance({ cotaId: 'x', assembleia: '2026-11-10', tipo: 'livre', percentual: 30, resultado: 'aguardando' })).not.toThrow();
-    expect(() => validarLance({ cotaId: 'x', assembleia: '2026-11-10', tipo: 'livre', percentual: 130, resultado: 'aguardando' })).toThrow();
+    expect(() =>
+      validarLance({ cotaId: 'x', assembleia: '2026-11-10', tipo: 'livre', resultado: 'aguardando' }),
+    ).toThrow(ErroValidacao);
+    expect(() =>
+      validarLance({
+        cotaId: 'x',
+        assembleia: '2026-11-10',
+        tipo: 'livre',
+        percentual: 30,
+        resultado: 'aguardando',
+      }),
+    ).not.toThrow();
+    expect(() =>
+      validarLance({
+        cotaId: 'x',
+        assembleia: '2026-11-10',
+        tipo: 'livre',
+        percentual: 130,
+        resultado: 'aguardando',
+      }),
+    ).toThrow();
   });
 });

@@ -6,7 +6,10 @@ import { idImportado } from '../domain/importacao';
 import type { Usuario } from '../domain/usuario';
 import { exigir } from './permissoes';
 
-export function lerArquivoImportacao(dados: unknown, sistema: ArquivoImportacao['sistema']): ArquivoImportacao {
+export function lerArquivoImportacao(
+  dados: unknown,
+  sistema: ArquivoImportacao['sistema'],
+): ArquivoImportacao {
   const a = dados as Partial<ArquivoImportacao> | null;
   if (!a || typeof a !== 'object' || a.versao !== 1 || !Array.isArray(a.clientes)) {
     throw new ErroValidacao('Arquivo não reconhecido. Gere-o com o importador da planilha.');
@@ -48,7 +51,14 @@ export function prepararClientes(
     const id = idImportado('cliente', c.chave);
     idPorChave.set(c.chave, id);
     const { chave: _chave, responsavel, ...dados } = c;
-    return { ...dados, tipoPessoa: c.tipoPessoa ?? 'PF', id, responsavelId: resolver(responsavel), criadoEm: agora, atualizadoEm: agora };
+    return {
+      ...dados,
+      tipoPessoa: c.tipoPessoa ?? 'PF',
+      id,
+      responsavelId: resolver(responsavel),
+      criadoEm: agora,
+      atualizadoEm: agora,
+    };
   });
   return { clientes, idPorChave };
 }

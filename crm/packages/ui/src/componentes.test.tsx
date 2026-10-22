@@ -23,12 +23,20 @@ describe('Botao', () => {
     const { rerender } = render(<Botao onClick={clique}>Salvar</Botao>);
     await userEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     expect(clique).toHaveBeenCalledTimes(1);
-    rerender(<Botao onClick={clique} carregando>Salvar</Botao>);
+    rerender(
+      <Botao onClick={clique} carregando>
+        Salvar
+      </Botao>,
+    );
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
   });
 
   it('botão só com ícone tem nome acessível', () => {
-    render(<Botao soIcone icone="fechar">Fechar</Botao>);
+    render(
+      <Botao soIcone icone="fechar">
+        Fechar
+      </Botao>,
+    );
     expect(screen.getByRole('button', { name: 'Fechar' })).toBeInTheDocument();
   });
 });
@@ -61,7 +69,9 @@ describe('Modal', () => {
         <>
           <Botao onClick={() => setAberto(true)}>Abrir</Botao>
           <Modal aberto={aberto} titulo="Novo cliente" aoFechar={() => setAberto(false)}>
-            <Campo rotulo="Nome"><Entrada /></Campo>
+            <Campo rotulo="Nome">
+              <Entrada />
+            </Campo>
           </Modal>
         </>
       );
@@ -79,7 +89,17 @@ describe('Modal', () => {
   it('confirmação chama os callbacks', async () => {
     const ok = vi.fn();
     const cancelar = vi.fn();
-    render(<ConfirmarAcao aberto titulo="Remover?" mensagem="Tem certeza?" textoConfirmar="Remover" perigo aoConfirmar={ok} aoCancelar={cancelar} />);
+    render(
+      <ConfirmarAcao
+        aberto
+        titulo="Remover?"
+        mensagem="Tem certeza?"
+        textoConfirmar="Remover"
+        perigo
+        aoConfirmar={ok}
+        aoCancelar={cancelar}
+      />,
+    );
     await userEvent.click(screen.getByRole('button', { name: 'Remover' }));
     await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     expect(ok).toHaveBeenCalled();
@@ -89,11 +109,22 @@ describe('Modal', () => {
 
 describe('Tabela', () => {
   const itens = Array.from({ length: 30 }, (_, i) => ({ id: String(i + 1), nome: `Cliente ${i + 1}` }));
-  const colunas = [{ chave: 'nome', titulo: 'Nome', principal: true, render: (x: { id: string; nome: string }) => x.nome }];
+  const colunas = [
+    { chave: 'nome', titulo: 'Nome', principal: true, render: (x: { id: string; nome: string }) => x.nome },
+  ];
 
   it('pagina, mostra rótulos para o modo cartão e responde a clique e teclado', async () => {
     const clique = vi.fn();
-    render(<Tabela itens={itens} colunas={colunas} chave={(x) => x.id} rotulo="Clientes" aoClicar={clique} porPagina={10} />);
+    render(
+      <Tabela
+        itens={itens}
+        colunas={colunas}
+        chave={(x) => x.id}
+        rotulo="Clientes"
+        aoClicar={clique}
+        porPagina={10}
+      />,
+    );
     expect(screen.getAllByRole('row')).toHaveLength(11);
     expect(screen.getByText('Cliente 1').closest('td')).toHaveAttribute('data-rotulo', 'Nome');
     await userEvent.click(screen.getByRole('button', { name: 'Próxima' }));
@@ -115,7 +146,17 @@ describe('Abas', () => {
   it('troca com clique e setas', async () => {
     function Exemplo() {
       const [ativa, setAtiva] = useState<'a' | 'b'>('a');
-      return <Abas rotulo="Seções" ativa={ativa} aoTrocar={setAtiva} abas={[{ id: 'a', rotulo: 'Dados' }, { id: 'b', rotulo: 'Apólices' }]} />;
+      return (
+        <Abas
+          rotulo="Seções"
+          ativa={ativa}
+          aoTrocar={setAtiva}
+          abas={[
+            { id: 'a', rotulo: 'Dados' },
+            { id: 'b', rotulo: 'Apólices' },
+          ]}
+        />
+      );
     }
     render(<Exemplo />);
     await userEvent.click(screen.getByRole('tab', { name: 'Apólices' }));
@@ -132,7 +173,10 @@ describe('Quadro', () => {
         rotulo="Funil"
         chave={(x: string) => x}
         renderItem={(x) => x}
-        colunas={[{ id: 'novo', titulo: 'Novo', itens: ['A', 'B'] }, { id: 'ganho', titulo: 'Fechado', itens: [] }]}
+        colunas={[
+          { id: 'novo', titulo: 'Novo', itens: ['A', 'B'] },
+          { id: 'ganho', titulo: 'Fechado', itens: [] },
+        ]}
       />,
     );
     const novo = screen.getByRole('region', { name: 'Novo' });
@@ -147,7 +191,11 @@ describe('Avisos', () => {
       const { avisar } = useAvisos();
       return <Botao onClick={() => avisar('Cliente salvo.')}>Disparar</Botao>;
     }
-    render(<ProvedorAvisos><Disparo /></ProvedorAvisos>);
+    render(
+      <ProvedorAvisos>
+        <Disparo />
+      </ProvedorAvisos>,
+    );
     await userEvent.click(screen.getByRole('button', { name: 'Disparar' }));
     expect(screen.getByRole('status')).toHaveTextContent('Cliente salvo.');
     await userEvent.click(screen.getByRole('button', { name: 'Dispensar' }));
@@ -165,7 +213,10 @@ describe('Estrutura', () => {
           logo="/logo.svg"
           usuario={{ nome: 'Ana', perfil: 'Administrador' }}
           aoSair={sair}
-          menu={[{ para: '/', rotulo: 'Painel', icone: 'painel' }, { para: '/clientes', rotulo: 'Clientes', icone: 'clientes' }]}
+          menu={[
+            { para: '/', rotulo: 'Painel', icone: 'painel' },
+            { para: '/clientes', rotulo: 'Clientes', icone: 'clientes' },
+          ]}
         >
           <p>conteúdo</p>
         </Estrutura>
@@ -185,7 +236,15 @@ describe('Estrutura', () => {
 describe('Barras', () => {
   it('mostra rótulo e valor de cada item com largura proporcional', async () => {
     const { Barras } = await import('./index');
-    render(<Barras rotulo="Por seguradora" itens={[{ rotulo: 'Porto Seguro', valor: 10 }, { rotulo: 'HDI', valor: 5, valorTexto: 'cinco' }]} />);
+    render(
+      <Barras
+        rotulo="Por seguradora"
+        itens={[
+          { rotulo: 'Porto Seguro', valor: 10 },
+          { rotulo: 'HDI', valor: 5, valorTexto: 'cinco' },
+        ]}
+      />,
+    );
     const lista = screen.getByRole('list', { name: 'Por seguradora' });
     expect(within(lista).getAllByRole('listitem')).toHaveLength(2);
     expect(screen.getByText('cinco')).toBeInTheDocument();

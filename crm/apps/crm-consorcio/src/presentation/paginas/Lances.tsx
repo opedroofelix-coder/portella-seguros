@@ -1,6 +1,17 @@
 import { mensagemErro, useColecao, useIndice, useSessao, useUsuario } from '@portella/app-base';
 import { formatarData, formatarDinheiro } from '@portella/core';
-import { BarraFiltros, Botao, CabecalhoPagina, Campo, Cartao, Carregando, EstadoVazio, Selecao, Tabela, useAvisos } from '@portella/ui';
+import {
+  BarraFiltros,
+  Botao,
+  CabecalhoPagina,
+  Campo,
+  Cartao,
+  Carregando,
+  EstadoVazio,
+  Selecao,
+  Tabela,
+  useAvisos,
+} from '@portella/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { registrarResultado } from '../../application/lances';
@@ -25,7 +36,10 @@ export function PaginaLances() {
   const [editando, setEditando] = useState<Lance | 'novo' | null>(null);
 
   const lista = useMemo(
-    () => (data ?? []).filter((l) => !filtro || l.resultado === filtro).sort((a, b) => a.assembleia.localeCompare(b.assembleia)),
+    () =>
+      (data ?? [])
+        .filter((l) => !filtro || l.resultado === filtro)
+        .sort((a, b) => a.assembleia.localeCompare(b.assembleia)),
     [data, filtro],
   );
 
@@ -48,16 +62,28 @@ export function PaginaLances() {
   return (
     <>
       <CabecalhoPagina
-        titulo={<>Lances e <em>assembleias</em></>}
+        titulo={
+          <>
+            Lances e <em>assembleias</em>
+          </>
+        }
         descricao="Registre os lances ofertados e o resultado de cada assembleia."
-        acoes={<Botao icone="mais" onClick={() => setEditando('novo')}>Novo lance</Botao>}
+        acoes={
+          <Botao icone="mais" onClick={() => setEditando('novo')}>
+            Novo lance
+          </Botao>
+        }
       />
       <Cartao>
         <BarraFiltros>
           <Campo rotulo="Resultado">
             <Selecao value={filtro} onChange={(e) => setFiltro(e.target.value as ResultadoLance | '')}>
               <option value="">Todos</option>
-              {RESULTADOS_LANCE.map((r) => <option key={r} value={r}>{ROTULO_RESULTADO[r]}</option>)}
+              {RESULTADOS_LANCE.map((r) => (
+                <option key={r} value={r}>
+                  {ROTULO_RESULTADO[r]}
+                </option>
+              ))}
             </Selecao>
           </Campo>
         </BarraFiltros>
@@ -69,21 +95,51 @@ export function PaginaLances() {
             itens={lista}
             chave={(l) => l.id}
             aoClicar={(l) => pode('registro:editar', l) && setEditando(l)}
-            vazio={<EstadoVazio titulo="Nenhum lance">Registre um lance para acompanhar a assembleia.</EstadoVazio>}
+            vazio={
+              <EstadoVazio titulo="Nenhum lance">Registre um lance para acompanhar a assembleia.</EstadoVazio>
+            }
             colunas={[
-              { chave: 'cliente', titulo: 'Cliente', principal: true, render: (l) => indiceClientes.get(indiceCotas.get(l.cotaId)?.clienteId ?? '')?.nome ?? '—' },
+              {
+                chave: 'cliente',
+                titulo: 'Cliente',
+                principal: true,
+                render: (l) => indiceClientes.get(indiceCotas.get(l.cotaId)?.clienteId ?? '')?.nome ?? '—',
+              },
               { chave: 'cota', titulo: 'Cota', render: descricaoCota },
               { chave: 'assembleia', titulo: 'Assembleia', render: (l) => formatarData(l.assembleia) },
-              { chave: 'oferta', titulo: 'Oferta', render: (l) => [ROTULO_TIPO_LANCE[l.tipo], l.percentual != null && `${String(l.percentual).replace('.', ',')}%`, l.valor != null && formatarDinheiro(l.valor)].filter(Boolean).join(' · ') },
-              { chave: 'resultado', titulo: 'Resultado', render: (l) => <SeloLance resultado={l.resultado} /> },
+              {
+                chave: 'oferta',
+                titulo: 'Oferta',
+                render: (l) =>
+                  [
+                    ROTULO_TIPO_LANCE[l.tipo],
+                    l.percentual != null && `${String(l.percentual).replace('.', ',')}%`,
+                    l.valor != null && formatarDinheiro(l.valor),
+                  ]
+                    .filter(Boolean)
+                    .join(' · '),
+              },
+              {
+                chave: 'resultado',
+                titulo: 'Resultado',
+                render: (l) => <SeloLance resultado={l.resultado} />,
+              },
               {
                 chave: 'acoes',
                 titulo: 'Ações',
                 render: (l) =>
                   l.resultado === 'aguardando' && pode('registro:editar', l) ? (
-                    <div className="acoes-linha" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
-                      <Botao pequeno onClick={() => resultado(l, 'contemplado')}>Contemplado</Botao>
-                      <Botao pequeno variante="secundario" onClick={() => resultado(l, 'nao_contemplado')}>Não contemplado</Botao>
+                    <div
+                      className="acoes-linha"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <Botao pequeno onClick={() => resultado(l, 'contemplado')}>
+                        Contemplado
+                      </Botao>
+                      <Botao pequeno variante="secundario" onClick={() => resultado(l, 'nao_contemplado')}>
+                        Não contemplado
+                      </Botao>
                     </div>
                   ) : null,
               },
@@ -91,7 +147,12 @@ export function PaginaLances() {
           />
         )}
       </Cartao>
-      {editando && <FormularioLance lance={editando === 'novo' ? undefined : editando} aoFechar={() => setEditando(null)} />}
+      {editando && (
+        <FormularioLance
+          lance={editando === 'novo' ? undefined : editando}
+          aoFechar={() => setEditando(null)}
+        />
+      )}
     </>
   );
 }

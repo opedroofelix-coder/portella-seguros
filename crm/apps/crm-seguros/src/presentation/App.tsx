@@ -31,7 +31,9 @@ export function App({ servicos }: { servicos: ServicosSeguros }) {
       MENU_COMUM.conta,
     ],
     importacao: criarImportacao(servicos),
-    abasCliente: [{ id: 'apolices', rotulo: 'Apólices', render: (cliente) => <ApolicesDoCliente cliente={cliente} /> }],
+    abasCliente: [
+      { id: 'apolices', rotulo: 'Apólices', render: (cliente) => <ApolicesDoCliente cliente={cliente} /> },
+    ],
   };
   return <AppCrm config={config} servicos={servicos} rotas={rotas} />;
 }

@@ -35,9 +35,15 @@ export function ProvedorAvisos({ children, duracao = 4500 }: { children: ReactNo
       {children}
       <div className={styles.pilha} aria-live="polite">
         {avisos.map((a) => (
-          <div key={a.id} className={`${styles.aviso} ${a.tipo === 'info' ? '' : styles[a.tipo]}`} role={a.tipo === 'erro' ? 'alert' : 'status'}>
+          <div
+            key={a.id}
+            className={`${styles.aviso} ${a.tipo === 'info' ? '' : styles[a.tipo]}`}
+            role={a.tipo === 'erro' ? 'alert' : 'status'}
+          >
             <p>{a.texto}</p>
-            <Botao variante="fantasma" soIcone icone="fechar" pequeno onClick={() => remover(a.id)}>Dispensar</Botao>
+            <Botao variante="fantasma" soIcone icone="fechar" pequeno onClick={() => remover(a.id)}>
+              Dispensar
+            </Botao>
           </div>
         ))}
       </div>

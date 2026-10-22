@@ -12,7 +12,11 @@ export async function registrarResultado(
 ): Promise<void> {
   if (resultado === 'contemplado') {
     const cota = await cotas.obter(usuario, lance.cotaId);
-    await cotas.salvar(usuario, { ...cota, status: 'contemplada', contemplacao: { data: lance.assembleia, forma: 'lance' } });
+    await cotas.salvar(usuario, {
+      ...cota,
+      status: 'contemplada',
+      contemplacao: { data: lance.assembleia, forma: 'lance' },
+    });
   }
   await lances.salvar(usuario, { ...lance, resultado });
 }

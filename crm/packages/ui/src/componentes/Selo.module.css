@@ -1,8 +1,37 @@
-.selo { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px solid currentColor; border-radius: 999px; font-size: 12px; font-weight: 500; line-height: 1.4; white-space: nowrap; }
-.selo::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.neutro { color: var(--text-muted); }
-.sucesso { color: var(--success); }
-.alerta { color: var(--warning); }
-.perigo { color: var(--danger); }
-.info { color: var(--info); }
-.dourado { color: var(--gold-light); }
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.selo::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.neutro {
+  color: var(--text-muted);
+}
+.sucesso {
+  color: var(--success);
+}
+.alerta {
+  color: var(--warning);
+}
+.perigo {
+  color: var(--danger);
+}
+.info {
+  color: var(--info);
+}
+.dourado {
+  color: var(--gold-light);
+}

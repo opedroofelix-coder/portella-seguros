@@ -1,35 +1,25 @@
 import type { Importacao } from '@portella/app-base';
-import type { Usuario } from '@portella/core';
-import { idImportado, lerArquivoImportacao, paraCentavos, prepararClientes, resolverResponsavel } from '@portella/core';
+import type { ApoliceImportada, Usuario } from '@portella/core';
+import {
+  idImportado,
+  lerArquivoImportacao,
+  paraCentavos,
+  prepararClientes,
+  resolverResponsavel,
+} from '@portella/core';
 import type { Apolice } from '../domain/apolice';
 import { validarApolice } from '../domain/apolice';
 import { RAMOS, SEGURADORAS } from '../domain/catalogo';
 import type { ServicosSeguros } from './servicos';
-
-/** Apólice como vem do importador; valores em reais (número) e datas AAAA-MM-DD. */
-export interface ApoliceImportada {
-  chave: string;
-  clienteChave: string;
-  seguradora: string;
-  ramo: string;
-  numero?: string;
-  item?: string;
-  inicioVigencia: string;
-  fimVigencia: string;
-  premioLiquido?: number;
-  premioTotal?: number;
-  comissaoPercentual?: number;
-  formaPagamento?: string;
-  observacoes?: string;
-  responsavel?: string;
-}
 
 const semAcento = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
 /** "PORTO SEGURO CIA" → "porto"; desconhecida fica com o nome original. */
 export function identificarSeguradora(nome: string): string {
   const n = semAcento(nome).replace(/[^a-z]/g, '');
-  const achada = SEGURADORAS.find((s) => n.includes(semAcento(s.nome).replace(/[^a-z]/g, '')) || n.startsWith(s.id));
+  const achada = SEGURADORAS.find(
+    (s) => n.includes(semAcento(s.nome).replace(/[^a-z]/g, '')) || n.startsWith(s.id),
+  );
   return achada?.id ?? nome.trim();
 }
 
@@ -45,7 +35,8 @@ export function identificarRamo(nome: string): Apolice['ramo'] {
 
 export function criarImportacao(servicos: ServicosSeguros): Importacao {
   return {
-    descricao: 'Clientes e apólices da planilha da Portella. Reimportar o mesmo arquivo atualiza os registros, sem duplicar.',
+    descricao:
+      'Clientes e apólices da planilha da Portella. Reimportar o mesmo arquivo atualiza os registros, sem duplicar.',
     async analisar(dados: unknown, ator: Usuario, equipe: Usuario[]) {
       const arquivo = lerArquivoImportacao(dados, 'seguros');
       const agora = new Date().toISOString();
@@ -83,7 +74,8 @@ export function criarImportacao(servicos: ServicosSeguros): Importacao {
           avisos.push(`Apólice ${a.numero ?? a.chave} ignorada: ${campos || (e as Error).message}`);
         }
       }
-      for (const nome of naoEncontrados) avisos.push(`Corretor "${nome}" não cadastrado: os registros ficaram com ${ator.nome}.`);
+      for (const nome of naoEncontrados)
+        avisos.push(`Corretor "${nome}" não cadastrado: os registros ficaram com ${ator.nome}.`);
 
       return {
         resumo: [

@@ -19,7 +19,9 @@ export function PaginaMinhaConta() {
   const usuario = useUsuario();
   const { usuarios } = useServicos();
   const { avisar } = useAvisos();
-  const { register, handleSubmit, formState, reset } = useForm<z.infer<typeof esquema>>({ resolver: zodResolver(esquema) });
+  const { register, handleSubmit, formState, reset } = useForm<z.infer<typeof esquema>>({
+    resolver: zodResolver(esquema),
+  });
 
   const enviar = handleSubmit(async ({ atual, nova }) => {
     try {
@@ -33,7 +35,14 @@ export function PaginaMinhaConta() {
 
   return (
     <>
-      <CabecalhoPagina titulo={<>Minha <em>conta</em></>} descricao={`${usuario.email} · ${ROTULO_PERFIL[usuario.perfil]}`} />
+      <CabecalhoPagina
+        titulo={
+          <>
+            Minha <em>conta</em>
+          </>
+        }
+        descricao={`${usuario.email} · ${ROTULO_PERFIL[usuario.perfil]}`}
+      />
       <Cartao titulo="Trocar senha" style={{ maxWidth: 560 }}>
         <form className="grade" onSubmit={enviar} noValidate>
           <Campo rotulo="Senha atual" erro={formState.errors.atual?.message}>
@@ -45,7 +54,11 @@ export function PaginaMinhaConta() {
           <Campo rotulo="Confirme a nova senha" erro={formState.errors.confirmacao?.message}>
             <Entrada type="password" autoComplete="new-password" {...register('confirmacao')} />
           </Campo>
-          <div><Botao type="submit" carregando={formState.isSubmitting}>Salvar nova senha</Botao></div>
+          <div>
+            <Botao type="submit" carregando={formState.isSubmitting}>
+              Salvar nova senha
+            </Botao>
+          </div>
         </form>
       </Cartao>
     </>

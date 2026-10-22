@@ -26,14 +26,56 @@ export function TabelaCotas({
   const { nomeDe } = useEquipe();
 
   const colunas: Coluna<Cota>[] = [
-    ...(mostrarCliente ? [{ chave: 'cliente', titulo: 'Cliente', principal: true, render: (c: Cota) => indice.get(c.clienteId)?.nome ?? '—' }] : []),
-    { chave: 'gc', titulo: 'Grupo / cota', principal: !mostrarCliente, render: (c) => `${c.grupo} / ${c.cota}` },
+    ...(mostrarCliente
+      ? [
+          {
+            chave: 'cliente',
+            titulo: 'Cliente',
+            principal: true,
+            render: (c: Cota) => indice.get(c.clienteId)?.nome ?? '—',
+          },
+        ]
+      : []),
+    {
+      chave: 'gc',
+      titulo: 'Grupo / cota',
+      principal: !mostrarCliente,
+      render: (c) => `${c.grupo} / ${c.cota}`,
+    },
     { chave: 'adm', titulo: 'Administradora', render: (c) => c.administradora },
     { chave: 'bem', titulo: 'Bem', render: (c) => nomeTipoBem(c.tipoBem) },
-    { chave: 'credito', titulo: 'Crédito', alinharDireita: true, render: (c) => formatarDinheiro(c.valorCredito) },
-    { chave: 'parcelas', titulo: 'Parcelas', ocultarNoMobile: true, render: (c) => `${c.parcelasPagas ?? 0} de ${c.prazoMeses}` },
+    {
+      chave: 'credito',
+      titulo: 'Crédito',
+      alinharDireita: true,
+      render: (c) => formatarDinheiro(c.valorCredito),
+    },
+    {
+      chave: 'parcelas',
+      titulo: 'Parcelas',
+      ocultarNoMobile: true,
+      render: (c) => `${c.parcelasPagas ?? 0} de ${c.prazoMeses}`,
+    },
     { chave: 'status', titulo: 'Situação', render: (c) => <SeloCota status={c.status} /> },
-    ...(pode('carteira:ver_todos') ? [{ chave: 'resp', titulo: 'Responsável', ocultarNoMobile: true, render: (c: Cota) => nomeDe(c.responsavelId) }] : []),
+    ...(pode('carteira:ver_todos')
+      ? [
+          {
+            chave: 'resp',
+            titulo: 'Responsável',
+            ocultarNoMobile: true,
+            render: (c: Cota) => nomeDe(c.responsavelId),
+          },
+        ]
+      : []),
   ];
-  return <Tabela rotulo="Cotas" itens={cotas} colunas={colunas} chave={(c) => c.id} aoClicar={aoClicar} vazio={vazio} />;
+  return (
+    <Tabela
+      rotulo="Cotas"
+      itens={cotas}
+      colunas={colunas}
+      chave={(c) => c.id}
+      aoClicar={aoClicar}
+      vazio={vazio}
+    />
+  );
 }

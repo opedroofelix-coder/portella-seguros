@@ -2,8 +2,10 @@
 
 Site com CRM de seguros e consórcio da **Portella Corretora de Seguros** (Osasco – SP).
 
-Esta primeira etapa é o site institucional (one-page), feito em HTML, CSS e JavaScript puros: sem build e sem dependências.
-O CRM de seguros e consórcio vem nas próximas etapas.
+O repositório tem duas partes:
+
+- **Site institucional** (one-page, na raiz): HTML, CSS e JavaScript puros, sem build e sem dependências.
+- **CRM** (pasta [`crm/`](crm/)): dois webapps em React, um de **seguros** e outro, separado, de **consórcio**, com login e perfis de usuário. A especificação está em [`docs/CRM.md`](docs/CRM.md).
 
 - Estrutura: segue a referência [lcedcorretora.com.br](https://lcedcorretora.com.br/).
 - Conteúdo: o da Portella, de [portellacorretora.com.br](https://www.portellacorretora.com.br/).
@@ -17,7 +19,22 @@ Abra o `index.html` no navegador ou sirva a pasta:
 npx serve .        # ou: python3 -m http.server 8000
 ```
 
-## Estrutura
+## CRM de seguros e consórcio
+
+```bash
+cd crm
+npm install
+npm run dev:seguros       # http://localhost:5173
+npm run dev:consorcio     # http://localhost:5174
+npm test                  # testes unitários e de componentes
+npm run test:e2e          # fluxos e responsividade (Playwright)
+PLANILHA_SENHA='…' npm run importar --silent -- planilha.xlsx   # gera crm/dados/*.seed.json
+```
+
+No primeiro acesso, cada CRM pede para criar o administrador. Os dados ficam no navegador
+até a escolha do backend (veja as pendências).
+
+## Estrutura do site
 
 ```
 index.html                     # página única com as 11 seções
@@ -56,6 +73,12 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 - [ ] Matérias do blog.
 - [ ] Integração do formulário de contato (hoje abre o e-mail via `mailto:`).
 - [ ] Páginas legais (Privacidade, Termos, LGPD, Cookies).
-- [ ] Próximas etapas: CRM de seguros e consórcio.
+
+### Pendências do CRM
+
+- [ ] **Senha da planilha** de dezembro, para rodar o importador e conferir o mapeamento das colunas.
+- [ ] **Texto da especificação** combinado na conversa anterior, para incorporar ao `docs/CRM.md`.
+- [ ] **Backend**: hoje os dados ficam só no navegador, sem sincronizar entre pessoas e sem backup. Escolher entre Supabase, Firebase ou API própria e trocar o `container.ts` de cada app.
+- [ ] Hospedagem dos dois apps, com redirecionamento de todas as rotas para o `index.html` (SPA).
 
 Os pontos a preencher estão marcados no código com `TODO` ou `[inserir]`.
