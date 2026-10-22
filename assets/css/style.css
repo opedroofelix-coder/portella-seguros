@@ -120,6 +120,8 @@ input, select, textarea, button { font: inherit; }
 .insurer { flex: none; width: 190px; height: 84px; margin: 0 14px; padding: 12px 20px; background: #F7F3EC; border: 1px solid rgba(217, 188, 126, .6); border-radius: 2px; display: flex; align-items: center; justify-content: center; filter: grayscale(1) sepia(.2); opacity: .82; transition: filter .4s, opacity .4s, transform .4s; }
 .insurer:hover { filter: none; opacity: 1; transform: scale(1.06); }
 .insurer img { width: 100%; height: 100%; object-fit: contain; }
+/* Logos quase quadrados pesam mais que os horizontais: ficam um pouco menores para a faixa ficar equilibrada. */
+.insurer--compacto img { width: 76%; height: 76%; }
 
 /* ---------- 4. Sobre ---------- */
 .about__grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 80px; align-items: center; }

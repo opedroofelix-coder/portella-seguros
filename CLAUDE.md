@@ -15,8 +15,9 @@
 - **Direção escolhida pela cliente (21/10/2026): Premium A "Noir Dourado".** O site inteiro (index.html, style.css, main.js) já segue essa direção: predominantemente azul e dourado (pedido da cliente: sem seções marfim; seções alternam #0F1E3C, #1A2B4B e #15274A; logos das seguradoras em placas marfim com fio dourado), Lora nos títulos e Jost nos textos, consultora num arco com fio dourado e brasão com o ícone.
 - Não inventar números, depoimentos ou dados (CNPJ, SUSEP, horário). Usar `[inserir]` até a Portella informar.
 - Lista de pendências: README.md.
-- Próximo passo combinado: trocar os logos das seguradoras por versões oficiais em alta qualidade
-  (ex.: SVGs do Wikimedia Commons), mantendo os nomes dos arquivos em `assets/img/seguradoras/`.
+- Logos das seguradoras (22/10/2026): oficiais, em `assets/img/seguradoras/<nome>.svg` (Tokio Marine em PNG,
+  Ituran em WebP), com a fonte de cada um em `FONTES.md`. A cliente quis manter a marca Liberty (não Yelum).
+  Logos quase quadrados (HDI, Azul, Suhai, Ituran) usam `.insurer--compacto` para equilibrar a faixa.
 
 ## Identidade visual (recebida em 21/10/2026)
 - Cores: branco #FFFFFF, laranja #F49629, azul-marinho #1A2B4B.

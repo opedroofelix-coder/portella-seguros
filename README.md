@@ -49,7 +49,7 @@ assets/css/style.css           # estilos; cores e fontes em :root (variáveis CS
 assets/js/main.js              # pó dourado, menu mobile, carrosséis, contadores, FAQ e modal de cotação
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
-assets/img/seguradoras/*.png   # logos das 12 seguradoras parceiras
+assets/img/seguradoras/        # logos oficiais das 12 seguradoras (fontes em FONTES.md)
 ```
 
 ## Seções (na ordem)
@@ -70,7 +70,7 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 
 ## Pendências
 
-- [ ] **Logos das seguradoras em alta qualidade.** Os atuais foram recortados de uma imagem pequena. Trocar pelos SVG/PNG oficiais em `assets/img/seguradoras/`, mantendo os nomes dos arquivos.
+- [x] **Logos das seguradoras em alta qualidade.** Trocados pelos oficiais (SVG; Tokio Marine em PNG e Ituran em WebP de alta resolução). Fontes em `assets/img/seguradoras/FONTES.md`.
 - [ ] Fotos dos 8 seguros e das matérias do blog.
 - [ ] Número de WhatsApp: `WHATSAPP_NUMBER` em `assets/js/main.js` e o `href` do botão `.fab`.
 - [ ] Horário de atendimento (seção Contato).
