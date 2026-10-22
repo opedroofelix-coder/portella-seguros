@@ -1,0 +1,25 @@
+.botao {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: var(--touch); padding: 10px 18px;
+  border: 1px solid transparent; border-radius: var(--radius);
+  font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s, transform .2s;
+}
+.botao:disabled { opacity: .55; cursor: not-allowed; }
+.botao:not(:disabled):active { transform: translateY(1px); }
+.primario { background: var(--gold); color: var(--navy-deep); }
+.primario:not(:disabled):hover { background: var(--gold-light); }
+.secundario { background: transparent; border-color: var(--line-strong); color: var(--text); }
+.secundario:not(:disabled):hover { border-color: var(--gold-light); color: var(--gold-light); }
+.fantasma { background: transparent; color: var(--text-muted); padding-inline: 10px; }
+.fantasma:not(:disabled):hover { color: var(--gold-light); background: rgba(217, 188, 126, .08); }
+.perigo { background: transparent; border-color: rgba(238, 143, 134, .5); color: var(--danger); }
+.perigo:not(:disabled):hover { background: rgba(238, 143, 134, .12); }
+.pequeno { padding: 6px 12px; font-size: 11px; }
+/* No toque o alvo continua com 44px; com mouse o botão pequeno pode ser mais baixo. */
+@media (min-width: 720px) and (pointer: fine) { .pequeno { min-height: 36px; } .pequeno.soIcone { width: 36px; } }
+.blocoInteiro { width: 100%; }
+.soIcone { padding: 0; width: var(--touch); }
+.spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: giro .7s linear infinite; }
+@keyframes giro { to { transform: rotate(360deg); } }

@@ -1,0 +1,10 @@
+/* Kanban: no celular as colunas rolam na horizontal com encaixe; no desktop cabem lado a lado. */
+.quadro { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(260px, 86%); gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; overscroll-behavior-x: contain; }
+@media (min-width: 720px) { .quadro { grid-auto-columns: minmax(260px, 46%); } }
+@media (min-width: 1280px) { .quadro { grid-auto-columns: minmax(0, 1fr); overflow-x: visible; } }
+.coluna { scroll-snap-align: start; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 12px; background: var(--navy); border: 1px solid var(--line); border-top: 2px solid var(--gold-line); }
+.colunaCabecalho { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.colunaCabecalho h2 { font-size: 17px; }
+.contagem { font-size: 13px; color: var(--text-faint); }
+.lista { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.vazia { font-size: 13px; color: var(--text-faint); padding: 8px 0; }

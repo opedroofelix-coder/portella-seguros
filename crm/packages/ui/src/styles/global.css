@@ -1,0 +1,70 @@
+/* Design system do CRM Portella — direção "Noir Dourado" (mesmas cores do site). */
+:root {
+  --navy-deep: #0F1E3C;
+  --navy: #1A2B4B;
+  --navy-2: #15274A;
+  --navy-3: #22365C;
+  --gold: #C9A85E;
+  --gold-light: #D9BC7E;
+  --gold-line: #B8924A;
+  --text: #F4EEE2;
+  --text-muted: #B9C1CF;
+  --text-faint: #9AA4B5;
+  --line: rgba(217, 188, 126, .2);
+  --line-strong: rgba(217, 188, 126, .45);
+  --success: #7CC7A0;
+  --warning: #E6C266;
+  --danger: #EE8F86;
+  --info: #93B7EA;
+  --serif: 'Lora', Georgia, 'Times New Roman', serif;
+  --sans: 'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius: 2px;
+  --touch: 44px;
+  --sidebar: 248px;
+  --topbar: 64px;
+  --gutter: 16px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: dark;
+}
+
+@media (min-width: 720px) { :root { --gutter: 24px; } }
+@media (min-width: 1280px) { :root { --gutter: 32px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--navy-deep);
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: var(--gold-light); }
+input, select, textarea, button { font: inherit; color: inherit; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; margin: 0; letter-spacing: -.01em; }
+h1 em, h2 em, h3 em { font-style: italic; color: var(--gold-light); }
+:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); border: 0; }
+.rotulo { font-size: 11px; font-weight: 500; letter-spacing: .28em; text-transform: uppercase; color: var(--gold-light); }
+.texto-suave { color: var(--text-muted); }
+.grade { display: grid; gap: 16px; }
+.grade-2 { display: grid; gap: 16px; grid-template-columns: 1fr; }
+.grade-3 { display: grid; gap: 16px; grid-template-columns: 1fr; }
+.grade-4 { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 720px) {
+  .grade-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grade-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grade-4 { gap: 16px; }
+}
+@media (min-width: 1024px) {
+  .grade-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grade-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.span-todo { grid-column: 1 / -1; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

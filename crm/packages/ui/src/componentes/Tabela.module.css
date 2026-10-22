@@ -1,0 +1,25 @@
+.envoltorio { width: 100%; }
+.tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tabela th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--gold-line); white-space: nowrap; }
+.tabela td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tabela tbody tr { transition: background-color .15s; }
+.clicavel { cursor: pointer; }
+.clicavel:hover, .clicavel:focus-visible { background: rgba(217, 188, 126, .06); }
+.direita { text-align: right !important; }
+
+/* Celular e tablet pequeno: cada linha vira um cartão com rótulo e valor. */
+@media (max-width: 719px) {
+  .tabela thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tabela, .tabela tbody, .tabela tr, .tabela td { display: block; width: 100%; }
+  .tabela tr { margin-bottom: 10px; padding: 12px 14px; background: var(--navy-2); border: 1px solid var(--line); border-left: 2px solid var(--gold-line); }
+  .tabela td { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 5px 0; border: 0; text-align: right; min-width: 0; }
+  .tabela td::before { content: attr(data-rotulo); flex-shrink: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-faint); text-align: left; }
+  .tabela td > * { min-width: 0; overflow-wrap: anywhere; }
+  .tabela td.principal { display: block; text-align: left; font-family: var(--serif); font-size: 18px; padding-bottom: 8px; }
+  .tabela td.principal::before { content: none; }
+  .ocultarMobile { display: none !important; }
+  .direita { text-align: right !important; }
+}
+
+.paginacao { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 14px; color: var(--text-muted); font-size: 14px; }
+.paginacao div { display: flex; gap: 8px; }

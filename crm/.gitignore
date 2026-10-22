@@ -1,0 +1,9 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+*.tsbuildinfo
+# Dados reais de clientes nunca vão para o Git
+dados/
+*.xlsx
+*.seed.json
