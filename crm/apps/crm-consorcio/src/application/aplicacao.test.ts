@@ -79,10 +79,29 @@ describe('importação de consórcio', () => {
       geradoEm: '',
       clientes: [{ chave: 'k1', nome: 'Maria', responsavel: 'Carlos Souza' }],
       comissoes: [
-        { chave: 'x1', clienteChave: 'k1', vendaChave: 'q1', clienteNome: 'Maria', produto: 'Consorcio', companhia: 'Magalu', comissaoReceber: 1680, comissaoRecebida: 1680, repasse: 504, responsavel: 'Carlos Souza' },
+        {
+          chave: 'x1',
+          clienteChave: 'k1',
+          vendaChave: 'q1',
+          clienteNome: 'Maria',
+          produto: 'Consorcio',
+          companhia: 'Magalu',
+          comissaoReceber: 1680,
+          comissaoRecebida: 1680,
+          repasse: 504,
+          responsavel: 'Carlos Souza',
+        },
       ],
       cotas: [
-        { chave: 'q3', clienteChave: 'k1', administradora: 'Magalu', numeroProposta: '9125116', tipoBem: 'Consorcio', valorCredito: 420000, dataAdesao: '2024-07-19' },
+        {
+          chave: 'q3',
+          clienteChave: 'k1',
+          administradora: 'Magalu',
+          numeroProposta: '9125116',
+          tipoBem: 'Consorcio',
+          valorCredito: 420000,
+          dataAdesao: '2024-07-19',
+        },
         {
           chave: 'q1',
           clienteChave: 'k1',
@@ -122,7 +141,13 @@ describe('importação de consórcio', () => {
     expect(previa.avisos.join('\n')).toMatch(/1 cota\(s\) sem grupo/);
     await previa.confirmar();
     const cotas = await s.cotas.listar(admin);
-    expect(cotas.find((c) => c.numeroProposta === '9125116')).toMatchObject({ grupo: undefined, cota: undefined, prazoMeses: undefined, valorCredito: 42000000, status: 'ativa' });
+    expect(cotas.find((c) => c.numeroProposta === '9125116')).toMatchObject({
+      grupo: undefined,
+      cota: undefined,
+      prazoMeses: undefined,
+      valorCredito: 42000000,
+      status: 'ativa',
+    });
     expect((await s.comissoes.listar(corretor))[0]).toMatchObject({ vendaId: 'imp:cota:q1', repasse: 50400 });
     const cota = (await s.cotas.listar(corretor)).find((c) => c.grupo === '1020');
     expect(cota).toMatchObject({

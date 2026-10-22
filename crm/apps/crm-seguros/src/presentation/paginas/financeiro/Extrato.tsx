@@ -1,7 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { aplicarErros, limparVazios, mensagemErro, useRemover, useSalvar } from '@portella/app-base';
 import { centavosParaTexto, formatarData, formatarDinheiro, hojeISO, paraCentavos } from '@portella/core';
-import { BarraFiltros, Botao, Campo, Carregando, Entrada, EstadoVazio, Modal, Selecao, Tabela, useAvisos } from '@portella/ui';
+import {
+  BarraFiltros,
+  Botao,
+  Campo,
+  Carregando,
+  Entrada,
+  EstadoVazio,
+  Modal,
+  Selecao,
+  Tabela,
+  useAvisos,
+} from '@portella/ui';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -26,18 +37,32 @@ export function ExtratoFinanceiro() {
     <>
       <BarraFiltros>
         <Campo rotulo="Conta">
-          <Selecao value={conta} onChange={(e) => { setConta(e.target.value); setMes(null); }}>
-            {contas.map((c) => <option key={c}>{c}</option>)}
+          <Selecao
+            value={conta}
+            onChange={(e) => {
+              setConta(e.target.value);
+              setMes(null);
+            }}
+          >
+            {contas.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
           </Selecao>
         </Campo>
         <Campo rotulo="Mês">
           <Selecao value={mesAtivo} onChange={(e) => setMes(e.target.value)}>
             <option value="">Todos</option>
-            {meses.map((m) => <option key={m} value={m}>{rotuloMes(m)}</option>)}
+            {meses.map((m) => (
+              <option key={m} value={m}>
+                {rotuloMes(m)}
+              </option>
+            ))}
           </Selecao>
         </Campo>
         <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-          <Botao icone="mais" onClick={() => setEditando('novo')}>Novo movimento</Botao>
+          <Botao icone="mais" onClick={() => setEditando('novo')}>
+            Novo movimento
+          </Botao>
         </div>
       </BarraFiltros>
       {movimentos.isPending ? (
@@ -53,13 +78,34 @@ export function ExtratoFinanceiro() {
           colunas={[
             { chave: 'desc', titulo: 'Descrição', principal: true, render: (m) => m.descricao },
             { chave: 'data', titulo: 'Data', render: (m) => formatarData(m.data) },
-            { chave: 'entrada', titulo: 'Entrada', alinharDireita: true, render: (m) => (m.tipo === 'saida' ? '—' : formatarDinheiro(m.valor)) },
-            { chave: 'saida', titulo: 'Saída', alinharDireita: true, render: (m) => (m.tipo === 'saida' ? formatarDinheiro(m.valor) : '—') },
-            { chave: 'saldo', titulo: 'Saldo', alinharDireita: true, render: (m) => formatarDinheiro(m.saldo) },
+            {
+              chave: 'entrada',
+              titulo: 'Entrada',
+              alinharDireita: true,
+              render: (m) => (m.tipo === 'saida' ? '—' : formatarDinheiro(m.valor)),
+            },
+            {
+              chave: 'saida',
+              titulo: 'Saída',
+              alinharDireita: true,
+              render: (m) => (m.tipo === 'saida' ? formatarDinheiro(m.valor) : '—'),
+            },
+            {
+              chave: 'saldo',
+              titulo: 'Saldo',
+              alinharDireita: true,
+              render: (m) => formatarDinheiro(m.saldo),
+            },
           ]}
         />
       )}
-      {editando && <FormularioMovimento movimento={editando === 'novo' ? undefined : editando} conta={conta} aoFechar={() => setEditando(null)} />}
+      {editando && (
+        <FormularioMovimento
+          movimento={editando === 'novo' ? undefined : editando}
+          conta={conta}
+          aoFechar={() => setEditando(null)}
+        />
+      )}
     </>
   );
 }
@@ -74,7 +120,15 @@ const esquema = z.object({
 });
 type Valores = z.infer<typeof esquema>;
 
-function FormularioMovimento({ movimento, conta, aoFechar }: { movimento?: Movimento; conta: string; aoFechar: () => void }) {
+function FormularioMovimento({
+  movimento,
+  conta,
+  aoFechar,
+}: {
+  movimento?: Movimento;
+  conta: string;
+  aoFechar: () => void;
+}) {
   const { movimentos } = useServicosSeguros();
   const salvar = useSalvar<Movimento>('movimentos', movimentos);
   const remover = useRemover<Movimento>('movimentos', movimentos);
@@ -92,7 +146,11 @@ function FormularioMovimento({ movimento, conta, aoFechar }: { movimento?: Movim
   });
   const enviar = handleSubmit(async (v) => {
     try {
-      await salvar.mutateAsync({ ...(movimento ?? {}), ...limparVazios(v), valor: paraCentavos(v.valor) ?? 0 });
+      await salvar.mutateAsync({
+        ...(movimento ?? {}),
+        ...limparVazios(v),
+        valor: paraCentavos(v.valor) ?? 0,
+      });
       avisar('Movimento salvo.');
       aoFechar();
     } catch (e) {
@@ -108,16 +166,40 @@ function FormularioMovimento({ movimento, conta, aoFechar }: { movimento?: Movim
       aoFechar={aoFechar}
       rodape={
         <>
-          {movimento && <Botao variante="perigo" onClick={() => remover.mutate(movimento.id, { onSuccess: () => { avisar('Movimento removido.'); aoFechar(); } })}>Remover</Botao>}
-          <Botao variante="secundario" onClick={aoFechar}>Cancelar</Botao>
-          <Botao type="submit" form="form-movimento" carregando={formState.isSubmitting}>Salvar</Botao>
+          {movimento && (
+            <Botao
+              variante="perigo"
+              onClick={() =>
+                remover.mutate(movimento.id, {
+                  onSuccess: () => {
+                    avisar('Movimento removido.');
+                    aoFechar();
+                  },
+                })
+              }
+            >
+              Remover
+            </Botao>
+          )}
+          <Botao variante="secundario" onClick={aoFechar}>
+            Cancelar
+          </Botao>
+          <Botao type="submit" form="form-movimento" carregando={formState.isSubmitting}>
+            Salvar
+          </Botao>
         </>
       }
     >
       <form id="form-movimento" className="grade-2" onSubmit={enviar} noValidate>
-        <Campo rotulo="Conta" obrigatorio erro={erros.conta?.message}><Entrada {...register('conta')} /></Campo>
-        <Campo rotulo="Data" obrigatorio erro={erros.data?.message}><Entrada type="date" {...register('data')} /></Campo>
-        <Campo rotulo="Descrição" obrigatorio erro={erros.descricao?.message} className="span-todo"><Entrada {...register('descricao')} /></Campo>
+        <Campo rotulo="Conta" obrigatorio erro={erros.conta?.message}>
+          <Entrada {...register('conta')} />
+        </Campo>
+        <Campo rotulo="Data" obrigatorio erro={erros.data?.message}>
+          <Entrada type="date" {...register('data')} />
+        </Campo>
+        <Campo rotulo="Descrição" obrigatorio erro={erros.descricao?.message} className="span-todo">
+          <Entrada {...register('descricao')} />
+        </Campo>
         <Campo rotulo="Tipo">
           <Selecao {...register('tipo')}>
             <option value="entrada">Entrada</option>
@@ -125,8 +207,12 @@ function FormularioMovimento({ movimento, conta, aoFechar }: { movimento?: Movim
             <option value="saldo_inicial">Saldo inicial</option>
           </Selecao>
         </Campo>
-        <Campo rotulo="Valor (R$)" obrigatorio erro={erros.valor?.message}><Entrada inputMode="decimal" {...register('valor')} /></Campo>
-        <Campo rotulo="Documento"><Entrada {...register('documento')} /></Campo>
+        <Campo rotulo="Valor (R$)" obrigatorio erro={erros.valor?.message}>
+          <Entrada inputMode="decimal" {...register('valor')} />
+        </Campo>
+        <Campo rotulo="Documento">
+          <Entrada {...register('documento')} />
+        </Campo>
       </form>
     </Modal>
   );

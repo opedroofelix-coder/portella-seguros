@@ -19,7 +19,11 @@ const NOME_BANCO = 'portella-crm-seguros';
  * Para usar um backend (Supabase, API própria…), troque apenas este arquivo.
  */
 export async function criarServicos(): Promise<ServicosSeguros> {
-  const banco = await BancoLocal.abrir(NOME_BANCO, ['clientes', 'oportunidades', 'apolices', 'comissoes', 'movimentos', 'despesas', 'fechamentos'], 2);
+  const banco = await BancoLocal.abrir(
+    NOME_BANCO,
+    ['clientes', 'oportunidades', 'apolices', 'comissoes', 'movimentos', 'despesas', 'fechamentos'],
+    2,
+  );
   return montarServicos({
     auth: new AutenticacaoLocal(
       banco.repositorio<Credencial>(COLECAO_CREDENCIAIS),

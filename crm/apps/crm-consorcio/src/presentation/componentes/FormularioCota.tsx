@@ -15,7 +15,13 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { Cota } from '../../domain/cota';
-import { camposPendentes, identificacaoCota, ROTULO_STATUS_COTA, STATUS_COTA, TIPOS_BEM } from '../../domain/cota';
+import {
+  camposPendentes,
+  identificacaoCota,
+  ROTULO_STATUS_COTA,
+  STATUS_COTA,
+  TIPOS_BEM,
+} from '../../domain/cota';
 import { useCotas, useServicosConsorcio } from '../hooks';
 
 const dinheiro = z.string().refine((v) => !v.trim() || paraCentavos(v) != null, 'Valor inválido.');
@@ -169,11 +175,21 @@ export function FormularioCota({
             <option key={a} value={a} />
           ))}
         </datalist>
-        <Campo rotulo="Nº da proposta"><Entrada {...register('numeroProposta')} /></Campo>
-        <Campo rotulo="Grupo" erro={erros.grupo?.message} dica={pendentes.includes('grupo') ? 'A completar' : undefined}>
+        <Campo rotulo="Nº da proposta">
+          <Entrada {...register('numeroProposta')} />
+        </Campo>
+        <Campo
+          rotulo="Grupo"
+          erro={erros.grupo?.message}
+          dica={pendentes.includes('grupo') ? 'A completar' : undefined}
+        >
           <Entrada {...register('grupo')} />
         </Campo>
-        <Campo rotulo="Cota" erro={erros.cota?.message} dica={pendentes.includes('cota') ? 'A completar' : undefined}>
+        <Campo
+          rotulo="Cota"
+          erro={erros.cota?.message}
+          dica={pendentes.includes('cota') ? 'A completar' : undefined}
+        >
           <Entrada {...register('cota')} />
         </Campo>
         <Campo rotulo="Tipo de bem">
@@ -188,7 +204,11 @@ export function FormularioCota({
         <Campo rotulo="Crédito (R$)" obrigatorio erro={erros.valorCredito?.message}>
           <Entrada inputMode="decimal" placeholder="0,00" {...register('valorCredito')} />
         </Campo>
-        <Campo rotulo="Prazo (meses)" erro={erros.prazoMeses?.message} dica={pendentes.includes('prazo') ? 'A completar' : undefined}>
+        <Campo
+          rotulo="Prazo (meses)"
+          erro={erros.prazoMeses?.message}
+          dica={pendentes.includes('prazo') ? 'A completar' : undefined}
+        >
           <Entrada inputMode="numeric" {...register('prazoMeses')} />
         </Campo>
         <Campo rotulo="Parcela (R$)" erro={erros.valorParcela?.message}>

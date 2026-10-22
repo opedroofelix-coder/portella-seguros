@@ -214,7 +214,11 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
         <Campo rotulo="Início da vigência" obrigatorio erro={erros.inicioVigencia?.message}>
           <Entrada type="date" {...register('inicioVigencia')} />
         </Campo>
-        <Campo rotulo="Fim da vigência" dica="Em branco para contratos contínuos (vida, saúde…)." erro={erros.fimVigencia?.message}>
+        <Campo
+          rotulo="Fim da vigência"
+          dica="Em branco para contratos contínuos (vida, saúde…)."
+          erro={erros.fimVigencia?.message}
+        >
           <Entrada type="date" {...register('fimVigencia')} />
         </Campo>
         {base.vigenciaEstimada && (

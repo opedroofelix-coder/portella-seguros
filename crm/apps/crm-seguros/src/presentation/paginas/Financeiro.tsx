@@ -11,7 +11,14 @@ export function PaginaFinanceiro() {
   const [aba, setAba] = useState<Aba>('resumo');
   return (
     <>
-      <CabecalhoPagina titulo={<>Financeiro da <em>corretora</em></>} descricao="Conta corrente, despesas da empresa e faturamento mensal." />
+      <CabecalhoPagina
+        titulo={
+          <>
+            Financeiro da <em>corretora</em>
+          </>
+        }
+        descricao="Conta corrente, despesas da empresa e faturamento mensal."
+      />
       <Abas
         rotulo="Seções do financeiro"
         ativa={aba}

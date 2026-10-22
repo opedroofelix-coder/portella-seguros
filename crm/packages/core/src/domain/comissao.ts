@@ -45,16 +45,37 @@ export const ROTULO_SITUACAO_COMISSAO: Record<SituacaoComissao, string> = {
 export const saldoReceber = (c: Pick<LancamentoComissao, 'comissaoReceber' | 'comissaoRecebida'>) =>
   c.comissaoReceber - c.comissaoRecebida;
 
-export const saldoRepasse = (c: Pick<LancamentoComissao, 'repasse' | 'repassePago'>) => (c.repasse ?? 0) - (c.repassePago ?? 0);
+export const saldoRepasse = (c: Pick<LancamentoComissao, 'repasse' | 'repassePago'>) =>
+  (c.repasse ?? 0) - (c.repassePago ?? 0);
 
 export function situacaoComissao(c: LancamentoComissao): SituacaoComissao {
   if (c.estorno || c.comissaoReceber < 0) return 'estorno';
   return saldoReceber(c) > 0 ? 'a_receber' : 'recebida';
 }
 
+/** Valor de mês para parcelas sem nenhuma data (ex.: datas inválidas na planilha). */
+export const SEM_DATA = 'sem-data';
+
 /** Mês de competência (AAAA-MM): o do recebimento; sem recebimento, o da proposta. */
-export function mesCompetencia(c: Pick<LancamentoComissao, 'dataRecebimento' | 'dataProposta' | 'criadoEm'>): string {
-  return (c.dataRecebimento ?? c.dataProposta ?? c.criadoEm).slice(0, 7);
+export function mesCompetencia(c: Pick<LancamentoComissao, 'dataRecebimento' | 'dataProposta'>): string {
+  return (c.dataRecebimento ?? c.dataProposta)?.slice(0, 7) ?? SEM_DATA;
+}
+
+/** Mês a mostrar primeiro: o do recebimento mais recente; sem recebimentos, o mês mais recente. */
+export function mesMaisRecente(
+  lancamentos: Array<Pick<LancamentoComissao, 'dataRecebimento' | 'dataProposta'>>,
+): string | undefined {
+  const recebidos = lancamentos
+    .map((c) => c.dataRecebimento)
+    .filter(Boolean)
+    .sort();
+  const ultimo = recebidos[recebidos.length - 1];
+  if (ultimo) return ultimo.slice(0, 7);
+  return lancamentos
+    .map(mesCompetencia)
+    .filter((m) => m !== SEM_DATA)
+    .sort()
+    .reverse()[0];
 }
 
 /** "8.10", "8/10" ou 8 → "8/10" / "8". Mantém outros formatos como vieram ("1.2.3." → "1, 2, 3"). */
@@ -71,7 +92,8 @@ export function validarComissao(c: Partial<LancamentoComissao>): void {
   const campos: Record<string, string> = {};
   if (!c.clienteNome?.trim()) campos.clienteNome = 'Informe o cliente.';
   if (!c.companhia?.trim()) campos.companhia = 'Informe a companhia.';
-  if (c.comissaoReceber == null || Number.isNaN(c.comissaoReceber)) campos.comissaoReceber = 'Informe a comissão.';
+  if (c.comissaoReceber == null || Number.isNaN(c.comissaoReceber))
+    campos.comissaoReceber = 'Informe a comissão.';
   if (c.percentualRepasse != null && (c.percentualRepasse < 0 || c.percentualRepasse > 100)) {
     campos.percentualRepasse = 'Entre 0 e 100%.';
   }
@@ -113,7 +135,13 @@ export function resumirComissoes(lancamentos: LancamentoComissao[]): ResumoComis
     r.repasse += c.repasse ?? 0;
     r.repassePago += c.repassePago ?? 0;
     if (!c.vendaDaCorretora) {
-      const p = corretores.get(c.responsavelId) ?? { responsavelId: c.responsavelId, recebido: 0, repasse: 0, repassePago: 0, saldo: 0 };
+      const p = corretores.get(c.responsavelId) ?? {
+        responsavelId: c.responsavelId,
+        recebido: 0,
+        repasse: 0,
+        repassePago: 0,
+        saldo: 0,
+      };
       p.recebido += c.comissaoRecebida;
       p.repasse += c.repasse ?? 0;
       p.repassePago += c.repassePago ?? 0;
@@ -125,6 +153,8 @@ export function resumirComissoes(lancamentos: LancamentoComissao[]): ResumoComis
     ...r,
     liquidoCorretora: r.recebido + r.estornos - r.repasse,
     porCorretor: [...corretores.values()].sort((a, b) => b.repasse - a.repasse),
-    porCompanhia: [...companhias].map(([companhia, recebido]) => ({ companhia, recebido })).sort((a, b) => b.recebido - a.recebido),
+    porCompanhia: [...companhias]
+      .map(([companhia, recebido]) => ({ companhia, recebido }))
+      .sort((a, b) => b.recebido - a.recebido),
   };
 }

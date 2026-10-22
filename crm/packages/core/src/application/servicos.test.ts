@@ -186,7 +186,14 @@ describe('comissões', () => {
     const servico = new ServicoComissoes(new RepositorioMemoria(), ambiente);
     const gestor: Usuario = { id: 'g', nome: 'G', email: 'g@x', perfil: 'gestor', ativo: true, criadoEm: '' };
     const carla: Usuario = { ...gestor, id: 'carla', perfil: 'corretor' };
-    const dados = { clienteNome: 'Cliente', produto: 'Auto', companhia: 'Suhai', comissaoReceber: 1000, comissaoRecebida: 0, responsavelId: 'carla' };
+    const dados = {
+      clienteNome: 'Cliente',
+      produto: 'Auto',
+      companhia: 'Suhai',
+      comissaoReceber: 1000,
+      comissaoRecebida: 0,
+      responsavelId: 'carla',
+    };
     await expect(servico.salvar(carla, dados)).rejects.toThrow(ErroPermissao);
     const lanc = await servico.salvar(gestor, dados);
     await servico.salvar(gestor, { ...lanc, comissaoRecebida: 1000, dataRecebimento: '2026-10-22' });

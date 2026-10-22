@@ -48,7 +48,8 @@ export function validarDespesa(d: Partial<Despesa>): void {
 }
 
 export function validarFechamento(f: Partial<Fechamento>): void {
-  if (!f.mes || !/^\d{4}-(0[1-9]|1[0-2])$/.test(f.mes)) throw new ErroValidacao('Mês inválido.', { mes: 'Use AAAA-MM.' });
+  if (!f.mes || !/^\d{4}-(0[1-9]|1[0-2])$/.test(f.mes))
+    throw new ErroValidacao('Mês inválido.', { mes: 'Use AAAA-MM.' });
 }
 
 /** Saldo de cada conta: saldos iniciais + entradas − saídas, até a data (inclusive). */
@@ -67,7 +68,11 @@ export function extrato(movimentos: Movimento[], conta: string): Array<Movimento
   let saldo = 0;
   return movimentos
     .filter((m) => m.conta === conta)
-    .sort((a, b) => a.data.localeCompare(b.data) || (a.tipo === 'saldo_inicial' ? -1 : 0) - (b.tipo === 'saldo_inicial' ? -1 : 0))
+    .sort(
+      (a, b) =>
+        a.data.localeCompare(b.data) ||
+        (a.tipo === 'saldo_inicial' ? -1 : 0) - (b.tipo === 'saldo_inicial' ? -1 : 0),
+    )
     .map((m) => {
       saldo += m.tipo === 'saida' ? -m.valor : m.valor;
       return { ...m, saldo };
@@ -75,9 +80,16 @@ export function extrato(movimentos: Movimento[], conta: string): Array<Movimento
 }
 
 export type SituacaoDespesa = 'paga' | 'aberta' | 'vencida';
-export const ROTULO_DESPESA: Record<SituacaoDespesa, string> = { paga: 'Paga', aberta: 'Em aberto', vencida: 'Vencida' };
+export const ROTULO_DESPESA: Record<SituacaoDespesa, string> = {
+  paga: 'Paga',
+  aberta: 'Em aberto',
+  vencida: 'Vencida',
+};
 
-export function situacaoDespesa(d: Pick<Despesa, 'valor' | 'pago' | 'vencimento'>, hoje: DataISO): SituacaoDespesa {
+export function situacaoDespesa(
+  d: Pick<Despesa, 'valor' | 'pago' | 'vencimento'>,
+  hoje: DataISO,
+): SituacaoDespesa {
   if (d.pago >= d.valor) return 'paga';
   return d.vencimento && diasEntre(hoje, d.vencimento) < 0 ? 'vencida' : 'aberta';
 }
@@ -91,7 +103,12 @@ export interface ResumoMes {
 }
 
 /** Movimento de caixa da conta principal e despesas (pelo vencimento) do mês AAAA-MM. */
-export function resumirMes(movimentos: Movimento[], despesas: Despesa[], mes: string, conta = CONTA_PRINCIPAL): ResumoMes {
+export function resumirMes(
+  movimentos: Movimento[],
+  despesas: Despesa[],
+  mes: string,
+  conta = CONTA_PRINCIPAL,
+): ResumoMes {
   const doMes = movimentos.filter((m) => m.conta === conta && m.data.startsWith(mes));
   const despesasMes = despesas.filter((d) => (d.vencimento ?? d.pagamento ?? d.criadoEm).startsWith(mes));
   const soma = (xs: Array<{ valor: Centavos }>) => xs.reduce((t, x) => t + x.valor, 0);

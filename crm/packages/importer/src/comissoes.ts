@@ -31,11 +31,16 @@ export interface ResultadoComissoes {
 }
 
 /** Ramos de vigência anual: o fim é estimado em proposta + 12 meses. */
-const ANUAIS = /automovel|auto\b|resid|empresa|respons|\brc\b|fianca|aluguel|transporte|bike|celular|portat|camera|equip/;
+const ANUAIS =
+  /automovel|auto\b|resid|empresa|respons|\brc\b|fianca|aluguel|transporte|bike|celular|portat|camera|equip/;
 const NAO_SAO_APOLICES = /endosso|estorno|cartao|rastreador/;
 const PRODUTORES_CORRETORA = /^corret/;
 
-const norm = (t?: string) => semAcento(t ?? '').toLowerCase().replace(/\s+/g, ' ').trim();
+const norm = (t?: string) =>
+  semAcento(t ?? '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
 
 export function ehFormatoComissoes(abas: Aba[]): boolean {
   return abas.some((a) => norm(a.nome) === 'a receber') || abas.some((a) => /^comiss/.test(norm(a.nome)));
@@ -58,7 +63,8 @@ function acharLinha(linhas: Celula[][], teste: (titulos: string[]) => boolean, d
   return -1;
 }
 
-const ehConsorcio = (produto?: string, companhia?: string) => /cons?o?rcio|cnsorcio/.test(norm(produto)) || norm(companhia) === 'magalu';
+const ehConsorcio = (produto?: string, companhia?: string) =>
+  /cons?o?rcio|cnsorcio/.test(norm(produto)) || norm(companhia) === 'magalu';
 
 /** "8.10" → "8/10"; número 14 → "14". */
 function parcela(c: Celula): string | undefined {
@@ -115,7 +121,9 @@ export const chaveParcela = (v: Venda) =>
 export function lerVendas(aba: Aba, avisos: string[]): { vendas: Venda[]; estornos: Venda[] } {
   const vendas: Venda[] = [];
   const estornos: Venda[] = [];
-  const corretorDaAba = /^comiss/.test(norm(aba.nome)) ? texto(aba.nome.replace(/^comiss(o|õ)es\s*/i, '')) : undefined;
+  const corretorDaAba = /^comiss/.test(norm(aba.nome))
+    ? texto(aba.nome.replace(/^comiss(o|õ)es\s*/i, ''))
+    : undefined;
 
   const ler = (inicio: number, estorno: boolean, destino: Venda[]) => {
     const cab = aba.linhas[inicio] ?? [];
@@ -164,7 +172,8 @@ export function lerVendas(aba: Aba, avisos: string[]): { vendas: Venda[]; estorn
         premio: dinheiro(l[c.premio]) || undefined,
         comissaoReceber: receber,
         // Nas abas de corretor, a parcela recebida é a que tem data de recebimento.
-        comissaoRecebida: c.recebida >= 0 ? (dinheiro(l[c.recebida]) ?? 0) : data(l[c.receb]) || estorno ? receber : 0,
+        comissaoRecebida:
+          c.recebida >= 0 ? (dinheiro(l[c.recebida]) ?? 0) : data(l[c.receb]) || estorno ? receber : 0,
         repasse: c.repasse >= 0 ? dinheiro(l[c.repasse]) : undefined,
         repassePago: c.pago >= 0 ? dinheiro(l[c.pago]) : undefined,
         estorno: estorno || /estorno/.test(norm(produto)) || undefined,
@@ -174,11 +183,18 @@ export function lerVendas(aba: Aba, avisos: string[]): { vendas: Venda[]; estorn
     }
   };
 
-  const cab = acharLinha(aba.linhas, (t) => t.some((x) => x.startsWith('nome')) && t.some((x) => x.startsWith('parcela')));
+  const cab = acharLinha(
+    aba.linhas,
+    (t) => t.some((x) => x.startsWith('nome')) && t.some((x) => x.startsWith('parcela')),
+  );
   if (cab >= 0) ler(cab, false, vendas);
   const est = acharLinha(aba.linhas, (t) => /^(controle de estornos|estorno por)/.test(t[0] ?? ''), cab + 1);
   if (est >= 0) {
-    const cabEst = acharLinha(aba.linhas, (t) => t.some((x) => x.startsWith('nome')) && t.some((x) => x.startsWith('parcela')), est);
+    const cabEst = acharLinha(
+      aba.linhas,
+      (t) => t.some((x) => x.startsWith('nome')) && t.some((x) => x.startsWith('parcela')),
+      est,
+    );
     if (cabEst >= 0) ler(cabEst, true, estornos);
   }
   return { vendas, estornos };
@@ -189,7 +205,14 @@ function lerExtrato(aba: Aba, conta: string): MovimentoImportado[] {
   const cab = acharLinha(aba.linhas, (t) => t[0] === 'data' && t.some((x) => x.startsWith('historico')));
   if (cab < 0) return [];
   const col = colunas(aba.linhas[cab]!);
-  const [iData, iHist, iDoc, iCred, iDeb, iSaldo] = [col('data'), col('historico'), col('doc'), col('credito'), col('debito'), col('saldo')];
+  const [iData, iHist, iDoc, iCred, iDeb, iSaldo] = [
+    col('data'),
+    col('historico'),
+    col('doc'),
+    col('credito'),
+    col('debito'),
+    col('saldo'),
+  ];
   const movimentos: MovimentoImportado[] = [];
   for (let i = cab + 1; i < aba.linhas.length; i++) {
     const l = aba.linhas[i] ?? [];
@@ -199,7 +222,12 @@ function lerExtrato(aba: Aba, conta: string): MovimentoImportado[] {
     if (!dia || !descricao) continue;
     const base = { conta, data: dia, descricao, documento: texto(l[iDoc]) };
     if (/saldo anterior/.test(norm(descricao))) {
-      movimentos.push({ ...base, chave: `${conta}|${i}`, tipo: 'saldo_inicial', valor: dinheiro(l[iSaldo]) ?? 0 });
+      movimentos.push({
+        ...base,
+        chave: `${conta}|${i}`,
+        tipo: 'saldo_inicial',
+        valor: dinheiro(l[iSaldo]) ?? 0,
+      });
       continue;
     }
     const credito = dinheiro(l[iCred]) ?? 0;
@@ -236,7 +264,13 @@ function lerDespesas(aba: Aba): DespesaImportada[] {
   const cab = acharLinha(aba.linhas, (t) => t[0] === 'item' && t.some((x) => x.startsWith('venc')), secao);
   if (cab < 0) return [];
   const col = colunas(aba.linhas[cab]!);
-  const [iVenc, iPgto, iHist, iDeb, iPago] = [col('venc'), col('data pgto'), col('historico'), col('debito'), col('pago')];
+  const [iVenc, iPgto, iHist, iDeb, iPago] = [
+    col('venc'),
+    col('data pgto'),
+    col('historico'),
+    col('debito'),
+    col('pago'),
+  ];
   const despesas: DespesaImportada[] = [];
   for (let i = cab + 1; i < aba.linhas.length; i++) {
     const l = aba.linhas[i] ?? [];
@@ -282,7 +316,11 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
       incluir(v, '');
       porChave.set(chaveParcela(v), [...(porChave.get(chaveParcela(v)) ?? []), v]);
     }
-    relatorio.push({ nome: abaAReceber.nome, uso: 'vendas e comissões', linhas: vendas.length + estornos.length });
+    relatorio.push({
+      nome: abaAReceber.nome,
+      uso: 'vendas e comissões',
+      linhas: vendas.length + estornos.length,
+    });
   }
 
   for (const aba of abas) {
@@ -299,13 +337,23 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
           candidatas.find((r) => Math.abs(r.comissaoReceber - v.comissaoReceber) < 0.01) ??
           candidatas.find((r) => norm(r.produto) === norm(v.produto)) ??
           candidatas[0];
-        const corretorDaParcela = par && !PRODUTORES_CORRETORA.test(norm(par.produtor)) ? norm(par.produtor) : undefined;
-        if (par && (par.repasseDe != null || (corretorDaParcela != null && corretorDaParcela !== norm(v.produtor)))) {
+        const corretorDaParcela =
+          par && !PRODUTORES_CORRETORA.test(norm(par.produtor)) ? norm(par.produtor) : undefined;
+        if (
+          par &&
+          (par.repasseDe != null || (corretorDaParcela != null && corretorDaParcela !== norm(v.produtor)))
+        ) {
           // A mesma parcela já tem repasse de outro corretor (ex.: supervisão): vira um repasse adicional,
           // sem repetir o valor recebido da seguradora.
           casadas.add(par);
           incluir(
-            { ...v, premio: undefined, comissaoReceber: 0, comissaoRecebida: 0, observacoes: `Repasse adicional sobre a parcela de ${par.repasseDe ?? par.produtor}.` },
+            {
+              ...v,
+              premio: undefined,
+              comissaoReceber: 0,
+              comissaoRecebida: 0,
+              observacoes: `Repasse adicional sobre a parcela de ${par.repasseDe ?? par.produtor}.`,
+            },
             `${norm(aba.nome)}|adicional|`,
           );
           adicionais++;
@@ -328,7 +376,11 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
         linhas: vendas.length + estornos.length,
       });
     } else if (/^essencial/.test(nome)) {
-      relatorio.push({ nome: aba.nome, uso: 'ignorada: detalhamento da assessoria (valores líquidos já estão em "A Receber")', linhas: 0 });
+      relatorio.push({
+        nome: aba.nome,
+        uso: 'ignorada: detalhamento da assessoria (valores líquidos já estão em "A Receber")',
+        linhas: 0,
+      });
     } else if (/bradesco/.test(nome)) {
       const m = lerExtrato(aba, 'Bradesco');
       movimentos.push(...m);
@@ -338,19 +390,40 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
       for (const par of lerPares(aba)) {
         const conta = /tracker/i.test(par.titulo) ? 'Tracker' : 'Poupança Portella';
         par.itens.forEach((it, i) => {
-          movimentos.push({ chave: `${conta}|${it.data}|${i}`, conta, data: it.data, descricao: it.valor < 0 ? 'Resgate' : 'Depósito', tipo: it.valor < 0 ? 'saida' : 'entrada', valor: Math.abs(it.valor) });
+          movimentos.push({
+            chave: `${conta}|${it.data}|${i}`,
+            conta,
+            data: it.data,
+            descricao: it.valor < 0 ? 'Resgate' : 'Depósito',
+            tipo: it.valor < 0 ? 'saida' : 'entrada',
+            valor: Math.abs(it.valor),
+          });
           n++;
         });
       }
       relatorio.push({ nome: aba.nome, uso: 'depósitos da poupança', linhas: n });
     } else if (/faturamento/.test(nome)) {
       const [fat, cons] = lerPares(aba);
-      for (const it of fat?.itens ?? []) fechamentos.set(it.data.slice(0, 7), { ...fechamentos.get(it.data.slice(0, 7)), mes: it.data.slice(0, 7), faturamento: it.valor });
-      for (const it of cons?.itens ?? []) fechamentos.set(it.data.slice(0, 7), { ...fechamentos.get(it.data.slice(0, 7)), mes: it.data.slice(0, 7), creditoConsorcio: it.valor });
+      for (const it of fat?.itens ?? [])
+        fechamentos.set(it.data.slice(0, 7), {
+          ...fechamentos.get(it.data.slice(0, 7)),
+          mes: it.data.slice(0, 7),
+          faturamento: it.valor,
+        });
+      for (const it of cons?.itens ?? [])
+        fechamentos.set(it.data.slice(0, 7), {
+          ...fechamentos.get(it.data.slice(0, 7)),
+          mes: it.data.slice(0, 7),
+          creditoConsorcio: it.valor,
+        });
       relatorio.push({ nome: aba.nome, uso: 'faturamento mensal', linhas: fechamentos.size });
     } else if (/demonstrativo/.test(nome)) {
       despesas = lerDespesas(aba);
-      relatorio.push({ nome: aba.nome, uso: 'despesas da empresa (receitas e repasses são calculados pelo CRM)', linhas: despesas.length });
+      relatorio.push({
+        nome: aba.nome,
+        uso: 'despesas da empresa (receitas e repasses são calculados pelo CRM)',
+        linhas: despesas.length,
+      });
     } else {
       relatorio.push({ nome: aba.nome, uso: 'ignorada: formato não reconhecido', linhas: 0 });
       avisos.push(`Aba "${aba.nome}" não reconhecida; ignorada.`);
@@ -359,8 +432,16 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
 
   // 2) Clientes, vendas (apólices/cotas) e comissões de cada sistema.
   const sistemas = {
-    seguros: { clientes: new Map<string, ClienteImportado>(), vendas: new Map<string, ApoliceImportada>(), comissoes: [] as ComissaoImportada[] },
-    consorcio: { clientes: new Map<string, ClienteImportado>(), vendas: new Map<string, CotaImportada>(), comissoes: [] as ComissaoImportada[] },
+    seguros: {
+      clientes: new Map<string, ClienteImportado>(),
+      vendas: new Map<string, ApoliceImportada>(),
+      comissoes: [] as ComissaoImportada[],
+    },
+    consorcio: {
+      clientes: new Map<string, ClienteImportado>(),
+      vendas: new Map<string, CotaImportada>(),
+      comissoes: [] as ComissaoImportada[],
+    },
   };
 
   for (const { chave, venda: v } of parcelas) {
@@ -370,7 +451,12 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
     const responsavel = daCorretora ? undefined : v.produtor;
     const clienteChave = chaveCliente(v.nome);
     if (!s.clientes.has(clienteChave)) {
-      s.clientes.set(clienteChave, { chave: clienteChave, nome: v.nome, tipoPessoa: /ltda|eirel|s\/?a\b|\bme\b|epp|servicos|comercio/i.test(semAcento(v.nome)) ? 'PJ' : 'PF', responsavel });
+      s.clientes.set(clienteChave, {
+        chave: clienteChave,
+        nome: v.nome,
+        tipoPessoa: /ltda|eirel|s\/?a\b|\bme\b|epp|servicos|comercio/i.test(semAcento(v.nome)) ? 'PJ' : 'PF',
+        responsavel,
+      });
     }
 
     const vendaChave = chaveVenda(v);
@@ -399,7 +485,9 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
           ramo: v.produto,
           numero: v.numeroProposta,
           inicioVigencia: v.dataProposta,
-          fimVigencia: anual ? `${Number(v.dataProposta.slice(0, 4)) + 1}${v.dataProposta.slice(4)}` : undefined,
+          fimVigencia: anual
+            ? `${Number(v.dataProposta.slice(0, 4)) + 1}${v.dataProposta.slice(4)}`
+            : undefined,
           vigenciaEstimada: anual || undefined,
           premioLiquido: v.premio,
           responsavel,
@@ -422,7 +510,8 @@ export function converterComissoes(abas: Aba[], origem: string, agora = new Date
       premio: v.premio,
       comissaoReceber: v.comissaoReceber,
       comissaoRecebida: v.comissaoRecebida,
-      percentualRepasse: v.repasse && v.comissaoReceber ? Math.round((v.repasse / v.comissaoReceber) * 100) : undefined,
+      percentualRepasse:
+        v.repasse && v.comissaoReceber ? Math.round((v.repasse / v.comissaoReceber) * 100) : undefined,
       repasse: daCorretora ? undefined : v.repasse,
       repassePago: daCorretora ? undefined : v.repassePago,
       estorno: v.estorno,

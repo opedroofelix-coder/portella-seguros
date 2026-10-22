@@ -47,7 +47,8 @@ export function identificarRamo(nome: string): Apolice['ramo'] {
   return 'outros';
 }
 
-const motivo = (e: unknown) => Object.values((e as { campos?: Record<string, string> }).campos ?? {}).join(' ') || (e as Error).message;
+const motivo = (e: unknown) =>
+  Object.values((e as { campos?: Record<string, string> }).campos ?? {}).join(' ') || (e as Error).message;
 
 export function criarImportacao(servicos: ServicosSeguros): Importacao {
   return {
@@ -102,20 +103,26 @@ export function criarImportacao(servicos: ServicosSeguros): Importacao {
         agora,
       );
 
-      const movimentos: Movimento[] = ((arquivo.movimentos as MovimentoImportado[] | undefined) ?? []).map(({ chave, valor, ...m }) => ({
-        ...m,
-        ...registro,
-        id: idImportado('movimento', chave),
-        valor: centavos(valor) ?? 0,
-      }));
-      const despesas: Despesa[] = ((arquivo.despesas as DespesaImportada[] | undefined) ?? []).map(({ chave, valor, pago, ...d }) => ({
-        ...d,
-        ...registro,
-        id: idImportado('despesa', chave),
-        valor: centavos(valor) ?? 0,
-        pago: centavos(pago) ?? 0,
-      }));
-      const fechamentos: Fechamento[] = ((arquivo.fechamentos as FechamentoImportado[] | undefined) ?? []).map((f) => ({
+      const movimentos: Movimento[] = ((arquivo.movimentos as MovimentoImportado[] | undefined) ?? []).map(
+        ({ chave, valor, ...m }) => ({
+          ...m,
+          ...registro,
+          id: idImportado('movimento', chave),
+          valor: centavos(valor) ?? 0,
+        }),
+      );
+      const despesas: Despesa[] = ((arquivo.despesas as DespesaImportada[] | undefined) ?? []).map(
+        ({ chave, valor, pago, ...d }) => ({
+          ...d,
+          ...registro,
+          id: idImportado('despesa', chave),
+          valor: centavos(valor) ?? 0,
+          pago: centavos(pago) ?? 0,
+        }),
+      );
+      const fechamentos: Fechamento[] = (
+        (arquivo.fechamentos as FechamentoImportado[] | undefined) ?? []
+      ).map((f) => ({
         ...registro,
         id: f.mes,
         mes: f.mes,
@@ -124,8 +131,12 @@ export function criarImportacao(servicos: ServicosSeguros): Importacao {
       }));
 
       const estimadas = apolices.filter((a) => a.vigenciaEstimada).length;
-      if (estimadas) avisos.push(`${estimadas} apólice(s) com fim de vigência estimado (proposta + 12 meses): confirme na tela de apólices.`);
-      for (const nome of naoEncontrados) avisos.push(`Corretor "${nome}" não cadastrado: os registros ficaram com ${ator.nome}.`);
+      if (estimadas)
+        avisos.push(
+          `${estimadas} apólice(s) com fim de vigência estimado (proposta + 12 meses): confirme na tela de apólices.`,
+        );
+      for (const nome of naoEncontrados)
+        avisos.push(`Corretor "${nome}" não cadastrado: os registros ficaram com ${ator.nome}.`);
 
       return {
         resumo: [

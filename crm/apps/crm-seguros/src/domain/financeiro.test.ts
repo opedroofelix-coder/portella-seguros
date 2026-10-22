@@ -1,12 +1,39 @@
 import { ErroValidacao } from '@portella/core';
 import { describe, expect, it } from 'vitest';
 import type { Despesa, Movimento } from './financeiro';
-import { extrato, resumirMes, saldosPorConta, situacaoDespesa, validarDespesa, validarFechamento, validarMovimento } from './financeiro';
+import {
+  extrato,
+  resumirMes,
+  saldosPorConta,
+  situacaoDespesa,
+  validarDespesa,
+  validarFechamento,
+  validarMovimento,
+} from './financeiro';
 
 let n = 0;
-const base = () => ({ id: String(++n), responsavelId: 'a', criadoEm: '2026-10-01T00:00:00Z', atualizadoEm: '' });
-const mov = (p: Partial<Movimento>): Movimento => ({ ...base(), conta: 'Bradesco', data: '2026-10-05', descricao: 'Mov', tipo: 'entrada', valor: 1000, ...p });
-const desp = (p: Partial<Despesa>): Despesa => ({ ...base(), descricao: 'Aluguel', valor: 300000, pago: 0, ...p });
+const base = () => ({
+  id: String(++n),
+  responsavelId: 'a',
+  criadoEm: '2026-10-01T00:00:00Z',
+  atualizadoEm: '',
+});
+const mov = (p: Partial<Movimento>): Movimento => ({
+  ...base(),
+  conta: 'Bradesco',
+  data: '2026-10-05',
+  descricao: 'Mov',
+  tipo: 'entrada',
+  valor: 1000,
+  ...p,
+});
+const desp = (p: Partial<Despesa>): Despesa => ({
+  ...base(),
+  descricao: 'Aluguel',
+  valor: 300000,
+  pago: 0,
+  ...p,
+});
 
 describe('financeiro', () => {
   const movimentos = [
@@ -25,8 +52,22 @@ describe('financeiro', () => {
   });
 
   it('resume o mês da conta principal e as despesas', () => {
-    const r = resumirMes(movimentos, [desp({ vencimento: '2026-10-15', pago: 300000 }), desp({ vencimento: '2026-10-20', valor: 10000 }), desp({ vencimento: '2026-11-05' })], '2026-10');
-    expect(r).toEqual({ entradas: 3143, saidas: 10000, despesas: 310000, despesasPagas: 300000, despesasAbertas: 10000 });
+    const r = resumirMes(
+      movimentos,
+      [
+        desp({ vencimento: '2026-10-15', pago: 300000 }),
+        desp({ vencimento: '2026-10-20', valor: 10000 }),
+        desp({ vencimento: '2026-11-05' }),
+      ],
+      '2026-10',
+    );
+    expect(r).toEqual({
+      entradas: 3143,
+      saidas: 10000,
+      despesas: 310000,
+      despesasPagas: 300000,
+      despesasAbertas: 10000,
+    });
   });
 
   it('classifica despesas e valida dados', () => {

@@ -33,7 +33,15 @@ export const RAMOS = [
 export type Ramo = (typeof RAMOS)[number]['id'];
 
 /** Ramos com vigência anual (renovação todo ano). Os demais são contratos contínuos (vida, saúde…). */
-export const RAMOS_ANUAIS: ReadonlySet<Ramo> = new Set<Ramo>(['auto', 'residencial', 'empresarial', 'rc', 'fianca', 'transportes', 'equipamentos']);
+export const RAMOS_ANUAIS: ReadonlySet<Ramo> = new Set<Ramo>([
+  'auto',
+  'residencial',
+  'empresarial',
+  'rc',
+  'fianca',
+  'transportes',
+  'equipamentos',
+]);
 
 const nomesSeguradoras = new Map<string, string>(SEGURADORAS.map((s) => [s.id, s.nome]));
 const nomesRamos = new Map<string, string>(RAMOS.map((r) => [r.id, r.nome]));

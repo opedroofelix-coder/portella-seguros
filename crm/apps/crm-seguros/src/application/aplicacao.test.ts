@@ -105,12 +105,46 @@ describe('importação de seguros', () => {
         { chave: 'a3', clienteChave: 'k2', seguradora: 'GNDI', ramo: 'Saude', inicioVigencia: '2024-06-01' },
       ],
       comissoes: [
-        { chave: 'x1', clienteChave: 'k1', vendaChave: 'a1', clienteNome: 'Maria', produto: 'Auto', companhia: 'Porto Seguro', comissaoReceber: 300, comissaoRecebida: 300, repasse: 60, responsavel: 'Carlos' },
-        { chave: 'x2', clienteChave: 'k2', clienteNome: 'João', produto: 'Endosso', companhia: 'HDI', comissaoReceber: 40, comissaoRecebida: 0, vendaDaCorretora: true },
+        {
+          chave: 'x1',
+          clienteChave: 'k1',
+          vendaChave: 'a1',
+          clienteNome: 'Maria',
+          produto: 'Auto',
+          companhia: 'Porto Seguro',
+          comissaoReceber: 300,
+          comissaoRecebida: 300,
+          repasse: 60,
+          responsavel: 'Carlos',
+        },
+        {
+          chave: 'x2',
+          clienteChave: 'k2',
+          clienteNome: 'João',
+          produto: 'Endosso',
+          companhia: 'HDI',
+          comissaoReceber: 40,
+          comissaoRecebida: 0,
+          vendaDaCorretora: true,
+        },
       ],
       movimentos: [
-        { chave: 'm1', conta: 'Bradesco', data: '2024-10-31', descricao: 'Saldo Anterior', tipo: 'saldo_inicial', valor: 16389.31 },
-        { chave: 'm2', conta: 'Bradesco', data: '2024-12-02', descricao: 'Recebimento', tipo: 'entrada', valor: 31.43 },
+        {
+          chave: 'm1',
+          conta: 'Bradesco',
+          data: '2024-10-31',
+          descricao: 'Saldo Anterior',
+          tipo: 'saldo_inicial',
+          valor: 16389.31,
+        },
+        {
+          chave: 'm2',
+          conta: 'Bradesco',
+          data: '2024-12-02',
+          descricao: 'Recebimento',
+          tipo: 'entrada',
+          valor: 31.43,
+        },
       ],
       despesas: [{ chave: 'd1', descricao: 'Aluguel', vencimento: '2024-12-15', valor: 3327, pago: 3327 }],
       fechamentos: [{ mes: '2024-12', faturamento: 65341.09, creditoConsorcio: 498000 }],
@@ -132,11 +166,23 @@ describe('importação de seguros', () => {
 
     const apolices = await s.apolices.listar(admin);
     expect(apolices).toHaveLength(2);
-    expect(apolices.find((a) => a.numero === undefined && a.ramo === 'auto')).toMatchObject({ premioLiquido: 150050, seguradora: 'porto', responsavelId: 'c1' });
-    expect(apolices.find((a) => a.ramo === 'saude')).toMatchObject({ seguradora: 'GNDI', fimVigencia: undefined });
+    expect(apolices.find((a) => a.numero === undefined && a.ramo === 'auto')).toMatchObject({
+      premioLiquido: 150050,
+      seguradora: 'porto',
+      responsavelId: 'c1',
+    });
+    expect(apolices.find((a) => a.ramo === 'saude')).toMatchObject({
+      seguradora: 'GNDI',
+      fimVigencia: undefined,
+    });
     const comissoes = await s.comissoes.listar(admin);
     expect(comissoes).toHaveLength(2);
-    expect(comissoes.find((c) => c.clienteNome === 'Maria')).toMatchObject({ vendaId: 'imp:apolice:a1', comissaoRecebida: 30000, repasse: 6000, responsavelId: 'c1' });
+    expect(comissoes.find((c) => c.clienteNome === 'Maria')).toMatchObject({
+      vendaId: 'imp:apolice:a1',
+      comissaoRecebida: 30000,
+      repasse: 6000,
+      responsavelId: 'c1',
+    });
     expect(await s.comissoes.listar(carlos)).toHaveLength(1);
     expect(await s.movimentos.listar(admin)).toHaveLength(2);
     await expect(s.movimentos.listar(carlos)).rejects.toThrow();

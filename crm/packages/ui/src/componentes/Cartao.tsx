@@ -35,7 +35,7 @@ export function Indicador({
       <span className={styles.indicadorRotulo}>{rotulo}</span>
       <strong
         className={styles.indicadorValor}
-        data-longo={typeof valor === 'string' && valor.length > 8 ? '' : undefined}
+        data-longo={typeof valor === 'string' && (valor.length > 8 || valor.includes('R$')) ? '' : undefined}
       >
         {valor}
       </strong>

@@ -44,7 +44,16 @@ export function PaginaCotas() {
         .filter((c) => !tipo || c.tipoBem === tipo)
         .filter((c) => !status || c.status === status)
         .filter((c) => !responsavel || c.responsavelId === responsavel)
-        .filter((c) => corresponde(busca, indice.get(c.clienteId)?.nome, c.grupo, c.cota, c.administradora, c.numeroProposta))
+        .filter((c) =>
+          corresponde(
+            busca,
+            indice.get(c.clienteId)?.nome,
+            c.grupo,
+            c.cota,
+            c.administradora,
+            c.numeroProposta,
+          ),
+        )
         .filter((c) => !pendencia || (pendencia === 'pendente') === camposPendentes(c).length > 0)
         .sort(
           (a, b) =>
@@ -104,7 +113,10 @@ export function PaginaCotas() {
             </Selecao>
           </Campo>
           <Campo rotulo="Cadastro">
-            <Selecao value={pendencia} onChange={(e) => setPendencia(e.target.value as '' | 'pendente' | 'completo')}>
+            <Selecao
+              value={pendencia}
+              onChange={(e) => setPendencia(e.target.value as '' | 'pendente' | 'completo')}
+            >
               <option value="">Todos</option>
               <option value="pendente">A completar</option>
               <option value="completo">Completo</option>

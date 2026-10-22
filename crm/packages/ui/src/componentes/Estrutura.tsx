@@ -70,6 +70,7 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
               key={item.para}
               to={item.para}
               end={item.para === '/'}
+              onClick={() => setAberto(false)}
               className={({ isActive }) => `${styles.link} ${isActive ? styles.linkAtivo : ''}`}
             >
               <Icone nome={item.icone} />

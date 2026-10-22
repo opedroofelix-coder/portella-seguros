@@ -8,20 +8,34 @@ export function ResumoFinanceiro() {
   const { movimentos, despesas, fechamentos } = useFinanceiro();
   const movs = useMemo(() => movimentos.data ?? [], [movimentos.data]);
   const desps = useMemo(() => despesas.data ?? [], [despesas.data]);
-  const meses = useMemo(() => mesesDe([...movs.map((m) => m.data), ...desps.map((d) => d.vencimento)]), [movs, desps]);
+  const meses = useMemo(
+    () => mesesDe([...movs.map((m) => m.data), ...desps.map((d) => d.vencimento)]),
+    [movs, desps],
+  );
   const [mes, setMes] = useState<string | null>(null);
   const mesAtivo = mes ?? meses[0] ?? hojeISO().slice(0, 7);
   const fimDoMes = `${mesAtivo}-31`;
   const hoje = hojeISO();
 
   const resumo = useMemo(() => resumirMes(movs, desps, mesAtivo), [movs, desps, mesAtivo]);
-  const saldos = useMemo(() => [...saldosPorConta(movs, fimDoMes)].sort((a, b) => b[1] - a[1]), [movs, fimDoMes]);
+  const saldos = useMemo(
+    () => [...saldosPorConta(movs, fimDoMes)].sort((a, b) => b[1] - a[1]),
+    [movs, fimDoMes],
+  );
   const aPagar = useMemo(
-    () => desps.filter((d) => situacaoDespesa(d, hoje) !== 'paga').sort((a, b) => (a.vencimento ?? '').localeCompare(b.vencimento ?? '')).slice(0, 8),
+    () =>
+      desps
+        .filter((d) => situacaoDespesa(d, hoje) !== 'paga')
+        .sort((a, b) => (a.vencimento ?? '').localeCompare(b.vencimento ?? ''))
+        .slice(0, 8),
     [desps, hoje],
   );
   const faturamento = useMemo(
-    () => (fechamentos.data ?? []).filter((f) => f.faturamento != null).sort((a, b) => a.mes.localeCompare(b.mes)).slice(-12),
+    () =>
+      (fechamentos.data ?? [])
+        .filter((f) => f.faturamento != null)
+        .sort((a, b) => a.mes.localeCompare(b.mes))
+        .slice(-12),
     [fechamentos.data],
   );
   const saldoPrincipal = saldos.find(([c]) => c === CONTA_PRINCIPAL)?.[1];
@@ -31,22 +45,42 @@ export function ResumoFinanceiro() {
       <BarraFiltros>
         <Campo rotulo="Mês">
           <Selecao value={mesAtivo} onChange={(e) => setMes(e.target.value)}>
-            {(meses.length ? meses : [mesAtivo]).map((m) => <option key={m} value={m}>{rotuloMes(m)}</option>)}
+            {(meses.length ? meses : [mesAtivo]).map((m) => (
+              <option key={m} value={m}>
+                {rotuloMes(m)}
+              </option>
+            ))}
           </Selecao>
         </Campo>
       </BarraFiltros>
       <div className="grade-4">
-        <Indicador rotulo={`Saldo ${CONTA_PRINCIPAL}`} valor={formatarDinheiro(saldoPrincipal ?? 0)} detalhe={`no fim de ${rotuloMesCurto(mesAtivo)}`} />
+        <Indicador
+          rotulo={`Saldo ${CONTA_PRINCIPAL}`}
+          valor={formatarDinheiro(saldoPrincipal ?? 0)}
+          detalhe={`no fim de ${rotuloMesCurto(mesAtivo)}`}
+        />
         <Indicador rotulo="Entradas" valor={formatarDinheiro(resumo.entradas)} detalhe="na conta principal" />
-        <Indicador rotulo="Saídas" valor={formatarDinheiro(resumo.saidas)} detalhe={`resultado ${formatarDinheiro(resumo.entradas - resumo.saidas)}`} />
-        <Indicador rotulo="Despesas em aberto" valor={formatarDinheiro(resumo.despesasAbertas)} detalhe={`de ${formatarDinheiro(resumo.despesas)} no mês`} />
+        <Indicador
+          rotulo="Saídas"
+          valor={formatarDinheiro(resumo.saidas)}
+          detalhe={`resultado ${formatarDinheiro(resumo.entradas - resumo.saidas)}`}
+        />
+        <Indicador
+          rotulo="Despesas em aberto"
+          valor={formatarDinheiro(resumo.despesasAbertas)}
+          detalhe={`de ${formatarDinheiro(resumo.despesas)} no mês`}
+        />
       </div>
       <div className="grade-3">
         <Cartao titulo="Faturamento mensal">
           {faturamento.length ? (
             <Barras
               rotulo="Faturamento por mês"
-              itens={faturamento.map((f) => ({ rotulo: rotuloMesCurto(f.mes), valor: f.faturamento ?? 0, valorTexto: formatarDinheiro(f.faturamento) }))}
+              itens={faturamento.map((f) => ({
+                rotulo: rotuloMesCurto(f.mes),
+                valor: f.faturamento ?? 0,
+                valorTexto: formatarDinheiro(f.faturamento),
+              }))}
             />
           ) : (
             <p className="texto-suave">Nenhum fechamento cadastrado.</p>
@@ -56,7 +90,10 @@ export function ResumoFinanceiro() {
           {saldos.length ? (
             <dl className="lista-dados">
               {saldos.map(([conta, valor]) => (
-                <div key={conta}><dt>{conta}</dt><dd>{formatarDinheiro(valor)}</dd></div>
+                <div key={conta}>
+                  <dt>{conta}</dt>
+                  <dd>{formatarDinheiro(valor)}</dd>
+                </div>
               ))}
             </dl>
           ) : (

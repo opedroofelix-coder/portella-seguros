@@ -78,7 +78,9 @@ export function criarImportacao(servicos: ServicosConsorcio): Importacao {
           idCota.set(c.chave, item.id);
         } catch (e) {
           const campos = Object.values((e as { campos?: Record<string, string> }).campos ?? {}).join(' ');
-          avisos.push(`Cota ${c.grupo ?? c.numeroProposta ?? c.chave}${c.cota ? `/${c.cota}` : ''} ignorada: ${campos || (e as Error).message}`);
+          avisos.push(
+            `Cota ${c.grupo ?? c.numeroProposta ?? c.chave}${c.cota ? `/${c.cota}` : ''} ignorada: ${campos || (e as Error).message}`,
+          );
         }
       }
       const comissoes = prepararComissoes(
@@ -90,7 +92,8 @@ export function criarImportacao(servicos: ServicosConsorcio): Importacao {
         agora,
       );
       const pendentes = cotas.filter((c) => !c.grupo || !c.cota || !c.prazoMeses).length;
-      if (pendentes) avisos.push(`${pendentes} cota(s) sem grupo, cota ou prazo: complete o cadastro na tela de cotas.`);
+      if (pendentes)
+        avisos.push(`${pendentes} cota(s) sem grupo, cota ou prazo: complete o cadastro na tela de cotas.`);
       for (const nome of naoEncontrados)
         avisos.push(`Corretor "${nome}" não cadastrado: os registros ficaram com ${ator.nome}.`);
 

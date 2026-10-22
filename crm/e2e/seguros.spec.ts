@@ -118,7 +118,10 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(page.getByText('Saldo Bradesco')).toBeVisible();
     await page.getByRole('tab', { name: 'Despesas' }).click();
     await page.getByLabel('Mês do vencimento').selectOption({ label: 'Todos' });
-    await page.getByRole('row', { name: /Contador \(teste\)/ }).getByRole('button', { name: 'Pagar' }).click();
+    await page
+      .getByRole('row', { name: /Contador \(teste\)/ })
+      .getByRole('button', { name: 'Pagar' })
+      .click();
     await expect(page.getByText('Despesa paga.')).toBeVisible();
     await page.getByRole('tab', { name: 'Extrato' }).click();
     await expect(page.getByRole('table', { name: 'Extrato Bradesco' })).toContainText('R$ 12.020,40');

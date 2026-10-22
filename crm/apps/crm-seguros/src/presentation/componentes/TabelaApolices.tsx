@@ -50,7 +50,10 @@ export function TabelaApolices({
     {
       chave: 'fim',
       titulo: 'Fim da vigência',
-      render: (a) => (a.fimVigencia ? `${formatarData(a.fimVigencia)}${a.vigenciaEstimada ? ' (estimada)' : ''}` : 'Contínua'),
+      render: (a) =>
+        a.fimVigencia
+          ? `${formatarData(a.fimVigencia)}${a.vigenciaEstimada ? ' (estimada)' : ''}`
+          : 'Contínua',
     },
     { chave: 'sit', titulo: 'Situação', render: (a) => <SeloSituacao apolice={a} /> },
     ...(mostrarRenovacao

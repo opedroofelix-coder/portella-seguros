@@ -61,7 +61,9 @@ export function validarCota(c: Partial<Cota>): void {
 
 /** Campos que faltam para completar o cadastro da cota. */
 export function camposPendentes(c: Pick<Cota, 'grupo' | 'cota' | 'prazoMeses'>): string[] {
-  return [!c.grupo?.trim() && 'grupo', !c.cota?.trim() && 'cota', !c.prazoMeses && 'prazo'].filter(Boolean) as string[];
+  return [!c.grupo?.trim() && 'grupo', !c.cota?.trim() && 'cota', !c.prazoMeses && 'prazo'].filter(
+    Boolean,
+  ) as string[];
 }
 
 /** "1020 / 33", ou o nº da proposta enquanto grupo e cota estão pendentes. */

@@ -42,7 +42,15 @@ export function TabelaCotas({
       principal: !mostrarCliente,
       render: (c) =>
         camposPendentes(c).length ? (
-          <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              gap: 8,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-end',
+            }}
+          >
             {identificacaoCota(c)} <Selo tom="alerta">Completar cadastro</Selo>
           </span>
         ) : (

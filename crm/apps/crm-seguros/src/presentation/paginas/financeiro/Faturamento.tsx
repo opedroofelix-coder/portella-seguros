@@ -16,9 +16,22 @@ export function FaturamentoFinanceiro() {
   const total = lista.reduce((t, f) => t + (f.faturamento ?? 0), 0);
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
-        <p className="texto-suave" style={{ margin: 0 }}>Total no período: {formatarDinheiro(total)}</p>
-        <Botao icone="mais" onClick={() => setEditando('novo')}>Fechar mês</Botao>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 12,
+          flexWrap: 'wrap',
+          marginBottom: 16,
+        }}
+      >
+        <p className="texto-suave" style={{ margin: 0 }}>
+          Total no período: {formatarDinheiro(total)}
+        </p>
+        <Botao icone="mais" onClick={() => setEditando('novo')}>
+          Fechar mês
+        </Botao>
       </div>
       {fechamentos.isPending ? (
         <Carregando />
@@ -31,18 +44,37 @@ export function FaturamentoFinanceiro() {
           vazio={<EstadoVazio titulo="Nenhum fechamento">Importe a planilha ou feche o mês.</EstadoVazio>}
           colunas={[
             { chave: 'mes', titulo: 'Mês', principal: true, render: (f) => rotuloMes(f.mes) },
-            { chave: 'fat', titulo: 'Faturamento (comissões)', alinharDireita: true, render: (f) => formatarDinheiro(f.faturamento) },
-            { chave: 'cons', titulo: 'Crédito de consórcio vendido', alinharDireita: true, render: (f) => formatarDinheiro(f.creditoConsorcio) },
+            {
+              chave: 'fat',
+              titulo: 'Faturamento (comissões)',
+              alinharDireita: true,
+              render: (f) => formatarDinheiro(f.faturamento),
+            },
+            {
+              chave: 'cons',
+              titulo: 'Crédito de consórcio vendido',
+              alinharDireita: true,
+              render: (f) => formatarDinheiro(f.creditoConsorcio),
+            },
           ]}
         />
       )}
-      {editando && <FormularioFechamento fechamento={editando === 'novo' ? undefined : editando} aoFechar={() => setEditando(null)} />}
+      {editando && (
+        <FormularioFechamento
+          fechamento={editando === 'novo' ? undefined : editando}
+          aoFechar={() => setEditando(null)}
+        />
+      )}
     </>
   );
 }
 
 const dinheiro = z.string().refine((v) => !v.trim() || paraCentavos(v) != null, 'Valor inválido.');
-const esquema = z.object({ mes: z.string().regex(/^\d{4}-\d{2}$/, 'Escolha o mês.'), faturamento: dinheiro, creditoConsorcio: dinheiro });
+const esquema = z.object({
+  mes: z.string().regex(/^\d{4}-\d{2}$/, 'Escolha o mês.'),
+  faturamento: dinheiro,
+  creditoConsorcio: dinheiro,
+});
 type Valores = z.infer<typeof esquema>;
 
 function FormularioFechamento({ fechamento, aoFechar }: { fechamento?: Fechamento; aoFechar: () => void }) {
@@ -61,7 +93,13 @@ function FormularioFechamento({ fechamento, aoFechar }: { fechamento?: Fechament
     const c = (t: string) => (t.trim() ? (paraCentavos(t) ?? undefined) : undefined);
     try {
       // O id é o mês: fechar o mesmo mês de novo atualiza o registro.
-      await salvar.mutateAsync({ ...(fechamento ?? {}), id: v.mes, mes: v.mes, faturamento: c(v.faturamento), creditoConsorcio: c(v.creditoConsorcio) });
+      await salvar.mutateAsync({
+        ...(fechamento ?? {}),
+        id: v.mes,
+        mes: v.mes,
+        faturamento: c(v.faturamento),
+        creditoConsorcio: c(v.creditoConsorcio),
+      });
       avisar('Fechamento salvo.');
       aoFechar();
     } catch (e) {
@@ -78,15 +116,25 @@ function FormularioFechamento({ fechamento, aoFechar }: { fechamento?: Fechament
       largura={520}
       rodape={
         <>
-          <Botao variante="secundario" onClick={aoFechar}>Cancelar</Botao>
-          <Botao type="submit" form="form-fechamento" carregando={formState.isSubmitting}>Salvar</Botao>
+          <Botao variante="secundario" onClick={aoFechar}>
+            Cancelar
+          </Botao>
+          <Botao type="submit" form="form-fechamento" carregando={formState.isSubmitting}>
+            Salvar
+          </Botao>
         </>
       }
     >
       <form id="form-fechamento" className="grade" onSubmit={enviar} noValidate>
-        <Campo rotulo="Mês" obrigatorio erro={erros.mes?.message}><Entrada type="month" readOnly={Boolean(fechamento)} {...register('mes')} /></Campo>
-        <Campo rotulo="Faturamento (R$)" erro={erros.faturamento?.message}><Entrada inputMode="decimal" {...register('faturamento')} /></Campo>
-        <Campo rotulo="Crédito de consórcio vendido (R$)" erro={erros.creditoConsorcio?.message}><Entrada inputMode="decimal" {...register('creditoConsorcio')} /></Campo>
+        <Campo rotulo="Mês" obrigatorio erro={erros.mes?.message}>
+          <Entrada type="month" readOnly={Boolean(fechamento)} {...register('mes')} />
+        </Campo>
+        <Campo rotulo="Faturamento (R$)" erro={erros.faturamento?.message}>
+          <Entrada inputMode="decimal" {...register('faturamento')} />
+        </Campo>
+        <Campo rotulo="Crédito de consórcio vendido (R$)" erro={erros.creditoConsorcio?.message}>
+          <Entrada inputMode="decimal" {...register('creditoConsorcio')} />
+        </Campo>
       </form>
     </Modal>
   );

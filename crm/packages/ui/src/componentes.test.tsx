@@ -228,6 +228,10 @@ describe('Estrutura', () => {
     expect(abrir).toHaveAttribute('aria-expanded', 'true');
     await userEvent.click(screen.getByRole('button', { name: 'Fechar menu' }));
     expect(abrir).toHaveAttribute('aria-expanded', 'false');
+    // Tocar no link da página atual também fecha o menu
+    await userEvent.click(abrir);
+    await userEvent.click(screen.getByRole('link', { name: 'Clientes' }));
+    expect(abrir).toHaveAttribute('aria-expanded', 'false');
     await userEvent.click(screen.getByRole('button', { name: 'Sair' }));
     expect(sair).toHaveBeenCalled();
   });
