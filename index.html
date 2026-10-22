@@ -94,21 +94,28 @@
     <!-- 3. SEGURADORAS -->
     <section class="insurers" id="seguradoras" aria-labelledby="insurers-label">
       <p class="insurers__label" id="insurers-label">Algumas das seguradoras parceiras</p>
-      <div class="marquee">
-        <div class="marquee__track" data-marquee>
-          <div class="insurer"><img src="assets/img/seguradoras/porto.png" alt="Porto Seguro" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/allianz.png" alt="Allianz" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/bradesco.png" alt="Bradesco Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/sulamerica.png" alt="SulAmérica" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/tokio.png" alt="Tokio Marine Seguradora" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/hdi.png" alt="HDI Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/mapfre.png" alt="Mapfre Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/yelum.png" alt="Yelum Seguradora (antiga Liberty Seguros)" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/sompo.png" alt="Sompo Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/azul.png" alt="Azul Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/suhai.png" alt="Suhai Seguros" loading="lazy"></div>
-          <div class="insurer"><img src="assets/img/seguradoras/ituran.png" alt="Ituran" loading="lazy"></div>
+      <div class="container" data-carousel>
+          <div class="carousel__nav">
+            <button class="arrow" type="button" aria-label="Seguradoras anteriores" data-scroll="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+            <button class="arrow" type="button" aria-label="Próximas seguradoras" data-scroll="1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+          </div>
+        <div class="carousel__viewport" data-viewport>
+          <div class="carousel__track" data-track>
+            <div class="insurer"><img src="assets/img/seguradoras/porto.png" alt="Porto Seguro" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/allianz.png" alt="Allianz" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/bradesco.png" alt="Bradesco Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/sulamerica.png" alt="SulAmérica" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/tokio.png" alt="Tokio Marine Seguradora" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/hdi.png" alt="HDI Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/mapfre.png" alt="Mapfre Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/yelum.png" alt="Yelum Seguradora (antiga Liberty Seguros)" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/sompo.png" alt="Sompo Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/azul.png" alt="Azul Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/suhai.png" alt="Suhai Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/ituran.png" alt="Ituran" loading="lazy"></div>
+          </div>
         </div>
+        <div class="carousel__progress" aria-hidden="true"><span data-progress></span></div>
       </div>
     </section>
 
@@ -149,18 +156,18 @@
     <!-- 5. SEGUROS -->
     <section class="section dark products" id="seguros">
       <img class="products__mark" src="assets/img/brand/icon-gold-mono.svg" alt="" aria-hidden="true">
-      <div class="container">
+      <div class="container" data-carousel>
         <div class="section-head reveal">
           <span class="eyebrow">Seguros e Consórcio</span>
           <h2 class="h-section">Nossas <em>soluções</em></h2>
           <p class="lead">Seguros para proteger você, sua família, seu imóvel e a sua empresa, e consórcio para planejar a próxima conquista.</p>
         </div>
-        <div class="products__nav">
+        <div class="carousel__nav products__nav">
           <button class="arrow" type="button" aria-label="Seguros anteriores" data-scroll="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
           <button class="arrow" type="button" aria-label="Próximos seguros" data-scroll="1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
         </div>
-        <div class="products-viewport" data-viewport>
-        <div class="products-track" data-track>
+        <div class="carousel__viewport" data-viewport>
+        <div class="carousel__track" data-track>
           <article class="product"><div class="product__img"><img src="assets/img/seguros/auto.webp" alt="Carro preto em movimento numa estrada" width="640" height="400" loading="lazy" decoding="async"></div><div class="product__body"><span class="product__num">01</span><h3>Seguro Auto</h3><p>Proteção contra colisão, roubo, furto e danos a terceiros, com assistência 24h da seguradora. Também há opções por assinatura mensal e com rastreador.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Auto">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
           <article class="product"><div class="product__img"><img src="assets/img/seguros/vida.webp" alt="Família reunida na praia ao pôr do sol" width="640" height="400" loading="lazy" decoding="async"></div><div class="product__body"><span class="product__num">02</span><h3>Seguro de Vida</h3><p>Segurança financeira para quem você ama, com coberturas individuais ou em grupo para a sua empresa.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Vida">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
           <article class="product"><div class="product__img"><img src="assets/img/seguros/previdencia.webp" alt="Cofrinho com moedas sobre a mesa" width="640" height="400" loading="lazy" decoding="async"></div><div class="product__body"><span class="product__num">03</span><h3>Previdência</h3><p>Planeje o futuro e construa uma renda complementar para a aposentadoria.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Previdência">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
@@ -173,7 +180,7 @@
           <article class="product"><div class="product__img"><img src="assets/img/seguros/empresarial.webp" alt="Prédios comerciais vistos de baixo" width="640" height="400" loading="lazy" decoding="async"></div><div class="product__body"><span class="product__num">10</span><h3>Seguro Empresarial</h3><p>Proteção para o patrimônio do seu negócio, incluindo seguro de risco de engenharia para obras.</p><div class="product__actions"><button class="btn btn-gold" type="button" data-open-quote="Empresarial">Cotar</button><a class="product__link" href="#contato">Saiba mais</a></div></div></article>
         </div>
         </div>
-        <div class="products__progress" aria-hidden="true"><span data-progress></span></div>
+        <div class="carousel__progress" aria-hidden="true"><span data-progress></span></div>
       </div>
     </section>
 
@@ -189,14 +196,21 @@
       <!-- Avaliações reais do Google (copiadas em 22/10/2026). Com GOOGLE_PLACES_API_KEY na Vercel,
            o main.js troca estas pelas que vierem de /api/avaliacoes -->
       <p class="reviews-summary" data-reviews-summary>4,9 de 5 no Google · 260 avaliações</p>
-      <div class="reviews" data-reviews>
-        <div class="marquee__track" data-marquee data-reviews-track>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Eu não tenho palavras pra falar dessa empresa e de todos que lá se encontra sempre fui muito bem atendido e sempre bem respeitado vcs estão de parabéns tudo de bom pra vcs</blockquote><figcaption><span class="avatar">F</span><span class="review__name">Flavio Silva<small>Avaliação no Google</small></span></figcaption></figure>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Ótimo atendimento, clareza nas informações, agilidade nos momentos de necessidade, gostaria de agradecer o excelente serviço prestado, estou muito satisfeito em ser cliente da Portella Corretora, e com certeza recomento o trabalho de vocês.</blockquote><figcaption><span class="avatar">D</span><span class="review__name">David Santos<small>Avaliação no Google</small></span></figcaption></figure>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Equipe Top<br>Super atenciosa. Fez as correria das minhas necessidades só tenho a agradecer obrigado</blockquote><figcaption><span class="avatar">D</span><span class="review__name">Dayson Novaes<small>Avaliação no Google</small></span></figcaption></figure>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Eu recomendo, pois, já faço seguro com eles a uns anos e nunca tive problema. Muito atenciosos e dão retorno rápido. Atendeu minha necessidade.</blockquote><figcaption><span class="avatar">N</span><span class="review__name">Neimar Alves<small>Avaliação no Google</small></span></figcaption></figure>
-          <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Profissionais de extrema competência e confiança, conheço a portella a vários anos, todo seguro é sempre com eles, tanto é que tenho um plano odontológico do Bradesco feito com eles desde 2020.<br>Super recomendo.</blockquote><figcaption><span class="avatar">F</span><span class="review__name">Fábio Martins da Cunha Ramos<small>Avaliação no Google</small></span></figcaption></figure>
+      <div class="container" data-carousel data-reviews>
+          <div class="carousel__nav">
+            <button class="arrow" type="button" aria-label="Depoimentos anteriores" data-scroll="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+            <button class="arrow" type="button" aria-label="Próximos depoimentos" data-scroll="1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+          </div>
+        <div class="carousel__viewport" data-viewport>
+          <div class="carousel__track" data-track data-reviews-track>
+            <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Eu não tenho palavras pra falar dessa empresa e de todos que lá se encontra sempre fui muito bem atendido e sempre bem respeitado vcs estão de parabéns tudo de bom pra vcs</blockquote><figcaption><span class="avatar">F</span><span class="review__name">Flavio Silva<small>Avaliação no Google</small></span></figcaption></figure>
+            <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Ótimo atendimento, clareza nas informações, agilidade nos momentos de necessidade, gostaria de agradecer o excelente serviço prestado, estou muito satisfeito em ser cliente da Portella Corretora, e com certeza recomento o trabalho de vocês.</blockquote><figcaption><span class="avatar">D</span><span class="review__name">David Santos<small>Avaliação no Google</small></span></figcaption></figure>
+            <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Equipe Top<br>Super atenciosa. Fez as correria das minhas necessidades só tenho a agradecer obrigado</blockquote><figcaption><span class="avatar">D</span><span class="review__name">Dayson Novaes<small>Avaliação no Google</small></span></figcaption></figure>
+            <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Eu recomendo, pois, já faço seguro com eles a uns anos e nunca tive problema. Muito atenciosos e dão retorno rápido. Atendeu minha necessidade.</blockquote><figcaption><span class="avatar">N</span><span class="review__name">Neimar Alves<small>Avaliação no Google</small></span></figcaption></figure>
+            <figure class="review"><div class="review__stars" role="img" aria-label="5 estrelas" data-stars></div><blockquote>Profissionais de extrema competência e confiança, conheço a portella a vários anos, todo seguro é sempre com eles, tanto é que tenho um plano odontológico do Bradesco feito com eles desde 2020.<br>Super recomendo.</blockquote><figcaption><span class="avatar">F</span><span class="review__name">Fábio Martins da Cunha Ramos<small>Avaliação no Google</small></span></figcaption></figure>
+          </div>
         </div>
+        <div class="carousel__progress" aria-hidden="true"><span data-progress></span></div>
       </div>
       <div class="container reviews-cta">
         <a class="btn btn-outline-light" href="https://www.google.com/maps/search/?api=1&amp;query=Portella+Corretora+de+Seguros+em+Osasco" target="_blank" rel="noopener" data-reviews-link>Ver avaliações no Google</a>

@@ -34,15 +34,6 @@
     });
   }
 
-  /* ---------- Marquees: duplica o conteúdo para o loop contínuo ---------- */
-  $$('[data-marquee]').forEach(function (track) {
-    Array.prototype.slice.call(track.children).forEach(function (item) {
-      var clone = item.cloneNode(true);
-      clone.setAttribute('aria-hidden', 'true');
-      track.appendChild(clone);
-    });
-  });
-
   /* ---------- Depoimentos: avaliações do Google via /api/avaliacoes ---------- */
   (function reviews() {
     var box = $('[data-reviews]'), track = $('[data-reviews-track]'), summary = $('[data-reviews-summary]'), link = $('[data-reviews-link]');
@@ -79,32 +70,30 @@
         summary.hidden = false;
       }
       if (!d.avaliacoes || !d.avaliacoes.length) return;
-      // troca as avaliações fixas do HTML; duas cópias para o loop contínuo do marquee
-      // (a segunda fica oculta para leitores de tela)
+      // troca as avaliações fixas do HTML e avisa o carrossel
       track.textContent = '';
-      [false, true].forEach(function (copy) {
-        d.avaliacoes.forEach(function (a) { var c = card(a); if (copy) c.setAttribute('aria-hidden', 'true'); track.appendChild(c); });
-      });
+      d.avaliacoes.forEach(function (a) { track.appendChild(card(a)); });
+      track.dispatchEvent(new Event('carousel:update'));
     }).catch(function () { /* sem a API: ficam as avaliações fixas do HTML */ });
   })();
 
-  /* ---------- Carrossel de seguros: autoplay, setas, arrastar e progresso ---------- */
-  (function carousel() {
-    var viewport = $('[data-viewport]'), track = $('[data-track]'), progress = $('[data-progress]');
+  /* ---------- Carrosséis (seguros, seguradoras e depoimentos): autoplay, setas, arrastar e progresso ---------- */
+  $$('[data-carousel]').forEach(function (root) {
+    var viewport = $('[data-viewport]', root), track = $('[data-track]', root), progress = $('[data-progress]', root);
     if (!viewport || !track) return;
-    var cards = Array.prototype.slice.call(track.children);
     var index = 0, timer = null, DELAY = 3500;
 
-    function step() { var gap = parseFloat(getComputedStyle(track).columnGap) || 24; return cards[0].getBoundingClientRect().width + gap; }
-    function maxIndex() { return Math.max(0, cards.length - Math.floor((viewport.clientWidth + 24) / step())); }
+    function cards() { return track.children; }
+    function step() { var gap = parseFloat(getComputedStyle(track).columnGap) || 24; return cards()[0].getBoundingClientRect().width + gap; }
+    function maxIndex() { return Math.max(0, cards().length - Math.floor((viewport.clientWidth + 24) / step())); }
     function render() {
-      var max = maxIndex();
+      if (!cards().length) return;
+      var max = maxIndex(), total = cards().length;
       if (index > max) index = max;
       track.style.transform = 'translateX(' + (-index * step()) + 'px)';
       if (progress) {
-        var visible = cards.length - max;
-        progress.style.width = (visible / cards.length * 100) + '%';
-        progress.style.left = (index / cards.length * 100) + '%';
+        progress.style.width = ((total - max) / total * 100) + '%';
+        progress.style.left = (index / total * 100) + '%';
       }
     }
     function go(dir) {
@@ -117,7 +106,7 @@
     function play() { stop(); if (!reduceMotion) timer = setInterval(function () { go(1); }, DELAY); }
     function stop() { if (timer) { clearInterval(timer); timer = null; } }
 
-    $$('[data-scroll]').forEach(function (btn) {
+    $$('[data-scroll]', root).forEach(function (btn) {
       btn.addEventListener('click', function () { go(+btn.getAttribute('data-scroll')); play(); });
     });
     viewport.addEventListener('mouseenter', stop);
@@ -125,7 +114,7 @@
     viewport.addEventListener('focusin', stop);
     viewport.addEventListener('focusout', play);
 
-    // arrastar com o dedo / mouse
+    // arrastar com o dedo
     var startX = null, dx = 0;
     viewport.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse') return;
@@ -145,9 +134,11 @@
     viewport.addEventListener('pointerup', end);
     viewport.addEventListener('pointercancel', end);
 
+    // itens trocados depois (avaliações vindas da API): volta ao começo
+    track.addEventListener('carousel:update', function () { index = 0; render(); play(); });
     window.addEventListener('resize', render);
     render(); play();
-  })();
+  });
 
   /* ---------- Revelar ao rolar ---------- */
   var reveals = $$('.reveal');

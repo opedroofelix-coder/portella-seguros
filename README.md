@@ -34,10 +34,12 @@ assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratad
 
 1. Header fixo: logo, menu (vira botão no celular) e "Cotar Agora"
 2. Hero: consultora num arco com fio dourado, brasão com o ícone, seletor de seguro
-3. Seguradoras parceiras: faixa contínua com os logos
+3. Seguradoras parceiras: carrossel com os logos
 4. Sobre: texto, contadores, "Por que escolher a Portella" e Missão, Visão e Valores
-5. Seguros: carrossel com 10 produtos (autoplay, setas, arrastar e barra de progresso)
-6. Depoimentos: carrossel contínuo
+5. Seguros: carrossel com 10 produtos
+
+Os três carrosséis (seguradoras, seguros e depoimentos) usam o mesmo código (`[data-carousel]` no `main.js`): avançam um card a cada 3,5 s, têm setas, arrastar no celular e barra de progresso.
+6. Depoimentos: carrossel com as avaliações do Google
 7. Dúvidas frequentes: acordeão
 8. Chamada para cotação
 9. Contato: dados e formulário

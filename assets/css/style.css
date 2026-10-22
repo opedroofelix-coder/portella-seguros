@@ -143,10 +143,7 @@ input, select, textarea, button { font: inherit; }
 /* ---------- 3. Seguradoras ---------- */
 .insurers { background: var(--navy-2); padding: 56px 0 60px; border-top: 1px solid rgba(217, 188, 126, .2); border-bottom: 1px solid rgba(217, 188, 126, .2); }
 .insurers__label { text-align: center; margin: 0 0 30px; font-size: 12px; font-weight: 500; letter-spacing: .4em; text-transform: uppercase; color: var(--gold-light); }
-.marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-.marquee__track { display: flex; align-items: center; width: max-content; animation: marquee 48s linear infinite; }
-.marquee:hover .marquee__track { animation-play-state: paused; }
-.insurer { flex: none; width: 190px; height: 84px; margin: 0 14px; padding: 12px 20px; background: #F7F3EC; border: 1px solid rgba(217, 188, 126, .6); border-radius: 2px; display: flex; align-items: center; justify-content: center; filter: grayscale(1) sepia(.2); opacity: .82; transition: filter .4s, opacity .4s, transform .4s; }
+.insurer { flex: none; width: 190px; height: 84px; padding: 12px 20px; background: #F7F3EC; border: 1px solid rgba(217, 188, 126, .6); border-radius: 2px; display: flex; align-items: center; justify-content: center; filter: grayscale(1) sepia(.2); opacity: .82; transition: filter .4s, opacity .4s, transform .4s; }
 .insurer:hover { filter: none; opacity: 1; transform: scale(1.06); }
 .insurer img { width: 100%; height: 100%; object-fit: contain; }
 
@@ -174,14 +171,18 @@ input, select, textarea, button { font: inherit; }
 /* ---------- 5. Seguros ---------- */
 .products { position: relative; overflow: hidden; }
 .products__mark { position: absolute; left: -160px; bottom: -120px; height: 640px; width: auto; opacity: .05; pointer-events: none; }
-.products__nav { display: flex; gap: 10px; justify-content: flex-end; margin: -40px 0 24px; }
+.carousel__nav { display: flex; gap: 10px; justify-content: flex-end; margin: 0 0 24px; }
+.products__nav { margin-top: -40px; }
+/* setas na mesma linha do rótulo da faixa */
+.insurers .carousel__nav { margin: -64px 0 14px; }
+.testimonials .carousel__nav { margin: -74px 0 24px; }
 .arrow { width: 50px; height: 50px; border: 1px solid rgba(217, 188, 126, .45); background: transparent; color: var(--gold-light); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color .3s, color .3s; }
 .arrow:hover { background: var(--gold-light); color: var(--navy-deep); }
-.products-viewport { overflow: hidden; padding: 12px 0 16px; margin-top: -12px; touch-action: pan-y; }
-.products-track { display: flex; gap: 24px; width: max-content; transition: transform .9s var(--ease); will-change: transform; }
-.products-viewport.is-dragging .products-track { transition: none; }
-.products__progress { position: relative; height: 1px; margin-top: 28px; background: rgba(217, 188, 126, .2); overflow: hidden; }
-.products__progress span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold-light); transition: width .9s var(--ease), left .9s var(--ease); }
+.carousel__viewport { overflow: hidden; padding: 12px 0 16px; margin-top: -12px; touch-action: pan-y; }
+.carousel__track { display: flex; gap: 24px; width: max-content; transition: transform .9s var(--ease); will-change: transform; }
+.carousel__viewport.is-dragging .carousel__track { transition: none; }
+.carousel__progress { position: relative; height: 1px; margin-top: 28px; background: rgba(217, 188, 126, .2); overflow: hidden; }
+.carousel__progress span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold-light); transition: width .9s var(--ease), left .9s var(--ease); }
 .product { flex: none; width: 320px; background: var(--navy-2); border: 1px solid rgba(217, 188, 126, .16); display: flex; flex-direction: column; transition: transform .45s var(--ease), border-color .45s, box-shadow .45s; }
 .product:hover { transform: translateY(-8px); border-color: rgba(217, 188, 126, .55); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .7); }
 .product__img { height: 200px; background: #1D2C4A; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-faint-dark); overflow: hidden; }
@@ -199,9 +200,7 @@ input, select, textarea, button { font: inherit; }
 /* ---------- 6. Depoimentos ---------- */
 .testimonials { text-align: center; }
 .quote-mark { font-family: var(--serif); font-size: 120px; line-height: .6; color: var(--gold); display: block; margin: 0 auto 10px; height: 60px; }
-.reviews { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.reviews .marquee__track { animation-duration: 80s; align-items: stretch; }
-.review { flex: none; width: 380px; margin: 0 18px; padding: 36px 34px; background: #FFFFFF; border-top: 2px solid var(--gold); text-align: left; display: flex; flex-direction: column; gap: 20px; }
+.review { flex: none; width: 380px; margin: 0; padding: 36px 34px; background: #FFFFFF; border-top: 2px solid var(--gold); text-align: left; display: flex; flex-direction: column; gap: 20px; }
 .review__stars { display: flex; gap: 4px; color: var(--gold); }
 .review blockquote { margin: 0; font-family: var(--serif); font-style: italic; font-size: 18px; line-height: 1.6; color: var(--text-on-light); flex-grow: 1; }
 .review figcaption { display: flex; align-items: center; gap: 14px; }
@@ -212,6 +211,7 @@ input, select, textarea, button { font: inherit; }
 .review__name a:hover { color: var(--gold-text); }
 .reviews-summary { text-align: center; margin: -8px 0 40px; font-size: 12px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; color: var(--gold-light); }
 .reviews-cta { margin-top: 48px; }
+.testimonials .carousel__track { align-items: stretch; }
 
 /* ---------- 7. FAQ ---------- */
 .faq__grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 80px; align-items: start; }
@@ -308,7 +308,6 @@ a.contact__row:hover span { color: var(--gold-text); }
 @keyframes shine { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 @keyframes dust { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .8; } 100% { transform: translateY(-760px); opacity: 0; } }
 @keyframes breathe { 0%, 100% { opacity: .07; } 50% { opacity: .12; } }
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes fabGlow { 0% { box-shadow: 0 0 0 0 rgba(201, 168, 94, .5), 0 12px 30px rgba(15, 30, 60, .35); } 70% { box-shadow: 0 0 0 18px rgba(201, 168, 94, 0), 0 12px 30px rgba(15, 30, 60, .35); } 100% { box-shadow: 0 0 0 0 rgba(201, 168, 94, 0), 0 12px 30px rgba(15, 30, 60, .35); } }
 @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(.98); } to { opacity: 1; transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
@@ -333,6 +332,7 @@ a.contact__row:hover span { color: var(--gold-text); }
   .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
+  .insurers .carousel__nav, .testimonials .carousel__nav { margin: 0 0 16px; }
   .menu-toggle { display: inline-flex; }
   .nav { display: none; position: absolute; top: 92px; left: 0; right: 0; flex-direction: column; gap: 0; background: var(--navy-deep); border-bottom: 1px solid rgba(217, 188, 126, .2); padding: 8px 24px 20px; }
   .nav.is-open { display: flex; }
