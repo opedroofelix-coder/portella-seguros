@@ -1,6 +1,6 @@
 import type { Acao } from '@portella/core';
 import { ROTULO_PERFIL } from '@portella/core';
-import { Estrutura, ProvedorAvisos } from '@portella/ui';
+import { Estrutura, ProvedorAvisos, ProvedorInterface } from '@portella/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -100,76 +100,78 @@ export function AppCrm<S extends ServicosBase>({
   return (
     <QueryClientProvider client={clienteQuery}>
       <ProvedorConfig config={config}>
-        <ProvedorServicos servicos={servicos}>
-          <ProvedorAvisos>
-            <Roteador future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <ProvedorSessao>
-                <Routes>
-                  <Route path="/entrar" element={<PaginaEntrar />} />
-                  <Route
-                    element={
-                      <RotaProtegida>
-                        <Layout />
-                      </RotaProtegida>
-                    }
-                  >
-                    {rotas.map((r) => (
+        <ProvedorInterface refinada={config.interface === 'refinada'}>
+          <ProvedorServicos servicos={servicos}>
+            <ProvedorAvisos>
+              <Roteador future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <ProvedorSessao>
+                  <Routes>
+                    <Route path="/entrar" element={<PaginaEntrar />} />
+                    <Route
+                      element={
+                        <RotaProtegida>
+                          <Layout />
+                        </RotaProtegida>
+                      }
+                    >
+                      {rotas.map((r) => (
+                        <Route
+                          key={r.caminho}
+                          path={r.caminho}
+                          element={
+                            r.acao ? <ExigePermissao acao={r.acao}>{r.elemento}</ExigePermissao> : r.elemento
+                          }
+                        />
+                      ))}
+                      <Route path="/clientes" element={<PaginaClientes />} />
+                      <Route path="/clientes/:id" element={<PaginaCliente />} />
+                      <Route path={ROTA_FUNIL} element={<PaginaFunil />} />
+                      <Route path="/producao" element={<PaginaProducao />} />
+                      <Route path="/propostas" element={<PaginaPropostas />} />
                       <Route
-                        key={r.caminho}
-                        path={r.caminho}
+                        path={ROTA_APROVACOES}
                         element={
-                          r.acao ? <ExigePermissao acao={r.acao}>{r.elemento}</ExigePermissao> : r.elemento
+                          <ExigePermissao acao="financeiro:gerenciar">
+                            <PaginaPropostas somentePendentes />
+                          </ExigePermissao>
                         }
                       />
-                    ))}
-                    <Route path="/clientes" element={<PaginaClientes />} />
-                    <Route path="/clientes/:id" element={<PaginaCliente />} />
-                    <Route path={ROTA_FUNIL} element={<PaginaFunil />} />
-                    <Route path="/producao" element={<PaginaProducao />} />
-                    <Route path="/propostas" element={<PaginaPropostas />} />
-                    <Route
-                      path={ROTA_APROVACOES}
-                      element={
-                        <ExigePermissao acao="financeiro:gerenciar">
-                          <PaginaPropostas somentePendentes />
-                        </ExigePermissao>
-                      }
-                    />
-                    <Route path="/relatorios" element={<PaginaRelatorios />} />
-                    <Route path="/estornos-vales" element={<PaginaEstornosVales />} />
-                    <Route
-                      path="/configuracoes"
-                      element={
-                        <ExigePermissao acao="financeiro:gerenciar">
-                          <PaginaConfiguracoes />
-                        </ExigePermissao>
-                      }
-                    />
-                    <Route
-                      path="/usuarios"
-                      element={
-                        <ExigePermissao acao="usuarios:gerenciar">
-                          <PaginaUsuarios />
-                        </ExigePermissao>
-                      }
-                    />
-                    <Route
-                      path="/importar"
-                      element={
-                        <ExigePermissao acao="dados:importar">
-                          <PaginaImportar />
-                        </ExigePermissao>
-                      }
-                    />
-                    <Route path="/conta" element={<PaginaMinhaConta />} />
-                    <Route path="*" element={<p>Página não encontrada.</p>} />
-                  </Route>
-                </Routes>
-                {extra}
-              </ProvedorSessao>
-            </Roteador>
-          </ProvedorAvisos>
-        </ProvedorServicos>
+                      <Route path="/relatorios" element={<PaginaRelatorios />} />
+                      <Route path="/estornos-vales" element={<PaginaEstornosVales />} />
+                      <Route
+                        path="/configuracoes"
+                        element={
+                          <ExigePermissao acao="financeiro:gerenciar">
+                            <PaginaConfiguracoes />
+                          </ExigePermissao>
+                        }
+                      />
+                      <Route
+                        path="/usuarios"
+                        element={
+                          <ExigePermissao acao="usuarios:gerenciar">
+                            <PaginaUsuarios />
+                          </ExigePermissao>
+                        }
+                      />
+                      <Route
+                        path="/importar"
+                        element={
+                          <ExigePermissao acao="dados:importar">
+                            <PaginaImportar />
+                          </ExigePermissao>
+                        }
+                      />
+                      <Route path="/conta" element={<PaginaMinhaConta />} />
+                      <Route path="*" element={<p>Página não encontrada.</p>} />
+                    </Route>
+                  </Routes>
+                  {extra}
+                </ProvedorSessao>
+              </Roteador>
+            </ProvedorAvisos>
+          </ProvedorServicos>
+        </ProvedorInterface>
       </ProvedorConfig>
     </QueryClientProvider>
   );

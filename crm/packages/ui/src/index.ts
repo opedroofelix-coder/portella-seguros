@@ -6,6 +6,7 @@ export * from './componentes/Campo';
 export * from './componentes/Cartao';
 export * from './componentes/Estrutura';
 export * from './componentes/Icone';
+export * from './componentes/Interface';
 export * from './componentes/Modal';
 export * from './componentes/Quadro';
 export * from './componentes/Selo';

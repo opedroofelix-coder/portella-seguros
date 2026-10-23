@@ -29,6 +29,22 @@ describe('apólice', () => {
     expect(situacao(apolice({ ramo: 'saude', fimVigencia: undefined }), HOJE)).toBe('vigente');
   });
 
+  it('a apólice nova fica "a iniciar" e a renovada não aparece como vencida', () => {
+    const nova = apolice({ inicioVigencia: '2026-11-10', fimVigencia: '2027-11-10' });
+    expect(situacao(nova, HOJE)).toBe('a_iniciar');
+    expect(situacao(apolice({ fimVigencia: '2026-09-01', renovacao: 'renovada' }), HOJE)).toBe('renovada');
+    expect(situacao(apolice({ fimVigencia: '2026-09-01', renovacao: 'nao_renovada' }), HOJE)).toBe('vencida');
+  });
+
+  it('não conta em dobro a apólice renovada antes do fim da anterior', () => {
+    const anterior = apolice({ premioLiquido: 100000, fimVigencia: '2026-11-10', renovacao: 'renovada' });
+    const nova = apolice({ premioLiquido: 110000, inicioVigencia: '2026-11-10', fimVigencia: '2027-11-10' });
+    const r = resumirCarteira([anterior, nova], HOJE);
+    expect(r.ativas).toBe(1);
+    expect(r.aIniciar).toBe(1);
+    expect(r.premioAtivo).toBe(100000);
+  });
+
   it('calcula a comissão sobre o prêmio líquido', () => {
     expect(comissao({ premioLiquido: 200000, comissaoPercentual: 15 })).toBe(30000);
     expect(comissao({ premioLiquido: 200000 })).toBeNull();
@@ -86,9 +102,9 @@ describe('apólice', () => {
     expect(r.ativas).toBe(3);
     expect(r.aVencer30).toBe(1);
     expect(r.aVencer60).toBe(2);
-    expect(r.premioAtivo).toBe(107380 + 50000 + 80000);
+    expect(r.premioAtivo).toBe(100000 + 50000 + 80000);
     expect(r.comissaoAtiva).toBe(20000 + 5000);
-    expect(r.porSeguradora[0]).toEqual({ seguradora: 'porto', quantidade: 2, premio: 157380 });
+    expect(r.porSeguradora[0]).toEqual({ seguradora: 'porto', quantidade: 2, premio: 150000 });
     expect(r.porRamo).toEqual([
       { ramo: 'auto', quantidade: 2 },
       { ramo: 'vida', quantidade: 1 },

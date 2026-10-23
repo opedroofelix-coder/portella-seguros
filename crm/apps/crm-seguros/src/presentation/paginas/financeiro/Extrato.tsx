@@ -1,11 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { aplicarErros, limparVazios, mensagemErro, useRemover, useSalvar } from '@portella/app-base';
-import { centavosParaTexto, formatarData, formatarDinheiro, hojeISO, paraCentavos } from '@portella/core';
+import {
+  aplicarErros,
+  EntradaDinheiro,
+  limparVazios,
+  mensagemErro,
+  useRemover,
+  useSalvar,
+} from '@portella/app-base';
+import { formatarData, formatarDinheiro, hojeISO, lerDinheiro, textoDinheiro } from '@portella/core';
 import {
   BarraFiltros,
   Botao,
   Campo,
   Carregando,
+  ConfirmarAcao,
   Entrada,
   EstadoVazio,
   Modal,
@@ -18,8 +26,9 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { Movimento } from '../../../domain/financeiro';
 import { CONTA_PRINCIPAL, extrato } from '../../../domain/financeiro';
+import { EstadoErro } from '../../componentes/EstadoErro';
 import { useServicosSeguros } from '../../hooks';
-import { mesesDe, rotuloMes, useFinanceiro } from './comum';
+import { mesesDe, mesPadrao, rotuloMes, useFinanceiro } from './comum';
 
 export function ExtratoFinanceiro() {
   const { movimentos } = useFinanceiro();
@@ -29,7 +38,7 @@ export function ExtratoFinanceiro() {
   const linhasConta = useMemo(() => extrato(movs, conta), [movs, conta]);
   const meses = useMemo(() => mesesDe(linhasConta.map((m) => m.data)), [linhasConta]);
   const [mes, setMes] = useState<string | null>(null);
-  const mesAtivo = mes ?? meses[0] ?? '';
+  const mesAtivo = mes ?? mesPadrao(meses, hojeISO());
   const [editando, setEditando] = useState<Movimento | 'novo' | null>(null);
   const linhas = linhasConta.filter((m) => !mesAtivo || m.data.startsWith(mesAtivo));
 
@@ -65,8 +74,10 @@ export function ExtratoFinanceiro() {
           </Botao>
         </div>
       </BarraFiltros>
-      {movimentos.isPending ? (
-        <Carregando />
+      {movimentos.isError ? (
+        <EstadoErro oque="o extrato" aoTentar={() => movimentos.refetch()} />
+      ) : movimentos.isPending ? (
+        <Carregando texto="Carregando o extrato…" />
       ) : (
         <Tabela
           rotulo={`Extrato ${conta}`}
@@ -76,19 +87,24 @@ export function ExtratoFinanceiro() {
           porPagina={50}
           vazio={<EstadoVazio titulo="Sem movimentos">Importe a planilha ou lance um movimento.</EstadoVazio>}
           colunas={[
-            { chave: 'desc', titulo: 'Descrição', principal: true, render: (m) => m.descricao },
+            {
+              chave: 'desc',
+              titulo: 'Descrição',
+              principal: true,
+              render: (m) => (m.tipo === 'saldo_inicial' ? `Saldo inicial · ${m.descricao}` : m.descricao),
+            },
             { chave: 'data', titulo: 'Data', render: (m) => formatarData(m.data) },
             {
               chave: 'entrada',
               titulo: 'Entrada',
               alinharDireita: true,
-              render: (m) => (m.tipo === 'saida' ? '—' : formatarDinheiro(m.valor)),
+              render: (m) => (m.tipo === 'entrada' ? formatarDinheiro(m.valor) : '—'),
             },
             {
               chave: 'saida',
               titulo: 'Saída',
               alinharDireita: true,
-              render: (m) => (m.tipo === 'saida' ? formatarDinheiro(m.valor) : '—'),
+              render: (m) => (m.tipo === 'saida' ? `− ${formatarDinheiro(m.valor)}` : '—'),
             },
             {
               chave: 'saldo',
@@ -103,6 +119,7 @@ export function ExtratoFinanceiro() {
         <FormularioMovimento
           movimento={editando === 'novo' ? undefined : editando}
           conta={conta}
+          contas={contas}
           aoFechar={() => setEditando(null)}
         />
       )}
@@ -115,7 +132,7 @@ const esquema = z.object({
   data: z.string().min(1, 'Informe a data.'),
   descricao: z.string().trim().min(1, 'Informe a descrição.'),
   tipo: z.enum(['entrada', 'saida', 'saldo_inicial']),
-  valor: z.string().refine((v) => paraCentavos(v) != null && paraCentavos(v)! >= 0, 'Valor inválido.'),
+  valor: z.string().refine((v) => lerDinheiro(v) != null && lerDinheiro(v)! >= 0, 'Valor inválido.'),
   documento: z.string(),
 });
 type Valores = z.infer<typeof esquema>;
@@ -123,16 +140,19 @@ type Valores = z.infer<typeof esquema>;
 function FormularioMovimento({
   movimento,
   conta,
+  contas,
   aoFechar,
 }: {
   movimento?: Movimento;
   conta: string;
+  contas: string[];
   aoFechar: () => void;
 }) {
   const { movimentos } = useServicosSeguros();
   const salvar = useSalvar<Movimento>('movimentos', movimentos);
   const remover = useRemover<Movimento>('movimentos', movimentos);
   const { avisar } = useAvisos();
+  const [confirmarRemocao, setConfirmarRemocao] = useState(false);
   const { register, handleSubmit, formState, setError } = useForm<Valores>({
     resolver: zodResolver(esquema),
     defaultValues: {
@@ -140,7 +160,7 @@ function FormularioMovimento({
       data: movimento?.data ?? hojeISO(),
       descricao: movimento?.descricao ?? '',
       tipo: movimento?.tipo ?? 'entrada',
-      valor: centavosParaTexto(movimento?.valor),
+      valor: textoDinheiro(movimento?.valor),
       documento: movimento?.documento ?? '',
     },
   });
@@ -149,7 +169,7 @@ function FormularioMovimento({
       await salvar.mutateAsync({
         ...(movimento ?? {}),
         ...limparVazios(v),
-        valor: paraCentavos(v.valor) ?? 0,
+        valor: lerDinheiro(v.valor) ?? 0,
       });
       avisar('Movimento salvo.');
       aoFechar();
@@ -164,21 +184,13 @@ function FormularioMovimento({
       aberto
       titulo={movimento ? 'Editar movimento' : 'Novo movimento'}
       aoFechar={aoFechar}
+      alterado={formState.isDirty}
+      bloqueado={formState.isSubmitting}
       rodape={
         <>
           {movimento && (
-            <Botao
-              variante="perigo"
-              onClick={() =>
-                remover.mutate(movimento.id, {
-                  onSuccess: () => {
-                    avisar('Movimento removido.');
-                    aoFechar();
-                  },
-                })
-              }
-            >
-              Remover
+            <Botao variante="perigo" icone="lixeira" onClick={() => setConfirmarRemocao(true)}>
+              Excluir
             </Botao>
           )}
           <Botao variante="secundario" onClick={aoFechar}>
@@ -191,9 +203,19 @@ function FormularioMovimento({
       }
     >
       <form id="form-movimento" className="grade-2" onSubmit={enviar} noValidate>
-        <Campo rotulo="Conta" obrigatorio erro={erros.conta?.message}>
-          <Entrada {...register('conta')} />
+        <Campo
+          rotulo="Conta"
+          obrigatorio
+          erro={erros.conta?.message}
+          dica="Escolha uma conta da lista; digite só para criar uma nova."
+        >
+          <Entrada list="contas-extrato" autoComplete="off" {...register('conta')} />
         </Campo>
+        <datalist id="contas-extrato">
+          {contas.map((c) => (
+            <option key={c} value={c} />
+          ))}
+        </datalist>
         <Campo rotulo="Data" obrigatorio erro={erros.data?.message}>
           <Entrada type="date" {...register('data')} />
         </Campo>
@@ -207,13 +229,33 @@ function FormularioMovimento({
             <option value="saldo_inicial">Saldo inicial</option>
           </Selecao>
         </Campo>
-        <Campo rotulo="Valor (R$)" obrigatorio erro={erros.valor?.message}>
-          <Entrada inputMode="decimal" {...register('valor')} />
+        <Campo rotulo="Valor" obrigatorio erro={erros.valor?.message}>
+          <EntradaDinheiro {...register('valor')} />
         </Campo>
         <Campo rotulo="Documento">
           <Entrada {...register('documento')} />
         </Campo>
       </form>
+      {movimento && (
+        <ConfirmarAcao
+          aberto={confirmarRemocao}
+          titulo="Excluir o movimento?"
+          mensagem={`"${movimento.descricao}" sai do extrato e o saldo é recalculado.`}
+          textoConfirmar="Excluir movimento"
+          perigo
+          carregando={remover.isPending}
+          aoCancelar={() => setConfirmarRemocao(false)}
+          aoConfirmar={() =>
+            remover.mutate(movimento.id, {
+              onSuccess: () => {
+                avisar('Movimento excluído.');
+                aoFechar();
+              },
+              onError: (e) => avisar(mensagemErro(e), 'erro'),
+            })
+          }
+        />
+      )}
     </Modal>
   );
 }

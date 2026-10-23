@@ -51,8 +51,10 @@ test.describe('CRM Seguros — fluxo completo', () => {
     const inicio = new Date(Date.now() - 345 * 86_400_000).toISOString().slice(0, 10);
     await ap.getByLabel('Início da vigência').fill(inicio);
     await ap.getByLabel('Fim da vigência').fill(fim);
-    await ap.getByLabel('Prêmio líquido (R$)').fill('2.000,00');
-    await ap.getByLabel('Comissão (%)').fill('15');
+    await ap.getByLabel('Prêmio líquido').fill('2.000');
+    await ap.getByLabel('Comissão', { exact: true }).fill('15');
+    // O valor com ponto de milhar é lido como R$ 2.000,00 e a comissão aparece na hora
+    await expect(ap.getByText('Comissão prevista: R$ 300,00')).toBeVisible();
     await page.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByText('Apólice cadastrada.')).toBeVisible();
     await expect(page.getByText(/Vence em (19|20) dias/)).toBeVisible();
@@ -94,12 +96,14 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await cadastrarUsuario(page, CORRETOR, 'Corretor');
     await importar(page, FIXTURE, /Propostas/);
     await irPara(page, 'Apólices');
+    await page.getByLabel('Situação').selectOption({ label: 'Todas' });
     await expect(page.getByText(/12 de 12 apólices/)).toBeVisible();
     await irPara(page, 'Propostas');
     await expect(page.getByRole('table', { name: 'Propostas' }).getByRole('row')).toHaveCount(12 + 1);
     await sair(page);
     await entrarPelaPrimeiraVez(page, URL, CORRETOR);
     await irPara(page, 'Apólices');
+    await page.getByLabel('Situação').selectOption({ label: 'Todas' });
     await expect(page.getByText(/6 de 6 apólices/)).toBeVisible();
     // Corretor vê só as propostas em que participa, sem os valores da corretora, e não acessa o financeiro
     await irPara(page, 'Propostas');
@@ -220,11 +224,19 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page.getByLabel('Mês do vencimento').selectOption({ label: 'Todos' });
     await page
       .getByRole('row', { name: /Contador \(teste\)/ })
-      .getByRole('button', { name: 'Pagar' })
+      .getByRole('button', { name: 'Pagar…' })
       .click();
-    await expect(page.getByText('Despesa paga.')).toBeVisible();
+    // Pagar pede confirmação e lança a saída no extrato, para despesas e conta baterem
+    const confirmar = page.getByRole('alertdialog', { name: 'Registrar o pagamento?' });
+    await expect(confirmar.getByLabel(/Lançar a saída no extrato/)).toBeChecked();
+    await confirmar.getByRole('button', { name: 'Registrar pagamento' }).click();
+    await expect(page.getByText('Despesa paga e lançada no extrato Bradesco.')).toBeVisible();
     await page.getByRole('tab', { name: 'Extrato' }).click();
-    await expect(page.getByRole('table', { name: 'Extrato Bradesco' })).toBeVisible();
+    await expect(page).toHaveURL(/aba=extrato/);
+    await page.getByLabel('Mês').selectOption({ label: 'Todos' });
+    await expect(page.getByRole('table', { name: 'Extrato Bradesco' })).toContainText(
+      'Pagamento: Contador (teste)',
+    );
   });
 });
 

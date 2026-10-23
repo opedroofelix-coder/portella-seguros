@@ -1,18 +1,35 @@
-/** Seguradoras parceiras da Portella e ramos atendidos (os mesmos do site). */
-export const SEGURADORAS = [
+export interface Seguradora {
+  id: string;
+  nome: string;
+  /** Outros nomes que aparecem na planilha ou nas apólices antigas. */
+  apelidos?: readonly string[];
+  /** Ramos que a seguradora não oferece mais. */
+  semRamos?: readonly string[];
+}
+
+/** Seguradoras parceiras da Portella (as mesmas da faixa do site). */
+export const SEGURADORAS: readonly Seguradora[] = [
   { id: 'porto', nome: 'Porto Seguro' },
+  { id: 'allianz', nome: 'Allianz' },
+  { id: 'bradesco', nome: 'Bradesco Seguros' },
+  { id: 'sulamerica', nome: 'SulAmérica', apelidos: ['sul america'] },
+  { id: 'tokio', nome: 'Tokio Marine' },
   { id: 'hdi', nome: 'HDI' },
-  { id: 'ituran', nome: 'Ituran' },
+  { id: 'mapfre', nome: 'Mapfre' },
+  // A Liberty virou Yelum: o id antigo continua valendo para as apólices já cadastradas.
+  { id: 'liberty', nome: 'Yelum (antiga Liberty)', apelidos: ['yelum', 'liberty'] },
   { id: 'azul', nome: 'Azul' },
   { id: 'suhai', nome: 'Suhai' },
-  { id: 'tokio', nome: 'Tokio Marine' },
-  { id: 'sulamerica', nome: 'SulAmérica' },
-  { id: 'liberty', nome: 'Liberty' },
-  { id: 'bradesco', nome: 'Bradesco Seguros' },
-  { id: 'mapfre', nome: 'Mapfre' },
-  { id: 'allianz', nome: 'Allianz' },
-  { id: 'sompo', nome: 'Sompo' },
-] as const;
+  { id: 'ituran', nome: 'Ituran' },
+  { id: 'justos', nome: 'Justos' },
+  { id: 'youse', nome: 'Youse' },
+  { id: 'pier', nome: 'Pier' },
+  // A Sompo não faz mais seguro de automóvel.
+  { id: 'sompo', nome: 'Sompo', semRamos: ['auto'] },
+];
+
+/** Seguradoras parceiras que oferecem o ramo. */
+export const seguradorasDoRamo = (ramo: string) => SEGURADORAS.filter((s) => !s.semRamos?.includes(ramo));
 
 export const RAMOS = [
   { id: 'auto', nome: 'Auto' },

@@ -1,34 +1,40 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   aplicarErros,
+  EntradaDinheiro,
+  EntradaPercentual,
   limparVazios,
   mensagemErro,
   SeletorResponsavel,
   useColecao,
+  useRemover,
   useSalvar,
+  useSessao,
   useUsuario,
 } from '@portella/app-base';
 import type { DadosRegistro } from '@portella/core';
 import {
-  centavosParaTexto,
   corresponde,
+  formatarDinheiro,
   hojeISO,
+  lerDinheiro,
   normalizar,
-  paraCentavos,
+  porcentagem,
   somarMeses,
+  textoDinheiro,
 } from '@portella/core';
-import { AreaTexto, Botao, Campo, Entrada, Modal, Selecao, useAvisos } from '@portella/ui';
+import { AreaTexto, Botao, Campo, ConfirmarAcao, Entrada, Modal, Selecao, useAvisos } from '@portella/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { renovarApolice } from '../../application/renovacao';
 import type { Apolice } from '../../domain/apolice';
 import { ROTULO_RENOVACAO, STATUS_RENOVACAO } from '../../domain/apolice';
-import { RAMOS, SEGURADORAS } from '../../domain/catalogo';
+import { RAMOS, RAMOS_ANUAIS, SEGURADORAS, seguradorasDoRamo } from '../../domain/catalogo';
 import { useServicosSeguros } from '../hooks';
 
-const dinheiro = z.string().refine((v) => !v.trim() || paraCentavos(v) != null, 'Valor inválido.');
+const dinheiro = z.string().refine((v) => !v.trim() || lerDinheiro(v) != null, 'Valor inválido.');
 const esquema = z.object({
   clienteId: z.string().min(1, 'Escolha o cliente.'),
   seguradora: z.string().min(1, 'Escolha a seguradora.'),
@@ -41,7 +47,13 @@ const esquema = z.object({
   vigenciaEstimada: z.enum(['sim', 'nao']),
   premioLiquido: dinheiro,
   premioTotal: dinheiro,
-  comissaoPercentual: z.string().refine((v) => !v.trim() || paraCentavos(v) != null, 'Percentual inválido.'),
+  comissaoPercentual: z
+    .string()
+    .refine((v) => !v.trim() || lerDinheiro(v) != null, 'Percentual inválido.')
+    .refine(
+      (v) => !v.trim() || ((lerDinheiro(v) ?? 0) >= 0 && (lerDinheiro(v) ?? 0) <= 10000),
+      'Entre 0 e 100%.',
+    ),
   formaPagamento: z.string(),
   renovacao: z.enum(STATUS_RENOVACAO),
   cancelada: z.boolean(),
@@ -67,13 +79,16 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
   const { apolices, clientes } = useServicosSeguros();
   const { data: listaClientes = [] } = useColecao('clientes', clientes);
   const salvar = useSalvar('apolices', apolices);
+  const remover = useRemover('apolices', apolices);
+  const { pode } = useSessao();
   const { avisar } = useAvisos();
   const consultas = useQueryClient();
   const [filtroCliente, setFiltroCliente] = useState('');
+  const [confirmarRemocao, setConfirmarRemocao] = useState(false);
   const base = { ...inicial, ...apolice };
   const hoje = hojeISO();
 
-  const { register, handleSubmit, formState, setError, watch } = useForm<Valores>({
+  const { register, handleSubmit, formState, setError, setValue, getValues, watch } = useForm<Valores>({
     resolver: zodResolver(esquema),
     defaultValues: {
       clienteId: base.clienteId ?? '',
@@ -85,8 +100,8 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
       inicioVigencia: base.inicioVigencia ?? hoje,
       fimVigencia: apolice ? (apolice.fimVigencia ?? '') : (base.fimVigencia ?? somarMeses(hoje, 12)),
       vigenciaEstimada: base.vigenciaEstimada ? 'sim' : 'nao',
-      premioLiquido: centavosParaTexto(base.premioLiquido),
-      premioTotal: centavosParaTexto(base.premioTotal),
+      premioLiquido: textoDinheiro(base.premioLiquido),
+      premioTotal: textoDinheiro(base.premioTotal),
       comissaoPercentual:
         base.comissaoPercentual == null ? '' : String(base.comissaoPercentual).replace('.', ','),
       formaPagamento: base.formaPagamento ?? '',
@@ -96,6 +111,27 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
       responsavelId: base.responsavelId ?? usuario.id,
     },
   });
+
+  // Ramo contínuo (vida, saúde…) fica sem fim de vigência; ramo anual sugere 12 meses.
+  const ramo = watch('ramo');
+  const ramoAnterior = useRef(ramo);
+  useEffect(() => {
+    if (ramoAnterior.current === ramo) return;
+    ramoAnterior.current = ramo;
+    if (!RAMOS_ANUAIS.has(ramo)) setValue('fimVigencia', '', { shouldDirty: true });
+    else if (!getValues('fimVigencia') && getValues('inicioVigencia')) {
+      setValue('fimVigencia', somarMeses(getValues('inicioVigencia'), 12), { shouldDirty: true });
+    }
+    const seguradora = getValues('seguradora');
+    if (seguradora && seguradora !== OUTRA && !seguradorasDoRamo(ramo).some((s) => s.id === seguradora)) {
+      setValue('seguradora', '', { shouldDirty: true });
+    }
+  }, [ramo, getValues, setValue]);
+
+  const premio = lerDinheiro(watch('premioLiquido') ?? '');
+  const percentual = lerDinheiro(watch('comissaoPercentual') ?? '');
+  const comissaoPrevista =
+    premio != null && percentual != null ? porcentagem(premio, percentual / 100) : null;
 
   const clienteFixo = Boolean(inicial?.clienteId && !apolice);
   const opcoesClientes = useMemo(
@@ -116,9 +152,9 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
       seguradora: v.seguradora === OUTRA ? (outraSeguradora ?? '') : v.seguradora,
       fimVigencia: d.fimVigencia,
       vigenciaEstimada: (Boolean(d.fimVigencia) && vigenciaEstimada === 'sim') || undefined,
-      premioLiquido: d.premioLiquido ? (paraCentavos(d.premioLiquido) ?? undefined) : undefined,
-      premioTotal: d.premioTotal ? (paraCentavos(d.premioTotal) ?? undefined) : undefined,
-      comissaoPercentual: d.comissaoPercentual ? (paraCentavos(d.comissaoPercentual) ?? 0) / 100 : undefined,
+      premioLiquido: d.premioLiquido ? (lerDinheiro(d.premioLiquido) ?? undefined) : undefined,
+      premioTotal: d.premioTotal ? (lerDinheiro(d.premioTotal) ?? undefined) : undefined,
+      comissaoPercentual: d.comissaoPercentual ? (lerDinheiro(d.comissaoPercentual) ?? 0) / 100 : undefined,
     };
     try {
       if (renovando) {
@@ -142,8 +178,15 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
       largura={800}
       titulo={renovando ? 'Renovar apólice' : apolice ? 'Editar apólice' : 'Nova apólice'}
       aoFechar={aoFechar}
+      alterado={formState.isDirty}
+      bloqueado={formState.isSubmitting}
       rodape={
         <>
+          {apolice && pode('registro:remover') && (
+            <Botao variante="perigo" icone="lixeira" onClick={() => setConfirmarRemocao(true)}>
+              Excluir
+            </Botao>
+          )}
           <Botao variante="secundario" onClick={aoFechar}>
             Cancelar
           </Botao>
@@ -183,7 +226,7 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
         <Campo rotulo="Seguradora" obrigatorio erro={erros.seguradora?.message}>
           <Selecao {...register('seguradora')}>
             <option value="">Escolha…</option>
-            {SEGURADORAS.map((s) => (
+            {seguradorasDoRamo(ramo).map((s) => (
               <option key={s.id} value={s.id}>
                 {s.nome}
               </option>
@@ -192,11 +235,16 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
           </Selecao>
         </Campo>
         {watch('seguradora') === OUTRA && (
-          <Campo rotulo="Nome da seguradora" obrigatorio>
+          <Campo rotulo="Nome da seguradora" obrigatorio erro={erros.seguradora?.message}>
             <Entrada {...register('outraSeguradora')} />
           </Campo>
         )}
-        <Campo rotulo="Ramo" obrigatorio>
+        <Campo
+          rotulo="Ramo"
+          obrigatorio
+          erro={erros.ramo?.message}
+          dica={ramo === 'equipamentos' ? 'Bike, celular, câmera, notebook…' : undefined}
+        >
           <Selecao {...register('ramo')}>
             {RAMOS.map((r) => (
               <option key={r.id} value={r.id}>
@@ -216,10 +264,20 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
         </Campo>
         <Campo
           rotulo="Fim da vigência"
-          dica="Em branco para contratos contínuos (vida, saúde…)."
+          dica={
+            RAMOS_ANUAIS.has(ramo)
+              ? 'Em geral, 12 meses depois do início.'
+              : 'Contrato contínuo: deixe em branco para não entrar na fila de renovação.'
+          }
           erro={erros.fimVigencia?.message}
         >
-          <Entrada type="date" {...register('fimVigencia')} />
+          <Entrada
+            type="date"
+            {...register('fimVigencia', {
+              // Quem digita o fim confirma a vigência que a importação estimou.
+              onChange: () => base.vigenciaEstimada && setValue('vigenciaEstimada', 'nao'),
+            })}
+          />
         </Campo>
         {base.vigenciaEstimada && (
           <Campo rotulo="Vigência" dica="Calculada na importação (proposta + 12 meses).">
@@ -229,14 +287,26 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
             </Selecao>
           </Campo>
         )}
-        <Campo rotulo="Prêmio líquido (R$)" erro={erros.premioLiquido?.message}>
-          <Entrada inputMode="decimal" placeholder="0,00" {...register('premioLiquido')} />
+        <Campo rotulo="Prêmio líquido" erro={erros.premioLiquido?.message}>
+          <EntradaDinheiro {...register('premioLiquido')} />
         </Campo>
-        <Campo rotulo="Prêmio total (R$)" erro={erros.premioTotal?.message}>
-          <Entrada inputMode="decimal" placeholder="0,00" {...register('premioTotal')} />
+        <Campo
+          rotulo="Prêmio total"
+          dica="Com IOF e juros do parcelamento."
+          erro={erros.premioTotal?.message}
+        >
+          <EntradaDinheiro {...register('premioTotal')} />
         </Campo>
-        <Campo rotulo="Comissão (%)" erro={erros.comissaoPercentual?.message}>
-          <Entrada inputMode="decimal" placeholder="Ex.: 15" {...register('comissaoPercentual')} />
+        <Campo
+          rotulo="Comissão"
+          erro={erros.comissaoPercentual?.message}
+          dica={
+            comissaoPrevista != null
+              ? `Comissão prevista: ${formatarDinheiro(comissaoPrevista)}`
+              : 'Sobre o prêmio líquido.'
+          }
+        >
+          <EntradaPercentual placeholder="Ex.: 15" {...register('comissaoPercentual')} />
         </Campo>
         <Campo rotulo="Forma de pagamento">
           <Entrada placeholder="Ex.: 10x no cartão" {...register('formaPagamento')} />
@@ -253,9 +323,9 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
           </Campo>
         )}
         {apolice && (
-          <Campo rotulo="Situação">
+          <Campo rotulo="Cancelamento">
             <Selecao {...register('cancelada', { setValueAs: (v) => v === true || v === 'true' })}>
-              <option value="false">Ativa</option>
+              <option value="false">Não cancelada</option>
               <option value="true">Cancelada</option>
             </Selecao>
           </Campo>
@@ -265,6 +335,27 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
           <AreaTexto {...register('observacoes')} />
         </Campo>
       </form>
+      {apolice && (
+        <ConfirmarAcao
+          aberto={confirmarRemocao}
+          titulo="Excluir a apólice?"
+          mensagem={`A apólice ${apolice.numero ? `nº ${apolice.numero} ` : ''}sai da carteira e da fila de renovação. Não dá para desfazer.`}
+          textoConfirmar="Excluir apólice"
+          perigo
+          carregando={remover.isPending}
+          aoCancelar={() => setConfirmarRemocao(false)}
+          aoConfirmar={() =>
+            remover.mutate(apolice.id, {
+              onSuccess: () => {
+                avisar('Apólice excluída.');
+                setConfirmarRemocao(false);
+                aoFechar();
+              },
+              onError: (e) => avisar(mensagemErro(e), 'erro'),
+            })
+          }
+        />
+      )}
     </Modal>
   );
 }

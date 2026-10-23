@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Botao } from './Botao';
+import { useInterface } from './Interface';
 import styles from './Modal.module.css';
 
 export interface ModalProps {
@@ -11,61 +12,122 @@ export interface ModalProps {
   children: ReactNode;
   rodape?: ReactNode;
   largura?: number;
+  /** Com a interface refinada: há alterações não salvas, então fechar pede confirmação. */
+  alterado?: boolean;
+  /** Com a interface refinada: não fecha (ex.: enquanto salva). */
+  bloqueado?: boolean;
+  /** 'alertdialog' para confirmações; o texto em `idDescricao` descreve a janela. */
+  papel?: 'dialog' | 'alertdialog';
+  idDescricao?: string;
 }
 
 const FOCAVEIS =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const PRIMEIRO_CAMPO =
+  '[data-autofoco], input:not([type=hidden]):not([disabled]):not([readonly]), select:not([disabled]), textarea:not([disabled])';
+
+/** Modais abertos, do mais antigo ao mais novo: só o de cima responde ao Esc e prende o foco. */
+const pilha: object[] = [];
 
 /** Janela modal: vira painel inferior no celular, centraliza no desktop. Esc fecha e o foco fica preso. */
-export function Modal({ aberto, titulo, aoFechar, children, rodape, largura }: ModalProps) {
+export function Modal({
+  aberto,
+  titulo,
+  aoFechar,
+  children,
+  rodape,
+  largura,
+  alterado,
+  bloqueado,
+  papel = 'dialog',
+  idDescricao,
+}: ModalProps) {
+  const { refinada } = useInterface();
   const idTitulo = useId();
   const janela = useRef<HTMLDivElement>(null);
-  const fechar = useRef(aoFechar);
-  fechar.current = aoFechar;
+  const [descartar, setDescartar] = useState(false);
+  // Pedido de fechamento pelo Esc, pelo X ou pelo fundo: respeita "bloqueado" e "alterado".
+  const pedirFechamento = () => {
+    if (!refinada) return aoFechar();
+    if (bloqueado) return;
+    if (alterado) setDescartar(true);
+    else aoFechar();
+  };
+  const pedir = useRef(pedirFechamento);
+  pedir.current = pedirFechamento;
 
   useEffect(() => {
     if (!aberto) return;
+    const eu = {};
+    pilha.push(eu);
+    const noTopo = () => !refinada || pilha[pilha.length - 1] === eu;
     const anterior = document.activeElement as HTMLElement | null;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const primeiro = janela.current?.querySelector<HTMLElement>('[data-autofoco], input, select, textarea');
+    const primeiro = janela.current?.querySelector<HTMLElement>(
+      refinada ? PRIMEIRO_CAMPO : '[data-autofoco], input, select, textarea',
+    );
     (primeiro ?? janela.current)?.focus();
 
     const teclado = (e: KeyboardEvent) => {
+      if (!noTopo()) return;
       if (e.key === 'Escape') {
         e.stopPropagation();
-        fechar.current();
+        if (refinada) e.stopImmediatePropagation();
+        pedir.current();
       }
       if (e.key === 'Tab' && janela.current) {
         const itens = [...janela.current.querySelectorAll<HTMLElement>(FOCAVEIS)];
         const [inicio, fim] = [itens[0], itens[itens.length - 1]];
-        if (!inicio || !fim) return;
-        if (e.shiftKey && document.activeElement === inicio) {
+        if (!inicio || !fim) {
+          if (refinada) e.preventDefault();
+          return;
+        }
+        const ativo = document.activeElement;
+        const fora = refinada && !janela.current.contains(ativo);
+        if (e.shiftKey && (ativo === inicio || fora || (refinada && ativo === janela.current))) {
           e.preventDefault();
           fim.focus();
-        } else if (!e.shiftKey && document.activeElement === fim) {
+        } else if (!e.shiftKey && (ativo === fim || fora)) {
           e.preventDefault();
           inicio.focus();
         }
       }
     };
+    // Foco que escapa (clique fora, leitor de tela) volta para a janela de cima.
+    const foco = (e: FocusEvent) => {
+      if (!refinada || !noTopo() || !janela.current) return;
+      if (!janela.current.contains(e.target as Node)) janela.current.focus();
+    };
     document.addEventListener('keydown', teclado);
+    document.addEventListener('focusin', foco);
     return () => {
       document.removeEventListener('keydown', teclado);
-      document.body.style.overflow = overflow;
+      document.removeEventListener('focusin', foco);
+      pilha.splice(pilha.indexOf(eu), 1);
+      if (!pilha.length) document.body.style.overflow = overflow;
       anterior?.focus?.();
     };
-  }, [aberto]);
+  }, [aberto, refinada]);
 
   if (!aberto) return null;
   return createPortal(
-    <div className={styles.fundo} onMouseDown={(e) => e.target === e.currentTarget && aoFechar()}>
+    <div
+      className={styles.fundo}
+      onMouseDown={(e) => {
+        if (e.target !== e.currentTarget) return;
+        // Com alterações, um clique fora não fecha nem pergunta: só o X, o Esc ou Cancelar.
+        if (refinada && alterado) return;
+        pedirFechamento();
+      }}
+    >
       <div
         ref={janela}
         className={styles.janela}
-        role="dialog"
+        role={refinada ? papel : 'dialog'}
         aria-modal="true"
         aria-labelledby={idTitulo}
+        aria-describedby={refinada ? idDescricao : undefined}
         tabIndex={-1}
         style={largura ? ({ '--largura': `${largura}px` } as CSSProperties) : undefined}
       >
@@ -73,13 +135,34 @@ export function Modal({ aberto, titulo, aoFechar, children, rodape, largura }: M
           <h2 id={idTitulo} className={styles.titulo}>
             {titulo}
           </h2>
-          <Botao variante="fantasma" soIcone icone="fechar" onClick={aoFechar}>
+          <Botao
+            variante="fantasma"
+            soIcone
+            icone="fechar"
+            onClick={pedirFechamento}
+            disabled={refinada && bloqueado}
+          >
             Fechar
           </Botao>
         </header>
         <div className={styles.corpo}>{children}</div>
         {rodape && <footer className={styles.rodape}>{rodape}</footer>}
       </div>
+      {refinada && (
+        <ConfirmarAcao
+          aberto={descartar}
+          titulo="Descartar as alterações?"
+          mensagem="O que você digitou nesta janela ainda não foi salvo."
+          textoConfirmar="Descartar"
+          textoCancelar="Continuar editando"
+          perigo
+          aoCancelar={() => setDescartar(false)}
+          aoConfirmar={() => {
+            setDescartar(false);
+            aoFechar();
+          }}
+        />
+      )}
     </div>,
     document.body,
   );
@@ -90,43 +173,63 @@ export function ConfirmarAcao({
   titulo,
   mensagem,
   textoConfirmar = 'Confirmar',
+  textoCancelar = 'Cancelar',
   perigo,
   carregando,
   aoConfirmar,
   aoCancelar,
+  children,
 }: {
   aberto: boolean;
   titulo: string;
   mensagem: ReactNode;
   textoConfirmar?: string;
+  textoCancelar?: string;
   perigo?: boolean;
   carregando?: boolean;
   aoConfirmar: () => void;
   aoCancelar: () => void;
+  /** Campos extras (motivo, valor…) abaixo da mensagem. */
+  children?: ReactNode;
 }) {
+  const { refinada } = useInterface();
+  const idMensagem = useId();
+  // Em ações destrutivas o foco começa em "Cancelar": Enter por engano não apaga nada.
+  const focoNoCancelar = refinada && perigo;
   return (
     <Modal
       aberto={aberto}
       titulo={titulo}
       aoFechar={aoCancelar}
       largura={460}
+      papel="alertdialog"
+      idDescricao={idMensagem}
+      bloqueado={carregando}
       rodape={
         <>
-          <Botao variante="secundario" onClick={aoCancelar}>
-            Cancelar
+          <Botao
+            variante="secundario"
+            onClick={aoCancelar}
+            disabled={refinada && carregando}
+            data-autofoco={focoNoCancelar || undefined}
+          >
+            {textoCancelar}
           </Botao>
           <Botao
             variante={perigo ? 'perigo' : 'primario'}
             carregando={carregando}
             onClick={aoConfirmar}
-            data-autofoco
+            data-autofoco={focoNoCancelar ? undefined : true}
           >
             {textoConfirmar}
           </Botao>
         </>
       }
     >
-      <p style={{ margin: 0 }}>{mensagem}</p>
+      <p id={idMensagem} style={{ margin: 0 }}>
+        {mensagem}
+      </p>
+      {children && <div style={{ marginTop: 16 }}>{children}</div>}
     </Modal>
   );
 }

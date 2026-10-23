@@ -397,3 +397,16 @@ h3 em {
     transition-duration: 0.01ms !important;
   }
 }
+/* Caixa de marcação com o texto ao lado, alvo de toque de 44px. */
+.opcao-marcar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch);
+  cursor: pointer;
+}
+.opcao-marcar input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primaria);
+}

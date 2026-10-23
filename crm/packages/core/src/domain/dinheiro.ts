@@ -27,3 +27,21 @@ export function centavosParaTexto(centavos: Centavos | null | undefined): string
 export function porcentagem(base: Centavos, percentual: number): Centavos {
   return Math.round((base * percentual) / 100);
 }
+
+/**
+ * Lê um valor digitado no padrão brasileiro. Sem vírgula, ponto seguido de grupos de três dígitos é
+ * separador de milhar ("1.500" = R$ 1.500,00); com outra quantidade de dígitos é o decimal ("1.5").
+ */
+export function lerDinheiro(valor: string): Centavos | null {
+  const texto = valor.replace(/[R$\s]/g, '');
+  if (!texto.includes(',') && /^-?\d{1,3}(\.\d{3})+$/.test(texto)) {
+    return paraCentavos(texto.replace(/\./g, ''));
+  }
+  return paraCentavos(texto);
+}
+
+/** Valor editável com separador de milhar (ex.: 150000 → "1.500,00"). */
+export function textoDinheiro(centavos: Centavos | null | undefined): string {
+  if (centavos == null) return '';
+  return (centavos / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}

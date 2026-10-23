@@ -67,3 +67,28 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function emailValido(email: string): boolean {
   return EMAIL.test(email.trim());
 }
+
+/** Máscaras aplicadas enquanto se digita (aceitam o número incompleto). */
+export function mascararDocumento(valor: string): string {
+  const d = somenteDigitos(valor).slice(0, 14);
+  if (d.length <= 11) {
+    return d
+      .replace(/^(\d{3})(\d)/, '$1.$2')
+      .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+      .replace(/\.(\d{3})(\d{1,2})$/, '.$1-$2');
+  }
+  return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})$/, '$1.$2.$3/$4-$5').replace(/-$/, '');
+}
+
+export function mascararTelefone(valor: string): string {
+  const d = somenteDigitos(valor).slice(0, 11);
+  if (d.length <= 2) return d.length ? `(${d}` : '';
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  const meio = d.length === 11 ? 7 : 6;
+  return `(${d.slice(0, 2)}) ${d.slice(2, meio)}-${d.slice(meio)}`;
+}
+
+export function mascararCep(valor: string): string {
+  const d = somenteDigitos(valor).slice(0, 8);
+  return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
+}

@@ -28,10 +28,8 @@ export const SEGURADORAS_DEMO = [
   'Bradesco',
   'Allianz',
   'Mapfre',
-  'Sompo',
   'Suhai',
   'Sul América',
-  'Liberty',
   'Yelum',
 ];
 const ANUAIS = new Set([

@@ -1,8 +1,19 @@
 import { formatarData, formatarDinheiro, hojeISO } from '@portella/core';
-import { Barras, BarraFiltros, Campo, Cartao, EstadoVazio, Indicador, Selecao } from '@portella/ui';
+import {
+  Barras,
+  BarraFiltros,
+  Campo,
+  Carregando,
+  Cartao,
+  EstadoVazio,
+  Indicador,
+  Selecao,
+  Selo,
+} from '@portella/ui';
 import { useMemo, useState } from 'react';
 import { CONTA_PRINCIPAL, resumirMes, saldosPorConta, situacaoDespesa } from '../../../domain/financeiro';
-import { mesesDe, rotuloMes, rotuloMesCurto, useFinanceiro } from './comum';
+import { EstadoErro } from '../../componentes/EstadoErro';
+import { mesesDe, mesPadrao, rotuloMes, rotuloMesCurto, useFinanceiro } from './comum';
 
 export function ResumoFinanceiro() {
   const { movimentos, despesas, fechamentos } = useFinanceiro();
@@ -13,9 +24,9 @@ export function ResumoFinanceiro() {
     [movs, desps],
   );
   const [mes, setMes] = useState<string | null>(null);
-  const mesAtivo = mes ?? meses[0] ?? hojeISO().slice(0, 7);
-  const fimDoMes = `${mesAtivo}-31`;
   const hoje = hojeISO();
+  const mesAtivo = mes ?? mesPadrao(meses, hoje);
+  const fimDoMes = `${mesAtivo}-31`;
 
   const resumo = useMemo(() => resumirMes(movs, desps, mesAtivo), [movs, desps, mesAtivo]);
   const saldos = useMemo(
@@ -39,6 +50,23 @@ export function ResumoFinanceiro() {
     [fechamentos.data],
   );
   const saldoPrincipal = saldos.find(([c]) => c === CONTA_PRINCIPAL)?.[1];
+  const resultado = resumo.entradas - resumo.saidas;
+
+  if (movimentos.isError || despesas.isError || fechamentos.isError) {
+    return (
+      <EstadoErro
+        oque="o financeiro"
+        aoTentar={() => {
+          void movimentos.refetch();
+          void despesas.refetch();
+          void fechamentos.refetch();
+        }}
+      />
+    );
+  }
+  if (movimentos.isPending || despesas.isPending || fechamentos.isPending) {
+    return <Carregando texto="Carregando o financeiro…" />;
+  }
 
   return (
     <div className="grade">
@@ -69,15 +97,15 @@ export function ResumoFinanceiro() {
           detalhe="na conta principal"
         />
         <Indicador
-          tom="perigo"
-          icone="carteira"
+          tom="primaria"
+          icone="estorno"
           rotulo="Saídas"
           valor={formatarDinheiro(resumo.saidas)}
-          detalhe={`resultado ${formatarDinheiro(resumo.entradas - resumo.saidas)}`}
+          detalhe={`resultado do mês: ${resultado >= 0 ? '+' : '−'} ${formatarDinheiro(Math.abs(resultado))}`}
         />
         <Indicador
           tom="alerta"
-          icone="carteira"
+          icone="calendario"
           rotulo="Despesas em aberto"
           valor={formatarDinheiro(resumo.despesasAbertas)}
           detalhe={`de ${formatarDinheiro(resumo.despesas)} no mês`}
@@ -95,7 +123,7 @@ export function ResumoFinanceiro() {
               }))}
             />
           ) : (
-            <p className="texto-suave">Nenhum fechamento cadastrado.</p>
+            <EstadoVazio titulo="Nenhum fechamento">Feche o mês na aba Faturamento.</EstadoVazio>
           )}
         </Cartao>
         <Cartao titulo="Saldos por conta">
@@ -109,10 +137,10 @@ export function ResumoFinanceiro() {
               ))}
             </dl>
           ) : (
-            <p className="texto-suave">Nenhum movimento cadastrado.</p>
+            <EstadoVazio titulo="Nenhum movimento">Lance os movimentos na aba Extrato.</EstadoVazio>
           )}
         </Cartao>
-        <Cartao titulo="Próximas despesas">
+        <Cartao titulo="Despesas a pagar">
           {aPagar.length ? (
             <ul className="lista-simples">
               {aPagar.map((d) => (
@@ -120,9 +148,15 @@ export function ResumoFinanceiro() {
                   <div className="linha">
                     <span>
                       <strong>{d.descricao}</strong>
-                      <small>vence {formatarData(d.vencimento)}</small>
+                      <small>
+                        {situacaoDespesa(d, hoje) === 'vencida' ? 'venceu' : 'vence'}{' '}
+                        {formatarData(d.vencimento)}
+                      </small>
                     </span>
-                    <span>{formatarDinheiro(d.valor - d.pago)}</span>
+                    <span>
+                      {situacaoDespesa(d, hoje) === 'vencida' && <Selo tom="perigo">Vencida</Selo>}{' '}
+                      {formatarDinheiro(d.valor - d.pago)}
+                    </span>
                   </div>
                 </li>
               ))}

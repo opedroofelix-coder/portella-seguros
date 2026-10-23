@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Cartao.module.css';
 import type { NomeIcone } from './Icone';
 import { Icone } from './Icone';
@@ -32,15 +33,19 @@ export function Indicador({
   detalhe,
   tom = 'primaria',
   icone,
+  para,
 }: {
   rotulo: string;
   valor: ReactNode;
   detalhe?: ReactNode;
   tom?: TomIndicador;
   icone?: NomeIcone;
+  /** Rota que o indicador abre (o cartão inteiro vira link). */
+  para?: string;
 }) {
-  return (
-    <div className={`${styles.cartao} ${styles.indicador} ${styles[tom]}`}>
+  const classes = `${styles.cartao} ${styles.indicador} ${styles[tom]}`;
+  const conteudo = (
+    <>
       {icone && (
         <span className={styles.indicadorIcone} aria-hidden="true">
           <Icone nome={icone} tamanho={18} />
@@ -54,7 +59,14 @@ export function Indicador({
         {valor}
       </strong>
       {detalhe && <span className={styles.indicadorDetalhe}>{detalhe}</span>}
-    </div>
+    </>
+  );
+  return para ? (
+    <Link to={para} className={`${classes} ${styles.indicadorLink}`}>
+      {conteudo}
+    </Link>
+  ) : (
+    <div className={classes}>{conteudo}</div>
   );
 }
 

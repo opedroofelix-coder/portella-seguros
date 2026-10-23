@@ -76,12 +76,17 @@ describe('importação de seguros', () => {
     expect(identificarSeguradora('PORTO SEGURO CIA DE SEGUROS')).toBe('porto');
     expect(identificarSeguradora('Sul America')).toBe('sulamerica');
     expect(identificarSeguradora('Tokio Marine Seguradora')).toBe('tokio');
-    expect(identificarSeguradora('Youse')).toBe('Youse');
+    expect(identificarSeguradora('Youse')).toBe('youse');
+    expect(identificarSeguradora('LIBERTY SEGUROS')).toBe('liberty');
+    expect(identificarSeguradora('Yelum Seguros')).toBe('liberty');
+    expect(identificarSeguradora('Akad')).toBe('Akad');
     expect(identificarRamo('AUTOMÓVEL')).toBe('auto');
     expect(identificarRamo('Seguro de Vida em Grupo')).toBe('vida');
     expect(identificarRamo('Residencial')).toBe('residencial');
     expect(identificarRamo('Fiança locatícia')).toBe('fianca');
     expect(identificarRamo('Xyz')).toBe('outros');
+    expect(identificarRamo('Comércio')).toBe('outros');
+    expect(identificarRamo('RC Profissional')).toBe('rc');
   });
 
   it('analisa o arquivo, avisa problemas e importa sem duplicar', async () => {

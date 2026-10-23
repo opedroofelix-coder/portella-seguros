@@ -28,6 +28,7 @@ export function App({
 }) {
   const config: ConfigApp = {
     sistema: 'Seguros',
+    interface: 'refinada',
     logo: `${import.meta.env.BASE_URL}logo.svg`,
     nomeFunil: 'Cotações',
     produtos: RAMOS.map((r) => r.nome),

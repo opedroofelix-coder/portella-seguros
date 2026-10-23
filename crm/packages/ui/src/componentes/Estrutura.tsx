@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Botao } from './Botao';
 import styles from './Estrutura.module.css';
 import type { NomeIcone } from './Icone';
 import { Icone } from './Icone';
+import { useInterface } from './Interface';
 import { SeletorTema } from './Tema';
 
 export interface ItemMenu {
@@ -171,10 +172,22 @@ export function CabecalhoPagina({
   acoes?: ReactNode;
 }) {
   const slot = useContext(SlotTopo);
+  const { refinada } = useInterface();
+  const h1 = useRef<HTMLHeadingElement>(null);
+  // Com a interface refinada, a aba do navegador mostra a tela atual ("Apólices · Portella").
+  useEffect(() => {
+    if (!refinada || !h1.current?.textContent) return;
+    const anterior = document.title;
+    const sistema = anterior.split(' · ').slice(-1)[0];
+    document.title = `${h1.current.textContent} · ${sistema}`;
+    return () => {
+      document.title = anterior;
+    };
+  });
   const cabecalho = (
     <div className={styles.cabecalhoPagina}>
       <div className={styles.cabecalhoTexto}>
-        <h1>{titulo}</h1>
+        <h1 ref={h1}>{titulo}</h1>
         {descricao && <p>{descricao}</p>}
       </div>
       {acoes && <div className={styles.acoes}>{acoes}</div>}

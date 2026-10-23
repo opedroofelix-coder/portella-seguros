@@ -84,3 +84,53 @@ select.controle {
   font-size: 12.5px;
   color: var(--perigo);
 }
+
+/* Entrada com unidade (R$, %): a moldura fica no conjunto e o foco aparece nele. */
+.afixada {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  background: var(--superficie-2);
+  border: 1px solid var(--borda-forte);
+  border-radius: min(7px, var(--raio-max, 7px));
+}
+.afixada:hover {
+  border-color: var(--destaque-fio);
+}
+.afixada:focus-within {
+  outline: var(--campo-foco-contorno, none);
+  outline-offset: var(--campo-foco-afastamento, 0px);
+  border-color: var(--campo-foco-borda, var(--destaque));
+  box-shadow: var(--campo-foco-anel, 0 0 0 3px var(--destaque-fundo));
+  background: var(--superficie);
+}
+.afixada:has([aria-invalid='true']) {
+  border-color: var(--perigo);
+}
+.afixo {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--texto-suave);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.afixo:first-child {
+  border-right: 1px solid var(--borda);
+}
+.afixo:last-child {
+  border-left: 1px solid var(--borda);
+}
+.controle.controleAfixado {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.controle.controleAfixado:focus {
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}

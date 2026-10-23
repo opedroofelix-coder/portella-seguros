@@ -33,6 +33,11 @@ export interface ConfigApp {
   /** Produtores cadastrados no primeiro acesso, com senha 1234. */
   produtoresIniciais?: ProdutorInicial[];
   abasCliente?: Array<{ id: string; rotulo: string; render: (cliente: Cliente) => ReactNode }>;
+  /**
+   * 'refinada' liga a revisão de UX nas telas comuns: confirmações antes de excluir, campos de R$ e %
+   * com máscara, pilha de modais, avisos de erro que não somem… Sem ela, as telas ficam como eram.
+   */
+  interface?: 'refinada';
 }
 
 const Contexto = createContext<ConfigApp | null>(null);
@@ -46,3 +51,6 @@ export function useConfig(): ConfigApp {
   if (!c) throw new Error('useConfig precisa estar dentro de <ProvedorConfig>.');
   return c;
 }
+
+/** A revisão de UX está ligada neste app? */
+export const useRefinada = () => useConfig().interface === 'refinada';

@@ -74,3 +74,32 @@ export const AreaTexto = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<
     );
   },
 );
+
+export interface EntradaAfixadaProps extends InputHTMLAttributes<HTMLInputElement> {
+  /** Texto antes do valor ("R$"). */
+  prefixo?: string;
+  /** Texto depois do valor ("%"). */
+  sufixo?: string;
+}
+
+/** Entrada com unidade fixa ao lado (R$, %). Os atributos (id, aria-*) vão para o <input>. */
+export const EntradaAfixada = forwardRef<HTMLInputElement, EntradaAfixadaProps>(function EntradaAfixada(
+  { prefixo, sufixo, className, ...props },
+  ref,
+) {
+  return (
+    <span className={[styles.afixada, className].filter(Boolean).join(' ')}>
+      {prefixo && (
+        <span className={styles.afixo} aria-hidden="true">
+          {prefixo}
+        </span>
+      )}
+      <input ref={ref} className={`${styles.controle} ${styles.controleAfixado}`} {...props} />
+      {sufixo && (
+        <span className={styles.afixo} aria-hidden="true">
+          {sufixo}
+        </span>
+      )}
+    </span>
+  );
+});

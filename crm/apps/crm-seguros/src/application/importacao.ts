@@ -27,13 +27,16 @@ const centavos = (reais?: number) => (reais == null ? undefined : (paraCentavos(
 /** "PORTO SEGURO CIA" → "porto"; desconhecida fica com o nome original. */
 export function identificarSeguradora(nome: string): string {
   const n = letras(nome);
-  const achada = SEGURADORAS.find((s) => n.includes(letras(s.nome)) || n.startsWith(s.id));
+  const achada = SEGURADORAS.find(
+    (s) => n.includes(letras(s.nome)) || n.startsWith(s.id) || s.apelidos?.some((a) => n.includes(letras(a))),
+  );
   return achada?.id ?? nome.trim();
 }
 
 export function identificarRamo(nome: string): Apolice['ramo'] {
   const n = normalizar(nome);
-  const achado = RAMOS.find((r) => n.includes(normalizar(r.nome)) || n.includes(r.id));
+  // O id só vale como palavra inteira: "Comércio" e "Consórcio" contêm "rc", mas não são RC.
+  const achado = RAMOS.find((r) => n.includes(normalizar(r.nome)) || new RegExp(`\\b${r.id}\\b`).test(n));
   if (achado) return achado.id;
   if (/automovel|veiculo|carro|moto/.test(n)) return 'auto';
   if (/resid|casa|apartamento/.test(n)) return 'residencial';

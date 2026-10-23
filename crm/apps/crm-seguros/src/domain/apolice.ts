@@ -29,27 +29,54 @@ export interface Apolice extends Registro {
   formaPagamento?: string;
   cancelada?: boolean;
   renovacao: StatusRenovacao;
+  /** Por que o cliente não renovou (preço, outra corretora…), quando `renovacao` é "nao_renovada". */
+  motivoNaoRenovacao?: string;
   observacoes?: string;
 }
 
-export type Situacao = 'vigente' | 'a_vencer' | 'vencida' | 'cancelada';
+/** Motivos sugeridos ao marcar "Não renovou". */
+export const MOTIVOS_NAO_RENOVACAO = [
+  'Preço',
+  'Fechou com outra corretora',
+  'Vendeu ou não tem mais o bem',
+  'Sem retorno do cliente',
+  'Outro',
+] as const;
+
+export type Situacao = 'a_iniciar' | 'vigente' | 'a_vencer' | 'vencida' | 'renovada' | 'cancelada';
 export const ROTULO_SITUACAO: Record<Situacao, string> = {
+  a_iniciar: 'A iniciar',
   vigente: 'Vigente',
   a_vencer: 'A vencer',
   vencida: 'Vencida',
+  renovada: 'Renovada',
   cancelada: 'Cancelada',
 };
 
 /** Janela (em dias) em que a apólice passa a ser considerada "a vencer". */
 export const JANELA_A_VENCER = 30;
 
-export function situacao(a: Pick<Apolice, 'fimVigencia' | 'cancelada'>, hoje: DataISO): Situacao {
+/**
+ * Situação pela vigência. A apólice nova de uma renovação fica "a iniciar" até a data de início,
+ * para não contar junto com a anterior; a anterior, depois do fim, aparece como "renovada".
+ */
+export function situacao(
+  a: Pick<Apolice, 'fimVigencia' | 'cancelada'> & Partial<Pick<Apolice, 'inicioVigencia' | 'renovacao'>>,
+  hoje: DataISO,
+): Situacao {
   if (a.cancelada) return 'cancelada';
+  if (a.inicioVigencia && diasEntre(hoje, a.inicioVigencia) > 0) return 'a_iniciar';
   if (!a.fimVigencia) return 'vigente';
   const dias = diasEntre(hoje, a.fimVigencia);
-  if (dias < 0) return 'vencida';
+  if (dias < 0) return a.renovacao === 'renovada' ? 'renovada' : 'vencida';
   return dias <= JANELA_A_VENCER ? 'a_vencer' : 'vigente';
 }
+
+/** Vigentes e a vencer: as apólices que estão valendo hoje. */
+export const estaValendo = (a: Apolice, hoje: DataISO) => {
+  const s = situacao(a, hoje);
+  return s === 'vigente' || s === 'a_vencer';
+};
 
 /** Comissão da corretora sobre o prêmio líquido. */
 export function comissao(a: Pick<Apolice, 'premioLiquido' | 'comissaoPercentual'>): Centavos | null {
@@ -88,6 +115,8 @@ export function filaRenovacao(apolices: Apolice[], hoje: DataISO, dias: number):
 
 export interface ResumoCarteira {
   ativas: number;
+  /** Apólices novas (em geral renovações) que ainda não começaram. */
+  aIniciar: number;
   aVencer30: number;
   aVencer60: number;
   aVencer90: number;
@@ -98,10 +127,7 @@ export interface ResumoCarteira {
 }
 
 export function resumirCarteira(apolices: Apolice[], hoje: DataISO): ResumoCarteira {
-  const ativas = apolices.filter((a) => {
-    const s = situacao(a, hoje);
-    return s === 'vigente' || s === 'a_vencer';
-  });
+  const ativas = apolices.filter((a) => estaValendo(a, hoje));
   const pendentes = filaRenovacao(apolices, hoje, 90).filter((a) => diasEntre(hoje, a.fimVigencia!) >= 0);
   const dentro = (n: number) => pendentes.filter((a) => diasEntre(hoje, a.fimVigencia!) <= n).length;
 
@@ -111,21 +137,23 @@ export function resumirCarteira(apolices: Apolice[], hoje: DataISO): ResumoCarte
     const s = seg.get(a.seguradora) ?? { quantidade: 0, premio: 0 };
     seg.set(a.seguradora, {
       quantidade: s.quantidade + 1,
-      premio: s.premio + (a.premioTotal ?? a.premioLiquido ?? 0),
+      premio: s.premio + (a.premioLiquido ?? 0),
     });
     ramo.set(a.ramo, (ramo.get(a.ramo) ?? 0) + 1);
   }
 
   return {
     ativas: ativas.length,
+    aIniciar: apolices.filter((a) => situacao(a, hoje) === 'a_iniciar').length,
     aVencer30: dentro(30),
     aVencer60: dentro(60),
     aVencer90: dentro(90),
-    premioAtivo: ativas.reduce((t, a) => t + (a.premioTotal ?? a.premioLiquido ?? 0), 0),
+    // Prêmio líquido, a mesma base da comissão (o prêmio total inclui IOF e juros).
+    premioAtivo: ativas.reduce((t, a) => t + (a.premioLiquido ?? 0), 0),
     comissaoAtiva: ativas.reduce((t, a) => t + (comissao(a) ?? 0), 0),
     porSeguradora: [...seg]
       .map(([seguradora, v]) => ({ seguradora, ...v }))
-      .sort((a, b) => b.quantidade - a.quantidade),
+      .sort((a, b) => b.premio - a.premio || b.quantidade - a.quantidade),
     porRamo: [...ramo]
       .map(([r, quantidade]) => ({ ramo: r, quantidade }))
       .sort((a, b) => b.quantidade - a.quantidade),

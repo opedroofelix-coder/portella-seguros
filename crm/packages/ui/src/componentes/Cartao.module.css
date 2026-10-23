@@ -142,3 +142,13 @@
     transform: rotate(360deg);
   }
 }
+
+/* Indicador que leva a uma tela: continua com cara de cartão, mas mostra que abre algo. */
+.indicadorLink {
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.indicadorLink:hover {
+  border-color: var(--destaque-fio);
+}

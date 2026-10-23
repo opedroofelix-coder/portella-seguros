@@ -1,4 +1,5 @@
 export * from './AppCrm';
+export * from './componentes/Entradas';
 export * from './componentes/FormularioCliente';
 export * from './componentes/SeletorResponsavel';
 export * from './config';

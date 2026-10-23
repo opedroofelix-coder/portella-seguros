@@ -154,3 +154,43 @@
   display: flex;
   gap: 8px;
 }
+
+/* Título de coluna ordenável e linha de totais (só aparecem quando a tela pede). */
+.ordenar {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.ordenar:hover {
+  color: var(--texto);
+}
+.totais td {
+  font-weight: 600;
+  border-top: 1px solid var(--destaque-fio);
+  border-bottom: 0;
+}
+@media (max-width: 899px) {
+  /* Os cabeçalhos ficam escondidos nos cartões: o botão de ordenar não recebe foco invisível. */
+  .ordenar {
+    visibility: hidden;
+  }
+  .tabela tfoot,
+  .tabela .totais {
+    display: block;
+  }
+  .tabela .totais {
+    margin-top: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--destaque-fio);
+    border-radius: min(10px, var(--raio-max, 10px));
+    background: var(--destaque-fundo);
+  }
+  .tabela .totais td:first-child::before {
+    content: none;
+  }
+}
