@@ -1,0 +1,38 @@
+.abas {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+  padding: var(--abas-espaco, 4px);
+  background: var(--abas-fundo, var(--superficie-2));
+  border: var(--abas-borda, 1px solid var(--borda));
+  border-bottom: var(--abas-fio, 1px solid var(--borda));
+  border-radius: min(9px, var(--raio-max, 9px));
+  scrollbar-width: none;
+}
+.aba {
+  flex-shrink: 0;
+  min-height: 38px;
+  padding: 6px 14px;
+  background: none;
+  border: 0;
+  border-radius: min(6px, var(--raio-max, 6px));
+  color: var(--texto-suave);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.aba:hover {
+  color: var(--texto);
+  background: var(--aba-hover-fundo, var(--superficie-3));
+}
+.aba[aria-selected='true'] {
+  background: var(--aba-ativa-fundo, var(--primaria));
+  color: var(--aba-ativa-texto, var(--primaria-texto));
+  box-shadow: var(--aba-ativa-marca, none);
+}
+@media (pointer: coarse), (max-width: 719px) {
+  .aba {
+    min-height: var(--touch);
+  }
+}

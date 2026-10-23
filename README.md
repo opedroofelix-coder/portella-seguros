@@ -24,6 +24,8 @@ index.html                     # página única com as 11 seções
 assets/css/style.css           # estilos; cores e fontes em :root (variáveis CSS)
 assets/js/main.js              # pó dourado, menu mobile, carrosséis, contadores, FAQ e modal de cotação
 api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
+crm/                           # CRM de seguros e consórcio (React); especificação em docs/CRM.md
+vercel.json, scripts/build-vercel.sh  # publicação: site na raiz e demonstração do CRM em /seguro
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
 assets/img/seguradoras/*.png   # logos da faixa Seguradoras & Operadoras (26)
@@ -47,6 +49,15 @@ assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratad
 Os três carrosséis (seguradoras, seguros e depoimentos) usam o mesmo código (`[data-carousel]` no `main.js`): avançam um card a cada 3,5 s, têm setas, arrastar no celular e barra de progresso.
 
 Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a mensagem para o WhatsApp.
+
+## Publicação na Vercel
+
+O `vercel.json` instala o CRM (`cd crm && npm ci`) e roda `scripts/build-vercel.sh`, que monta a
+pasta `publico/` com o site na raiz e a **demonstração do CRM de Seguros em `/seguro`** (dados
+fictícios, que ficam só no navegador; `/seguros` também leva para lá). A função `api/avaliacoes.js`
+continua publicada. A demonstração não é indexada pelo Google (`X-Robots-Tag: noindex`).
+
+Para testar o build na máquina: `sh scripts/build-vercel.sh` e depois `cd publico && python3 -m http.server`.
 
 ## Avaliações do Google
 
@@ -81,6 +92,9 @@ Com o cache de 1 dia são cerca de 30 consultas por mês.
 - [x] Resposta da pergunta "A cotação tem algum custo?": não tem custo.
 - [ ] Integração do formulário de contato (hoje abre o e-mail via `mailto:`).
 - [ ] Páginas legais (Privacidade, Termos, LGPD, Cookies).
-- [ ] Próximas etapas: CRM de seguros e consórcio.
+- [ ] CRM de seguros e consórcio: em `crm/` (React), especificação em `docs/CRM.md`. O CRM de Seguros
+  passou pela revisão de UX/UI (interface refinada) e segue o visual "A5 · Vidro + Bento" escolhido pela
+  cliente (tema claro padrão, menu no topo, busca Ctrl K e painel inicial com produção, comissões e
+  pagamento do mês). Falta escolher o backend para os dados serem compartilhados entre computadores.
 
 Os pontos a preencher estão marcados no código com `TODO` ou `[inserir]`.

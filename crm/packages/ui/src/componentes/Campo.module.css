@@ -1,0 +1,136 @@
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.rotulo {
+  font-size: var(--campo-rotulo-tamanho, 11px);
+  font-weight: 600;
+  letter-spacing: var(--campo-rotulo-espaco, 0.06em);
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+.linhaRotulo {
+  display: flex;
+  gap: 2px;
+}
+.obrigatorio {
+  font-size: 12px;
+  color: var(--destaque-texto);
+}
+.controle {
+  width: 100%;
+  min-height: var(--touch);
+  padding: 9px 12px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borda-forte);
+  border-radius: min(7px, var(--raio-max, 7px));
+  color: var(--texto);
+  font-size: 16px; /* 16px evita zoom automático no iOS */
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+/* Com mouse, numa tela larga, o campo pode ser mais baixo; no celular fica com 44px. */
+@media (min-width: 720px) and (pointer: fine) {
+  .controle {
+    min-height: 40px;
+    font-size: 14.5px;
+  }
+}
+.controle::placeholder {
+  color: var(--texto-fraco);
+}
+.controle:hover {
+  border-color: var(--destaque-fio);
+}
+.controle:focus {
+  outline: var(--campo-foco-contorno, none);
+  outline-offset: var(--campo-foco-afastamento, 0px);
+  border-color: var(--campo-foco-borda, var(--destaque));
+  box-shadow: var(--campo-foco-anel, 0 0 0 3px var(--destaque-fundo));
+  background: var(--superficie);
+}
+.controle:disabled,
+.controle[readonly] {
+  background: var(--superficie-3);
+  color: var(--texto-suave);
+}
+.controle[aria-invalid='true'] {
+  border-color: var(--perigo);
+}
+textarea.controle {
+  min-height: 90px;
+  resize: vertical;
+}
+select.controle {
+  appearance: none;
+  padding-right: 36px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--texto-suave) 50%),
+    linear-gradient(135deg, var(--texto-suave) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+.dica {
+  font-size: 12px;
+  color: var(--texto-fraco);
+}
+.erro {
+  font-size: 12.5px;
+  color: var(--perigo);
+}
+
+/* Entrada com unidade (R$, %): a moldura fica no conjunto e o foco aparece nele. */
+.afixada {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  background: var(--superficie-2);
+  border: 1px solid var(--borda-forte);
+  border-radius: min(7px, var(--raio-max, 7px));
+}
+.afixada:hover {
+  border-color: var(--destaque-fio);
+}
+.afixada:focus-within {
+  outline: var(--campo-foco-contorno, none);
+  outline-offset: var(--campo-foco-afastamento, 0px);
+  border-color: var(--campo-foco-borda, var(--destaque));
+  box-shadow: var(--campo-foco-anel, 0 0 0 3px var(--destaque-fundo));
+  background: var(--superficie);
+}
+.afixada:has([aria-invalid='true']) {
+  border-color: var(--perigo);
+}
+.afixo {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--texto-suave);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.afixo:first-child {
+  border-right: 1px solid var(--borda);
+}
+.afixo:last-child {
+  border-left: 1px solid var(--borda);
+}
+.controle.controleAfixado {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.controle.controleAfixado:focus {
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}

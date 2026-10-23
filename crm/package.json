@@ -1,0 +1,46 @@
+{
+  "name": "portella-crm",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:seguros": "npm run dev -w @portella/crm-seguros",
+    "dev:consorcio": "npm run dev -w @portella/crm-consorcio",
+    "build": "npm run build -w @portella/crm-seguros && npm run build -w @portella/crm-consorcio",
+    "build:demo": "VITE_DEMO=1 npm run build -w @portella/crm-seguros && VITE_DEMO=1 npm run build -w @portella/crm-consorcio && VITE_DEMO=1 vite build --config packages/ui/catalogo/vite.config.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit -p .",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "importar": "npm run importar -w @portella/importer --",
+    "catalogo": "vite --config packages/ui/catalogo/vite.config.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.29.0",
+    "@playwright/test": "1.56.0",
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.3.0",
+    "@testing-library/user-event": "14.6.1",
+    "@types/node": "22.15.32",
+    "@types/react": "18.3.23",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "4.5.2",
+    "eslint": "9.29.0",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "fake-indexeddb": "6.0.1",
+    "globals": "16.2.0",
+    "jsdom": "26.1.0",
+    "prettier": "3.5.3",
+    "tsx": "4.20.3",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.34.1",
+    "vite": "6.3.5",
+    "vite-plugin-pwa": "1.0.0",
+    "vitest": "3.2.4"
+  }
+}

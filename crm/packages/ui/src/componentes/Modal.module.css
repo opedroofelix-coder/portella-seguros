@@ -1,0 +1,91 @@
+.fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--veu);
+  backdrop-filter: blur(3px);
+  animation: aparecer 0.2s var(--ease);
+}
+.janela {
+  width: 100%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--superficie);
+  border-radius: min(14px, var(--raio-max, 14px)) min(14px, var(--raio-max, 14px)) 0 0;
+  border-top: var(--modal-fio, 0);
+  box-shadow: var(--sombra-forte);
+  animation: subir 0.25s var(--ease);
+}
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--borda);
+}
+.titulo {
+  font-size: 19px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* Título longo não espreme o botão de fechar. */
+.cabecalho > button {
+  flex-shrink: 0;
+}
+.corpo {
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.rodape {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--borda);
+}
+.rodape > * {
+  width: 100%;
+}
+@media (min-width: 720px) {
+  .fundo {
+    align-items: center;
+    padding: 24px;
+  }
+  .janela {
+    max-width: var(--largura, 640px);
+    max-height: 88vh;
+    border: 1px solid var(--modal-borda, var(--borda));
+    border-radius: min(13px, var(--raio-max, 13px));
+  }
+  .cabecalho {
+    padding: 18px 24px;
+  }
+  .corpo {
+    padding: 24px;
+  }
+  .rodape {
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 16px 24px;
+  }
+  .rodape > * {
+    width: auto;
+  }
+}
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes subir {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}

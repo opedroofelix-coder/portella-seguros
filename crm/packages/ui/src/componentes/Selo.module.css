@@ -1,0 +1,47 @@
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  border: 1px solid
+    var(--borda-selo, color-mix(in srgb, var(--cor-selo) var(--selo-borda-forca, 0%), transparent));
+  border-radius: min(999px, var(--raio-max, 999px));
+  background: var(--fundo-selo);
+  color: var(--cor-selo);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.selo::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.neutro {
+  --cor-selo: var(--texto-suave);
+  --fundo-selo: var(--superficie-3);
+  --borda-selo: var(--borda);
+}
+.sucesso {
+  --cor-selo: var(--sucesso);
+  --fundo-selo: var(--sucesso-fundo);
+}
+.alerta {
+  --cor-selo: var(--alerta);
+  --fundo-selo: var(--alerta-fundo);
+}
+.perigo {
+  --cor-selo: var(--perigo);
+  --fundo-selo: var(--perigo-fundo);
+}
+.info {
+  --cor-selo: var(--info);
+  --fundo-selo: var(--info-fundo);
+}
+.dourado {
+  --cor-selo: var(--destaque-texto);
+  --fundo-selo: var(--destaque-fundo);
+}

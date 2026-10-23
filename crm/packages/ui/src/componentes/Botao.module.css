@@ -1,0 +1,99 @@
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: var(--touch);
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--botao-raio, var(--radius));
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.botao:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.botao:not(:disabled):active {
+  transform: translateY(1px);
+}
+.primario {
+  background: var(--botao-fundo, var(--primaria));
+  border-color: var(--botao-borda, transparent);
+  color: var(--botao-texto, var(--primaria-texto));
+}
+.primario:not(:disabled):hover {
+  background: var(--botao-fundo-hover, var(--primaria-hover));
+}
+.secundario {
+  background: var(--superficie);
+  border-color: var(--borda-forte);
+  color: var(--texto);
+}
+.secundario:not(:disabled):hover {
+  border-color: var(--destaque);
+  color: var(--destaque-texto);
+}
+.fantasma {
+  background: transparent;
+  color: var(--texto-suave);
+  padding-inline: 10px;
+}
+.fantasma:not(:disabled):hover {
+  color: var(--texto);
+  background: var(--superficie-3);
+}
+.perigo {
+  background: var(--perigo-fundo);
+  border-color: var(--perigo-borda);
+  color: var(--perigo);
+}
+.perigo:not(:disabled):hover {
+  border-color: var(--perigo);
+}
+.pequeno {
+  padding: 5px 11px;
+  font-size: 13px;
+}
+/* No toque o alvo continua com 44px; com mouse o botão pequeno pode ser mais baixo. */
+@media (min-width: 720px) and (pointer: fine) {
+  .botao {
+    min-height: 40px;
+  }
+  .pequeno {
+    min-height: 34px;
+  }
+  .pequeno.soIcone {
+    width: 34px;
+  }
+  .soIcone {
+    width: 40px;
+  }
+}
+.blocoInteiro {
+  width: 100%;
+}
+.soIcone {
+  padding: 0;
+  width: var(--touch);
+}
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: giro 0.7s linear infinite;
+}
+@keyframes giro {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,619 @@
+.estrutura {
+  min-height: 100vh;
+}
+
+/* Menu lateral: sempre marinho, nos dois temas. */
+.lateral {
+  position: fixed;
+  /* --reserva-inferior: espaço de faixas fixas no rodapé da página (ex.: a da demonstração). */
+  inset: 0 auto var(--reserva-inferior, 0px) 0;
+  z-index: 40;
+  width: min(84vw, var(--sidebar));
+  display: flex;
+  flex-direction: column;
+  background: var(--menu-fundo);
+  color: var(--menu-texto-forte);
+  box-shadow: var(--sombra-menu, 4px 0 24px rgba(15, 30, 60, 0.28));
+  border-right: var(--menu-fio, 0);
+  padding-top: env(safe-area-inset-top, 0px);
+  transform: translateX(-105%);
+  transition: transform 0.25s var(--ease);
+}
+.lateralAberta {
+  transform: none;
+}
+.marca {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--menu-linha);
+  text-decoration: none;
+  color: inherit;
+}
+.marca img {
+  height: 32px;
+  width: auto;
+}
+.sistema {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--menu-ativo);
+}
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.grupoNome {
+  padding: 10px 12px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--menu-grupo, rgba(244, 238, 226, 0.45));
+}
+.link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--menu-link-altura, 42px);
+  padding: 8px 12px;
+  border-radius: min(8px, var(--raio-max, 8px));
+  color: var(--menu-texto);
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 500;
+  transition:
+    color 0.15s,
+    background-color 0.15s;
+}
+.link svg {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+.link:hover {
+  color: var(--menu-texto-forte);
+  background: rgba(255, 255, 255, 0.07);
+}
+.linkAtivo,
+.linkAtivo:hover {
+  color: var(--menu-ativo);
+  background: var(--menu-ativo-fundo);
+  box-shadow: var(--menu-ativo-marca, none);
+  font-weight: 600;
+}
+.linkAtivo svg {
+  opacity: 1;
+}
+.contador {
+  margin-left: auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: min(11px, var(--raio-max, 11px));
+  background: var(--destaque);
+  color: var(--destaque-sobre);
+  font-size: 11.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.rodape {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--menu-linha);
+}
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: min(9px, var(--raio-max, 9px));
+  background: rgba(255, 255, 255, 0.07);
+}
+.perfil div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.perfil strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.perfil div span {
+  font-size: 11.5px;
+  color: var(--menu-texto);
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--destaque);
+  color: var(--destaque-sobre);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.sair {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--sair-altura, 36px);
+  padding: 0 10px;
+  border: 1px solid var(--menu-linha);
+  border-radius: min(7px, var(--raio-max, 7px));
+  background: none;
+  color: var(--menu-texto);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.sair:hover {
+  color: var(--menu-texto-forte);
+  border-color: rgba(244, 238, 226, 0.4);
+}
+@media (pointer: coarse), (max-width: 1023px) {
+  .sair {
+    min-height: var(--touch);
+  }
+}
+.veu {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: var(--veu);
+  border: 0;
+  padding: 0;
+}
+
+/* Celular e tablet: barra fixa no topo com o botão do menu. */
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--topbar);
+  padding: env(safe-area-inset-top, 0px) var(--gutter) 0;
+  background: var(--topo-fundo);
+  border-bottom: 1px solid var(--topo-fio, var(--borda));
+  box-shadow: var(--sombra);
+  -webkit-backdrop-filter: var(--topo-desfoque, none);
+  backdrop-filter: var(--topo-desfoque, none);
+}
+.topoMarca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  text-decoration: none;
+}
+.topo img {
+  height: 26px;
+  width: auto;
+}
+.topo img.topoNome {
+  height: 20px;
+}
+.topoSistema {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--destaque-texto);
+}
+
+/* Computador: barra superior branca com o título da página e as ações. */
+.barraSuperior {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  min-height: 72px;
+  padding: 12px var(--gutter);
+  display: flex;
+  align-items: center;
+  background: var(--topo-fundo);
+  border-bottom: 1px solid var(--topo-fio, var(--borda));
+  box-shadow: var(--sombra);
+}
+.barraSuperior:empty {
+  display: none;
+}
+.barraSuperior .cabecalhoPagina {
+  width: 100%;
+  margin: 0;
+}
+.barraSuperior .cabecalhoPagina h1 {
+  font-size: 23px;
+}
+.barraSuperior .cabecalhoPagina p {
+  margin-top: 2px;
+  font-size: 13.5px;
+}
+.conteudo {
+  padding: 20px var(--gutter) 48px;
+  max-width: 1440px;
+  margin: 0 auto;
+  min-width: 0;
+}
+@media (min-width: 1024px) {
+  .lateral {
+    transform: none;
+    width: var(--sidebar);
+  }
+  .veu,
+  .topo {
+    display: none;
+  }
+  .principal {
+    margin-left: var(--sidebar);
+  }
+  .conteudo {
+    padding-top: 24px;
+  }
+}
+
+.cabecalhoPagina {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.cabecalhoTexto {
+  min-width: 0;
+}
+.cabecalhoPagina h1 {
+  font-size: clamp(24px, 5vw, 30px);
+  line-height: 1.15;
+}
+.cabecalhoPagina p {
+  margin: 4px 0 0;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 479px) {
+  .acoes > * {
+    flex: 1 1 auto;
+  }
+}
+@media (min-width: 720px) {
+  .cabecalhoPagina {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.filtros {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+  margin-bottom: 16px;
+}
+@media (min-width: 720px) {
+  .filtros {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    align-items: end;
+  }
+}
+
+/* Link para pular o menu: aparece só ao receber o foco pelo teclado. */
+.pular {
+  position: fixed;
+  z-index: 80;
+  top: 8px;
+  left: 8px;
+  padding: 10px 16px;
+  background: var(--superficie);
+  color: var(--texto);
+  border: 2px solid var(--foco);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+.pular:focus {
+  transform: none;
+}
+.conteudo:focus {
+  outline: none;
+}
+
+/* Busca no topo do celular (modo "topo"): fica à direita da marca. */
+.topoBusca {
+  margin-left: auto;
+}
+
+/*
+ * Modo "topo" no computador largo: cápsula de vidro flutuante com o grupo principal do menu,
+ * "Mais" (os outros grupos, tema e sair), busca rápida, a ação fixa e o avatar.
+ */
+.estruturaTopo {
+  padding: 18px var(--gutter) 0;
+}
+.estruturaTopo .conteudo {
+  padding: 26px 8px 48px;
+  max-width: 1440px;
+}
+.capsula {
+  position: sticky;
+  top: 14px;
+  z-index: 30;
+  max-width: 1424px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 8px 8px 18px;
+  border-radius: 999px;
+  background: var(--cartao-fundo, var(--topo-fundo));
+  border: 1px solid var(--cartao-borda, var(--borda));
+  box-shadow: var(--cartao-sombra, var(--sombra));
+  -webkit-backdrop-filter: var(--topo-desfoque, none);
+  backdrop-filter: var(--topo-desfoque, none);
+}
+.capsulaMarca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  padding-right: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.capsulaIcone {
+  height: 30px;
+  width: auto;
+}
+.capsulaNome {
+  height: 22px;
+  width: auto;
+}
+.soEscuro {
+  display: none;
+}
+:global(:root[data-tema='escuro']) .soClaro {
+  display: none;
+}
+:global(:root[data-tema='escuro']) .soEscuro {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-tema])) .soClaro {
+    display: none;
+  }
+  :global(:root:not([data-tema])) .soEscuro {
+    display: block;
+  }
+}
+.capsulaNav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.capsulaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--texto-suave);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+.capsulaLink > svg:first-child:not(.maisSeta) {
+  display: none;
+}
+.capsulaLink:hover {
+  color: var(--texto);
+  background: var(--linha-hover, var(--superficie-3));
+}
+.capsulaLinkAtivo,
+.capsulaLinkAtivo:hover {
+  background: var(--primaria);
+  color: var(--primaria-texto);
+  font-weight: 600;
+}
+.capsulaLink .contador {
+  margin-left: 2px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+}
+.maisArea {
+  position: relative;
+}
+.maisSeta {
+  transform: rotate(90deg);
+  opacity: 0.7;
+}
+.capsulaLink[aria-expanded='true'] .maisSeta {
+  transform: rotate(-90deg);
+}
+.mais {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 520px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: min(22px, var(--raio-max, 14px));
+  box-shadow: var(--sombra-forte);
+}
+.maisGrupos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 14px;
+}
+.maisGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.maisGrupoNome {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+.maisLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch);
+  padding: 0 12px;
+  border-radius: min(12px, var(--raio-max, 8px));
+  color: var(--texto);
+  font-size: 14px;
+  text-decoration: none;
+}
+.maisLink svg {
+  color: var(--texto-fraco);
+  flex-shrink: 0;
+}
+.maisLink:hover {
+  background: var(--linha-hover, var(--superficie-2));
+}
+.maisLinkAtivo,
+.maisLinkAtivo:hover {
+  background: var(--destaque-fundo);
+  font-weight: 600;
+}
+.maisLinkAtivo svg {
+  color: var(--destaque-texto);
+}
+.maisRodape {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda);
+}
+.maisPerfil {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.maisPerfil > span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.maisPerfil strong {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.maisPerfil small {
+  font-size: 12px;
+  color: var(--texto-fraco);
+}
+.capsulaEspaco {
+  flex: 1;
+}
+.capsulaBusca {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  min-width: var(--touch);
+  justify-content: center;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--linha-hover, var(--superficie-2));
+  color: var(--texto-suave);
+  font-size: 13.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.capsulaBusca:hover {
+  color: var(--texto);
+}
+.capsulaBusca kbd,
+.capsulaBuscaTexto {
+  display: none;
+}
+.capsulaBusca kbd {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto-suave);
+  font: 600 11px var(--sans);
+  box-shadow: 0 0 0 1px var(--borda);
+}
+@media (min-width: 1440px) {
+  .capsulaBusca {
+    padding: 0 8px 0 14px;
+  }
+  .capsulaBusca kbd,
+  .capsulaBuscaTexto {
+    display: inline;
+  }
+}
+.capsulaAvatar {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primaria);
+  color: var(--primaria-texto);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.capsulaAvatar:hover {
+  box-shadow: 0 0 0 3px var(--destaque-fundo);
+}

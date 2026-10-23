@@ -1,0 +1,31 @@
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 9px;
+  box-shadow: var(--sombra);
+}
+.cartao strong {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.acoes {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+.acoes select {
+  flex: 1;
+  min-width: 0;
+}

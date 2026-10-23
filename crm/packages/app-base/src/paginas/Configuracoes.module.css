@@ -1,0 +1,68 @@
+.marcar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch);
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.marcar input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--destaque);
+}
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lista > li + li {
+  border-top: 1px solid var(--borda);
+}
+.cabecalho {
+  display: none;
+}
+.linha {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 0;
+}
+.linha > button {
+  grid-column: 1 / -1;
+}
+.nome {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.campo small {
+  color: var(--perigo);
+  font-size: 12px;
+}
+@media (min-width: 720px) {
+  .cabecalho {
+    display: grid;
+    grid-template-columns: 1fr 140px 170px;
+    gap: 12px;
+    padding: 0 0 8px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+  }
+  .linha {
+    grid-template-columns: 1fr 140px 170px;
+  }
+  .linha > button {
+    grid-column: auto;
+  }
+}

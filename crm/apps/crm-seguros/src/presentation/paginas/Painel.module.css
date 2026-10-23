@@ -1,0 +1,648 @@
+/*
+ * Painel inicial "A5 · Vidro + Bento". Cores dos gráficos conferidas no validador de paleta
+ * (daltonismo e contraste): claro #A87F2E / #3866B8, escuro #B08430 / #4F84D6.
+ */
+.bento {
+  --g-ouro: #a87f2e;
+  --g-azul: #3866b8;
+  --g-ouro-claro: #c9a85e;
+  --g-ouro-escuro: #8f6a22;
+  --g-linha: #a87f2e;
+  --g-barra: rgba(26, 43, 75, 0.12);
+  --g-trilho: rgba(16, 26, 46, 0.07);
+  --g-neutro: #a3abbc;
+  --g-grade: rgba(16, 26, 46, 0.1);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+}
+:global(:root[data-tema='escuro']) .bento {
+  --g-ouro: #b08430;
+  --g-azul: #4f84d6;
+  --g-ouro-claro: #e2c687;
+  --g-ouro-escuro: #b08430;
+  --g-linha: #e2c687;
+  --g-barra: rgba(255, 255, 255, 0.1);
+  --g-trilho: rgba(255, 255, 255, 0.07);
+  --g-neutro: rgba(183, 192, 211, 0.45);
+  --g-grade: rgba(255, 255, 255, 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-tema])) .bento {
+    --g-ouro: #b08430;
+    --g-azul: #4f84d6;
+    --g-ouro-claro: #e2c687;
+    --g-ouro-escuro: #b08430;
+    --g-linha: #e2c687;
+    --g-barra: rgba(255, 255, 255, 0.1);
+    --g-trilho: rgba(255, 255, 255, 0.07);
+    --g-neutro: rgba(183, 192, 211, 0.45);
+    --g-grade: rgba(255, 255, 255, 0.08);
+  }
+}
+@media (min-width: 720px) {
+  .bento {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .bento > * {
+    grid-column: span 6;
+  }
+  .bento > .terco {
+    grid-column: span 3;
+  }
+  .bento > .renovacoes {
+    grid-column: span 6;
+  }
+}
+@media (min-width: 1100px) {
+  .bento {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .bento > .heroi {
+    grid-column: span 5;
+  }
+  .bento > .comissoes {
+    grid-column: span 7;
+  }
+  .bento > .largo {
+    grid-column: span 12;
+  }
+  .bento > .produtores {
+    grid-column: span 8;
+  }
+  .bento > .coluna {
+    grid-column: span 4;
+  }
+  .bento > .colunaLarga {
+    grid-column: span 12;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bento > .terco,
+  .bento > .renovacoes {
+    grid-column: span 4;
+  }
+}
+
+.cartao {
+  padding: 22px 24px;
+}
+.coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.rotulo,
+.trio dt,
+.variacoes dt {
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}
+.nota {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--texto-fraco);
+}
+.suave {
+  color: var(--texto-suave);
+}
+.ouro {
+  color: var(--destaque-texto);
+}
+.positivo {
+  color: var(--sucesso);
+}
+.negativo {
+  color: var(--perigo);
+}
+.neutro {
+  color: var(--texto-fraco);
+}
+
+/* Período: Mês / Ano / Tudo em cápsula. */
+.periodo {
+  display: inline-flex;
+  padding: 4px;
+  gap: 2px;
+  border-radius: 999px;
+  background: var(--cartao-fundo, var(--superficie));
+  border: 1px solid var(--cartao-borda, var(--borda));
+  box-shadow: var(--cartao-sombra, none);
+}
+.periodo button {
+  min-height: var(--touch);
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--texto-suave);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.periodo button:hover {
+  color: var(--texto);
+}
+.periodo button[aria-pressed='true'] {
+  background: var(--primaria);
+  color: var(--primaria-texto);
+  font-weight: 600;
+}
+
+/* Aviso de aprovações. */
+.aviso {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  margin-bottom: 16px;
+  padding: 12px 12px 12px 14px;
+  border-radius: 20px;
+  background:
+    linear-gradient(90deg, var(--destaque-fundo), transparent), var(--cartao-fundo, var(--superficie));
+  border: 1px solid var(--destaque-borda);
+  -webkit-backdrop-filter: var(--cartao-desfoque, none);
+  backdrop-filter: var(--cartao-desfoque, none);
+}
+.avisoNumero {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--botao-fundo, var(--destaque));
+  color: var(--botao-texto, var(--destaque-sobre));
+  font-weight: 700;
+}
+.avisoTexto {
+  flex: 1 1 220px;
+  font-size: 15px;
+}
+.avisoTexto strong {
+  font-weight: 600;
+}
+.avisoAcao {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--primaria);
+  color: var(--primaria-texto);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Produção. */
+.heroi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background:
+    linear-gradient(160deg, var(--destaque-fundo), transparent 70%), var(--cartao-fundo, var(--superficie));
+  border-color: var(--destaque-borda);
+}
+.valorHeroi {
+  font-size: clamp(34px, 4.2vw, 48px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.heroiDetalhe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.pilula {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--superficie-3);
+}
+.pilula.positivo {
+  background: var(--sucesso-fundo);
+}
+.pilula.negativo {
+  background: var(--perigo-fundo);
+}
+.mini {
+  width: 100%;
+  height: 96px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+.miniArea {
+  fill: var(--g-linha);
+  opacity: 0.18;
+}
+.miniLinha {
+  fill: none;
+  stroke: var(--g-linha);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* Comissões: três números e as variações embaixo. */
+.comissoes {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.trio,
+.variacoes {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.trio > div,
+.variacoes > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 24px;
+  min-width: 0;
+}
+.trio > div + div,
+.variacoes > div + div {
+  border-top: 1px solid var(--borda);
+}
+.trio dd,
+.variacoes dd {
+  margin: 0;
+}
+.trio dd:not(.nota) {
+  font-size: clamp(24px, 2.4vw, 32px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.variacoes {
+  border-top: 1px solid var(--borda);
+}
+.variacoes > div {
+  padding-block: 16px;
+}
+.variacoes dd {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+@media (min-width: 720px) {
+  .trio,
+  .variacoes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .trio > div + div,
+  .variacoes > div + div {
+    border-top: 0;
+    border-left: 1px solid var(--borda);
+  }
+}
+
+/* Barras dos 12 meses. */
+.barras {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.grade {
+  stroke: var(--g-grade);
+  stroke-dasharray: 3 6;
+}
+.eixo {
+  fill: var(--texto-fraco);
+}
+.eixoAtual {
+  fill: var(--texto);
+  font-weight: 600;
+}
+.soCompacto {
+  display: none;
+}
+svg.soLargo {
+  font-size: 12px;
+}
+span.soCompacto {
+  display: none;
+}
+@media (max-width: 1023px) {
+  svg.soLargo {
+    font-size: 17px;
+  }
+}
+@media (max-width: 719px) {
+  .soLargo {
+    display: none;
+  }
+  svg.soCompacto {
+    display: block;
+  }
+  span.soCompacto {
+    display: inline;
+  }
+}
+.barra {
+  fill: var(--g-barra);
+}
+.barra:hover {
+  fill: var(--g-neutro);
+}
+.ouroClaro {
+  stop-color: var(--g-ouro-claro);
+}
+.ouroEscuro {
+  stop-color: var(--g-ouro-escuro);
+}
+
+/* Por produtor. */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.tabela thead th {
+  padding: 0 0 10px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--texto-fraco);
+  text-align: right;
+}
+.tabela thead th:first-child {
+  text-align: left;
+}
+.tabela tbody th,
+.tabela tbody td,
+.tabela tfoot th,
+.tabela tfoot td {
+  padding: 10px 0;
+  border-top: 1px solid var(--borda);
+}
+.tabela tbody th,
+.tabela tfoot th {
+  text-align: left;
+  font-weight: 400;
+}
+.tabela td {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 12px;
+}
+.tabela tfoot th,
+.tabela tfoot td {
+  font-weight: 600;
+  border-top-color: var(--destaque-borda);
+}
+.tabela + .nota {
+  margin-top: 10px;
+}
+.produtor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.produtorNome {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: 230px;
+  min-width: 0;
+}
+.avatar {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--destaque-fundo);
+  border: 1px solid var(--destaque-borda);
+  color: var(--destaque-texto);
+}
+.avatarNeutro {
+  background: var(--superficie-3);
+  border-color: var(--borda);
+  color: var(--texto-fraco);
+}
+.trilho {
+  display: block;
+  height: 6px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: var(--g-trilho);
+}
+.trilho i {
+  display: block;
+  height: 100%;
+  min-width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--g-ouro-escuro), var(--g-ouro-claro));
+}
+.trilho i.trilhoNeutro {
+  background: var(--g-neutro);
+}
+@media (max-width: 719px) {
+  .tabela thead {
+    display: none;
+  }
+  .tabela tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px 10px;
+    padding: 12px 0;
+    border-top: 1px solid var(--borda);
+  }
+  .tabela tbody th,
+  .tabela tbody td,
+  .tabela tfoot th,
+  .tabela tfoot td {
+    padding: 0;
+    border: 0;
+  }
+  .tabela tr > th {
+    grid-column: 1 / -1;
+    margin-bottom: 6px;
+  }
+  .tabela td {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    white-space: normal;
+  }
+  .tabela td::before {
+    content: attr(data-rotulo);
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--texto-fraco);
+  }
+}
+
+/* Pagamento do mês: cartão dourado. */
+.pagamento {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: linear-gradient(150deg, #e8cf95 0%, #d6b876 60%, #c9a85e 100%);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #101a2e;
+}
+.pagamentoTitulo {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.pagamentoValor {
+  font-size: clamp(30px, 3vw, 38px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+.pagamentoDetalhe {
+  font-size: 13px;
+  color: #2b3550;
+}
+.pagamentoAcao {
+  align-self: flex-start;
+  margin-top: 8px;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #1a2b4b;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.pagamentoAcao:hover {
+  background: #0f1e3c;
+  color: #ffffff;
+}
+
+/* Novo × renovação. */
+.rosca {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.rosca svg {
+  flex-shrink: 0;
+}
+.rosca circle {
+  fill: none;
+  stroke-width: 14;
+}
+.roscaFundo {
+  stroke: var(--g-trilho);
+}
+.roscaNovo {
+  stroke: var(--g-ouro);
+}
+.roscaRenovacao {
+  stroke: var(--g-azul);
+}
+.roscaCentro {
+  fill: var(--texto);
+  font-size: 15px;
+  font-weight: 600;
+}
+.roscaLegenda {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.roscaLegenda dt {
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.roscaLegenda dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.roscaLegenda small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--texto-fraco);
+}
+.marca {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  border-radius: 50%;
+}
+.marcaNovo {
+  background: var(--g-ouro);
+}
+.marcaRenovacao {
+  background: var(--g-azul);
+}
+
+/* Por produto e por seguradora. */
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lista li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 0;
+  font-size: 14px;
+}
+.lista li + li {
+  border-top: 1px solid var(--borda);
+}
+.lista strong {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.listaNome {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Renovações. */
+.renovacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.numeroGrande {
+  font-size: 64px;
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+.botaoSuave {
+  margin-top: auto;
+  min-height: var(--touch);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--linha-hover, var(--superficie-2));
+  border: 1px solid var(--borda);
+  font-weight: 600;
+  text-decoration: none;
+}

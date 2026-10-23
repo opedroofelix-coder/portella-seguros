@@ -1,0 +1,62 @@
+.pilha {
+  position: fixed;
+  z-index: 70;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+@media (min-width: 720px) {
+  .pilha {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    width: 380px;
+  }
+}
+.aviso {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 8px 8px 14px;
+  background: var(--toast-fundo);
+  color: var(--toast-texto);
+  border-radius: min(10px, var(--raio-max, 10px));
+  box-shadow: var(--sombra-forte);
+  animation: entrar 0.25s var(--ease);
+}
+.aviso::before {
+  content: '';
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 18px;
+  border-radius: 50%;
+  background: var(--destaque);
+}
+.aviso p {
+  flex: 1;
+  margin: 0;
+  padding-top: 10px;
+  font-size: 14px;
+}
+.aviso button {
+  color: inherit;
+}
+.sucesso::before {
+  background: #34d399;
+}
+.erro::before {
+  background: #f87171;
+}
+@keyframes entrar {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}

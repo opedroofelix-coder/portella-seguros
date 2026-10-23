@@ -1,0 +1,410 @@
+{
+ "versao": 1,
+ "sistema": "consorcio",
+ "origem": "fixture-e2e",
+ "geradoEm": "2026-10-22",
+ "clientes": [
+  {
+   "chave": "q0",
+   "nome": "Consorciado Teste Um",
+   "tipoPessoa": "PF",
+   "telefone": "11988880000",
+   "responsavel": ""
+  },
+  {
+   "chave": "q1",
+   "nome": "Consorciado Teste Dois",
+   "tipoPessoa": "PF",
+   "telefone": "11988880001",
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "q2",
+   "nome": "Consorciado Teste Três",
+   "tipoPessoa": "PF",
+   "telefone": "11988880002",
+   "responsavel": ""
+  },
+  {
+   "chave": "q3",
+   "nome": "Empresa Consórcio Teste Ltda.",
+   "tipoPessoa": "PJ",
+   "telefone": "11988880003",
+   "responsavel": "Corretor Teste"
+  }
+ ],
+ "cotas": [
+  {
+   "chave": "c0",
+   "clienteChave": "q0",
+   "administradora": "Administradora Teste A",
+   "grupo": "1000",
+   "cota": "10",
+   "tipoBem": "Imóvel",
+   "valorCredito": 80000,
+   "prazoMeses": 120,
+   "valorParcela": 900,
+   "dataAdesao": "2025-12-26",
+   "parcelasPagas": 10,
+   "status": "Ativa",
+   "dataContemplacao": null,
+   "formaContemplacao": null,
+   "responsavel": ""
+  },
+  {
+   "chave": "c1",
+   "clienteChave": "q1",
+   "administradora": "Administradora Teste B",
+   "grupo": "1001",
+   "cota": "11",
+   "tipoBem": "Automóvel",
+   "valorCredito": 105000,
+   "prazoMeses": 120,
+   "valorParcela": 1010.5,
+   "dataAdesao": "2025-12-26",
+   "parcelasPagas": 11,
+   "status": "Ativa",
+   "dataContemplacao": null,
+   "formaContemplacao": null,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "c2",
+   "clienteChave": "q2",
+   "administradora": "Administradora Teste A",
+   "grupo": "1002",
+   "cota": "12",
+   "tipoBem": "Moto",
+   "valorCredito": 130000,
+   "prazoMeses": 120,
+   "valorParcela": 1121,
+   "dataAdesao": "2025-12-26",
+   "parcelasPagas": 12,
+   "status": "Ativa",
+   "dataContemplacao": null,
+   "formaContemplacao": null,
+   "responsavel": ""
+  },
+  {
+   "chave": "c3",
+   "clienteChave": "q3",
+   "administradora": "Administradora Teste B",
+   "grupo": "1003",
+   "cota": "13",
+   "tipoBem": "Caminhão",
+   "valorCredito": 155000,
+   "prazoMeses": 120,
+   "valorParcela": 1231.5,
+   "dataAdesao": "2025-12-26",
+   "parcelasPagas": 13,
+   "status": "Contemplada",
+   "dataContemplacao": "2026-09-22",
+   "formaContemplacao": "Sorteio",
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "c4",
+   "clienteChave": "q0",
+   "administradora": "Administradora Teste A",
+   "grupo": "1004",
+   "cota": "14",
+   "tipoBem": "Imóvel",
+   "valorCredito": 180000,
+   "prazoMeses": 120,
+   "valorParcela": 1342,
+   "dataAdesao": "2025-12-26",
+   "parcelasPagas": 14,
+   "status": "Ativa",
+   "dataContemplacao": null,
+   "formaContemplacao": null,
+   "responsavel": ""
+  },
+  {
+   "chave": "c5",
+   "clienteChave": "q1",
+   "administradora": "Administradora Teste B",
+   "grupo": "1005",
+   "cota": "15",
+   "tipoBem": "Automóvel",
+   "valorCredito": 205000,
+   "prazoMeses": 120,
+   "valorParcela": 1452.5,
+   "dataAdesao": "2025-12-26",
+   "parcelasPagas": 15,
+   "status": "Ativa",
+   "dataContemplacao": null,
+   "formaContemplacao": null,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "c6",
+   "clienteChave": "q2",
+   "administradora": "Administradora Teste A",
+   "grupo": "1006",
+   "cota": "16",
+   "tipoBem": "Moto",
+   "valorCredito": 230000,
+   "prazoMeses": 120,
+   "valorParcela": 1563,
+   "dataAdesao": "2025-12-26",
+   "parcelasPagas": 16,
+   "status": "Ativa",
+   "dataContemplacao": null,
+   "formaContemplacao": null,
+   "responsavel": ""
+  },
+  {
+   "chave": "c7",
+   "clienteChave": "q3",
+   "administradora": "Administradora Teste B",
+   "grupo": "1007",
+   "cota": "17",
+   "tipoBem": "Caminhão",
+   "valorCredito": 255000,
+   "prazoMeses": 120,
+   "valorParcela": 1673.5,
+   "dataAdesao": "2025-12-26",
+   "parcelasPagas": 17,
+   "status": "Ativa",
+   "dataContemplacao": null,
+   "formaContemplacao": null,
+   "responsavel": "Corretor Teste"
+  },
+  {
+   "chave": "pend1",
+   "clienteChave": "q0",
+   "administradora": "Administradora Teste A",
+   "numeroProposta": "9000001",
+   "tipoBem": "Consorcio",
+   "valorCredito": 300000,
+   "dataAdesao": "2026-08-23",
+   "responsavel": ""
+  }
+ ],
+ "propostas": [
+  {
+   "chave": "k0",
+   "clienteChave": "q0",
+   "vendaChave": "c0",
+   "clienteNome": "Consorciado Teste Um",
+   "data": "2025-12-26",
+   "companhia": "Administradora Teste A",
+   "produto": "Consorcio",
+   "premioLiquido": 80000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 320,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k0|r",
+     "data": "2026-10-18",
+     "valor": 320,
+     "parcela": "1/12"
+    }
+   ]
+  },
+  {
+   "chave": "k1",
+   "clienteChave": "q1",
+   "vendaChave": "c1",
+   "clienteNome": "Consorciado Teste Dois",
+   "data": "2025-12-26",
+   "companhia": "Administradora Teste B",
+   "produto": "Consorcio",
+   "premioLiquido": 105000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 420,
+   "produtores": [
+    {
+     "nome": "Corretor Teste",
+     "percentual": 30
+    }
+   ],
+   "recebimentos": [
+    {
+     "chave": "k1|r",
+     "data": "2026-10-18",
+     "valor": 420,
+     "parcela": "2/12",
+     "repasses": {
+      "Corretor Teste": 126
+     }
+    }
+   ]
+  },
+  {
+   "chave": "k2",
+   "clienteChave": "q2",
+   "vendaChave": "c2",
+   "clienteNome": "Consorciado Teste Três",
+   "data": "2025-12-26",
+   "companhia": "Administradora Teste A",
+   "produto": "Consorcio",
+   "premioLiquido": 130000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 520,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k2|r",
+     "data": "2026-10-18",
+     "valor": 520,
+     "parcela": "3/12"
+    }
+   ]
+  },
+  {
+   "chave": "k3",
+   "clienteChave": "q3",
+   "vendaChave": "c3",
+   "clienteNome": "Empresa Consórcio Teste Ltda.",
+   "data": "2025-12-26",
+   "companhia": "Administradora Teste B",
+   "produto": "Consorcio",
+   "premioLiquido": 155000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 620,
+   "produtores": [
+    {
+     "nome": "Corretor Teste",
+     "percentual": 30
+    }
+   ],
+   "recebimentos": [
+    {
+     "chave": "k3|r",
+     "data": "2026-10-18",
+     "valor": 620,
+     "parcela": "4/12",
+     "repasses": {
+      "Corretor Teste": 186
+     }
+    }
+   ]
+  },
+  {
+   "chave": "k4",
+   "clienteChave": "q0",
+   "vendaChave": "c4",
+   "clienteNome": "Consorciado Teste Um",
+   "data": "2025-12-26",
+   "companhia": "Administradora Teste A",
+   "produto": "Consorcio",
+   "premioLiquido": 180000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 720,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k4|r",
+     "data": "2026-10-18",
+     "valor": 720,
+     "parcela": "5/12"
+    }
+   ]
+  },
+  {
+   "chave": "k5",
+   "clienteChave": "q1",
+   "vendaChave": "c5",
+   "clienteNome": "Consorciado Teste Dois",
+   "data": "2025-12-26",
+   "companhia": "Administradora Teste B",
+   "produto": "Consorcio",
+   "premioLiquido": 205000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 820,
+   "produtores": [
+    {
+     "nome": "Corretor Teste",
+     "percentual": 30
+    }
+   ],
+   "recebimentos": [
+    {
+     "chave": "k5|r",
+     "data": "2026-10-18",
+     "valor": 820,
+     "parcela": "6/12",
+     "repasses": {
+      "Corretor Teste": 246
+     }
+    }
+   ]
+  },
+  {
+   "chave": "k6",
+   "clienteChave": "q2",
+   "vendaChave": "c6",
+   "clienteNome": "Consorciado Teste Três",
+   "data": "2025-12-26",
+   "companhia": "Administradora Teste A",
+   "produto": "Consorcio",
+   "premioLiquido": 230000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 920,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k6|r",
+     "data": "2026-10-18",
+     "valor": 920,
+     "parcela": "7/12"
+    }
+   ]
+  },
+  {
+   "chave": "k7",
+   "clienteChave": "q3",
+   "vendaChave": "c7",
+   "clienteNome": "Empresa Consórcio Teste Ltda.",
+   "data": "2025-12-26",
+   "companhia": "Administradora Teste B",
+   "produto": "Consorcio",
+   "premioLiquido": 255000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 1020,
+   "produtores": [
+    {
+     "nome": "Corretor Teste",
+     "percentual": 30
+    }
+   ],
+   "recebimentos": [
+    {
+     "chave": "k7|r",
+     "data": "2026-10-18",
+     "valor": 1020,
+     "parcela": "8/12",
+     "repasses": {
+      "Corretor Teste": 306
+     }
+    }
+   ]
+  },
+  {
+   "chave": "k8",
+   "clienteChave": "q0",
+   "vendaChave": "pend1",
+   "clienteNome": "Consorciado Teste Um",
+   "numero": "9000001",
+   "data": "2026-08-23",
+   "companhia": "Administradora Teste A",
+   "produto": "Consorcio",
+   "premioLiquido": 300000,
+   "comissaoPercentual": 0.4,
+   "comissaoReceber": 1200,
+   "produtores": [],
+   "recebimentos": [
+    {
+     "chave": "k8|r",
+     "data": "2026-10-18",
+     "valor": 1200,
+     "parcela": "9/12"
+    }
+   ]
+  }
+ ],
+ "estornos": [],
+ "pagamentos": []
+}
