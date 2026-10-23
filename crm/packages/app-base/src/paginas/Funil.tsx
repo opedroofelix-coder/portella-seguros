@@ -5,10 +5,12 @@ import {
   ETAPAS,
   formatarDinheiro,
   formatarTelefone,
+  lerDinheiro,
   paraCentavos,
   resumirFunil,
   ROTULO_ETAPA,
   somenteDigitos,
+  textoDinheiro,
 } from '@portella/core';
 import {
   AreaTexto,
@@ -16,6 +18,7 @@ import {
   CabecalhoPagina,
   Campo,
   Carregando,
+  ConfirmarAcao,
   Entrada,
   Indicador,
   Modal,
@@ -26,10 +29,11 @@ import {
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { EntradaDinheiro, EntradaMascara } from '../componentes/Entradas';
 import { SeletorResponsavel } from '../componentes/SeletorResponsavel';
-import { useConfig } from '../config';
+import { useConfig, useRefinada } from '../config';
 import { aplicarErros, limparVazios, mensagemErro } from '../erros';
-import { useColecao, useEquipe, useRemover, useSalvar } from '../hooks/dados';
+import { useCatalogo, useColecao, useEquipe, useRemover, useSalvar } from '../hooks/dados';
 import { useServicos } from '../servicos';
 import { useSessao, useUsuario } from '../sessao/Sessao';
 import styles from './Funil.module.css';
@@ -110,12 +114,19 @@ function CartaoOportunidade({
   const { avisar } = useAvisos();
   const salvar = useSalvar('oportunidades', oportunidades);
   const editavel = pode('registro:editar', o);
+  const refinada = useRefinada();
+  // Interface refinada: mover para "Perdido" pede o motivo (spec §3).
+  const [perdendo, setPerdendo] = useState(false);
+  const [motivo, setMotivo] = useState('');
 
-  const mover = (etapa: Etapa) =>
+  const mover = (etapa: Etapa, extra: Partial<Oportunidade> = {}) =>
     salvar.mutate(
-      { ...o, etapa },
+      { ...o, ...extra, etapa },
       {
-        onSuccess: () => avisar(`Movido para "${ROTULO_ETAPA[etapa]}".`),
+        onSuccess: () => {
+          avisar(`Movido para "${ROTULO_ETAPA[etapa]}".`);
+          setPerdendo(false);
+        },
         onError: (e) => avisar(mensagemErro(e), 'erro'),
       },
     );
@@ -134,7 +145,13 @@ function CartaoOportunidade({
           <Selecao
             aria-label={`Etapa de ${o.nomeContato}`}
             value={o.etapa}
-            onChange={(e) => mover(e.target.value as Etapa)}
+            onChange={(e) => {
+              const etapa = e.target.value as Etapa;
+              if (refinada && etapa === 'perdido') {
+                setMotivo(o.motivoPerda ?? '');
+                setPerdendo(true);
+              } else mover(etapa);
+            }}
             disabled={salvar.isPending}
           >
             {ETAPAS.map((e) => (
@@ -152,6 +169,26 @@ function CartaoOportunidade({
           onClick={aoAbrir}
         >{`Abrir ${o.nomeContato}`}</Botao>
       </div>
+      {refinada && (
+        <ConfirmarAcao
+          aberto={perdendo}
+          titulo={`Marcar ${o.nomeContato} como perdido?`}
+          mensagem="Conte por que não fechou: ajuda a entender as perdas."
+          textoConfirmar="Marcar como perdido"
+          perigo
+          carregando={salvar.isPending}
+          aoCancelar={() => setPerdendo(false)}
+          aoConfirmar={() => motivo.trim() && mover('perdido', { motivoPerda: motivo.trim() })}
+        >
+          <Campo rotulo="Motivo da perda" obrigatorio erro={motivo.trim() ? undefined : 'Informe o motivo.'}>
+            <Entrada
+              placeholder="Preço, fechou com outro corretor…"
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+            />
+          </Campo>
+        </ConfirmarAcao>
+      )}
     </article>
   );
 }
@@ -168,6 +205,10 @@ const esquema = z.object({
   responsavelId: z.string().optional(),
 });
 type Valores = z.infer<typeof esquema>;
+const esquemaRefinado = esquema.superRefine((v, ctx) => {
+  if (v.etapa === 'perdido' && !v.motivoPerda.trim())
+    ctx.addIssue({ code: 'custom', path: ['motivoPerda'], message: 'Informe o motivo da perda.' });
+});
 
 function FormularioOportunidade({
   oportunidade,
@@ -178,21 +219,36 @@ function FormularioOportunidade({
 }) {
   const usuario = useUsuario();
   const { oportunidades } = useServicos();
-  const { produtos } = useConfig();
+  const { produtos: produtosApp } = useConfig();
+  const refinada = useRefinada();
+  // Interface refinada: os mesmos produtos de Propostas (lista editável em Configurações).
+  const catalogo = useCatalogo('produtos');
+  const produtos = refinada && catalogo.length ? catalogo : produtosApp;
   const { pode } = useSessao();
   const { avisar } = useAvisos();
   const salvar = useSalvar('oportunidades', oportunidades);
   const remover = useRemover('oportunidades', oportunidades);
+  const [confirmarRemocao, setConfirmarRemocao] = useState(false);
+  const removerAgora = () =>
+    oportunidade &&
+    remover.mutate(oportunidade.id, {
+      onSuccess: () => {
+        avisar(refinada ? 'Oportunidade excluída.' : 'Oportunidade removida.');
+        aoFechar();
+      },
+      // Sem a interface refinada a exclusão ficava sem aviso de erro; mantido igual.
+      onError: (e) => refinada && avisar(mensagemErro(e), 'erro'),
+    });
   const somenteLeitura = oportunidade ? !pode('registro:editar', oportunidade) : false;
   const { register, handleSubmit, formState, setError, watch } = useForm<Valores>({
-    resolver: zodResolver(esquema),
+    resolver: zodResolver(refinada ? esquemaRefinado : esquema),
     defaultValues: {
       nomeContato: oportunidade?.nomeContato ?? '',
       telefone: oportunidade?.telefone ? formatarTelefone(oportunidade.telefone) : '',
       email: oportunidade?.email ?? '',
       produto: oportunidade?.produto ?? produtos[0] ?? '',
       etapa: oportunidade?.etapa ?? 'novo',
-      valorEstimado: centavosParaTexto(oportunidade?.valorEstimado),
+      valorEstimado: (refinada ? textoDinheiro : centavosParaTexto)(oportunidade?.valorEstimado),
       motivoPerda: oportunidade?.motivoPerda ?? '',
       observacoes: oportunidade?.observacoes ?? '',
       responsavelId: oportunidade?.responsavelId ?? usuario.id,
@@ -206,7 +262,9 @@ function FormularioOportunidade({
         ...(oportunidade ?? {}),
         ...d,
         telefone: d.telefone ? somenteDigitos(d.telefone) : undefined,
-        valorEstimado: d.valorEstimado ? (paraCentavos(d.valorEstimado) ?? undefined) : undefined,
+        valorEstimado: d.valorEstimado
+          ? ((refinada ? lerDinheiro : paraCentavos)(d.valorEstimado) ?? undefined)
+          : undefined,
       });
       avisar(oportunidade ? 'Oportunidade atualizada.' : 'Oportunidade criada.');
       aoFechar();
@@ -220,24 +278,26 @@ function FormularioOportunidade({
   return (
     <Modal
       aberto
-      titulo={oportunidade ? oportunidade.nomeContato : 'Nova oportunidade'}
+      titulo={
+        oportunidade
+          ? refinada
+            ? `${somenteLeitura ? 'Oportunidade' : 'Editar oportunidade'} · ${oportunidade.nomeContato}`
+            : oportunidade.nomeContato
+          : 'Nova oportunidade'
+      }
       aoFechar={aoFechar}
+      alterado={!somenteLeitura && formState.isDirty}
+      bloqueado={formState.isSubmitting}
       rodape={
         <>
           {oportunidade && pode('registro:remover', oportunidade) && (
             <Botao
               variante="perigo"
-              carregando={remover.isPending}
-              onClick={() =>
-                remover.mutate(oportunidade.id, {
-                  onSuccess: () => {
-                    avisar('Oportunidade removida.');
-                    aoFechar();
-                  },
-                })
-              }
+              icone={refinada ? 'lixeira' : undefined}
+              carregando={!refinada && remover.isPending}
+              onClick={refinada ? () => setConfirmarRemocao(true) : removerAgora}
             >
-              Remover
+              {refinada ? 'Excluir' : 'Remover'}
             </Botao>
           )}
           <Botao variante="secundario" onClick={aoFechar}>
@@ -257,7 +317,11 @@ function FormularioOportunidade({
             <Entrada {...register('nomeContato')} />
           </Campo>
           <Campo rotulo="Telefone">
-            <Entrada type="tel" inputMode="tel" {...register('telefone')} />
+            {refinada ? (
+              <EntradaMascara mascara="telefone" type="tel" {...register('telefone')} />
+            ) : (
+              <Entrada type="tel" inputMode="tel" {...register('telefone')} />
+            )}
           </Campo>
           <Campo rotulo="E-mail">
             <Entrada type="email" {...register('email')} />
@@ -278,11 +342,23 @@ function FormularioOportunidade({
               ))}
             </Selecao>
           </Campo>
-          <Campo rotulo="Valor estimado (R$)" erro={erros.valorEstimado?.message}>
-            <Entrada inputMode="decimal" placeholder="0,00" {...register('valorEstimado')} />
+          <Campo
+            rotulo={refinada ? 'Valor estimado' : 'Valor estimado (R$)'}
+            erro={erros.valorEstimado?.message}
+          >
+            {refinada ? (
+              <EntradaDinheiro {...register('valorEstimado')} />
+            ) : (
+              <Entrada inputMode="decimal" placeholder="0,00" {...register('valorEstimado')} />
+            )}
           </Campo>
           {watch('etapa') === 'perdido' && (
-            <Campo rotulo="Motivo da perda" className="span-todo">
+            <Campo
+              rotulo="Motivo da perda"
+              className="span-todo"
+              obrigatorio={refinada}
+              erro={erros.motivoPerda?.message}
+            >
               <Entrada {...register('motivoPerda')} />
             </Campo>
           )}
@@ -292,6 +368,18 @@ function FormularioOportunidade({
           </Campo>
         </fieldset>
       </form>
+      {oportunidade && (
+        <ConfirmarAcao
+          aberto={confirmarRemocao}
+          titulo="Excluir a oportunidade?"
+          mensagem={`${oportunidade.nomeContato} sai do funil. Não dá para desfazer.`}
+          textoConfirmar="Excluir oportunidade"
+          perigo
+          carregando={remover.isPending}
+          aoCancelar={() => setConfirmarRemocao(false)}
+          aoConfirmar={removerAgora}
+        />
+      )}
     </Modal>
   );
 }

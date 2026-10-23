@@ -62,6 +62,9 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   const desktop = useDesktop();
   const local = useLocation();
+  const { refinada } = useInterface();
+  const lateral = useRef<HTMLElement>(null);
+  const botaoMenu = useRef<HTMLButtonElement>(null);
 
   useEffect(() => setAberto(false), [local.pathname]);
   useEffect(() => {
@@ -70,6 +73,33 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
     document.addEventListener('keydown', esc);
     return () => document.removeEventListener('keydown', esc);
   }, [aberto]);
+
+  // Interface refinada no celular: o menu fechado sai da ordem do Tab; aberto, recebe o foco,
+  // prende o Tab e, ao fechar, devolve o foco ao botão que o abriu.
+  const menuInerte = refinada && !desktop && !aberto;
+  useEffect(() => {
+    if (!refinada || desktop || !aberto || !lateral.current) return;
+    const menu = lateral.current;
+    const botao = botaoMenu.current;
+    menu.querySelector<HTMLElement>('a[href]')?.focus();
+    const prender = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const itens = [...menu.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')];
+      const [inicio, fim] = [itens[0], itens[itens.length - 1]];
+      if (e.shiftKey && document.activeElement === inicio) {
+        e.preventDefault();
+        fim?.focus();
+      } else if (!e.shiftKey && document.activeElement === fim) {
+        e.preventDefault();
+        inicio?.focus();
+      }
+    };
+    document.addEventListener('keydown', prender);
+    return () => {
+      document.removeEventListener('keydown', prender);
+      if (menu.contains(document.activeElement)) botao?.focus();
+    };
+  }, [refinada, desktop, aberto]);
 
   const grupos: Array<{ nome?: string; itens: ItemMenu[] }> = [];
   for (const item of menu) {
@@ -80,8 +110,14 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
 
   return (
     <div className={styles.estrutura}>
+      {refinada && (
+        <a className={styles.pular} href="#conteudo">
+          Pular para o conteúdo
+        </a>
+      )}
       <header className={styles.topo}>
         <Botao
+          ref={botaoMenu}
           variante="fantasma"
           soIcone
           icone="menu"
@@ -103,12 +139,14 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
         id="menu-lateral"
         className={`${styles.lateral} ${aberto ? styles.lateralAberta : ''}`}
         aria-label="Menu principal"
+        ref={lateral}
+        {...(menuInerte ? { inert: '' } : {})}
       >
         <Link to="/" className={styles.marca}>
           <img src={logo} alt="Portella Corretora de Seguros" />
           <span className={styles.sistema}>CRM {sistema}</span>
         </Link>
-        <nav className={styles.nav}>
+        <nav className={styles.nav} aria-label={refinada ? 'Seções' : undefined}>
           {grupos.map((g, i) => (
             <div key={`${g.nome ?? ''}-${i}`} className={styles.grupo}>
               {g.nome && <span className={styles.grupoNome}>{g.nome}</span>}
@@ -123,9 +161,18 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
                   <Icone nome={item.icone} tamanho={18} />
                   {item.rotulo}
                   {item.contador ? (
-                    <span className={styles.contador} aria-label={`${item.contador} pendente(s)`}>
-                      {item.contador}
-                    </span>
+                    refinada ? (
+                      <>
+                        <span className={styles.contador} aria-hidden="true">
+                          {item.contador}
+                        </span>
+                        <span className="sr-only"> {item.contador} pendente(s)</span>
+                      </>
+                    ) : (
+                      <span className={styles.contador} aria-label={`${item.contador} pendente(s)`}>
+                        {item.contador}
+                      </span>
+                    )
                   ) : null}
                 </NavLink>
               ))}
@@ -138,7 +185,7 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
               {iniciais(usuario.nome)}
             </span>
             <div>
-              <strong>{usuario.nome}</strong>
+              <strong title={refinada ? usuario.nome : undefined}>{usuario.nome}</strong>
               <span>{usuario.perfil}</span>
             </div>
             <button type="button" className={styles.sair} onClick={aoSair}>
@@ -153,7 +200,7 @@ export function Estrutura({ sistema, logo, menu, usuario, aoSair, children }: Es
       <div className={styles.principal}>
         {desktop && <div className={styles.barraSuperior} ref={setSlot} />}
         <SlotTopo.Provider value={desktop ? slot : null}>
-          <main className={styles.conteudo} id="conteudo">
+          <main className={styles.conteudo} id="conteudo" tabIndex={refinada ? -1 : undefined}>
             {children}
           </main>
         </SlotTopo.Provider>

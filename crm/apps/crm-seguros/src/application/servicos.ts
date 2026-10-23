@@ -21,9 +21,15 @@ export interface RepositoriosSeguros extends RepositoriosBase {
   fechamentos: Repositorio<Fechamento>;
 }
 
+/** Listas iniciais do Seguros: as da Portella, sem "Liberty", que hoje é a Yelum (já na lista). */
+export const CATALOGOS_SEGUROS = {
+  ...CATALOGOS_PADRAO,
+  seguradoras: CATALOGOS_PADRAO.seguradoras.filter((s) => s !== 'Liberty'),
+};
+
 export function montarServicos(repos: RepositoriosSeguros): ServicosSeguros {
   return {
-    ...montarServicosBase(repos, CATALOGOS_PADRAO),
+    ...montarServicosBase(repos, CATALOGOS_SEGUROS),
     apolices: new ServicoCarteira<Apolice>(repos.apolices, validarApolice),
     movimentos: new ServicoFinanceiro<Movimento>(repos.movimentos, validarMovimento),
     despesas: new ServicoFinanceiro<Despesa>(repos.despesas, validarDespesa),

@@ -316,3 +316,23 @@
     align-items: end;
   }
 }
+
+/* Link para pular o menu: aparece só ao receber o foco pelo teclado. */
+.pular {
+  position: fixed;
+  z-index: 80;
+  top: 8px;
+  left: 8px;
+  padding: 10px 16px;
+  background: var(--superficie);
+  color: var(--texto);
+  border: 2px solid var(--foco);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+.pular:focus {
+  transform: none;
+}
+.conteudo:focus {
+  outline: none;
+}

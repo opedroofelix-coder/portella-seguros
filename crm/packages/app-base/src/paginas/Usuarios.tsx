@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Perfil, Usuario } from '@portella/core';
-import { PERFIS, ROTULO_PERFIL, sugerirLogin } from '@portella/core';
+import { PERFIS, sugerirLogin } from '@portella/core';
 import {
   Botao,
   CabecalhoPagina,
@@ -16,9 +16,11 @@ import {
   useAvisos,
 } from '@portella/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useRefinada, useRotuloPerfil } from '../config';
 import { aplicarErros, mensagemErro } from '../erros';
 import { useEquipe } from '../hooks/dados';
 import { useServicos } from '../servicos';
@@ -36,6 +38,12 @@ const paraNumero = (v: string) => (v.trim() ? Number(v.replace(',', '.')) : unde
 export function PaginaUsuarios() {
   const { equipe, isPending } = useEquipe();
   const [editando, setEditando] = useState<Usuario | 'novo' | null>(null);
+  const refinada = useRefinada();
+  const rotuloPerfil = useRotuloPerfil();
+  // Interface refinada: ativos primeiro, em ordem alfabética; desativados no fim.
+  const lista = refinada
+    ? [...equipe].sort((a, b) => Number(b.ativo) - Number(a.ativo) || a.nome.localeCompare(b.nome, 'pt-BR'))
+    : equipe;
 
   return (
     <>
@@ -58,7 +66,7 @@ export function PaginaUsuarios() {
         ) : (
           <Tabela
             rotulo="Usuários"
-            itens={equipe}
+            itens={lista}
             chave={(u) => u.id}
             aoClicar={setEditando}
             colunas={[
@@ -67,7 +75,7 @@ export function PaginaUsuarios() {
               {
                 chave: 'perfil',
                 titulo: 'Perfil',
-                render: (u) => <Selo tom={TOM_PERFIL[u.perfil]}>{ROTULO_PERFIL[u.perfil]}</Selo>,
+                render: (u) => <Selo tom={TOM_PERFIL[u.perfil]}>{rotuloPerfil(u.perfil)}</Selo>,
               },
               {
                 chave: 'repasse',
@@ -82,7 +90,7 @@ export function PaginaUsuarios() {
                   !u.ativo ? (
                     <Selo tom="perigo">Desativado</Selo>
                   ) : u.trocarSenha ? (
-                    <Selo tom="alerta">Senha 1234</Selo>
+                    <Selo tom="alerta">{refinada ? 'Aguardando 1º acesso' : 'Senha 1234'}</Selo>
                   ) : (
                     <Selo tom="sucesso">Ativo</Selo>
                   ),
@@ -115,6 +123,7 @@ function ModalNovoUsuario({ aoFechar }: { aoFechar: () => void }) {
   const { equipe } = useEquipe();
   const cliente = useQueryClient();
   const { avisar } = useAvisos();
+  const rotuloPerfil = useRotuloPerfil();
   const { register, handleSubmit, formState, setError, setValue, getValues } = useForm<
     z.infer<typeof esquemaNovo>
   >({
@@ -145,6 +154,8 @@ function ModalNovoUsuario({ aoFechar }: { aoFechar: () => void }) {
       aberto
       titulo="Novo usuário"
       aoFechar={aoFechar}
+      alterado={formState.isDirty}
+      bloqueado={criar.isPending}
       rodape={
         <>
           <Botao variante="secundario" onClick={aoFechar}>
@@ -185,7 +196,7 @@ function ModalNovoUsuario({ aoFechar }: { aoFechar: () => void }) {
           <Selecao {...register('perfil')}>
             {PERFIS.map((p) => (
               <option key={p} value={p}>
-                {ROTULO_PERFIL[p]}
+                {rotuloPerfil(p)}
               </option>
             ))}
           </Selecao>
@@ -217,7 +228,24 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
     usuario.percentualRepasse != null ? String(usuario.percentualRepasse) : '',
   );
   const [confirmarSenha, setConfirmarSenha] = useState(false);
+  const [confirmarDesativar, setConfirmarDesativar] = useState(false);
+  const refinada = useRefinada();
+  const rotuloPerfil = useRotuloPerfil();
+  const proprio = usuario.id === ator.id;
+  const Envoltorio = refinada ? 'form' : 'div';
   const repasseValido = percentual.safeParse(repasse).success;
+  const nomeValido = !refinada || nome.trim().length >= 2;
+  const alterado =
+    nome !== usuario.nome ||
+    perfil !== usuario.perfil ||
+    ativo !== usuario.ativo ||
+    repasse !== (usuario.percentualRepasse != null ? String(usuario.percentualRepasse) : '');
+  // Desativar tira o acesso na hora (e derruba a sessão aberta): confirma antes.
+  const pedirSalvar = () => {
+    if (!repasseValido || !nomeValido) return;
+    if (refinada && usuario.ativo && !ativo) setConfirmarDesativar(true);
+    else salvar.mutate();
+  };
 
   const atualizarCache = async () => {
     await cliente.invalidateQueries({ queryKey: ['usuarios'] });
@@ -225,7 +253,12 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
   };
   const salvar = useMutation({
     mutationFn: () =>
-      usuarios.atualizar(ator, usuario.id, { nome, perfil, ativo, percentualRepasse: paraNumero(repasse) }),
+      usuarios.atualizar(ator, usuario.id, {
+        nome: refinada ? nome.trim() : nome,
+        perfil,
+        ativo,
+        percentualRepasse: paraNumero(repasse),
+      }),
     onSuccess: async () => {
       await atualizarCache();
       avisar('Usuário atualizado.');
@@ -249,22 +282,45 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
         aberto
         titulo={usuario.nome}
         aoFechar={aoFechar}
+        alterado={alterado}
+        bloqueado={salvar.isPending}
         rodape={
           <>
-            <Botao variante="secundario" onClick={() => setConfirmarSenha(true)}>
-              Redefinir senha para 1234
-            </Botao>
+            {!(refinada && proprio) && (
+              <Botao variante="secundario" onClick={() => setConfirmarSenha(true)}>
+                Redefinir senha para 1234
+              </Botao>
+            )}
             <Botao variante="secundario" onClick={aoFechar}>
               Cancelar
             </Botao>
-            <Botao onClick={() => salvar.mutate()} carregando={salvar.isPending} disabled={!repasseValido}>
+            <Botao
+              type={refinada ? 'submit' : 'button'}
+              form={refinada ? 'form-editar-usuario' : undefined}
+              onClick={refinada ? undefined : () => salvar.mutate()}
+              carregando={salvar.isPending}
+              disabled={!repasseValido || !nomeValido}
+            >
               Salvar
             </Botao>
           </>
         }
       >
-        <div className="grade-2">
-          <Campo rotulo="Nome">
+        {/* Com a interface refinada é um <form>: Enter salva. */}
+        <Envoltorio
+          {...(refinada
+            ? {
+                id: 'form-editar-usuario',
+                noValidate: true,
+                onSubmit: (e: FormEvent) => {
+                  e.preventDefault();
+                  pedirSalvar();
+                },
+              }
+            : {})}
+          className="grade-2"
+        >
+          <Campo rotulo="Nome" obrigatorio={refinada} erro={nomeValido ? undefined : 'Informe o nome.'}>
             <Entrada value={nome} onChange={(e) => setNome(e.target.value)} />
           </Campo>
           <Campo rotulo="Usuário">
@@ -274,7 +330,7 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
             <Selecao value={perfil} onChange={(e) => setPerfil(e.target.value as Perfil)}>
               {PERFIS.map((p) => (
                 <option key={p} value={p}>
-                  {ROTULO_PERFIL[p]}
+                  {rotuloPerfil(p)}
                 </option>
               ))}
             </Selecao>
@@ -291,8 +347,20 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
           <Campo rotulo="Repasse padrão (%)" erro={repasseValido ? undefined : 'Entre 0 e 100.'}>
             <Entrada inputMode="decimal" value={repasse} onChange={(e) => setRepasse(e.target.value)} />
           </Campo>
-        </div>
+        </Envoltorio>
       </Modal>
+      {refinada && (
+        <ConfirmarAcao
+          aberto={confirmarDesativar}
+          titulo={`Desativar ${usuario.nome}?`}
+          mensagem="A pessoa perde o acesso na hora, inclusive se estiver com o sistema aberto. As propostas e clientes dela continuam no sistema."
+          textoConfirmar="Desativar e salvar"
+          perigo
+          carregando={salvar.isPending}
+          aoCancelar={() => setConfirmarDesativar(false)}
+          aoConfirmar={() => salvar.mutate()}
+        />
+      )}
       <ConfirmarAcao
         aberto={confirmarSenha}
         titulo="Redefinir senha?"

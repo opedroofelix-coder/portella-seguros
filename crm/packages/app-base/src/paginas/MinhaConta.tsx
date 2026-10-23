@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ROTULO_PERFIL, SENHA_PADRAO, SENHA_TAMANHO_MINIMO } from '@portella/core';
+import { SENHA_PADRAO, SENHA_TAMANHO_MINIMO } from '@portella/core';
 import { Botao, CabecalhoPagina, Campo, Cartao, Entrada, SeletorTema, useAvisos } from '@portella/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useConfig } from '../config';
+import { useConfig, useRefinada, useRotuloPerfil } from '../config';
 import { mensagemErro } from '../erros';
 import { useServicos } from '../servicos';
 import { useSessao, useUsuario } from '../sessao/Sessao';
@@ -25,6 +25,7 @@ function FormularioTrocarSenha({ senhaAtualConhecida }: { senhaAtualConhecida?: 
   const { usuarios } = useServicos();
   const { atualizar } = useSessao();
   const { avisar } = useAvisos();
+  const refinada = useRefinada();
   const { register, handleSubmit, formState, reset } = useForm<z.infer<typeof esquema>>({
     resolver: zodResolver(esquema),
     defaultValues: { atual: senhaAtualConhecida ?? '', nova: '', confirmacao: '' },
@@ -51,7 +52,11 @@ function FormularioTrocarSenha({ senhaAtualConhecida }: { senhaAtualConhecida?: 
       <Campo
         rotulo="Nova senha"
         erro={formState.errors.nova?.message}
-        dica={`Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres.`}
+        dica={
+          refinada
+            ? `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres, diferente de ${SENHA_PADRAO}.`
+            : `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres.`
+        }
       >
         <Entrada type="password" autoComplete="new-password" {...register('nova')} />
       </Campo>
@@ -69,6 +74,7 @@ function FormularioTrocarSenha({ senhaAtualConhecida }: { senhaAtualConhecida?: 
 
 export function PaginaMinhaConta() {
   const usuario = useUsuario();
+  const rotuloPerfil = useRotuloPerfil();
   return (
     <>
       <CabecalhoPagina
@@ -77,7 +83,7 @@ export function PaginaMinhaConta() {
             Minha <em>conta</em>
           </>
         }
-        descricao={`Usuário ${usuario.login} · ${ROTULO_PERFIL[usuario.perfil]}${usuario.percentualRepasse != null ? ` · repasse padrão ${usuario.percentualRepasse}%` : ''}`}
+        descricao={`Usuário ${usuario.login} · ${rotuloPerfil(usuario.perfil)}${usuario.percentualRepasse != null ? ` · repasse padrão ${usuario.percentualRepasse}%` : ''}`}
       />
       <div className="grade-2" style={{ alignItems: 'start' }}>
         <Cartao titulo="Trocar senha">

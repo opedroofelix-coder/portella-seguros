@@ -13,9 +13,10 @@ import {
   Tabela,
 } from '@portella/ui';
 import { useMemo, useState } from 'react';
+import { useRefinada } from '../config';
 import { useColecao, useEquipe } from '../hooks/dados';
 import { useServicos } from '../servicos';
-import { useSessao } from '../sessao/Sessao';
+import { useSessao, useUsuario } from '../sessao/Sessao';
 import { AvisoAprovacoes } from './Propostas';
 import { rotuloMes } from './Relatorios';
 
@@ -54,19 +55,37 @@ export function PaginaProducao() {
   const painel = useMemo(() => montarPainel(aprovadas, periodo), [aprovadas, periodo.de, periodo.ate]); // eslint-disable-line react-hooks/exhaustive-deps
   const nomeProdutor = (id: string) => (id === CORRETORA ? 'Corretora' : nomeDe(id));
   const gestao = pode('financeiro:gerenciar');
+  const usuario = useUsuario();
+  const refinada = useRefinada();
+  // Interface refinada: o produtor vê a própria produção e o próprio repasse, nunca a comissão
+  // que a corretora recebe da seguradora nem o repasse dos colegas (spec §0.2 e §4.1).
+  const soMeu = refinada && !gestao;
+  const meuRepasse = painel.pendentes.find((g) => g.produtorId === usuario.id)?.repasseProjetado ?? 0;
+  const qtd = (n: number) => (refinada ? `${n} proposta${n === 1 ? '' : 's'}` : `${n}`);
 
-  if (isPending) return <Carregando />;
+  const cabecalho = (
+    <CabecalhoPagina
+      titulo={
+        <>
+          Painel de <em>produção</em>
+        </>
+      }
+      descricao="Propostas aprovadas. Produção = prêmio líquido pela data da proposta."
+    />
+  );
+  if (isPending)
+    return refinada ? (
+      <>
+        {cabecalho}
+        <Carregando texto="Carregando a produção…" />
+      </>
+    ) : (
+      <Carregando />
+    );
 
   return (
     <>
-      <CabecalhoPagina
-        titulo={
-          <>
-            Painel de <em>produção</em>
-          </>
-        }
-        descricao="Propostas aprovadas. Produção = prêmio líquido pela data da proposta."
-      />
+      {cabecalho}
       {gestao && <AvisoAprovacoes />}
       <Cartao style={{ marginBottom: 20 }}>
         <BarraFiltros>
@@ -106,26 +125,38 @@ export function PaginaProducao() {
             valor={formatarDinheiro(painel.producao)}
             detalhe={`${painel.quantidade} proposta(s)`}
           />
-          <Indicador
-            tom="sucesso"
-            icone="moeda"
-            rotulo="Comissão recebida"
-            valor={formatarDinheiro(painel.comissaoRecebida)}
-            detalhe="pela data do recebimento"
-          />
-          <Indicador
-            tom="info"
-            icone="usuarios"
-            rotulo="Repassada aos produtores"
-            valor={formatarDinheiro(painel.comissaoRepassada)}
-          />
-          <Indicador
-            tom="alerta"
-            icone="moeda"
-            rotulo="Saldo a receber"
-            valor={formatarDinheiro(painel.saldoReceber)}
-            detalhe="todas as propostas, sem filtro"
-          />
+          {soMeu ? (
+            <Indicador
+              tom="sucesso"
+              icone="moeda"
+              rotulo="Meu repasse a receber"
+              valor={formatarDinheiro(meuRepasse)}
+              detalhe="das propostas com saldo, sem filtro de período"
+            />
+          ) : (
+            <>
+              <Indicador
+                tom="sucesso"
+                icone="moeda"
+                rotulo="Comissão recebida"
+                valor={formatarDinheiro(painel.comissaoRecebida)}
+                detalhe="pela data do recebimento"
+              />
+              <Indicador
+                tom="info"
+                icone="usuarios"
+                rotulo="Repassada aos produtores"
+                valor={formatarDinheiro(painel.comissaoRepassada)}
+              />
+              <Indicador
+                tom="alerta"
+                icone="moeda"
+                rotulo="Saldo a receber"
+                valor={formatarDinheiro(painel.saldoReceber)}
+                detalhe="todas as propostas, sem filtro"
+              />
+            </>
+          )}
         </div>
       </Cartao>
 
@@ -152,27 +183,30 @@ export function PaginaProducao() {
             />
             <Indicador
               tom="primaria"
+              icone={refinada ? 'documento' : undefined}
               rotulo="Tipo não informado"
               valor={formatarDinheiro(painel.porTipo.nao_informado.premio)}
               detalhe={`${painel.porTipo.nao_informado.quantidade} proposta(s)`}
             />
           </div>
           <div className="grade-3">
-            <Cartao titulo="Por produtor">
-              <Barras
-                rotulo="Prêmio líquido por produtor (proporcional ao %)"
-                itens={painel.porProdutor.map((g) => ({
-                  chave: g.chave,
-                  rotulo: nomeProdutor(g.chave),
-                  valor: g.premio,
-                  valorTexto: formatarDinheiro(g.premio),
-                  detalhe: `${g.quantidade}`,
-                }))}
-              />
-              <p className="texto-suave" style={{ fontSize: 13, marginBottom: 0 }}>
-                Dividido pelo % de cada produtor na proposta.
-              </p>
-            </Cartao>
+            {!soMeu && (
+              <Cartao titulo="Por produtor">
+                <Barras
+                  rotulo="Prêmio líquido por produtor (proporcional ao %)"
+                  itens={painel.porProdutor.map((g) => ({
+                    chave: g.chave,
+                    rotulo: nomeProdutor(g.chave),
+                    valor: g.premio,
+                    valorTexto: formatarDinheiro(g.premio),
+                    detalhe: qtd(g.quantidade),
+                  }))}
+                />
+                <p className="texto-suave" style={{ fontSize: 13, marginBottom: 0 }}>
+                  Dividido pelo % de cada produtor na proposta.
+                </p>
+              </Cartao>
+            )}
             <Cartao titulo="Por produto">
               <Barras
                 rotulo="Prêmio líquido por produto"
@@ -180,57 +214,81 @@ export function PaginaProducao() {
                   rotulo: g.chave,
                   valor: g.premio,
                   valorTexto: formatarDinheiro(g.premio),
-                  detalhe: `${g.quantidade}`,
+                  detalhe: qtd(g.quantidade),
                 }))}
               />
             </Cartao>
             <Cartao titulo="Por seguradora">
-              <Barras
-                rotulo="Prêmio líquido por seguradora"
-                itens={painel.porCompanhia.slice(0, 15).map((g) => ({
-                  rotulo: g.chave,
-                  valor: g.premio,
-                  valorTexto: formatarDinheiro(g.premio),
-                  detalhe: `${g.quantidade}`,
-                }))}
-              />
-              {painel.porCompanhia.length > 15 && (
-                <p className="texto-suave" style={{ fontSize: 13, marginBottom: 0 }}>
-                  15 maiores de {painel.porCompanhia.length}.
-                </p>
+              {refinada ? (
+                // Todas as seguradoras, com os valores exatos (spec §0.7).
+                <Tabela
+                  rotulo="Prêmio líquido por seguradora"
+                  itens={painel.porCompanhia}
+                  chave={(g) => g.chave}
+                  porPagina={10}
+                  colunas={[
+                    { chave: 'seg', titulo: 'Seguradora', principal: true, render: (g) => g.chave },
+                    { chave: 'qtd', titulo: 'Propostas', alinharDireita: true, render: (g) => g.quantidade },
+                    {
+                      chave: 'premio',
+                      titulo: 'Prêmio líquido',
+                      alinharDireita: true,
+                      render: (g) => formatarDinheiro(g.premio),
+                    },
+                  ]}
+                />
+              ) : (
+                <>
+                  <Barras
+                    rotulo="Prêmio líquido por seguradora"
+                    itens={painel.porCompanhia.slice(0, 15).map((g) => ({
+                      rotulo: g.chave,
+                      valor: g.premio,
+                      valorTexto: formatarDinheiro(g.premio),
+                      detalhe: `${g.quantidade}`,
+                    }))}
+                  />
+                  {painel.porCompanhia.length > 15 && (
+                    <p className="texto-suave" style={{ fontSize: 13, marginBottom: 0 }}>
+                      15 maiores de {painel.porCompanhia.length}.
+                    </p>
+                  )}
+                </>
               )}
             </Cartao>
           </div>
 
-          <Cartao titulo="Comissão pendente por produtor">
-            <Tabela
-              rotulo="Comissão pendente por produtor"
-              itens={painel.pendentes}
-              chave={(g) => g.produtorId || 'corretora'}
-              vazio={<p className="texto-suave">Nada pendente.</p>}
-              colunas={[
-                {
-                  chave: 'produtor',
-                  titulo: 'Produtor',
-                  principal: true,
-                  render: (g) => nomeProdutor(g.produtorId),
-                },
-                { chave: 'qtd', titulo: 'Propostas', alinharDireita: true, render: (g) => g.itens.length },
-                {
-                  chave: 'saldo',
-                  titulo: 'Saldo a receber',
-                  alinharDireita: true,
-                  render: (g) => formatarDinheiro(g.saldo),
-                },
-                {
-                  chave: 'repasse',
-                  titulo: 'Repasse previsto',
-                  alinharDireita: true,
-                  render: (g) => formatarDinheiro(g.repasseProjetado),
-                },
-              ]}
-            />
-          </Cartao>
+          {!soMeu && (
+            <Cartao titulo="Comissão pendente por produtor">
+              <Tabela
+                rotulo="Comissão pendente por produtor"
+                itens={painel.pendentes}
+                chave={(g) => g.produtorId || 'corretora'}
+                vazio={<p className="texto-suave">Nada pendente.</p>}
+                colunas={[
+                  {
+                    chave: 'produtor',
+                    titulo: 'Produtor',
+                    principal: true,
+                    render: (g) => nomeProdutor(g.produtorId),
+                  },
+                  { chave: 'qtd', titulo: 'Propostas', alinharDireita: true, render: (g) => g.itens.length },
+                  {
+                    chave: 'saldo',
+                    titulo: 'Saldo a receber',
+                    alinharDireita: true,
+                    render: (g) => formatarDinheiro(g.saldo),
+                  },
+                  {
+                    chave: 'repasse',
+                    titulo: 'Repasse previsto',
+                    alinharDireita: true,
+                    render: (g) => formatarDinheiro(g.repasseProjetado),
+                  },
+                ]}
+              />
+            </Cartao>
+          )}
 
           <Cartao titulo="Crescimento mês a mês">
             <TabelaCrescimento linhas={[...painel.crescimentoMensal].reverse().slice(0, 24)} mensal />

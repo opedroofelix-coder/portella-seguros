@@ -37,9 +37,9 @@ for (const tela of LARGURAS) {
       await barra.getByRole('combobox').selectOption({ label: 'Administradora' });
       await expect(page.getByRole('heading', { name: 'Olá, Administradora' })).toBeVisible();
       await irPara(page, 'Aprovações');
-      await page.getByRole('row', { name: /Cliente Teste Moreira/ }).click();
-      await page.getByRole('button', { name: 'Aprovar' }).click();
-      await expect(page.getByText('Proposta aprovada.')).toBeVisible();
+      // Aprovar direto na linha da lista
+      await page.getByRole('button', { name: 'Aprovar a proposta de Cliente Teste Moreira' }).click();
+      await expect(page.getByText('Proposta de Cliente Teste Moreira aprovada.')).toBeVisible();
       await barra.getByRole('button', { name: 'Recomeçar' }).click();
       await expect(page.getByRole('heading', { name: 'Olá, Administradora' })).toBeVisible({
         timeout: 30_000,

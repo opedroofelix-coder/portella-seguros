@@ -18,7 +18,7 @@ export async function primeiroAcesso(page: Page, url: string) {
 export async function entrar(page: Page, url: string, u: { login: string; senha: string }) {
   await page.goto(`${url}/entrar`);
   await page.getByLabel('Usuário').fill(u.login);
-  await page.getByLabel('Senha').fill(u.senha);
+  await page.getByLabel('Senha', { exact: true }).fill(u.senha);
   await page.getByRole('button', { name: 'Entrar' }).click();
 }
 
@@ -72,5 +72,11 @@ export async function importar(page: Page, arquivo: string, esperado: RegExp) {
   await page.getByLabel(/Arquivo gerado/).setInputFiles(arquivo);
   await expect(page.getByText(esperado).first()).toBeVisible();
   await page.getByRole('button', { name: 'Importar agora' }).click();
-  await expect(page.getByText('Importação concluída.')).toBeVisible();
+  // No Seguros (interface refinada) a importação pede confirmação; no Consórcio, não.
+  const confirmar = page.getByRole('alertdialog', { name: 'Importar os dados?' });
+  const concluida = page.getByText('Importação concluída.').first();
+  await expect(confirmar.or(concluida)).toBeVisible();
+  if (await confirmar.isVisible())
+    await confirmar.getByRole('button', { name: 'Importar', exact: true }).click();
+  await expect(concluida).toBeVisible();
 }

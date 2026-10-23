@@ -1,5 +1,14 @@
-import type { Cliente } from '@portella/core';
-import { corresponde, formatarDocumento, formatarTelefone, linkWhatsApp, normalizar } from '@portella/core';
+import type { Cliente, Proposta } from '@portella/core';
+import {
+  corresponde,
+  formatarData,
+  formatarDocumento,
+  formatarDinheiro,
+  formatarTelefone,
+  linkWhatsApp,
+  normalizar,
+  somenteDigitos,
+} from '@portella/core';
 import {
   BarraFiltros,
   Botao,
@@ -13,13 +22,15 @@ import {
   EstadoVazio,
   Icone,
   Selecao,
+  Selo,
   Tabela,
   useAvisos,
 } from '@portella/ui';
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FormularioCliente } from '../componentes/FormularioCliente';
-import { useConfig } from '../config';
+import { FormularioProposta } from '../componentes/FormularioProposta';
+import { useConfig, useRefinada } from '../config';
 import { mensagemErro } from '../erros';
 import { useColecao, useEquipe, useRemover } from '../hooks/dados';
 import { useServicos } from '../servicos';
@@ -29,27 +40,42 @@ export function PaginaClientes() {
   const { clientes } = useServicos();
   const { pode } = useSessao();
   const { nomeDe, equipe } = useEquipe();
-  const { data, isPending } = useColecao('clientes', clientes);
+  const { data, isPending, isError, refetch } = useColecao('clientes', clientes);
   const navegar = useNavigate();
   const [busca, setBusca] = useState('');
   const [responsavel, setResponsavel] = useState('');
   const [novo, setNovo] = useState(false);
   const verTodos = pode('carteira:ver_todos');
+  const refinada = useRefinada();
+  // Documento e telefone ficam guardados só com dígitos: "(11) 98888-7777" também precisa achar.
+  const digitos = refinada ? somenteDigitos(busca) : '';
 
   const filtrados = useMemo(
     () =>
       (data ?? [])
         .filter((c) => !responsavel || c.responsavelId === responsavel)
-        .filter((c) => corresponde(busca, c.nome, c.documento, c.telefone, c.email, c.endereco?.cidade))
+        .filter(
+          (c) =>
+            corresponde(busca, c.nome, c.documento, c.telefone, c.email, c.endereco?.cidade) ||
+            (digitos.length >= 4 &&
+              /^[\d\s().\-/+]+$/.test(busca.trim()) &&
+              [c.documento, c.telefone].some((d) => d?.includes(digitos))),
+        )
         .sort((a, b) => normalizar(a.nome).localeCompare(normalizar(b.nome))),
-    [data, busca, responsavel],
+    [data, busca, responsavel, digitos],
   );
 
   return (
     <>
       <CabecalhoPagina
         titulo="Clientes"
-        descricao={verTodos ? 'Carteira completa da corretora.' : 'Sua carteira de clientes.'}
+        descricao={
+          refinada && data
+            ? `${filtrados.length.toLocaleString('pt-BR')} de ${data.length.toLocaleString('pt-BR')} clientes${verTodos ? ' da corretora' : ' da sua carteira'}.`
+            : verTodos
+              ? 'Carteira completa da corretora.'
+              : 'Sua carteira de clientes.'
+        }
         acoes={
           <Botao icone="mais" onClick={() => setNovo(true)}>
             Novo cliente
@@ -67,19 +93,32 @@ export function PaginaClientes() {
             />
           </Campo>
           {verTodos && (
-            <Campo rotulo="Responsável">
+            <Campo rotulo={refinada ? 'Produtor' : 'Responsável'}>
               <Selecao value={responsavel} onChange={(e) => setResponsavel(e.target.value)}>
                 <option value="">Todos</option>
-                {equipe.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.nome}
-                  </option>
-                ))}
+                {equipe
+                  .filter((u) => !refinada || u.ativo || u.id === responsavel)
+                  .map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.nome}
+                    </option>
+                  ))}
               </Selecao>
             </Campo>
           )}
         </BarraFiltros>
-        {isPending ? (
+        {refinada && isError ? (
+          <div role="alert">
+            <EstadoVazio
+              titulo="Não foi possível carregar os clientes"
+              acao={
+                <Botao variante="secundario" onClick={() => refetch()}>
+                  Tentar de novo
+                </Botao>
+              }
+            />
+          </div>
+        ) : isPending ? (
           <Carregando />
         ) : (
           <Tabela
@@ -111,7 +150,13 @@ export function PaginaClientes() {
                 render: (c) => c.endereco?.cidade ?? '—',
               },
               ...(verTodos
-                ? [{ chave: 'resp', titulo: 'Responsável', render: (c: Cliente) => nomeDe(c.responsavelId) }]
+                ? [
+                    {
+                      chave: 'resp',
+                      titulo: refinada ? 'Produtor' : 'Responsável',
+                      render: (c: Cliente) => nomeDe(c.responsavelId),
+                    },
+                  ]
                 : []),
             ]}
           />
@@ -144,6 +189,7 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
   const { pode } = useSessao();
   const { nomeDe } = useEquipe();
   const { abasCliente = [] } = useConfig();
+  const refinada = useRefinada();
   const { avisar } = useAvisos();
   const navegar = useNavigate();
   const remover = useRemover('clientes', clientes);
@@ -171,11 +217,16 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
     ['Telefone', cliente.telefone ? formatarTelefone(cliente.telefone) : '—'],
     ['E-mail', cliente.email ?? '—'],
     ['Endereço', endereco || '—'],
-    ['Responsável', nomeDe(cliente.responsavelId)],
+    [refinada ? 'Produtor' : 'Responsável', nomeDe(cliente.responsavelId)],
   ];
 
   return (
     <>
+      {refinada && (
+        <p style={{ margin: '0 0 12px' }}>
+          <Link to="/clientes">← Voltar para clientes</Link>
+        </p>
+      )}
       <CabecalhoPagina
         titulo={cliente.nome}
         descricao={cliente.tipoPessoa === 'PF' ? 'Pessoa física' : 'Pessoa jurídica'}
@@ -187,6 +238,7 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
                 href={whatsapp}
                 target="_blank"
                 rel="noreferrer"
+                aria-label={refinada ? 'WhatsApp (abre em nova aba)' : undefined}
               >
                 <Icone nome="whatsapp" tamanho={18} /> WhatsApp
               </a>
@@ -198,7 +250,7 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
             )}
             {pode('registro:remover', cliente) && (
               <Botao variante="perigo" icone="lixeira" onClick={() => setConfirmar(true)}>
-                Remover
+                {refinada ? 'Excluir' : 'Remover'}
               </Botao>
             )}
           </>
@@ -225,26 +277,80 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
             {aba.render(cliente)}
           </Cartao>
         ))}
+        {refinada && (
+          <Cartao titulo="Propostas">
+            <PropostasDoCliente cliente={cliente} />
+          </Cartao>
+        )}
       </div>
       {editar && <FormularioCliente cliente={cliente} aoFechar={() => setEditar(false)} />}
       <ConfirmarAcao
         aberto={confirmar}
         perigo
-        titulo="Remover cliente?"
-        mensagem={`${cliente.nome} será removido. Esta ação não pode ser desfeita.`}
-        textoConfirmar="Remover"
+        titulo={refinada ? 'Excluir cliente?' : 'Remover cliente?'}
+        mensagem={
+          refinada
+            ? `${cliente.nome} será excluído. As apólices e propostas dele continuam no sistema, sem o vínculo. Não dá para desfazer.`
+            : `${cliente.nome} será removido. Esta ação não pode ser desfeita.`
+        }
+        textoConfirmar={refinada ? 'Excluir cliente' : 'Remover'}
         carregando={remover.isPending}
         aoCancelar={() => setConfirmar(false)}
         aoConfirmar={() =>
           remover.mutate(cliente.id, {
             onSuccess: () => {
-              avisar('Cliente removido.');
+              avisar(refinada ? 'Cliente excluído.' : 'Cliente removido.');
               navegar('/clientes');
             },
             onError: (erro) => avisar(mensagemErro(erro), 'erro'),
           })
         }
       />
+    </>
+  );
+}
+
+/** Propostas (vendas) do cliente: pelo vínculo ou, nas importadas, pelo nome. */
+function PropostasDoCliente({ cliente }: { cliente: Cliente }) {
+  const { propostas } = useServicos();
+  const { data, isPending } = useColecao<Proposta>('propostas', propostas);
+  const [abrindo, setAbrindo] = useState<Proposta | null>(null);
+  const nome = normalizar(cliente.nome);
+  const doCliente = (data ?? [])
+    .filter((p) => p.clienteId === cliente.id || (!p.clienteId && normalizar(p.clienteNome) === nome))
+    .sort((a, b) => b.data.localeCompare(a.data));
+  if (isPending) return <Carregando />;
+  return (
+    <>
+      <Tabela
+        rotulo={`Propostas de ${cliente.nome}`}
+        itens={doCliente}
+        chave={(p) => p.id}
+        aoClicar={setAbrindo}
+        porPagina={10}
+        vazio={<EstadoVazio titulo="Nenhuma proposta">As vendas deste cliente aparecem aqui.</EstadoVazio>}
+        colunas={[
+          { chave: 'data', titulo: 'Data', principal: true, render: (p) => formatarData(p.data) },
+          { chave: 'cia', titulo: 'Seguradora · produto', render: (p) => `${p.companhia} · ${p.produto}` },
+          { chave: 'numero', titulo: 'Nº', render: (p) => p.numero ?? '—' },
+          {
+            chave: 'premio',
+            titulo: 'Prêmio líquido',
+            alinharDireita: true,
+            render: (p) => formatarDinheiro(p.premioLiquido),
+          },
+          {
+            chave: 'status',
+            titulo: 'Situação',
+            render: (p) => (
+              <Selo tom={p.status === 'pendente' ? 'alerta' : 'sucesso'}>
+                {p.status === 'pendente' ? 'Aguardando aprovação' : 'Aprovada'}
+              </Selo>
+            ),
+          },
+        ]}
+      />
+      {abrindo && <FormularioProposta proposta={abrindo} aoFechar={() => setAbrindo(null)} />}
     </>
   );
 }

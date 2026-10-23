@@ -1,12 +1,18 @@
 import type { Acao } from '@portella/core';
-import { ROTULO_PERFIL } from '@portella/core';
-import { Estrutura, ProvedorAvisos, ProvedorInterface } from '@portella/ui';
+import {
+  CabecalhoPagina,
+  classesBotao,
+  EstadoVazio,
+  Estrutura,
+  ProvedorAvisos,
+  ProvedorInterface,
+} from '@portella/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { BrowserRouter, HashRouter, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import type { ConfigApp, ItemMenuApp } from './config';
-import { ProvedorConfig, useConfig as useConfigInterno } from './config';
+import { ProvedorConfig, useConfig as useConfigInterno, useRefinada, useRotuloPerfil } from './config';
 import { PaginaCliente, PaginaClientes } from './paginas/Clientes';
 import { PaginaConfiguracoes } from './paginas/Configuracoes';
 import { PaginaEstornosVales } from './paginas/EstornosVales';
@@ -163,7 +169,7 @@ export function AppCrm<S extends ServicosBase>({
                         }
                       />
                       <Route path="/conta" element={<PaginaMinhaConta />} />
-                      <Route path="*" element={<p>Página não encontrada.</p>} />
+                      <Route path="*" element={<NaoEncontrada />} />
                     </Route>
                   </Routes>
                   {extra}
@@ -182,12 +188,13 @@ function Layout() {
   const usuario = useUsuario();
   const { sair } = useSessao();
   const navegar = useNavigate();
+  const rotuloPerfil = useRotuloPerfil();
   return (
     <Estrutura
       sistema={sistema}
       logo={logo}
       menu={menu}
-      usuario={{ nome: usuario.nome, perfil: ROTULO_PERFIL[usuario.perfil] }}
+      usuario={{ nome: usuario.nome, perfil: rotuloPerfil(usuario.perfil) }}
       aoSair={async () => {
         // Vai para o login antes de encerrar a sessão, para não guardar a página atual
         // como destino do próximo usuário.
@@ -210,4 +217,24 @@ function useConfigMenu() {
       .filter((i) => !i.acao || pode(i.acao))
       .map((i) => (i.para === ROTA_APROVACOES ? { ...i, contador: pendentes } : i)),
   };
+}
+
+function NaoEncontrada() {
+  const refinada = useRefinada();
+  if (!refinada) return <p>Página não encontrada.</p>;
+  return (
+    <>
+      <CabecalhoPagina titulo="Página não encontrada" />
+      <EstadoVazio
+        titulo="Este endereço não existe"
+        acao={
+          <Link className={classesBotao({ variante: 'secundario' })} to="/">
+            Voltar ao painel
+          </Link>
+        }
+      >
+        O link pode estar errado ou a página mudou de lugar.
+      </EstadoVazio>
+    </>
+  );
 }

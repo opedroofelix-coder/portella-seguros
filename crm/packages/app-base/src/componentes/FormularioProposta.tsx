@@ -6,6 +6,7 @@ import {
   formatarData,
   formatarDinheiro,
   hojeISO,
+  lerDinheiro,
   marcarVitalicios,
   paraCentavos,
   recebidoTotal,
@@ -13,6 +14,7 @@ import {
   ROTULO_STATUS_PROPOSTA,
   ROTULO_TIPO_NEGOCIO,
   saldoReceber,
+  textoDinheiro,
   valorVitalicio,
 } from '@portella/core';
 import {
@@ -28,12 +30,14 @@ import {
 } from '@portella/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { useRefinada } from '../config';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { aplicarErros, mensagemErro } from '../erros';
 import { useCatalogo, useColecao, useEquipe } from '../hooks/dados';
 import { useServicos } from '../servicos';
 import { useSessao, useUsuario } from '../sessao/Sessao';
+import { EntradaDinheiro, EntradaPercentual } from './Entradas';
 import styles from './FormularioProposta.module.css';
 
 const valor = z.string().refine((v) => !v.trim() || paraCentavos(v) != null, 'Valor inválido.');
@@ -76,11 +80,36 @@ const esquema = z.object({
 });
 type Valores = z.infer<typeof esquema>;
 
-const numero = (t: string) => (t.trim() ? (paraCentavos(t) ?? 0) / 100 : undefined);
-const centavos = (t: string) => (t.trim() ? (paraCentavos(t) ?? undefined) : undefined);
+function conversores(ler: (t: string) => number | null) {
+  return {
+    numero: (t: string) => (t.trim() ? (ler(t) ?? 0) / 100 : undefined),
+    centavos: (t: string) => (t.trim() ? (ler(t) ?? undefined) : undefined),
+  };
+}
+const ORIGINAL = conversores(paraCentavos);
+/** Com a interface refinada, "1.500" é lido como mil e quinhentos (ponto de milhar). */
+const REFINADO = conversores(lerDinheiro);
 const textoPct = (n?: number) => (n == null ? '' : String(n).replace('.', ','));
+const OUTRA = '__outra__';
+
+/** Interface refinada: tipo de negócio e prêmio obrigatórios e soma dos produtores até 100%. */
+const esquemaRefinado = esquema
+  .extend({
+    tipoNegocio: z.enum(['novo', 'renovacao', '']).refine((v) => v !== '', 'Escolha o tipo de negócio.'),
+    premioLiquido: valor.refine((v) => v.trim() !== '', 'Informe o prêmio líquido.'),
+  })
+  .superRefine((v, ctx) => {
+    const soma = v.produtores.reduce((t, x) => t + (REFINADO.numero(x.percentual) ?? 0), 0);
+    if (soma > 100)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['produtores'],
+        message: `Os produtores somam ${soma.toLocaleString('pt-BR')}%: o máximo é 100%.`,
+      });
+  });
 
 function iniciais(
+  refinada: boolean,
   p: Proposta | undefined,
   usuarioId: string,
   percentualPadrao?: number,
@@ -93,9 +122,9 @@ function iniciais(
     companhia: p?.companhia ?? '',
     produto: p?.produto ?? '',
     tipoNegocio: p?.tipoNegocio ?? '',
-    premioLiquido: centavosParaTexto(p?.premioLiquido),
+    premioLiquido: (refinada ? textoDinheiro : centavosParaTexto)(p?.premioLiquido),
     comissaoPercentual: textoPct(p?.comissaoPercentual),
-    comissaoReceber: centavosParaTexto(p?.comissaoReceber),
+    comissaoReceber: (refinada ? textoDinheiro : centavosParaTexto)(p?.comissaoReceber),
     regra: p?.percentualVitalicio != null ? 'vitalicio' : 'normal',
     percentualVitalicio: textoPct(p?.percentualVitalicio),
     produtores: p
@@ -106,7 +135,7 @@ function iniciais(
     recebimentos: (p?.recebimentos ?? []).map((r) => ({
       id: r.id,
       data: r.data,
-      valor: centavosParaTexto(r.valor),
+      valor: (refinada ? textoDinheiro : centavosParaTexto)(r.valor),
       parcela: r.parcela ?? '',
       repasses: r.repasses,
     })),
@@ -125,6 +154,10 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
   const consultas = useQueryClient();
   const { avisar } = useAvisos();
   const [confirmarExclusao, setConfirmarExclusao] = useState(false);
+  const refinada = useRefinada();
+  const { numero, centavos } = refinada ? REFINADO : ORIGINAL;
+  // Seguradora e produto vêm das listas de Configurações; "Outra…" libera o texto livre.
+  const [digitar, setDigitar] = useState({ companhia: false, produto: false });
 
   const gestao = pode('financeiro:gerenciar');
   const somenteLeitura = Boolean(
@@ -134,8 +167,14 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
     proposta && (gestao || (proposta.status === 'pendente' && proposta.responsavelId === usuario.id));
 
   const { register, handleSubmit, formState, setError, watch, control, setValue } = useForm<Valores>({
-    resolver: zodResolver(esquema),
-    defaultValues: iniciais(proposta, usuario.id, usuario.percentualRepasse, usuario.perfil === 'corretor'),
+    resolver: zodResolver(refinada ? esquemaRefinado : esquema),
+    defaultValues: iniciais(
+      refinada,
+      proposta,
+      usuario.id,
+      usuario.percentualRepasse,
+      usuario.perfil === 'corretor',
+    ),
   });
   const produtoresCampos = useFieldArray({ control, name: 'produtores' });
   const recebimentosCampos = useFieldArray({ control, name: 'recebimentos' });
@@ -156,6 +195,7 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
       })),
     };
   const ativos = useMemo(() => equipe.filter((u) => u.ativo), [equipe]);
+  const somaProdutores = v.produtores.reduce((t, x) => t + (numero(x.percentual) ?? 0), 0);
 
   const montar = (valores: Valores): DadosRegistro<Proposta> => {
     const base: DadosRegistro<Proposta> = {
@@ -221,6 +261,9 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
     onError: (e) => avisar(mensagemErro(e), 'erro'),
   });
 
+  // "Salvar" e "Aprovar" mostram o carregando só no botão que foi clicado.
+  const aprovando = refinada ? salvar.isPending && salvar.variables?.aprovar === true : salvar.isPending;
+  const salvando = refinada ? salvar.isPending && salvar.variables?.aprovar === false : salvar.isPending;
   const enviar = (aprovar: boolean) => handleSubmit((valores) => salvar.mutate({ valores, aprovar }));
   const erros = formState.errors;
   const titulo = proposta ? `Proposta · ${proposta.clienteNome}` : 'Nova proposta';
@@ -232,11 +275,17 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
         largura={880}
         titulo={titulo}
         aoFechar={aoFechar}
+        alterado={!somenteLeitura && formState.isDirty}
+        bloqueado={salvar.isPending}
         rodape={
           <>
             {podeExcluir && (
-              <Botao variante="perigo" onClick={() => setConfirmarExclusao(true)}>
-                Excluir
+              <Botao
+                variante="perigo"
+                icone={refinada ? 'lixeira' : undefined}
+                onClick={() => setConfirmarExclusao(true)}
+              >
+                {refinada ? 'Excluir proposta' : 'Excluir'}
               </Botao>
             )}
             <Botao variante="secundario" onClick={aoFechar}>
@@ -247,14 +296,23 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                 type="submit"
                 form="form-proposta"
                 variante={gestao && proposta?.status === 'pendente' ? 'secundario' : 'primario'}
-                carregando={salvar.isPending}
+                carregando={salvando}
+                disabled={refinada && aprovando}
               >
-                {gestao ? 'Salvar' : 'Enviar para aprovação'}
+                {!gestao
+                  ? 'Enviar para aprovação'
+                  : !refinada
+                    ? 'Salvar'
+                    : proposta?.status === 'pendente'
+                      ? 'Salvar e manter pendente'
+                      : proposta
+                        ? 'Salvar'
+                        : 'Salvar (já aprovada)'}
               </Botao>
             )}
             {gestao && proposta?.status === 'pendente' && (
-              <Botao onClick={enviar(true)} carregando={salvar.isPending}>
-                Aprovar
+              <Botao onClick={enviar(true)} carregando={aprovando} disabled={refinada && salvando}>
+                {refinada ? 'Aprovar proposta' : 'Aprovar'}
               </Botao>
             )}
           </>
@@ -266,6 +324,34 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
             className="grade-2"
             style={{ border: 0, padding: 0, margin: 0 }}
           >
+            {refinada && (
+              <div className={`${styles.resumoFixo} span-todo`} aria-live="polite">
+                <dl className={styles.resumo}>
+                  <div>
+                    <dt>Comissão a receber</dt>
+                    <dd>{formatarDinheiro(comissaoReceber)}</dd>
+                  </div>
+                  {gestao && (
+                    <div>
+                      <dt>Recebido</dt>
+                      <dd>{formatarDinheiro(recebidoTotal(previa))}</dd>
+                    </div>
+                  )}
+                  {gestao && (
+                    <div>
+                      <dt>Saldo a receber</dt>
+                      <dd>{formatarDinheiro(saldoReceber(previa))}</dd>
+                    </div>
+                  )}
+                  <div>
+                    <dt>Soma dos produtores</dt>
+                    <dd className={somaProdutores > 100 ? styles.excedeu : undefined}>
+                      {somaProdutores.toLocaleString('pt-BR')}%
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            )}
             {proposta && (
               <p
                 className={styles.aviso}
@@ -280,7 +366,10 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                 </Selo>{' '}
                 Lançada por {nomeDe(proposta.responsavelId)}
                 {proposta.aprovadaEm && ` · aprovada em ${formatarData(proposta.aprovadaEm)}`}
-                {somenteLeitura && ' · só a administração altera propostas aprovadas.'}
+                {somenteLeitura &&
+                  (refinada && proposta.status === 'pendente'
+                    ? ' · só quem lançou ou a administração altera esta proposta.'
+                    : ' · só a administração altera propostas aprovadas.')}
               </p>
             )}
             <Campo
@@ -303,7 +392,32 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
               <Entrada type="date" {...register('data')} />
             </Campo>
             <Campo rotulo="Seguradora" obrigatorio erro={erros.companhia?.message}>
-              <Entrada list="seguradoras-proposta" autoComplete="off" {...register('companhia')} />
+              {refinada && !digitar.companhia ? (
+                <Selecao
+                  {...register('companhia', {
+                    onChange: (e) => {
+                      if (e.target.value !== OUTRA) return;
+                      setValue('companhia', '');
+                      setDigitar((d) => ({ ...d, companhia: true }));
+                    },
+                  })}
+                >
+                  <option value="">Escolha…</option>
+                  {[...new Set([...seguradoras, ...(v.companhia ? [v.companhia] : [])])].map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                  <option value={OUTRA}>Outra (digitar)…</option>
+                </Selecao>
+              ) : (
+                <Entrada
+                  list="seguradoras-proposta"
+                  autoComplete="off"
+                  autoFocus={refinada && digitar.companhia}
+                  {...register('companhia')}
+                />
+              )}
             </Campo>
             <datalist id="seguradoras-proposta">
               {seguradoras.map((s) => (
@@ -311,45 +425,103 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
               ))}
             </datalist>
             <Campo rotulo="Produto" obrigatorio erro={erros.produto?.message}>
-              <Entrada list="produtos-proposta" autoComplete="off" {...register('produto')} />
+              {refinada && !digitar.produto ? (
+                <Selecao
+                  {...register('produto', {
+                    onChange: (e) => {
+                      if (e.target.value !== OUTRA) return;
+                      setValue('produto', '');
+                      setDigitar((d) => ({ ...d, produto: true }));
+                    },
+                  })}
+                >
+                  <option value="">Escolha…</option>
+                  {[...new Set([...produtos, ...(v.produto ? [v.produto] : [])])].map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                  <option value={OUTRA}>Outro (digitar)…</option>
+                </Selecao>
+              ) : (
+                <Entrada
+                  list="produtos-proposta"
+                  autoComplete="off"
+                  autoFocus={refinada && digitar.produto}
+                  {...register('produto')}
+                />
+              )}
             </Campo>
             <datalist id="produtos-proposta">
               {produtos.map((p) => (
                 <option key={p} value={p} />
               ))}
             </datalist>
-            <Campo rotulo="Tipo de negócio" dica="Renovação da própria carteira (não de congênere).">
+            <Campo
+              rotulo="Tipo de negócio"
+              obrigatorio={refinada}
+              erro={erros.tipoNegocio?.message}
+              dica="Renovação da própria carteira (não de congênere)."
+            >
               <Selecao {...register('tipoNegocio')}>
-                <option value="">Não informado</option>
+                <option value="">{refinada ? 'Escolha…' : 'Não informado'}</option>
                 <option value="novo">{ROTULO_TIPO_NEGOCIO.novo}</option>
                 <option value="renovacao">{ROTULO_TIPO_NEGOCIO.renovacao}</option>
               </Selecao>
             </Campo>
-            <Campo rotulo="Prêmio líquido (R$)" erro={erros.premioLiquido?.message}>
-              <Entrada inputMode="decimal" placeholder="0,00" {...register('premioLiquido')} />
-            </Campo>
-            <Campo
-              rotulo="Comissão trabalhada (%)"
-              erro={erros.comissaoPercentual?.message}
-              dica="Em saúde pode passar de 100% (ex.: 300)."
-            >
-              <Entrada inputMode="decimal" placeholder="Ex.: 15" {...register('comissaoPercentual')} />
-            </Campo>
-            <Campo
-              rotulo="Comissão a receber (R$)"
-              erro={erros.comissaoReceber?.message}
-              dica={
-                calculada != null
-                  ? `Em branco: ${formatarDinheiro(calculada)} (prêmio × %).`
-                  : 'Prêmio × % ou o valor combinado.'
-              }
-            >
-              <Entrada
-                inputMode="decimal"
-                placeholder={calculada != null ? centavosParaTexto(calculada) : '0,00'}
-                {...register('comissaoReceber')}
-              />
-            </Campo>
+            {refinada ? (
+              <>
+                <Campo rotulo="Prêmio líquido" obrigatorio erro={erros.premioLiquido?.message}>
+                  <EntradaDinheiro {...register('premioLiquido')} />
+                </Campo>
+                <Campo
+                  rotulo="Comissão trabalhada"
+                  erro={erros.comissaoPercentual?.message}
+                  dica="Em saúde pode passar de 100% (ex.: 300)."
+                >
+                  <EntradaPercentual placeholder="Ex.: 15" {...register('comissaoPercentual')} />
+                </Campo>
+                <Campo
+                  rotulo="Comissão a receber"
+                  erro={erros.comissaoReceber?.message}
+                  dica={
+                    calculada != null
+                      ? `Deixe em branco para usar ${formatarDinheiro(calculada)} (prêmio × %).`
+                      : 'Prêmio × % ou o valor combinado.'
+                  }
+                >
+                  <EntradaDinheiro placeholder="calculada" {...register('comissaoReceber')} />
+                </Campo>
+              </>
+            ) : (
+              <>
+                <Campo rotulo="Prêmio líquido (R$)" erro={erros.premioLiquido?.message}>
+                  <Entrada inputMode="decimal" placeholder="0,00" {...register('premioLiquido')} />
+                </Campo>
+                <Campo
+                  rotulo="Comissão trabalhada (%)"
+                  erro={erros.comissaoPercentual?.message}
+                  dica="Em saúde pode passar de 100% (ex.: 300)."
+                >
+                  <Entrada inputMode="decimal" placeholder="Ex.: 15" {...register('comissaoPercentual')} />
+                </Campo>
+                <Campo
+                  rotulo="Comissão a receber (R$)"
+                  erro={erros.comissaoReceber?.message}
+                  dica={
+                    calculada != null
+                      ? `Em branco: ${formatarDinheiro(calculada)} (prêmio × %).`
+                      : 'Prêmio × % ou o valor combinado.'
+                  }
+                >
+                  <Entrada
+                    inputMode="decimal"
+                    placeholder={calculada != null ? centavosParaTexto(calculada) : '0,00'}
+                    {...register('comissaoReceber')}
+                  />
+                </Campo>
+              </>
+            )}
             <Campo rotulo="Regra de recebimento">
               <Selecao {...register('regra')}>
                 <option value="normal">Normal (controle por saldo)</option>
@@ -375,7 +547,7 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                   icone="mais"
                   onClick={() => produtoresCampos.append({ produtorId: '', percentual: '' })}
                 >
-                  Produtor
+                  {refinada ? 'Adicionar produtor' : 'Produtor'}
                 </Botao>
               </div>
               {!produtoresCampos.fields.length && (
@@ -408,10 +580,17 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                         )}
                       </Selecao>
                     </Campo>
-                    <Campo rotulo="Repasse (%)" erro={erros.produtores?.[i]?.percentual?.message}>
-                      <Entrada inputMode="decimal" {...register(`produtores.${i}.percentual`)} />
+                    <Campo
+                      rotulo={refinada ? 'Repasse' : 'Repasse (%)'}
+                      erro={erros.produtores?.[i]?.percentual?.message}
+                    >
+                      {refinada ? (
+                        <EntradaPercentual {...register(`produtores.${i}.percentual`)} />
+                      ) : (
+                        <Entrada inputMode="decimal" {...register(`produtores.${i}.percentual`)} />
+                      )}
                     </Campo>
-                    <p className={styles.previa} aria-live="polite">
+                    <p className={styles.previa} aria-live={refinada ? undefined : 'polite'}>
                       Receberá {formatarDinheiro(repassePrevisto({ comissaoReceber }, pctAtual))}
                     </p>
                     <Botao
@@ -423,11 +602,23 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                   </div>
                 );
               })}
-              {(erros.produtores as { message?: string } | undefined)?.message && (
-                <p className="texto-suave" role="alert">
-                  {(erros.produtores as { message?: string }).message}
-                </p>
-              )}
+              {refinada
+                ? produtoresCampos.fields.length > 0 && (
+                    <p
+                      className={`${styles.avisoSoma} ${somaProdutores > 100 ? styles.excedeu : ''}`}
+                      role={erros.produtores ? 'alert' : undefined}
+                    >
+                      {(erros.produtores as { message?: string } | undefined)?.message ??
+                        (somaProdutores > 100
+                          ? `Os produtores somam ${somaProdutores.toLocaleString('pt-BR')}%: o máximo é 100%.`
+                          : `Produtores: ${somaProdutores.toLocaleString('pt-BR')}% · corretora: ${(100 - somaProdutores).toLocaleString('pt-BR')}%`)}
+                    </p>
+                  )
+                : (erros.produtores as { message?: string } | undefined)?.message && (
+                    <p className="texto-suave" role="alert">
+                      {(erros.produtores as { message?: string }).message}
+                    </p>
+                  )}
             </section>
 
             {gestao && (
@@ -442,7 +633,7 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                       recebimentosCampos.append({ id: '', data: hojeISO(), valor: '', parcela: '' })
                     }
                   >
-                    Recebimento
+                    {refinada ? 'Adicionar recebimento' : 'Recebimento'}
                   </Botao>
                 </div>
                 {!recebimentosCampos.fields.length && (
@@ -455,8 +646,15 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                     <Campo rotulo="Data" erro={erros.recebimentos?.[i]?.data?.message}>
                       <Entrada type="date" {...register(`recebimentos.${i}.data`)} />
                     </Campo>
-                    <Campo rotulo="Valor (R$)" erro={erros.recebimentos?.[i]?.valor?.message}>
-                      <Entrada inputMode="decimal" {...register(`recebimentos.${i}.valor`)} />
+                    <Campo
+                      rotulo={refinada ? 'Valor' : 'Valor (R$)'}
+                      erro={erros.recebimentos?.[i]?.valor?.message}
+                    >
+                      {refinada ? (
+                        <EntradaDinheiro {...register(`recebimentos.${i}.valor`)} />
+                      ) : (
+                        <Entrada inputMode="decimal" {...register(`recebimentos.${i}.valor`)} />
+                      )}
                     </Campo>
                     <Campo rotulo="Parcela">
                       <Entrada placeholder="1ª, 6.6, 156…" {...register(`recebimentos.${i}.parcela`)} />
@@ -472,36 +670,41 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
               </section>
             )}
 
-            <dl className={styles.resumo}>
-              <div>
-                <dt>Comissão a receber</dt>
-                <dd>{formatarDinheiro(comissaoReceber)}</dd>
-              </div>
-              {gestao && (
-                <div>
-                  <dt>Recebido</dt>
-                  <dd>{formatarDinheiro(recebidoTotal(previa))}</dd>
-                </div>
-              )}
-              {gestao && (
-                <div>
-                  <dt>Saldo a receber</dt>
-                  <dd>{formatarDinheiro(saldoReceber(previa))}</dd>
-                </div>
-              )}
-              {gestao && (
-                <div>
-                  <dt>Recebimentos</dt>
-                  <dd>{v.recebimentos.length}</dd>
-                </div>
-              )}
-              {previa.percentualVitalicio != null && (
-                <div>
-                  <dt>Vitalício por ciclo</dt>
-                  <dd>{formatarDinheiro(valorVitalicio(previa))}</dd>
-                </div>
-              )}
-            </dl>
+            {/* Com a interface refinada o resumo fica no alto; aqui sobra só o vitalício. */}
+            {(!refinada || previa.percentualVitalicio != null) && (
+              <dl className={styles.resumo}>
+                {!refinada && (
+                  <div>
+                    <dt>Comissão a receber</dt>
+                    <dd>{formatarDinheiro(comissaoReceber)}</dd>
+                  </div>
+                )}
+                {gestao && !refinada && (
+                  <div>
+                    <dt>Recebido</dt>
+                    <dd>{formatarDinheiro(recebidoTotal(previa))}</dd>
+                  </div>
+                )}
+                {gestao && !refinada && (
+                  <div>
+                    <dt>Saldo a receber</dt>
+                    <dd>{formatarDinheiro(saldoReceber(previa))}</dd>
+                  </div>
+                )}
+                {gestao && !refinada && (
+                  <div>
+                    <dt>Recebimentos</dt>
+                    <dd>{v.recebimentos.length}</dd>
+                  </div>
+                )}
+                {previa.percentualVitalicio != null && (
+                  <div>
+                    <dt>Vitalício por ciclo</dt>
+                    <dd>{formatarDinheiro(valorVitalicio(previa))}</dd>
+                  </div>
+                )}
+              </dl>
+            )}
             <Campo rotulo="Observações" className="span-todo">
               <AreaTexto {...register('observacoes')} />
             </Campo>
@@ -512,7 +715,11 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
         aberto={confirmarExclusao}
         perigo
         titulo="Excluir proposta?"
-        mensagem="A proposta e os recebimentos dela serão apagados."
+        mensagem={
+          refinada && proposta
+            ? `A proposta ${proposta.numero ? `nº ${proposta.numero} ` : ''}de ${proposta.clienteNome} e os recebimentos dela serão apagados. Não dá para desfazer.`
+            : 'A proposta e os recebimentos dela serão apagados.'
+        }
         textoConfirmar="Excluir"
         carregando={excluir.isPending}
         aoConfirmar={() => excluir.mutate()}

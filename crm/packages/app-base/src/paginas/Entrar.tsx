@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { useConfig } from '../config';
+import { useConfig, useRefinada } from '../config';
 import { aplicarErros, mensagemErro } from '../erros';
 import { useServicos } from '../servicos';
 import { useSessao } from '../sessao/Sessao';
@@ -53,6 +53,8 @@ export function PaginaEntrar() {
 function FormularioLogin({ destino }: { destino: string }) {
   const { entrar } = useSessao();
   const navegar = useNavigate();
+  const refinada = useRefinada();
+  const [mostrar, setMostrar] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const { register, handleSubmit, formState } = useForm<z.infer<typeof esquemaLogin>>({
     resolver: zodResolver(esquemaLogin),
@@ -81,11 +83,26 @@ function FormularioLogin({ destino }: { destino: string }) {
           <Entrada autoComplete="username" autoCapitalize="none" spellCheck={false} {...register('login')} />
         </Campo>
         <Campo rotulo="Senha" erro={formState.errors.senha?.message}>
-          <Entrada type="password" autoComplete="current-password" {...register('senha')} />
+          <Entrada
+            type={refinada && mostrar ? 'text' : 'password'}
+            autoComplete="current-password"
+            {...register('senha')}
+          />
         </Campo>
+        {refinada && (
+          <label className="opcao-marcar">
+            <input type="checkbox" checked={mostrar} onChange={(e) => setMostrar(e.target.checked)} />
+            Mostrar a senha
+          </label>
+        )}
         <Botao type="submit" blocoInteiro carregando={formState.isSubmitting}>
           Entrar
         </Botao>
+        {refinada && (
+          <p className={styles.texto}>
+            Esqueceu a senha? Peça à administradora para redefinir: você entra com 1234 e cria uma nova.
+          </p>
+        )}
       </form>
     </>
   );
@@ -94,6 +111,7 @@ function FormularioLogin({ destino }: { destino: string }) {
 function FormularioPrimeiroAcesso() {
   const { usuarios } = useServicos();
   const { produtoresIniciais } = useConfig();
+  const refinada = useRefinada();
   const { entrar } = useSessao();
   const [erro, setErro] = useState<string | null>(null);
   const { register, handleSubmit, formState, setError } = useForm<z.infer<typeof esquemaAdmin>>({
@@ -116,9 +134,16 @@ function FormularioPrimeiroAcesso() {
   return (
     <>
       <h1 className={styles.titulo}>Primeiro acesso</h1>
-      <p className={styles.texto}>
-        Crie a conta de administrador. Depois você cadastra a equipe em Usuários.
-      </p>
+      {refinada && produtoresIniciais?.length ? (
+        <p className={styles.texto}>
+          Crie a conta de administrador. A equipe já entra cadastrada, com usuário igual ao primeiro nome e
+          senha 1234: {produtoresIniciais.map((p) => p.nome).join(', ')}. Ajuste em Usuários depois.
+        </p>
+      ) : (
+        <p className={styles.texto}>
+          Crie a conta de administrador. Depois você cadastra a equipe em Usuários.
+        </p>
+      )}
       <form className={styles.form} onSubmit={enviar} noValidate>
         {erro && (
           <p className={styles.erro} role="alert">
@@ -128,7 +153,11 @@ function FormularioPrimeiroAcesso() {
         <Campo rotulo="Nome" erro={formState.errors.nome?.message}>
           <Entrada autoComplete="name" {...register('nome')} />
         </Campo>
-        <Campo rotulo="Usuário" erro={formState.errors.login?.message} dica="Ex.: deliziane">
+        <Campo
+          rotulo="Usuário"
+          erro={formState.errors.login?.message}
+          dica={refinada ? 'Sem espaços. Use um nome diferente do da equipe (ex.: admin).' : 'Ex.: deliziane'}
+        >
           <Entrada autoComplete="username" autoCapitalize="none" spellCheck={false} {...register('login')} />
         </Campo>
         <Campo

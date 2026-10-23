@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { useEffect, useId, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Botao } from './Botao';
 import { useInterface } from './Interface';
@@ -26,8 +26,12 @@ const FOCAVEIS =
 const PRIMEIRO_CAMPO =
   '[data-autofoco], input:not([type=hidden]):not([disabled]):not([readonly]), select:not([disabled]), textarea:not([disabled])';
 
-/** Modais abertos, do mais antigo ao mais novo: só o de cima responde ao Esc e prende o foco. */
-const pilha: object[] = [];
+/**
+ * Modais abertos. Só o de cima responde ao Esc e prende o foco. "De cima" é o mais aninhado
+ * (uma confirmação dentro de um formulário), mesmo quando os dois abrem juntos.
+ */
+const pilha: Array<{ profundidade: number }> = [];
+const Profundidade = createContext(0);
 
 /** Janela modal: vira painel inferior no celular, centraliza no desktop. Esc fecha e o foco fica preso. */
 export function Modal({
@@ -43,6 +47,7 @@ export function Modal({
   idDescricao,
 }: ModalProps) {
   const { refinada } = useInterface();
+  const profundidade = useContext(Profundidade) + 1;
   const idTitulo = useId();
   const janela = useRef<HTMLDivElement>(null);
   const [descartar, setDescartar] = useState(false);
@@ -58,16 +63,23 @@ export function Modal({
 
   useEffect(() => {
     if (!aberto) return;
-    const eu = {};
+    const eu = { profundidade };
     pilha.push(eu);
-    const noTopo = () => !refinada || pilha[pilha.length - 1] === eu;
+    const noTopo = () =>
+      !refinada ||
+      pilha.every(
+        (o, i) =>
+          o === eu ||
+          o.profundidade < profundidade ||
+          (o.profundidade === profundidade && i < pilha.indexOf(eu)),
+      );
     const anterior = document.activeElement as HTMLElement | null;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const primeiro = janela.current?.querySelector<HTMLElement>(
       refinada ? PRIMEIRO_CAMPO : '[data-autofoco], input, select, textarea',
     );
-    (primeiro ?? janela.current)?.focus();
+    if (noTopo()) (primeiro ?? janela.current)?.focus();
 
     const teclado = (e: KeyboardEvent) => {
       if (!noTopo()) return;
@@ -108,62 +120,64 @@ export function Modal({
       if (!pilha.length) document.body.style.overflow = overflow;
       anterior?.focus?.();
     };
-  }, [aberto, refinada]);
+  }, [aberto, refinada, profundidade]);
 
   if (!aberto) return null;
   return createPortal(
-    <div
-      className={styles.fundo}
-      onMouseDown={(e) => {
-        if (e.target !== e.currentTarget) return;
-        // Com alterações, um clique fora não fecha nem pergunta: só o X, o Esc ou Cancelar.
-        if (refinada && alterado) return;
-        pedirFechamento();
-      }}
-    >
+    <Profundidade.Provider value={profundidade}>
       <div
-        ref={janela}
-        className={styles.janela}
-        role={refinada ? papel : 'dialog'}
-        aria-modal="true"
-        aria-labelledby={idTitulo}
-        aria-describedby={refinada ? idDescricao : undefined}
-        tabIndex={-1}
-        style={largura ? ({ '--largura': `${largura}px` } as CSSProperties) : undefined}
+        className={styles.fundo}
+        onMouseDown={(e) => {
+          if (e.target !== e.currentTarget) return;
+          // Com alterações, um clique fora não fecha nem pergunta: só o X, o Esc ou Cancelar.
+          if (refinada && alterado) return;
+          pedirFechamento();
+        }}
       >
-        <header className={styles.cabecalho}>
-          <h2 id={idTitulo} className={styles.titulo}>
-            {titulo}
-          </h2>
-          <Botao
-            variante="fantasma"
-            soIcone
-            icone="fechar"
-            onClick={pedirFechamento}
-            disabled={refinada && bloqueado}
-          >
-            Fechar
-          </Botao>
-        </header>
-        <div className={styles.corpo}>{children}</div>
-        {rodape && <footer className={styles.rodape}>{rodape}</footer>}
+        <div
+          ref={janela}
+          className={styles.janela}
+          role={refinada ? papel : 'dialog'}
+          aria-modal="true"
+          aria-labelledby={idTitulo}
+          aria-describedby={refinada ? idDescricao : undefined}
+          tabIndex={-1}
+          style={largura ? ({ '--largura': `${largura}px` } as CSSProperties) : undefined}
+        >
+          <header className={styles.cabecalho}>
+            <h2 id={idTitulo} className={styles.titulo}>
+              {titulo}
+            </h2>
+            <Botao
+              variante="fantasma"
+              soIcone
+              icone="fechar"
+              onClick={pedirFechamento}
+              disabled={refinada && bloqueado}
+            >
+              Fechar
+            </Botao>
+          </header>
+          <div className={styles.corpo}>{children}</div>
+          {rodape && <footer className={styles.rodape}>{rodape}</footer>}
+        </div>
+        {refinada && (
+          <ConfirmarAcao
+            aberto={descartar}
+            titulo="Descartar as alterações?"
+            mensagem="O que você digitou nesta janela ainda não foi salvo."
+            textoConfirmar="Descartar"
+            textoCancelar="Continuar editando"
+            perigo
+            aoCancelar={() => setDescartar(false)}
+            aoConfirmar={() => {
+              setDescartar(false);
+              aoFechar();
+            }}
+          />
+        )}
       </div>
-      {refinada && (
-        <ConfirmarAcao
-          aberto={descartar}
-          titulo="Descartar as alterações?"
-          mensagem="O que você digitou nesta janela ainda não foi salvo."
-          textoConfirmar="Descartar"
-          textoCancelar="Continuar editando"
-          perigo
-          aoCancelar={() => setDescartar(false)}
-          aoConfirmar={() => {
-            setDescartar(false);
-            aoFechar();
-          }}
-        />
-      )}
-    </div>,
+    </Profundidade.Provider>,
     document.body,
   );
 }

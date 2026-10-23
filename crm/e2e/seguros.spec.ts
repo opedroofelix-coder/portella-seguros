@@ -23,8 +23,8 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await primeiroAcesso(page, URL);
     // Os produtores da Portella já entram cadastrados, com senha 1234 e o % padrão
     await irPara(page, 'Usuários');
-    await expect(page.getByRole('row', { name: /Deliziane.*40%/ })).toContainText('Senha 1234');
-    await cadastrarUsuario(page, CORRETOR, 'Corretor');
+    await expect(page.getByRole('row', { name: /Deliziane.*40%/ })).toContainText('Aguardando 1º acesso');
+    await cadastrarUsuario(page, CORRETOR, 'Produtor');
 
     // Cliente novo com validação de CPF
     await irPara(page, 'Clientes');
@@ -93,13 +93,14 @@ test.describe('CRM Seguros — fluxo completo', () => {
 
   test('importa a planilha convertida e distribui a carteira por corretor', async ({ page }) => {
     await primeiroAcesso(page, URL);
-    await cadastrarUsuario(page, CORRETOR, 'Corretor');
+    await cadastrarUsuario(page, CORRETOR, 'Produtor');
     await importar(page, FIXTURE, /Propostas/);
     await irPara(page, 'Apólices');
     await page.getByLabel('Situação').selectOption({ label: 'Todas' });
     await expect(page.getByText(/12 de 12 apólices/)).toBeVisible();
     await irPara(page, 'Propostas');
-    await expect(page.getByRole('table', { name: 'Propostas' }).getByRole('row')).toHaveCount(12 + 1);
+    // 12 propostas + cabeçalho + linha de totais
+    await expect(page.getByRole('table', { name: 'Propostas' }).getByRole('row')).toHaveCount(12 + 2);
     await sair(page);
     await entrarPelaPrimeiraVez(page, URL, CORRETOR);
     await irPara(page, 'Apólices');
@@ -119,7 +120,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     page,
   }) => {
     await primeiroAcesso(page, URL);
-    await cadastrarUsuario(page, { ...CORRETOR, percentual: '30' }, 'Corretor');
+    await cadastrarUsuario(page, { ...CORRETOR, percentual: '30' }, 'Produtor');
     await sair(page);
 
     // Produtor lança a proposta: fica pendente e ele ainda pode editar
@@ -129,15 +130,21 @@ test.describe('CRM Seguros — fluxo completo', () => {
     const form = page.getByRole('dialog', { name: 'Nova proposta' });
     await form.getByLabel('Nome completo do cliente').fill('Cliente Teste Proposta');
     await form.getByLabel('Nº da proposta / apólice').fill('TESTE-900');
-    await form.getByLabel('Seguradora').fill('Porto Seguro');
-    await form.getByLabel('Produto', { exact: true }).fill('Automóvel');
+    await form.getByLabel('Seguradora').selectOption({ label: 'Porto Seguro' });
+    await form.getByLabel('Produto', { exact: true }).selectOption({ label: 'Automóvel' });
+    // Tipo de negócio e prêmio são obrigatórios
+    await page.getByRole('button', { name: 'Enviar para aprovação' }).click();
+    await expect(form.getByText('Escolha o tipo de negócio.')).toBeVisible();
     await form.getByLabel('Tipo de negócio').selectOption({ label: 'Seguro novo' });
-    await form.getByLabel('Prêmio líquido (R$)').fill('1.000,00');
-    await form.getByLabel('Comissão trabalhada (%)').fill('20');
+    await form.getByLabel('Prêmio líquido').fill('1.000');
+    await form.getByLabel('Comissão trabalhada').fill('20');
     await expect(form.getByText('Receberá R$ 60,00')).toBeVisible();
+    await expect(form.getByText('Soma dos produtores').locator('..')).toContainText('30%');
     await page.getByRole('button', { name: 'Enviar para aprovação' }).click();
     await expect(page.getByText('Proposta enviada para aprovação.')).toBeVisible();
-    await expect(page.getByRole('row', { name: /Cliente Teste Proposta/ })).toContainText('Pendente');
+    await expect(page.getByRole('row', { name: /Cliente Teste Proposta/ })).toContainText(
+      'Aguardando aprovação',
+    );
     await sair(page);
 
     // Administradora: aviso no painel e contador no menu; dá a baixa e aprova
@@ -152,7 +159,11 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page
       .getByRole('listitem')
       .filter({ hasText: CORRETOR.nome })
-      .getByRole('button', { name: 'Salvar e aplicar' })
+      .getByRole('button', { name: 'Salvar e aplicar…' })
+      .click();
+    await page
+      .getByRole('alertdialog', { name: /Aplicar 25% às propostas em aberto/ })
+      .getByRole('button', { name: 'Aplicar às propostas' })
       .click();
     await expect(
       page.getByText(`Repasse de ${CORRETOR.nome}: 25%. 1 proposta(s) em aberto atualizada(s).`),
@@ -161,11 +172,11 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await irPara(page, 'Aprovações');
     await page.getByRole('row', { name: /Cliente Teste Proposta/ }).click();
     const aprovar = page.getByRole('dialog', { name: /Cliente Teste Proposta/ });
-    await aprovar.getByRole('button', { name: 'Recebimento' }).click();
-    await aprovar.getByLabel('Valor (R$)').fill('200,00');
+    await aprovar.getByRole('button', { name: 'Adicionar recebimento' }).click();
+    await aprovar.getByLabel('Valor', { exact: true }).fill('200');
     await aprovar.getByLabel('Parcela').fill('1ª');
     await expect(aprovar.getByText('Saldo a receber').locator('..')).toContainText('R$ 0,00');
-    await aprovar.getByRole('button', { name: 'Aprovar' }).click();
+    await aprovar.getByRole('button', { name: 'Aprovar proposta' }).click();
     await expect(page.getByText('Proposta aprovada.')).toBeVisible();
     await expect(page.getByText('Nada para aprovar')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Aprovações', exact: true })).toBeVisible();
@@ -176,7 +187,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page.getByRole('button', { name: 'Novo vale' }).click();
     const vale = page.getByRole('dialog', { name: 'Novo vale' });
     await vale.getByLabel('Produtor').selectOption({ label: CORRETOR.nome });
-    await vale.getByLabel('Valor (R$)').fill('10,00');
+    await vale.getByLabel('Valor', { exact: true }).fill('10');
     await vale.getByLabel('Motivo').fill('Adiantamento');
     await vale.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByRole('table', { name: 'Vales' })).toContainText('R$ 10,00');
@@ -196,7 +207,11 @@ test.describe('CRM Seguros — fluxo completo', () => {
       await page.getByRole('button', { name: botao, exact: true }).click();
       expect((await baixa).suggestedFilename()).toMatch(new RegExp(`corretor-teste.*\\${extensao}$`, 'i'));
     }
-    await page.getByRole('button', { name: 'Registrar pagamento' }).click();
+    // Registrar pagamento confirma valor e data antes de gravar
+    await page.getByRole('button', { name: 'Registrar pagamento…' }).click();
+    const pagamento = page.getByRole('alertdialog', { name: /Registrar o pagamento de Corretor Teste/ });
+    await expect(pagamento.getByLabel('Valor pago')).toHaveValue('40,00');
+    await pagamento.getByRole('button', { name: 'Registrar pagamento' }).click();
     await expect(page.getByText('Pagamento de Corretor Teste registrado.')).toBeVisible();
 
     // Painel de produção

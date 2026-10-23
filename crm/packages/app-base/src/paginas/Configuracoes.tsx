@@ -1,8 +1,18 @@
 import type { TipoCatalogo, Usuario } from '@portella/core';
-import { ROTULO_PERFIL } from '@portella/core';
-import { Botao, CabecalhoPagina, Campo, Cartao, Carregando, Entrada, useAvisos } from '@portella/ui';
+import { normalizar } from '@portella/core';
+import {
+  Botao,
+  CabecalhoPagina,
+  Campo,
+  Cartao,
+  Carregando,
+  ConfirmarAcao,
+  Entrada,
+  useAvisos,
+} from '@portella/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useRefinada, useRotuloPerfil } from '../config';
 import { mensagemErro } from '../erros';
 import { useCatalogo, useEquipe } from '../hooks/dados';
 import { useServicos } from '../servicos';
@@ -55,7 +65,12 @@ function RepasseProdutores() {
             <span>Repasse (%)</span>
           </li>
           {ativos.map((u) => (
-            <LinhaRepasse key={`${u.id}:${u.percentualRepasse ?? ''}`} produtor={u} aplicar={aplicar} />
+            <LinhaRepasse
+              key={`${u.id}:${u.percentualRepasse ?? ''}`}
+              produtor={u}
+              aplicar={aplicar}
+              aoAplicar={() => setAplicar(false)}
+            />
           ))}
         </ul>
       )}
@@ -63,8 +78,20 @@ function RepasseProdutores() {
   );
 }
 
-function LinhaRepasse({ produtor, aplicar }: { produtor: Usuario; aplicar: boolean }) {
+function LinhaRepasse({
+  produtor,
+  aplicar,
+  aoAplicar,
+}: {
+  produtor: Usuario;
+  aplicar: boolean;
+  /** Depois de aplicar às propostas, a opção é desmarcada (não fica ligada para o próximo). */
+  aoAplicar: () => void;
+}) {
   const usuario = useUsuario();
+  const refinada = useRefinada();
+  const rotuloPerfil = useRotuloPerfil();
+  const [confirmar, setConfirmar] = useState(false);
   const { usuarios, propostas } = useServicos();
   const consultas = useQueryClient();
   const { avisar } = useAvisos();
@@ -88,7 +115,9 @@ function LinhaRepasse({ produtor, aplicar }: { produtor: Usuario; aplicar: boole
         texto += ` ${resultado.alteradas} proposta(s) em aberto atualizada(s).`;
         if (resultado.ignoradas)
           texto += ` ${resultado.ignoradas} ficaram como estavam: a soma dos % passaria de 100%.`;
+        if (refinada) aoAplicar();
       }
+      setConfirmar(false);
       avisar(texto);
     },
     onError: (e) => avisar(mensagemErro(e), 'erro'),
@@ -100,12 +129,15 @@ function LinhaRepasse({ produtor, aplicar }: { produtor: Usuario; aplicar: boole
         className={styles.linha}
         onSubmit={(e) => {
           e.preventDefault();
-          if (valido) salvar.mutate();
+          if (!valido) return;
+          // Aplicar às propostas em aberto muda várias propostas de uma vez: confirma antes.
+          if (refinada && aplicar) setConfirmar(true);
+          else salvar.mutate();
         }}
       >
         <span className={styles.nome}>
           <strong>{produtor.nome}</strong>
-          <span className="texto-suave">{ROTULO_PERFIL[produtor.perfil]}</span>
+          <span className="texto-suave">{rotuloPerfil(produtor.perfil)}</span>
         </span>
         <span className={styles.campo}>
           <Entrada
@@ -124,9 +156,20 @@ function LinhaRepasse({ produtor, aplicar }: { produtor: Usuario; aplicar: boole
           carregando={salvar.isPending}
           disabled={!valido || (!mudou && !aplicar)}
         >
-          {aplicar ? 'Salvar e aplicar' : 'Salvar'}
+          {aplicar ? (refinada ? 'Salvar e aplicar…' : 'Salvar e aplicar') : 'Salvar'}
         </Botao>
       </form>
+      {refinada && (
+        <ConfirmarAcao
+          aberto={confirmar}
+          titulo={`Aplicar ${textoPct(pct)}% às propostas em aberto?`}
+          mensagem={`Todas as propostas de ${produtor.nome} com saldo a receber passam a usar ${textoPct(pct)}%. O que já foi recebido continua com o % antigo.`}
+          textoConfirmar="Aplicar às propostas"
+          carregando={salvar.isPending}
+          aoCancelar={() => setConfirmar(false)}
+          aoConfirmar={() => salvar.mutate()}
+        />
+      )}
     </li>
   );
 }
@@ -138,6 +181,8 @@ function EditorCatalogo({ tipo, titulo }: { tipo: TipoCatalogo; titulo: string }
   const consultas = useQueryClient();
   const { avisar } = useAvisos();
   const [novo, setNovo] = useState('');
+  const refinada = useRefinada();
+  const [removendo, setRemovendo] = useState<string | null>(null);
   const salvar = useMutation({
     mutationFn: (lista: string[]) => catalogos.salvar(usuario, tipo, lista),
     onSuccess: () => consultas.invalidateQueries({ queryKey: ['catalogos', tipo] }),
@@ -145,9 +190,24 @@ function EditorCatalogo({ tipo, titulo }: { tipo: TipoCatalogo; titulo: string }
   });
   const incluir = () => {
     if (!novo.trim()) return;
+    if (refinada) {
+      // Sem duplicar ("sul america" = "SulAmérica") e sem perder o texto se der erro.
+      const igual = itens.find(
+        (i) => normalizar(i).replace(/\s/g, '') === normalizar(novo).replace(/\s/g, ''),
+      );
+      if (igual) return avisar(`"${igual}" já está na lista.`, 'erro');
+      salvar.mutate([...itens, novo.trim()], {
+        onSuccess: () => {
+          avisar(`"${novo.trim()}" incluído.`);
+          setNovo('');
+        },
+      });
+      return;
+    }
     salvar.mutate([...itens, novo], { onSuccess: () => avisar(`"${novo.trim()}" incluído.`) });
     setNovo('');
   };
+  const lista = refinada ? [...itens].sort((a, b) => a.localeCompare(b, 'pt-BR')) : itens;
 
   return (
     <Cartao titulo={`${titulo} (${itens.length})`}>
@@ -167,7 +227,7 @@ function EditorCatalogo({ tipo, titulo }: { tipo: TipoCatalogo; titulo: string }
         </Botao>
       </form>
       <ul className="lista-simples">
-        {itens.map((item) => (
+        {lista.map((item) => (
           <li key={item}>
             <div className="linha">
               <span>
@@ -178,14 +238,38 @@ function EditorCatalogo({ tipo, titulo }: { tipo: TipoCatalogo; titulo: string }
                 pequeno
                 soIcone
                 icone="lixeira"
-                onClick={() => salvar.mutate(itens.filter((i) => i !== item))}
+                onClick={() =>
+                  refinada ? setRemovendo(item) : salvar.mutate(itens.filter((i) => i !== item))
+                }
               >
-                {`Remover ${item}`}
+                {refinada ? `Excluir ${item}` : `Remover ${item}`}
               </Botao>
             </div>
           </li>
         ))}
       </ul>
+      {refinada && (
+        <ConfirmarAcao
+          aberto={removendo != null}
+          titulo={`Excluir "${removendo}" da lista?`}
+          mensagem="Some das opções das propostas novas. As propostas já lançadas continuam com esse nome."
+          textoConfirmar="Excluir da lista"
+          perigo
+          carregando={salvar.isPending}
+          aoCancelar={() => setRemovendo(null)}
+          aoConfirmar={() =>
+            salvar.mutate(
+              itens.filter((i) => i !== removendo),
+              {
+                onSuccess: () => {
+                  avisar(`"${removendo}" excluído da lista.`);
+                  setRemovendo(null);
+                },
+              },
+            )
+          }
+        />
+      )}
     </Cartao>
   );
 }

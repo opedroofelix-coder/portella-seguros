@@ -23,9 +23,13 @@ import {
   Selecao,
   Selo,
   Tabela,
+  useAvisos,
 } from '@portella/ui';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useRefinada } from '../config';
+import { mensagemErro } from '../erros';
 import { FormularioProposta } from '../componentes/FormularioProposta';
 import { useColecao, useEquipe, usePendentesAprovacao } from '../hooks/dados';
 import { useServicos } from '../servicos';
@@ -53,8 +57,19 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
   const { propostas } = useServicos();
   const { pode } = useSessao();
   const { equipe, nomeDe } = useEquipe();
-  const { data, isPending } = useColecao<Proposta>('propostas', propostas);
+  const { data, isPending, isError, refetch } = useColecao<Proposta>('propostas', propostas);
   const gestao = pode('financeiro:gerenciar');
+  const refinada = useRefinada();
+  const consultas = useQueryClient();
+  const { avisar } = useAvisos();
+  const aprovar = useMutation({
+    mutationFn: (p: Proposta) => propostas.aprovar(usuario, p.id),
+    onSuccess: async (_, p) => {
+      await consultas.invalidateQueries({ queryKey: ['propostas'] });
+      avisar(`Proposta de ${p.clienteNome} aprovada.`);
+    },
+    onError: (e) => avisar(mensagemErro(e), 'erro'),
+  });
   const [busca, setBusca] = useState('');
   const [status, setStatus] = useState<StatusProposta | ''>('');
   const [produtor, setProdutor] = useState('');
@@ -79,10 +94,31 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
     [data, somentePendentes, status, produtor, tipo, saldo, busca],
   );
 
+  // Interface refinada: colunas ordenáveis e o nº visível no celular (é o que a seguradora usa).
+  const ordenar = <K,>(f: (p: Proposta) => K, cmp: (a: K, b: K) => number) =>
+    refinada ? (a: Proposta, b: Proposta) => cmp(f(a), f(b)) : undefined;
+  const texto = (a: string, b: string) => a.localeCompare(b, 'pt-BR');
+  const num = (a: number, b: number) => a - b;
   const colunas: Coluna<Proposta>[] = [
-    { chave: 'cliente', titulo: 'Cliente', principal: true, render: (p) => p.clienteNome },
-    { chave: 'data', titulo: 'Data', render: (p) => formatarData(p.data) },
-    { chave: 'numero', titulo: 'Nº', ocultarNoMobile: true, render: (p) => p.numero ?? '—' },
+    {
+      chave: 'cliente',
+      titulo: 'Cliente',
+      principal: true,
+      render: (p) => p.clienteNome,
+      ordenar: ordenar((p) => p.clienteNome, texto),
+    },
+    {
+      chave: 'data',
+      titulo: 'Data',
+      render: (p) => formatarData(p.data),
+      ordenar: ordenar((p) => p.data, texto),
+    },
+    {
+      chave: 'numero',
+      titulo: 'Nº',
+      ocultarNoMobile: !refinada,
+      render: (p) => p.numero ?? '—',
+    },
     { chave: 'produto', titulo: 'Seguradora · produto', render: (p) => `${p.companhia} · ${p.produto}` },
     {
       chave: 'tipo',
@@ -102,6 +138,7 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
       titulo: 'Prêmio líquido',
       alinharDireita: true,
       render: (p) => formatarDinheiro(p.premioLiquido),
+      ordenar: ordenar((p) => p.premioLiquido ?? 0, num),
     },
     ...(gestao
       ? [
@@ -123,6 +160,7 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
             titulo: 'Saldo',
             alinharDireita: true,
             render: (p: Proposta) => formatarDinheiro(saldoReceber(p)),
+            ordenar: ordenar(saldoReceber, num),
           },
           {
             chave: 'produtores',
@@ -137,7 +175,7 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
       : [
           {
             chave: 'receberei',
-            titulo: 'Minha comissão prevista',
+            titulo: refinada ? 'Meu repasse previsto' : 'Minha comissão prevista',
             alinharDireita: true,
             render: (p: Proposta) => formatarDinheiro(repassePrevisto(p, percentualDe(p, usuario.id))),
           },
@@ -146,7 +184,19 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
       chave: 'status',
       titulo: 'Situação',
       render: (p) =>
-        p.status === 'pendente' ? (
+        refinada ? (
+          // Aprovação e recebimento são coisas diferentes: um selo para cada.
+          <span className="acoes-linha" style={{ justifyContent: 'flex-start' }}>
+            <Selo tom={p.status === 'pendente' ? 'alerta' : 'sucesso'}>
+              {p.status === 'pendente' ? 'Aguardando aprovação' : ROTULO_STATUS_PROPOSTA.aprovada}
+            </Selo>
+            {gestao && p.status === 'aprovada' && (
+              <Selo tom={saldoReceber(p) > 0 ? 'info' : 'neutro'}>
+                {saldoReceber(p) > 0 ? 'Saldo a receber' : 'Quitada'}
+              </Selo>
+            )}
+          </span>
+        ) : p.status === 'pendente' ? (
           <Selo tom="alerta">Pendente</Selo>
         ) : saldoReceber(p) > 0 ? (
           <Selo tom="info">Com saldo</Selo>
@@ -154,21 +204,63 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
           <Selo tom="sucesso">{ROTULO_STATUS_PROPOSTA.aprovada}</Selo>
         ),
     },
+    ...(refinada && somentePendentes && gestao
+      ? [
+          {
+            chave: 'aprovar',
+            titulo: 'Ações',
+            render: (p: Proposta) => (
+              <Botao
+                pequeno
+                icone="aprovar"
+                carregando={aprovar.isPending && aprovar.variables?.id === p.id}
+                aria-label={`Aprovar a proposta de ${p.clienteNome}`}
+                onClick={() => aprovar.mutate(p)}
+              >
+                Aprovar
+              </Botao>
+            ),
+          },
+        ]
+      : []),
   ];
+
+  const somar = (f: (p: Proposta) => number) => formatarDinheiro(lista.reduce((t, p) => t + f(p), 0));
+  const totais = refinada
+    ? {
+        rotulo: `Total de ${lista.length} proposta${lista.length === 1 ? '' : 's'}`,
+        valores: gestao
+          ? {
+              premio: somar((p) => p.premioLiquido ?? 0),
+              comissao: somar((p) => p.comissaoReceber),
+              recebido: somar(recebidoTotal),
+              saldo: somar(saldoReceber),
+            }
+          : {
+              premio: somar((p) => p.premioLiquido ?? 0),
+              receberei: somar((p) => repassePrevisto(p, percentualDe(p, usuario.id))),
+            },
+      }
+    : undefined;
+  const pendentes = (data ?? []).filter((p) => p.status === 'pendente').length;
 
   return (
     <>
       <CabecalhoPagina
-        titulo={somentePendentes ? <>Aprovações</> : gestao ? 'Propostas' : 'Minhas propostas'}
+        titulo={somentePendentes ? 'Aprovações' : gestao ? 'Propostas' : 'Minhas propostas'}
         descricao={
           somentePendentes
-            ? 'Propostas lançadas pelos produtores. Revise, corrija se preciso e aprove para entrarem no controle.'
+            ? refinada
+              ? `${pendentes} proposta${pendentes === 1 ? '' : 's'} aguardando aprovação. Abra para revisar ou aprove direto na lista.`
+              : 'Propostas lançadas pelos produtores. Revise, corrija se preciso e aprove para entrarem no controle.'
             : `${lista.length} de ${data?.length ?? 0} propostas.`
         }
         acoes={
-          <Botao icone="mais" onClick={() => setEditando('nova')}>
-            Nova proposta
-          </Botao>
+          refinada && somentePendentes ? undefined : (
+            <Botao icone="mais" onClick={() => setEditando('nova')}>
+              Nova proposta
+            </Botao>
+          )
         }
       />
       <Cartao>
@@ -194,11 +286,13 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
             <Campo rotulo="Produtor">
               <Selecao value={produtor} onChange={(e) => setProdutor(e.target.value)}>
                 <option value="">Todos</option>
-                {equipe.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.nome}
-                  </option>
-                ))}
+                {equipe
+                  .filter((u) => !refinada || u.ativo || u.id === produtor)
+                  .map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.nome}
+                    </option>
+                  ))}
                 <option value="-">Corretora (sem produtor)</option>
               </Selecao>
             </Campo>
@@ -221,7 +315,18 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
             </Campo>
           )}
         </BarraFiltros>
-        {isPending ? (
+        {refinada && isError ? (
+          <div role="alert">
+            <EstadoVazio
+              titulo="Não foi possível carregar as propostas"
+              acao={
+                <Botao variante="secundario" onClick={() => refetch()}>
+                  Tentar de novo
+                </Botao>
+              }
+            />
+          </div>
+        ) : isPending ? (
           <Carregando />
         ) : (
           <Tabela
@@ -230,6 +335,7 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
             colunas={colunas}
             chave={(p) => p.id}
             aoClicar={setEditando}
+            totais={totais}
             vazio={
               <EstadoVazio titulo={somentePendentes ? 'Nada para aprovar' : 'Nenhuma proposta'}>
                 {somentePendentes

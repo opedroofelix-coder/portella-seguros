@@ -7,7 +7,9 @@ import {
   hojeISO,
   pagamentoMensal,
   pendentesPorProdutor,
+  lerDinheiro,
   recebidoPrincipal,
+  textoDinheiro,
 } from '@portella/core';
 import {
   Abas,
@@ -17,6 +19,8 @@ import {
   Campo,
   Cartao,
   Carregando,
+  ConfirmarAcao,
+  Entrada,
   EstadoVazio,
   Indicador,
   Selecao,
@@ -25,6 +29,8 @@ import {
   useAvisos,
 } from '@portella/ui';
 import { useMemo, useState } from 'react';
+import { EntradaDinheiro } from '../componentes/Entradas';
+import { useRefinada } from '../config';
 import { mensagemErro } from '../erros';
 import type { DocumentoRelatorio } from '../exportar';
 import { exportarExcel, exportarPdf, nomeArquivo } from '../exportar';
@@ -76,13 +82,16 @@ export function PaginaRelatorios() {
 
 // ------------------------------------------------------------------ Pagamento mensal
 
-function documentoPagamento(p: PagamentoMensal, nomeProdutor: string): DocumentoRelatorio {
+function documentoPagamento(p: PagamentoMensal, nomeProdutor: string, refinada = false): DocumentoRelatorio {
   return {
     titulo: `Pagamento de comissões — ${rotuloMes(p.mes)}`,
     subtitulo: `Produtor: ${nomeProdutor}`,
     arquivo: nomeArquivo('comissoes', nomeProdutor, p.mes),
     resumo: [
-      ['Comissões a receber (repasse)', { dinheiro: p.totalRepasse }],
+      [
+        refinada ? 'Comissões recebidas (repasse)' : 'Comissões a receber (repasse)',
+        { dinheiro: p.totalRepasse },
+      ],
       ['(−) Estornos', { dinheiro: p.totalEstornos }],
       ['(−) Vales', { dinheiro: p.totalVales }],
       ['Líquido a pagar', { dinheiro: p.liquido }],
@@ -184,6 +193,7 @@ function RelatorioPagamento() {
   const { nomeDe } = useEquipe();
   const { dados, carregando } = useDadosComissao();
   const gestao = pode('financeiro:gerenciar');
+  const refinada = useRefinada();
   const meses = useMemo(() => mesesComMovimento(dados), [dados]);
   const [mesEscolhido, setMes] = useState<string | null>(null);
   const mes = mesEscolhido ?? meses[0] ?? hojeISO().slice(0, 7);
@@ -229,6 +239,19 @@ function RelatorioPagamento() {
             itens={fechamento}
             chave={(l) => l.produtorId}
             aoClicar={(l) => setProdutor(l.produtorId)}
+            totais={
+              refinada && fechamento.length
+                ? {
+                    rotulo: 'Total do mês',
+                    valores: {
+                      repasse: formatarDinheiro(fechamento.reduce((t, l) => t + l.totalRepasse, 0)),
+                      estornos: formatarDinheiro(-fechamento.reduce((t, l) => t + l.totalEstornos, 0)),
+                      vales: formatarDinheiro(-fechamento.reduce((t, l) => t + l.totalVales, 0)),
+                      liquido: formatarDinheiro(fechamento.reduce((t, l) => t + l.liquido, 0)),
+                    },
+                  }
+                : undefined
+            }
             vazio={
               <EstadoVazio titulo="Nada neste mês">
                 Lance os recebimentos nas propostas para gerar o pagamento.
@@ -238,7 +261,7 @@ function RelatorioPagamento() {
               { chave: 'produtor', titulo: 'Produtor', principal: true, render: (l) => nomeDe(l.produtorId) },
               {
                 chave: 'repasse',
-                titulo: 'Comissões',
+                titulo: refinada ? 'Repasse' : 'Comissões',
                 alinharDireita: true,
                 render: (l) => formatarDinheiro(l.totalRepasse),
               },
@@ -302,21 +325,37 @@ function DetalhePagamento({
   const registrar = useSalvar<PagamentoProdutor>('pagamentos', pagamentos);
   const { avisar } = useAvisos();
   const gestao = pode('financeiro:gerenciar');
+  const refinada = useRefinada();
+  // Interface refinada: "Registrar pagamento" abre uma confirmação com valor, data e observação.
+  const [confirmando, setConfirmando] = useState(false);
+  const [valorPago, setValorPago] = useState('');
+  const [dataPago, setDataPago] = useState(hojeISO());
+  const [obs, setObs] = useState('');
 
-  const pagar = () =>
+  const pagar = (valor = p.saldo, data = hojeISO(), observacao?: string) =>
     registrar.mutate(
       {
         responsavelId: p.produtorId,
         mes: p.mes,
-        data: hojeISO(),
-        valor: p.saldo,
-        observacoes: `Registrado por ${usuario.nome}.`,
+        data,
+        valor,
+        observacoes: [observacao?.trim(), `Registrado por ${usuario.nome}.`].filter(Boolean).join(' · '),
       },
       {
-        onSuccess: () => avisar(`Pagamento de ${nomeProdutor} registrado.`),
+        onSuccess: () => {
+          avisar(`Pagamento de ${nomeProdutor} registrado.`);
+          setConfirmando(false);
+        },
         onError: (e) => avisar(mensagemErro(e), 'erro'),
       },
     );
+  const abrirConfirmacao = () => {
+    setValorPago(textoDinheiro(Math.max(0, p.saldo)));
+    setDataPago(hojeISO());
+    setObs('');
+    setConfirmando(true);
+  };
+  const valorDigitado = lerDinheiro(valorPago);
 
   return (
     <>
@@ -326,13 +365,16 @@ function DetalhePagamento({
           <div className="acoes-linha">
             {aoVoltar && (
               <Botao variante="fantasma" icone="voltar" onClick={aoVoltar}>
-                Todos
+                {refinada ? 'Voltar ao fechamento' : 'Todos'}
               </Botao>
             )}
-            <BotoesExportar documento={() => documentoPagamento(p, nomeProdutor)} />
+            <BotoesExportar documento={() => documentoPagamento(p, nomeProdutor, refinada)} />
             {gestao && p.saldo !== 0 && (
-              <Botao carregando={registrar.isPending} onClick={pagar}>
-                Registrar pagamento
+              <Botao
+                carregando={!refinada && registrar.isPending}
+                onClick={refinada ? abrirConfirmacao : () => pagar()}
+              >
+                {refinada ? 'Registrar pagamento…' : 'Registrar pagamento'}
               </Botao>
             )}
           </div>
@@ -342,7 +384,7 @@ function DetalhePagamento({
           <Indicador
             tom="primaria"
             icone="moeda"
-            rotulo="Comissões"
+            rotulo={refinada ? 'Repasse das comissões recebidas' : 'Comissões'}
             valor={formatarDinheiro(p.totalRepasse)}
             detalhe={`${p.itens.length} recebimento(s)`}
           />
@@ -421,7 +463,7 @@ function DetalhePagamento({
                   chave: 'valor',
                   titulo: 'Desconto',
                   alinharDireita: true,
-                  render: (e) => formatarDinheiro(e.descontoProdutor),
+                  render: (e) => formatarDinheiro(refinada ? -e.descontoProdutor : e.descontoProdutor),
                 },
               ]}
             />
@@ -439,12 +481,48 @@ function DetalhePagamento({
                   chave: 'valor',
                   titulo: 'Valor',
                   alinharDireita: true,
-                  render: (v) => formatarDinheiro(v.valor),
+                  render: (v) => formatarDinheiro(refinada ? -v.valor : v.valor),
                 },
               ]}
             />
           </Cartao>
         </div>
+      )}
+      {refinada && (
+        <ConfirmarAcao
+          aberto={confirmando}
+          titulo={`Registrar o pagamento de ${nomeProdutor}?`}
+          mensagem={
+            p.saldo < 0
+              ? `Os descontos de ${rotuloMes(p.mes)} passam das comissões: o líquido é ${formatarDinheiro(p.saldo)}. Confira antes de registrar.`
+              : `Líquido a pagar em ${rotuloMes(p.mes)}: ${formatarDinheiro(p.saldo)}.`
+          }
+          textoConfirmar="Registrar pagamento"
+          carregando={registrar.isPending}
+          aoCancelar={() => setConfirmando(false)}
+          aoConfirmar={() =>
+            valorDigitado != null && valorDigitado > 0 && pagar(valorDigitado, dataPago, obs)
+          }
+        >
+          <div className="grade-2">
+            <Campo
+              rotulo="Valor pago"
+              erro={valorDigitado == null || valorDigitado <= 0 ? 'Informe o valor pago.' : undefined}
+            >
+              <EntradaDinheiro value={valorPago} onChange={(e) => setValorPago(e.target.value)} />
+            </Campo>
+            <Campo rotulo="Data do pagamento">
+              <Entrada type="date" value={dataPago} onChange={(e) => setDataPago(e.target.value)} />
+            </Campo>
+            <Campo rotulo="Observação" className="span-todo">
+              <Entrada
+                placeholder="PIX, transferência…"
+                value={obs}
+                onChange={(e) => setObs(e.target.value)}
+              />
+            </Campo>
+          </div>
+        </ConfirmarAcao>
       )}
     </>
   );

@@ -6,7 +6,9 @@ import {
   formatarData,
   formatarDinheiro,
   hojeISO,
+  lerDinheiro,
   paraCentavos,
+  textoDinheiro,
 } from '@portella/core';
 import {
   Abas,
@@ -18,6 +20,7 @@ import {
   Carregando,
   Entrada,
   EstadoVazio,
+  ConfirmarAcao,
   Modal,
   Selecao,
   Tabela,
@@ -26,13 +29,17 @@ import {
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { EntradaDinheiro } from '../componentes/Entradas';
+import { useRefinada } from '../config';
 import { aplicarErros, mensagemErro } from '../erros';
 import { useCatalogo, useColecao, useEquipe, useRemover, useSalvar } from '../hooks/dados';
 import { useServicos } from '../servicos';
 import { useSessao } from '../sessao/Sessao';
 
 const valor = z.string().refine((v) => paraCentavos(v) != null && paraCentavos(v)! >= 0, 'Informe o valor.');
-const cent = (t: string) => paraCentavos(t) ?? 0;
+const cent = (t: string, refinada = false) => (refinada ? lerDinheiro : paraCentavos)(t) ?? 0;
+const textoValor = (c: number | undefined, refinada: boolean) =>
+  (refinada ? textoDinheiro : centavosParaTexto)(c);
 
 export function PaginaEstornosVales() {
   const [aba, setAba] = useState<'estornos' | 'vales'>('estornos');
@@ -72,22 +79,30 @@ function useFiltroProdutor() {
   const [busca, setBusca] = useState('');
   const { equipe } = useEquipe();
   const { pode } = useSessao();
+  const refinada = useRefinada();
   const filtros = (
     <>
       {pode('carteira:ver_todos') && (
         <Campo rotulo="Produtor">
           <Selecao value={produtor} onChange={(e) => setProdutor(e.target.value)}>
             <option value="">Todos</option>
-            {equipe.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.nome}
-              </option>
-            ))}
+            {equipe
+              .filter((u) => !refinada || u.ativo || u.id === produtor)
+              .map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nome}
+                </option>
+              ))}
           </Selecao>
         </Campo>
       )}
       <Campo rotulo="Buscar">
-        <Entrada type="search" value={busca} onChange={(e) => setBusca(e.target.value)} />
+        <Entrada
+          type="search"
+          placeholder={refinada ? 'Segurado, apólice, motivo…' : undefined}
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
       </Campo>
     </>
   );
@@ -193,6 +208,18 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
   const salvar = useSalvar<Estorno>('estornos', estornos);
   const remover = useRemover<Estorno>('estornos', estornos);
   const { avisar } = useAvisos();
+  const refinada = useRefinada();
+  const [confirmarRemocao, setConfirmarRemocao] = useState(false);
+  const removerAgora = () =>
+    estorno &&
+    remover.mutate(estorno.id, {
+      onSuccess: () => {
+        avisar(refinada ? 'Estorno excluído.' : 'Estorno removido.');
+        aoFechar();
+      },
+      // Sem a interface refinada a exclusão ficava sem aviso de erro; mantido igual.
+      onError: (e) => refinada && avisar(mensagemErro(e), 'erro'),
+    });
   const { register, handleSubmit, formState, setError } = useForm<z.infer<typeof esquemaEstorno>>({
     resolver: zodResolver(esquemaEstorno),
     defaultValues: {
@@ -202,8 +229,8 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
       companhia: estorno?.companhia ?? '',
       produto: estorno?.produto ?? '',
       data: estorno?.data ?? hojeISO(),
-      valor: centavosParaTexto(estorno?.valor),
-      descontoProdutor: centavosParaTexto(estorno?.descontoProdutor),
+      valor: textoValor(estorno?.valor, refinada),
+      descontoProdutor: textoValor(estorno?.descontoProdutor, refinada),
       observacoes: estorno?.observacoes ?? '',
     },
   });
@@ -213,8 +240,8 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
       ...v,
       numeroApolice: v.numeroApolice.trim() || undefined,
       observacoes: v.observacoes.trim() || undefined,
-      valor: cent(v.valor),
-      descontoProdutor: cent(v.descontoProdutor),
+      valor: cent(v.valor, refinada),
+      descontoProdutor: cent(v.descontoProdutor, refinada),
     };
     try {
       await salvar.mutateAsync(dados);
@@ -231,21 +258,17 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
       aberto
       titulo={estorno ? 'Editar estorno' : 'Novo estorno'}
       aoFechar={aoFechar}
+      alterado={formState.isDirty}
+      bloqueado={formState.isSubmitting}
       rodape={
         <>
           {estorno && (
             <Botao
               variante="perigo"
-              onClick={() =>
-                remover.mutate(estorno.id, {
-                  onSuccess: () => {
-                    avisar('Estorno removido.');
-                    aoFechar();
-                  },
-                })
-              }
+              icone={refinada ? 'lixeira' : undefined}
+              onClick={refinada ? () => setConfirmarRemocao(true) : removerAgora}
             >
-              Remover
+              {refinada ? 'Excluir' : 'Remover'}
             </Botao>
           )}
           <Botao variante="secundario" onClick={aoFechar}>
@@ -286,23 +309,55 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
         <Campo rotulo="Produtor" obrigatorio erro={erros.responsavelId?.message}>
           <Selecao {...register('responsavelId')}>
             <option value="">Escolha…</option>
-            {equipe.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.nome}
-              </option>
-            ))}
+            {equipe
+              .filter((u) => !refinada || u.ativo || u.id === estorno?.responsavelId)
+              .map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nome}
+                </option>
+              ))}
           </Selecao>
         </Campo>
-        <Campo rotulo="Comissão estornada pela seguradora (R$)" obrigatorio erro={erros.valor?.message}>
-          <Entrada inputMode="decimal" {...register('valor')} />
-        </Campo>
-        <Campo rotulo="Desconto do produtor (R$)" obrigatorio erro={erros.descontoProdutor?.message}>
-          <Entrada inputMode="decimal" {...register('descontoProdutor')} />
-        </Campo>
+        {refinada ? (
+          <>
+            <Campo rotulo="Comissão estornada pela seguradora" obrigatorio erro={erros.valor?.message}>
+              <EntradaDinheiro {...register('valor')} />
+            </Campo>
+            <Campo
+              rotulo="Desconto do produtor"
+              obrigatorio
+              erro={erros.descontoProdutor?.message}
+              dica="Em geral, o valor estornado × o % do produtor na venda."
+            >
+              <EntradaDinheiro {...register('descontoProdutor')} />
+            </Campo>
+          </>
+        ) : (
+          <>
+            <Campo rotulo="Comissão estornada pela seguradora (R$)" obrigatorio erro={erros.valor?.message}>
+              <Entrada inputMode="decimal" {...register('valor')} />
+            </Campo>
+            <Campo rotulo="Desconto do produtor (R$)" obrigatorio erro={erros.descontoProdutor?.message}>
+              <Entrada inputMode="decimal" {...register('descontoProdutor')} />
+            </Campo>
+          </>
+        )}
         <Campo rotulo="Observações" className="span-todo">
           <Entrada {...register('observacoes')} />
         </Campo>
       </form>
+      {estorno && (
+        <ConfirmarAcao
+          aberto={confirmarRemocao}
+          titulo="Excluir o estorno?"
+          mensagem={`O estorno de ${estorno.segurado} deixa de descontar do pagamento do produtor.`}
+          textoConfirmar="Excluir estorno"
+          perigo
+          carregando={remover.isPending}
+          aoCancelar={() => setConfirmarRemocao(false)}
+          aoConfirmar={removerAgora}
+        />
+      )}
     </Modal>
   );
 }
@@ -380,12 +435,24 @@ function FormularioVale({ vale, aoFechar }: { vale?: Vale; aoFechar: () => void 
   const salvar = useSalvar<Vale>('vales', vales);
   const remover = useRemover<Vale>('vales', vales);
   const { avisar } = useAvisos();
+  const refinada = useRefinada();
+  const [confirmarRemocao, setConfirmarRemocao] = useState(false);
+  const removerAgora = () =>
+    vale &&
+    remover.mutate(vale.id, {
+      onSuccess: () => {
+        avisar(refinada ? 'Vale excluído.' : 'Vale removido.');
+        aoFechar();
+      },
+      // Sem a interface refinada a exclusão ficava sem aviso de erro; mantido igual.
+      onError: (e) => refinada && avisar(mensagemErro(e), 'erro'),
+    });
   const { register, handleSubmit, formState, setError } = useForm<z.infer<typeof esquemaVale>>({
     resolver: zodResolver(esquemaVale),
     defaultValues: {
       responsavelId: vale?.responsavelId ?? '',
       data: vale?.data ?? hojeISO(),
-      valor: centavosParaTexto(vale?.valor),
+      valor: textoValor(vale?.valor, refinada),
       motivo: vale?.motivo ?? '',
     },
   });
@@ -395,7 +462,7 @@ function FormularioVale({ vale, aoFechar }: { vale?: Vale; aoFechar: () => void 
         ...(vale ?? {}),
         ...v,
         motivo: v.motivo.trim() || undefined,
-        valor: cent(v.valor),
+        valor: cent(v.valor, refinada),
       });
       avisar('Vale salvo.');
       aoFechar();
@@ -411,21 +478,17 @@ function FormularioVale({ vale, aoFechar }: { vale?: Vale; aoFechar: () => void 
       largura={520}
       titulo={vale ? 'Editar vale' : 'Novo vale'}
       aoFechar={aoFechar}
+      alterado={formState.isDirty}
+      bloqueado={formState.isSubmitting}
       rodape={
         <>
           {vale && (
             <Botao
               variante="perigo"
-              onClick={() =>
-                remover.mutate(vale.id, {
-                  onSuccess: () => {
-                    avisar('Vale removido.');
-                    aoFechar();
-                  },
-                })
-              }
+              icone={refinada ? 'lixeira' : undefined}
+              onClick={refinada ? () => setConfirmarRemocao(true) : removerAgora}
             >
-              Remover
+              {refinada ? 'Excluir' : 'Remover'}
             </Botao>
           )}
           <Botao variante="secundario" onClick={aoFechar}>
@@ -441,23 +504,41 @@ function FormularioVale({ vale, aoFechar }: { vale?: Vale; aoFechar: () => void 
         <Campo rotulo="Produtor" obrigatorio erro={erros.responsavelId?.message}>
           <Selecao {...register('responsavelId')}>
             <option value="">Escolha…</option>
-            {equipe.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.nome}
-              </option>
-            ))}
+            {equipe
+              .filter((u) => !refinada || u.ativo || u.id === vale?.responsavelId)
+              .map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nome}
+                </option>
+              ))}
           </Selecao>
         </Campo>
         <Campo rotulo="Data" obrigatorio erro={erros.data?.message}>
           <Entrada type="date" {...register('data')} />
         </Campo>
-        <Campo rotulo="Valor (R$)" obrigatorio erro={erros.valor?.message}>
-          <Entrada inputMode="decimal" {...register('valor')} />
+        <Campo rotulo={refinada ? 'Valor' : 'Valor (R$)'} obrigatorio erro={erros.valor?.message}>
+          {refinada ? (
+            <EntradaDinheiro {...register('valor')} />
+          ) : (
+            <Entrada inputMode="decimal" {...register('valor')} />
+          )}
         </Campo>
         <Campo rotulo="Motivo">
           <Entrada {...register('motivo')} />
         </Campo>
       </form>
+      {vale && (
+        <ConfirmarAcao
+          aberto={confirmarRemocao}
+          titulo="Excluir o vale?"
+          mensagem="O vale deixa de descontar do pagamento do produtor."
+          textoConfirmar="Excluir vale"
+          perigo
+          carregando={remover.isPending}
+          aoCancelar={() => setConfirmarRemocao(false)}
+          aoConfirmar={removerAgora}
+        />
+      )}
     </Modal>
   );
 }

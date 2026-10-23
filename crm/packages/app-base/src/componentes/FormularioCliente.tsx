@@ -4,11 +4,15 @@ import { formatarDocumento, formatarTelefone, somenteDigitos } from '@portella/c
 import { AreaTexto, Botao, Campo, Entrada, Modal, Selecao, useAvisos } from '@portella/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useRefinada } from '../config';
 import { aplicarErros, limparVazios, mensagemErro } from '../erros';
 import { useSalvar } from '../hooks/dados';
 import { useServicos } from '../servicos';
 import { useUsuario } from '../sessao/Sessao';
+import { EntradaMascara } from './Entradas';
 import { SeletorResponsavel } from './SeletorResponsavel';
+
+const UFS = 'AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO'.split(' ');
 
 const esquema = z.object({
   tipoPessoa: z.enum(['PF', 'PJ']),
@@ -66,6 +70,7 @@ export function FormularioCliente({
   const { clientes } = useServicos();
   const { avisar } = useAvisos();
   const salvar = useSalvar('clientes', clientes);
+  const refinada = useRefinada();
   const { register, handleSubmit, formState, setError, watch } = useForm<Valores>({
     resolver: zodResolver(esquema),
     defaultValues: valoresIniciais(cliente, usuario.id),
@@ -87,6 +92,8 @@ export function FormularioCliente({
       const salvo = await salvar.mutateAsync({
         ...(cliente ?? {}),
         ...resto,
+        // Pessoa jurídica não tem data de nascimento (o campo some, o valor não fica guardado).
+        ...(refinada && resto.tipoPessoa === 'PJ' ? { dataNascimento: undefined } : {}),
         documento: resto.documento ? somenteDigitos(resto.documento) : undefined,
         telefone: resto.telefone ? somenteDigitos(resto.telefone) : undefined,
         endereco: Object.values(endereco).some(Boolean) ? endereco : undefined,
@@ -107,6 +114,8 @@ export function FormularioCliente({
       largura={760}
       titulo={cliente ? 'Editar cliente' : 'Novo cliente'}
       aoFechar={aoFechar}
+      alterado={formState.isDirty}
+      bloqueado={formState.isSubmitting}
       rodape={
         <>
           <Botao variante="secundario" onClick={aoFechar}>
@@ -133,10 +142,27 @@ export function FormularioCliente({
           <Entrada autoComplete="off" {...register('nome')} />
         </Campo>
         <Campo rotulo={tipo === 'PF' ? 'CPF' : 'CNPJ'} erro={erros.documento?.message}>
-          <Entrada inputMode="numeric" {...register('documento')} />
+          {refinada ? (
+            <EntradaMascara
+              mascara="documento"
+              placeholder={tipo === 'PF' ? '000.000.000-00' : '00.000.000/0000-00'}
+              {...register('documento')}
+            />
+          ) : (
+            <Entrada inputMode="numeric" {...register('documento')} />
+          )}
         </Campo>
         <Campo rotulo="Telefone / WhatsApp" erro={erros.telefone?.message}>
-          <Entrada type="tel" inputMode="tel" placeholder="(11) 90000-0000" {...register('telefone')} />
+          {refinada ? (
+            <EntradaMascara
+              mascara="telefone"
+              type="tel"
+              placeholder="(11) 90000-0000"
+              {...register('telefone')}
+            />
+          ) : (
+            <Entrada type="tel" inputMode="tel" placeholder="(11) 90000-0000" {...register('telefone')} />
+          )}
         </Campo>
         <Campo rotulo="E-mail" erro={erros.email?.message}>
           <Entrada type="email" inputMode="email" {...register('email')} />
@@ -147,7 +173,11 @@ export function FormularioCliente({
           </Campo>
         )}
         <Campo rotulo="CEP">
-          <Entrada inputMode="numeric" {...register('cep')} />
+          {refinada ? (
+            <EntradaMascara mascara="cep" placeholder="00000-000" {...register('cep')} />
+          ) : (
+            <Entrada inputMode="numeric" {...register('cep')} />
+          )}
         </Campo>
         <Campo rotulo="Endereço">
           <Entrada {...register('logradouro')} />
@@ -165,7 +195,16 @@ export function FormularioCliente({
           <Entrada {...register('cidade')} />
         </Campo>
         <Campo rotulo="UF" erro={erros.uf?.message}>
-          <Entrada maxLength={2} {...register('uf')} />
+          {refinada ? (
+            <Selecao {...register('uf')}>
+              <option value="">—</option>
+              {UFS.map((uf) => (
+                <option key={uf}>{uf}</option>
+              ))}
+            </Selecao>
+          ) : (
+            <Entrada maxLength={2} {...register('uf')} />
+          )}
         </Campo>
         <SeletorResponsavel {...register('responsavelId')} />
         <Campo rotulo="Observações" className="span-todo">

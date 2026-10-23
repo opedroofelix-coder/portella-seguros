@@ -1,4 +1,5 @@
-import type { Acao, Cliente, ProdutorInicial, Usuario } from '@portella/core';
+import type { Acao, Cliente, Perfil, ProdutorInicial, Usuario } from '@portella/core';
+import { ROTULO_PERFIL } from '@portella/core';
 import type { ItemMenu } from '@portella/ui';
 import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
@@ -54,3 +55,9 @@ export function useConfig(): ConfigApp {
 
 /** A revisão de UX está ligada neste app? */
 export const useRefinada = () => useConfig().interface === 'refinada';
+
+/** Nome do perfil na tela: com a interface refinada, "Produtor" (o termo da Portella) no lugar de "Corretor". */
+export function useRotuloPerfil() {
+  const refinada = useRefinada();
+  return (perfil: Perfil) => (refinada && perfil === 'corretor' ? 'Produtor' : ROTULO_PERFIL[perfil]);
+}
