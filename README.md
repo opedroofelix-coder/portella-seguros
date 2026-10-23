@@ -81,6 +81,8 @@ Com o cache de 1 dia são cerca de 30 consultas por mês.
 - [x] Resposta da pergunta "A cotação tem algum custo?": não tem custo.
 - [ ] Integração do formulário de contato (hoje abre o e-mail via `mailto:`).
 - [ ] Páginas legais (Privacidade, Termos, LGPD, Cookies).
-- [ ] Próximas etapas: CRM de seguros e consórcio.
+- [ ] CRM de seguros e consórcio: em `crm/` (React), especificação em `docs/CRM.md`. O CRM de Seguros
+  passou pela revisão de UX/UI (visual Noir Dourado e interface refinada). Falta escolher o backend para
+  os dados serem compartilhados entre computadores.
 
 Os pontos a preencher estão marcados no código com `TODO` ou `[inserir]`.

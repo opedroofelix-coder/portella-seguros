@@ -173,9 +173,11 @@ Regras extras:
 ## 3. CRM de Seguros
 
 **Painel**
-- Apólices ativas, renovações em 30/60/90 dias, prêmio ativo e comissão prevista.
-- Próximas renovações e distribuição por seguradora e por ramo.
-- Resumo do funil de cotações.
+- Apólices vigentes (as "a iniciar" à parte), renovações em até 30/60/90 dias, prêmio líquido vigente
+  e comissão prevista. Os indicadores levam às telas de Apólices e Renovações.
+- Renovações dos próximos 30 dias (as mesmas do indicador; as vencidas ficam na fila de Renovações).
+- Tabela por seguradora (prêmio líquido e quantidade, com "Outras"), gráfico por ramo e resumo do funil.
+- O produtor não vê a comissão da corretora: no lugar dela aparecem as cotações em aberto.
 
 **Clientes**
 - Pessoa física ou jurídica, com validação de CPF/CNPJ, telefone/WhatsApp, e-mail, endereço e observações.
@@ -183,25 +185,37 @@ Regras extras:
 - A ficha do cliente mostra os dados e as apólices dele, com botão para o WhatsApp.
 
 **Apólices**
-- Seguradora: uma das 12 parceiras (Porto Seguro, HDI, Ituran, Azul, Suhai, Tokio Marine,
-  SulAmérica, Liberty, Bradesco Seguros, Mapfre, Allianz, Sompo) ou "Outra".
+- Seguradora: uma das parceiras (as mesmas da faixa do site: Porto Seguro, Allianz, Bradesco Seguros,
+  SulAmérica, Tokio Marine, HDI, Mapfre, Yelum, Azul, Suhai, Ituran, Justos, Youse e Pier, além da
+  Sompo, que não faz mais automóvel e por isso não aparece no ramo Auto) ou "Outra".
+- A Liberty virou Yelum: as apólices antigas guardadas como Liberty aparecem como "Yelum (antiga Liberty)",
+  e a importação reconhece os dois nomes.
 - Ramo: Auto, Vida, Previdência, Saúde, Residencial, Fiança Locatícia, Responsabilidade Civil, Empresarial,
   Dental, Transportes, Equipamentos portáteis (bike, celular, câmera), Pet ou Outros.
-- Seguradoras fora das 12 parceiras (Yelum, GNDI, Mitsui, Akad, Aliro…) ficam pelo nome.
+- Seguradoras fora das parceiras (GNDI, Mitsui, Akad, Aliro…) ficam pelo nome e aparecem no filtro.
 - Campos: nº da apólice, bem segurado, vigência, prêmio líquido, prêmio total, comissão (%) e forma de pagamento.
-- Situação calculada pela data: **vigente**, **a vencer** (até 30 dias), **vencida** ou **cancelada**.
-- Contratos contínuos (vida, saúde, dental…) ficam sem fim de vigência e não entram na fila de renovação.
+- Situação calculada pela data: **a iniciar** (início no futuro, como a apólice nova de uma renovação),
+  **vigente**, **a vencer** (até 30 dias), **vencida**, **renovada** (venceu, mas já foi renovada) ou
+  **cancelada**. Assim a renovação não conta em dobro no Painel.
+- Contratos contínuos (vida, saúde, dental…) ficam sem fim de vigência e não entram na fila de renovação:
+  ao escolher um desses ramos, o formulário limpa o fim da vigência.
+- A lista abre pelas vigentes e a vencer, com filtros de situação, seguradora, ramo, vigência estimada,
+  renovação e produtor, colunas ordenáveis e o total de prêmio líquido e comissão.
 - **Vigência estimada**: a planilha não tem o fim da vigência; nas apólices importadas de ramos anuais
-  o fim é a data da proposta + 12 meses e aparece como "(estimada)" até alguém confirmar na edição.
-- Comissão prevista = prêmio líquido × comissão (%).
+  o fim é a data da proposta + 12 meses e aparece como "(estimada)" até alguém confirmar na edição
+  (mudar a data já confirma). O filtro "Vigência: estimada" lista as que faltam conferir.
+- Comissão prevista = prêmio líquido × comissão (%), mostrada ao digitar. Administração e gestão excluem
+  apólices, com confirmação.
 
 **Renovações**
 - Fila das apólices que vencem em 15, 30, 60 ou 90 dias (e das vencidas há até 30 dias) e ainda não foram renovadas.
-- Ações: chamar no WhatsApp (marca como "em contato"), **Renovar** (cria a apólice nova
-  com 12 meses de vigência e marca a anterior como renovada) e "Não renovou".
+- Ações: chamar no WhatsApp com a mensagem pronta (marca como "em contato"), **Renovar** (cria a apólice
+  nova com 12 meses de vigência e marca a anterior como renovada) e "Não renovou", que pede confirmação e
+  o motivo (preço, outra corretora, vendeu o bem, sem retorno, outro). Busca e filtro de contato.
 
 **Cotações (funil)**
-- Etapas: Novo → Em contato → Proposta enviada → Fechado / Perdido (com motivo).
+- Etapas: Novo → Em contato → Proposta enviada → Fechado / Perdido (com motivo: mover para Perdido pede o
+  motivo). Os produtos são os mesmos de Propostas (lista de Configurações).
 - Indicadores: em aberto, propostas enviadas, fechadas e taxa de conversão.
 
 ## 4. CRM de Consórcio (sistema separado)
@@ -257,8 +271,11 @@ Substitui as abas "Bradesco", "Demonstrativo" e "Faturamento". A poupança ficou
 - **Resumo do mês**: saldo da conta corrente, entradas, saídas, despesas em aberto, saldos por
   conta, faturamento mensal e próximas despesas.
 - **Extrato**: movimentos da conta (Bradesco) com saldo acumulado.
-- **Despesas**: contas a pagar com vencimento, pagamento e situação (paga, em aberto, vencida); botão **Pagar**.
-- **Faturamento**: fechamento mensal (comissões recebidas e crédito de consórcio vendido).
+- **Despesas**: contas a pagar com vencimento, pagamento e situação (paga, em aberto, vencida). **Pagar…**
+  pede a data e, se marcado, lança a saída no extrato Bradesco, para despesas e conta baterem.
+- **Faturamento**: fechamento mensal (comissões recebidas e crédito de consórcio vendido), com total por ano.
+  Fechar de novo um mês que já tem fechamento pede confirmação.
+- A aba fica no endereço (`/financeiro?aba=extrato`) e o mês padrão nunca é um mês futuro.
 
 ## 5. Importação da planilha
 
@@ -360,8 +377,19 @@ crm/
   `apps/*/src/infrastructure/container.ts`. O ESLint impede que o `core` importe React ou infraestrutura.
 - **Stack**: React 18, TypeScript estrito, Vite, React Router, TanStack Query, React Hook Form + Zod, CSS Modules.
 - **Visual**: layout de painel de gestão (menu lateral marinho com grupos Principal, Relatórios e
-  Sistema; barra superior branca com título e ações; indicadores com faixa colorida e ícone), nas cores
+  Sistema; barra superior com título e ações; indicadores com faixa e ícone), nas cores
   do site: marinho #1A2B4B e dourado #C9A85E, Lora nos títulos e Jost no resto.
+- **CRM Seguros: direção Noir Dourado aprovada** (revisão de UX/UI de 23/10/2026). Com
+  `<html data-app="seguros">`, `apps/crm-seguros/src/presentation/seguros.css` redefine os tokens:
+  superfícies marfim (#F2ECE1/#FBF9F4/#F7F3EC), cantos de 2 px, fios dourados no lugar das sombras,
+  botão principal dourado com texto marinho (7,3:1), foco marinho visível, bordas de campo com 3:1.
+  Os componentes leem esses tokens com o valor antigo de reserva, por isso o Consórcio não muda.
+- **Interface refinada** (`ConfigApp.interface = 'refinada'`, ligada só no Seguros): confirmações antes
+  de excluir, pagar, aplicar repasse e importar; campos de R$ e % com máscara ("1.500" = R$ 1.500,00);
+  CPF/CNPJ, telefone e CEP com máscara; pilha de modais (Esc fecha só a de cima) e aviso de alterações
+  não salvas; tabelas ordenáveis e com totais; menu do celular fora do Tab quando fechado; avisos de erro
+  que ficam até serem dispensados; "Produtor" no lugar de "Corretor". Para levar ao Consórcio, basta
+  ligar a mesma opção no `App.tsx` dele.
 - **Tema**: claro (padrão), escuro ou automático (segue o aparelho), no rodapé do menu e em Minha conta.
   A escolha fica no navegador (`portella-crm:tema`) e um script no `index.html` aplica o tema antes da
   primeira pintura. As cores são tokens semânticos em `packages/ui/src/styles/global.css`
@@ -383,7 +411,7 @@ de `core/application/permissoes.ts` viram políticas no servidor.
 | Comando (em `crm/`) | O que faz |
 |---|---|
 | `npm test` | testes unitários e de componentes (Vitest) |
-| `npm run test:e2e` | fluxos completos e responsividade em 360, 768 e 1280 px (Playwright) |
+| `npm run test:e2e` | fluxos completos e responsividade em 360, 768 e 1280 px (Playwright). Em ambientes onde o Playwright não consegue subir os servidores sozinho, suba-os antes (`npm run catalogo`, `dev:seguros`, `dev:consorcio` e os dois modos demonstração nas portas 5185/5186): ele reaproveita os que estiverem rodando |
 | `npm run typecheck` | TypeScript estrito |
 | `npm run lint` | ESLint, incluindo as regras de camadas |
 | `npm run build` | build de produção dos dois apps (PWA) |
