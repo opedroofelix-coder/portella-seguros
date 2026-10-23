@@ -1,7 +1,11 @@
-import type { Acao } from '@portella/core';
+import type { Acao, Cliente } from '@portella/core';
+import { corresponde } from '@portella/core';
+import type { ResultadoBusca } from '@portella/ui';
 import {
   CabecalhoPagina,
   classesBotao,
+  Icone,
+  normalizarBusca,
   EstadoVazio,
   Estrutura,
   ProvedorAvisos,
@@ -9,7 +13,7 @@ import {
 } from '@portella/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { BrowserRouter, HashRouter, Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import type { ConfigApp, ItemMenuApp } from './config';
 import { ProvedorConfig, useConfig as useConfigInterno, useRefinada, useRotuloPerfil } from './config';
@@ -28,7 +32,8 @@ import type { ServicosBase } from './servicos';
 import { ProvedorServicos } from './servicos';
 import { ExigePermissao, RotaProtegida } from './sessao/Rotas';
 import { ProvedorSessao, useSessao, useUsuario } from './sessao/Sessao';
-import { usePendentesAprovacao } from './hooks/dados';
+import { useColecao, usePendentesAprovacao } from './hooks/dados';
+import { useServicos } from './servicos';
 
 export interface RotaApp {
   caminho: string;
@@ -184,16 +189,28 @@ export function AppCrm<S extends ServicosBase>({
 }
 
 function Layout() {
-  const { sistema, logo, menu } = useConfigMenu();
+  const { sistema, logo, menu, navegacao, marca } = useConfigMenu();
   const usuario = useUsuario();
   const { sair } = useSessao();
   const navegar = useNavigate();
   const rotuloPerfil = useRotuloPerfil();
+  const buscar = useBuscaGlobal(navegacao === 'topo');
   return (
     <Estrutura
       sistema={sistema}
       logo={logo}
       menu={menu}
+      navegacao={navegacao}
+      marca={marca}
+      buscar={buscar}
+      acaoTopo={
+        navegacao === 'topo' ? (
+          <Link className={classesBotao()} to="/propostas?nova=1">
+            <Icone nome="mais" tamanho={18} />
+            Nova proposta
+          </Link>
+        ) : undefined
+      }
       usuario={{ nome: usuario.nome, perfil: rotuloPerfil(usuario.perfil) }}
       aoSair={async () => {
         // Vai para o login antes de encerrar a sessão, para não guardar a página atual
@@ -205,6 +222,42 @@ function Layout() {
       <Outlet />
     </Estrutura>
   );
+}
+
+/** Busca rápida (Ctrl K): páginas do menu e clientes, sem acento e sem diferença de maiúsculas. */
+function useBuscaGlobal(ligada: boolean) {
+  const { menu } = useConfigMenu();
+  const { clientes } = useServicos();
+  const { data: listaClientes = [] } = useColecao<Cliente>('clientes', clientes, { enabled: ligada });
+  const buscar = useCallback(
+    (texto: string): ResultadoBusca[] => {
+      const termo = normalizarBusca(texto);
+      const paginas = menu
+        .filter((i) => !termo || normalizarBusca(i.rotulo).includes(termo))
+        .map((i) => ({
+          id: `p:${i.para}`,
+          titulo: i.rotulo,
+          grupo: 'Páginas',
+          icone: i.icone,
+          para: i.para,
+        }));
+      if (!termo) return paginas.slice(0, 6);
+      const achados = listaClientes
+        .filter((c) => corresponde(texto, c.nome, c.documento, c.telefone))
+        .slice(0, 6)
+        .map((c) => ({
+          id: `c:${c.id}`,
+          titulo: c.nome,
+          detalhe: c.documento || c.telefone || undefined,
+          grupo: 'Clientes',
+          icone: 'clientes' as const,
+          para: `/clientes/${c.id}`,
+        }));
+      return [...paginas, ...achados];
+    },
+    [menu, listaClientes],
+  );
+  return ligada ? buscar : undefined;
 }
 
 function useConfigMenu() {

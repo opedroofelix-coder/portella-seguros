@@ -16,9 +16,13 @@ import { useUsuario } from '../sessao/Sessao';
 import { useServicos } from '../servicos';
 
 /** Lista os registros visíveis para o usuário logado. */
-export function useColecao<T extends Registro>(chave: string, servico: ServicoCarteira<T>) {
+export function useColecao<T extends Registro>(
+  chave: string,
+  servico: ServicoCarteira<T>,
+  opcoes: { enabled?: boolean } = {},
+) {
   const usuario = useUsuario();
-  return useQuery({ queryKey: [chave, usuario.id], queryFn: () => servico.listar(usuario) });
+  return useQuery({ queryKey: [chave, usuario.id], queryFn: () => servico.listar(usuario), ...opcoes });
 }
 
 export function useSalvar<T extends Registro>(chave: string, servico: ServicoCarteira<T>) {

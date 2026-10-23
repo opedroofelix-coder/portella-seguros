@@ -6,7 +6,7 @@
   min-height: var(--touch);
   padding: 9px 16px;
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--botao-raio, var(--radius));
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;

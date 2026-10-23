@@ -1,65 +1,89 @@
 /*
- * CRM Seguros: direção Noir Dourado aprovada pela Portella (marfim, cantos retos, fios dourados,
- * botão dourado com texto marinho). Vale só com <html data-app="seguros">; o Consórcio continua com
- * os valores padrão do design system. Os componentes leem estes tokens com o valor antigo de reserva.
+ * CRM Seguros: direção "A5 · Vidro + Bento" escolhida pela Portella (23/10/2026). Fonte Sora, cartões
+ * de vidro com cantos arredondados sobre fundo com brilho dourado e azul, botões em cápsula.
+ * Tema claro é o padrão; o escuro vale com data-tema="escuro" ou, em Automático, com o aparelho no
+ * escuro. Vale só com <html data-app="seguros">: o Consórcio continua com os valores do design system.
+ * Os componentes leem estes tokens com o valor antigo de reserva.
  */
 :root[data-app='seguros'] {
-  --radius: 2px;
-  --raio-cartao: 2px;
-  --raio-max: 2px;
-  --botao-fundo: #c9a85e;
-  --botao-fundo-hover: #b8924a;
-  --botao-borda: #b8924a;
-  --botao-texto: #0f1e3c;
-  --campo-rotulo-tamanho: 12px;
-  --campo-rotulo-espaco: 0.08em;
+  --sans: 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: var(--sans);
+  --radius: 12px;
+  --raio-cartao: 24px;
+  --raio-max: 999px;
+  --botao-raio: 999px;
+  --botao-texto: #101a2e;
+  --campo-rotulo-tamanho: 12.5px;
   --campo-foco-contorno: 2px solid var(--foco);
   --campo-foco-afastamento: 1px;
   --campo-foco-borda: var(--foco);
   --campo-foco-anel: none;
-  --abas-espaco: 0 2px;
-  --abas-fundo: transparent;
-  --abas-borda: 0;
-  --abas-fio: 1px solid var(--borda);
-  --aba-hover-fundo: transparent;
-  --aba-ativa-fundo: transparent;
-  --aba-ativa-texto: var(--texto);
-  --aba-ativa-marca: inset 0 -2px 0 var(--destaque-fio);
-  --indicador-faixa: 2px;
-  --indicador-rotulo-tamanho: 13px;
-  --indicador-valor-fonte: var(--serif);
-  --indicador-valor-peso: 500;
-  --barras-destaque: var(--primaria);
+  --indicador-faixa: 0px;
+  --indicador-rotulo-tamanho: 12.5px;
+  --indicador-valor-peso: 600;
   --selo-borda-forca: 38%;
-  --tabela-cabecalho-fio: 1px solid var(--destaque-fio);
+  --tabela-cabecalho-fio: 1px solid var(--borda);
   --tabela-cartao-faixa: 1px solid var(--borda);
-  --linha-hover: var(--destaque-fundo);
   --sombra-menu: none;
-  --menu-fio: 1px solid var(--destaque-fio);
-  --menu-grupo: rgba(244, 238, 226, 0.66);
   --menu-link-altura: 44px;
-  --menu-ativo-marca: inset 2px 0 0 var(--menu-ativo);
   --sair-altura: 40px;
-  --topo-fio: var(--destaque-fio);
-  --modal-borda: var(--destaque-fio);
-  --modal-fio: 2px solid var(--destaque-fio);
+  --topo-desfoque: blur(18px) saturate(140%);
+}
+:root[data-app='seguros'] body {
+  background: var(--brilho), var(--fundo);
+  background-attachment: fixed;
+}
+:root[data-app='seguros'] h1,
+:root[data-app='seguros'] h2,
+:root[data-app='seguros'] h3 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+:root[data-app='seguros'] h1 em,
+:root[data-app='seguros'] h2 em,
+:root[data-app='seguros'] h3 em {
+  font-style: normal;
 }
 
 /* Claro (padrão, ou Automático com o aparelho no claro). */
 :root[data-app='seguros'][data-tema='claro'] {
-  --fundo: #f2ece1;
-  --superficie: #fbf9f4;
-  --superficie-2: #f7f3ec;
-  --superficie-3: #efe8db;
-  --borda: #e3d9c6;
-  --borda-forte: #8a7a5a;
-  --texto-suave: #44506a;
-  --texto-fraco: #5a6479;
-  --destaque-fundo: #f7efdc;
-  --destaque-borda: #c9a85e;
-  --topo-fundo: #fbf9f4;
-  --sucesso: #05683f;
-  --sucesso-fundo: #eaf5ee;
+  --fundo: #f3f1ec;
+  --brilho:
+    radial-gradient(900px 520px at 10% -5%, rgba(214, 180, 110, 0.38), transparent 60%),
+    radial-gradient(800px 600px at 96% 8%, rgba(120, 160, 225, 0.3), transparent 60%),
+    radial-gradient(900px 700px at 50% 112%, rgba(214, 180, 110, 0.2), transparent 60%);
+  --superficie: #ffffff;
+  --superficie-2: #f8f7f3;
+  --superficie-3: #efede6;
+  --borda: rgba(16, 26, 46, 0.1);
+  --borda-forte: #8a93a6;
+  --texto: #101a2e;
+  --texto-suave: #46506a;
+  --texto-fraco: #5b657b;
+  --primaria: #1a2b4b;
+  --primaria-hover: #0f1e3c;
+  --primaria-texto: #ffffff;
+  --primaria-fundo: rgba(26, 43, 75, 0.07);
+  --primaria-borda: rgba(26, 43, 75, 0.22);
+  --destaque: #c9a85e;
+  --destaque-hover: #b8924a;
+  --destaque-sobre: #101a2e;
+  --destaque-texto: #7a5c24;
+  --destaque-fio: #c9a85e;
+  --destaque-fundo: #faf0da;
+  --destaque-borda: #e3cc97;
+  --menu-fundo: #1a2b4b;
+  --topo-fundo: rgba(255, 255, 255, 0.72);
+  --cartao-fundo: rgba(255, 255, 255, 0.66);
+  --cartao-borda: rgba(255, 255, 255, 0.95);
+  --cartao-desfoque: blur(20px) saturate(140%);
+  --cartao-sombra: 0 1px 2px rgba(16, 26, 46, 0.04), 0 18px 40px -24px rgba(26, 43, 75, 0.28);
+  --botao-fundo: linear-gradient(135deg, #e8cf95, #c9a85e);
+  --botao-fundo-hover: linear-gradient(135deg, #e2c687, #b8924a);
+  --botao-borda: transparent;
+  --linha-hover: rgba(26, 43, 75, 0.04);
+  --sucesso: #0e7a4b;
+  --sucesso-fundo: #e3f4ec;
   --sucesso-borda: #9ed3b7;
   --alerta: #8a4b05;
   --alerta-fundo: #fbf1de;
@@ -67,26 +91,53 @@
   --perigo: #a61b1b;
   --perigo-fundo: #faecec;
   --perigo-borda: #e6b9b9;
+  --info: #2f5ea8;
   --info-fundo: #ecf1fb;
-  --sombra: none;
-  --sombra-forte: 0 24px 48px -28px rgba(15, 30, 60, 0.45);
+  --info-borda: #bcd0ef;
+  --sombra: 0 1px 2px rgba(16, 26, 46, 0.04);
+  --sombra-forte: 0 28px 60px -28px rgba(15, 30, 60, 0.45);
   --foco: #1a2b4b;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: light) {
   :root[data-app='seguros']:not([data-tema]) {
-    --fundo: #f2ece1;
-    --superficie: #fbf9f4;
-    --superficie-2: #f7f3ec;
-    --superficie-3: #efe8db;
-    --borda: #e3d9c6;
-    --borda-forte: #8a7a5a;
-    --texto-suave: #44506a;
-    --texto-fraco: #5a6479;
-    --destaque-fundo: #f7efdc;
-    --destaque-borda: #c9a85e;
-    --topo-fundo: #fbf9f4;
-    --sucesso: #05683f;
-    --sucesso-fundo: #eaf5ee;
+    --fundo: #f3f1ec;
+    --brilho:
+      radial-gradient(900px 520px at 10% -5%, rgba(214, 180, 110, 0.38), transparent 60%),
+      radial-gradient(800px 600px at 96% 8%, rgba(120, 160, 225, 0.3), transparent 60%),
+      radial-gradient(900px 700px at 50% 112%, rgba(214, 180, 110, 0.2), transparent 60%);
+    --superficie: #ffffff;
+    --superficie-2: #f8f7f3;
+    --superficie-3: #efede6;
+    --borda: rgba(16, 26, 46, 0.1);
+    --borda-forte: #8a93a6;
+    --texto: #101a2e;
+    --texto-suave: #46506a;
+    --texto-fraco: #5b657b;
+    --primaria: #1a2b4b;
+    --primaria-hover: #0f1e3c;
+    --primaria-texto: #ffffff;
+    --primaria-fundo: rgba(26, 43, 75, 0.07);
+    --primaria-borda: rgba(26, 43, 75, 0.22);
+    --destaque: #c9a85e;
+    --destaque-hover: #b8924a;
+    --destaque-sobre: #101a2e;
+    --destaque-texto: #7a5c24;
+    --destaque-fio: #c9a85e;
+    --destaque-fundo: #faf0da;
+    --destaque-borda: #e3cc97;
+    --menu-fundo: #1a2b4b;
+    --topo-fundo: rgba(255, 255, 255, 0.72);
+    --cartao-fundo: rgba(255, 255, 255, 0.66);
+    --cartao-borda: rgba(255, 255, 255, 0.95);
+    --cartao-desfoque: blur(20px) saturate(140%);
+    --cartao-sombra: 0 1px 2px rgba(16, 26, 46, 0.04), 0 18px 40px -24px rgba(26, 43, 75, 0.28);
+    --botao-fundo: linear-gradient(135deg, #e8cf95, #c9a85e);
+    --botao-fundo-hover: linear-gradient(135deg, #e2c687, #b8924a);
+    --botao-borda: transparent;
+    --linha-hover: rgba(26, 43, 75, 0.04);
+    --sucesso: #0e7a4b;
+    --sucesso-fundo: #e3f4ec;
     --sucesso-borda: #9ed3b7;
     --alerta: #8a4b05;
     --alerta-fundo: #fbf1de;
@@ -94,27 +145,124 @@
     --perigo: #a61b1b;
     --perigo-fundo: #faecec;
     --perigo-borda: #e6b9b9;
+    --info: #2f5ea8;
     --info-fundo: #ecf1fb;
-    --sombra: none;
-    --sombra-forte: 0 24px 48px -28px rgba(15, 30, 60, 0.45);
+    --info-borda: #bcd0ef;
+    --sombra: 0 1px 2px rgba(16, 26, 46, 0.04);
+    --sombra-forte: 0 28px 60px -28px rgba(15, 30, 60, 0.45);
     --foco: #1a2b4b;
+    color-scheme: light;
   }
 }
 
-/* Escuro: já é marinho e dourado; só as bordas dos campos ganham contraste e as sombras saem. */
+/* Escuro: marinho profundo com vidro translúcido e dourado claro. */
 :root[data-app='seguros'][data-tema='escuro'] {
-  --borda-forte: rgba(217, 188, 126, 0.6);
-  --texto-fraco: #a9b2c2;
+  --fundo: #0b1426;
+  --brilho:
+    radial-gradient(900px 520px at 12% -5%, rgba(201, 168, 94, 0.3), transparent 60%),
+    radial-gradient(800px 600px at 95% 10%, rgba(79, 132, 214, 0.28), transparent 60%),
+    radial-gradient(900px 700px at 50% 110%, rgba(201, 168, 94, 0.12), transparent 60%);
+  --superficie: #14213a;
+  --superficie-2: #18263f;
+  --superficie-3: #1f2e4b;
+  --borda: rgba(255, 255, 255, 0.12);
+  --borda-forte: rgba(255, 255, 255, 0.42);
+  --texto: #f5f2ea;
+  --texto-suave: #b7c0d3;
+  --texto-fraco: #98a2b7;
+  --primaria: #e2c687;
+  --primaria-hover: #f0d9a2;
+  --primaria-texto: #0b1426;
+  --primaria-fundo: rgba(226, 198, 135, 0.12);
+  --primaria-borda: rgba(226, 198, 135, 0.4);
+  --destaque: #e2c687;
+  --destaque-hover: #f0d9a2;
+  --destaque-sobre: #0b1426;
+  --destaque-texto: #e2c687;
+  --destaque-fio: rgba(226, 198, 135, 0.6);
+  --destaque-fundo: rgba(226, 198, 135, 0.12);
+  --destaque-borda: rgba(226, 198, 135, 0.4);
+  --menu-fundo: #0f1a30;
+  --topo-fundo: rgba(11, 20, 38, 0.72);
+  --cartao-fundo: rgba(255, 255, 255, 0.055);
+  --cartao-borda: rgba(255, 255, 255, 0.12);
+  --cartao-desfoque: blur(18px);
+  --cartao-sombra: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --botao-fundo: #e2c687;
+  --botao-fundo-hover: #f0d9a2;
+  --botao-borda: transparent;
+  --botao-texto: #0b1426;
+  --linha-hover: rgba(255, 255, 255, 0.04);
+  --sucesso: #74d9a6;
+  --sucesso-fundo: rgba(116, 217, 166, 0.12);
+  --sucesso-borda: rgba(116, 217, 166, 0.38);
+  --alerta: #e6c266;
+  --alerta-fundo: rgba(230, 194, 102, 0.1);
+  --alerta-borda: rgba(230, 194, 102, 0.42);
+  --perigo: #ee8f86;
+  --perigo-fundo: rgba(238, 143, 134, 0.1);
+  --perigo-borda: rgba(238, 143, 134, 0.42);
+  --info: #93b7ea;
+  --info-fundo: rgba(147, 183, 234, 0.1);
+  --info-borda: rgba(147, 183, 234, 0.4);
   --sombra: none;
-  --sombra-forte: 0 24px 48px -28px rgba(0, 0, 0, 0.75);
-  --barras-destaque: var(--destaque);
+  --sombra-forte: 0 28px 60px -28px rgba(0, 0, 0, 0.75);
+  --foco: #e2c687;
+  color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root[data-app='seguros']:not([data-tema]) {
-    --borda-forte: rgba(217, 188, 126, 0.6);
-    --texto-fraco: #a9b2c2;
+    --fundo: #0b1426;
+    --brilho:
+      radial-gradient(900px 520px at 12% -5%, rgba(201, 168, 94, 0.3), transparent 60%),
+      radial-gradient(800px 600px at 95% 10%, rgba(79, 132, 214, 0.28), transparent 60%),
+      radial-gradient(900px 700px at 50% 110%, rgba(201, 168, 94, 0.12), transparent 60%);
+    --superficie: #14213a;
+    --superficie-2: #18263f;
+    --superficie-3: #1f2e4b;
+    --borda: rgba(255, 255, 255, 0.12);
+    --borda-forte: rgba(255, 255, 255, 0.42);
+    --texto: #f5f2ea;
+    --texto-suave: #b7c0d3;
+    --texto-fraco: #98a2b7;
+    --primaria: #e2c687;
+    --primaria-hover: #f0d9a2;
+    --primaria-texto: #0b1426;
+    --primaria-fundo: rgba(226, 198, 135, 0.12);
+    --primaria-borda: rgba(226, 198, 135, 0.4);
+    --destaque: #e2c687;
+    --destaque-hover: #f0d9a2;
+    --destaque-sobre: #0b1426;
+    --destaque-texto: #e2c687;
+    --destaque-fio: rgba(226, 198, 135, 0.6);
+    --destaque-fundo: rgba(226, 198, 135, 0.12);
+    --destaque-borda: rgba(226, 198, 135, 0.4);
+    --menu-fundo: #0f1a30;
+    --topo-fundo: rgba(11, 20, 38, 0.72);
+    --cartao-fundo: rgba(255, 255, 255, 0.055);
+    --cartao-borda: rgba(255, 255, 255, 0.12);
+    --cartao-desfoque: blur(18px);
+    --cartao-sombra: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --botao-fundo: #e2c687;
+    --botao-fundo-hover: #f0d9a2;
+    --botao-borda: transparent;
+    --botao-texto: #0b1426;
+    --linha-hover: rgba(255, 255, 255, 0.04);
+    --sucesso: #74d9a6;
+    --sucesso-fundo: rgba(116, 217, 166, 0.12);
+    --sucesso-borda: rgba(116, 217, 166, 0.38);
+    --alerta: #e6c266;
+    --alerta-fundo: rgba(230, 194, 102, 0.1);
+    --alerta-borda: rgba(230, 194, 102, 0.42);
+    --perigo: #ee8f86;
+    --perigo-fundo: rgba(238, 143, 134, 0.1);
+    --perigo-borda: rgba(238, 143, 134, 0.42);
+    --info: #93b7ea;
+    --info-fundo: rgba(147, 183, 234, 0.1);
+    --info-borda: rgba(147, 183, 234, 0.4);
     --sombra: none;
-    --sombra-forte: 0 24px 48px -28px rgba(0, 0, 0, 0.75);
-    --barras-destaque: var(--destaque);
+    --sombra-forte: 0 28px 60px -28px rgba(0, 0, 0, 0.75);
+    --foco: #e2c687;
+    color-scheme: dark;
   }
 }

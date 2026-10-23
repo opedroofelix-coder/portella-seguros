@@ -199,6 +199,8 @@
   background: var(--topo-fundo);
   border-bottom: 1px solid var(--topo-fio, var(--borda));
   box-shadow: var(--sombra);
+  -webkit-backdrop-filter: var(--topo-desfoque, none);
+  backdrop-filter: var(--topo-desfoque, none);
 }
 .topoMarca {
   display: flex;
@@ -210,6 +212,9 @@
 .topo img {
   height: 26px;
   width: auto;
+}
+.topo img.topoNome {
+  height: 20px;
 }
 .topoSistema {
   font-size: 10px;
@@ -335,4 +340,280 @@
 }
 .conteudo:focus {
   outline: none;
+}
+
+/* Busca no topo do celular (modo "topo"): fica à direita da marca. */
+.topoBusca {
+  margin-left: auto;
+}
+
+/*
+ * Modo "topo" no computador largo: cápsula de vidro flutuante com o grupo principal do menu,
+ * "Mais" (os outros grupos, tema e sair), busca rápida, a ação fixa e o avatar.
+ */
+.estruturaTopo {
+  padding: 18px var(--gutter) 0;
+}
+.estruturaTopo .conteudo {
+  padding: 26px 8px 48px;
+  max-width: 1440px;
+}
+.capsula {
+  position: sticky;
+  top: 14px;
+  z-index: 30;
+  max-width: 1424px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 8px 8px 18px;
+  border-radius: 999px;
+  background: var(--cartao-fundo, var(--topo-fundo));
+  border: 1px solid var(--cartao-borda, var(--borda));
+  box-shadow: var(--cartao-sombra, var(--sombra));
+  -webkit-backdrop-filter: var(--topo-desfoque, none);
+  backdrop-filter: var(--topo-desfoque, none);
+}
+.capsulaMarca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  padding-right: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.capsulaIcone {
+  height: 30px;
+  width: auto;
+}
+.capsulaNome {
+  height: 22px;
+  width: auto;
+}
+.soEscuro {
+  display: none;
+}
+:global(:root[data-tema='escuro']) .soClaro {
+  display: none;
+}
+:global(:root[data-tema='escuro']) .soEscuro {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-tema])) .soClaro {
+    display: none;
+  }
+  :global(:root:not([data-tema])) .soEscuro {
+    display: block;
+  }
+}
+.capsulaNav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.capsulaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--texto-suave);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+.capsulaLink > svg:first-child:not(.maisSeta) {
+  display: none;
+}
+.capsulaLink:hover {
+  color: var(--texto);
+  background: var(--linha-hover, var(--superficie-3));
+}
+.capsulaLinkAtivo,
+.capsulaLinkAtivo:hover {
+  background: var(--primaria);
+  color: var(--primaria-texto);
+  font-weight: 600;
+}
+.capsulaLink .contador {
+  margin-left: 2px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+}
+.maisArea {
+  position: relative;
+}
+.maisSeta {
+  transform: rotate(90deg);
+  opacity: 0.7;
+}
+.capsulaLink[aria-expanded='true'] .maisSeta {
+  transform: rotate(-90deg);
+}
+.mais {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 520px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: min(22px, var(--raio-max, 14px));
+  box-shadow: var(--sombra-forte);
+}
+.maisGrupos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 14px;
+}
+.maisGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.maisGrupoNome {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+.maisLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch);
+  padding: 0 12px;
+  border-radius: min(12px, var(--raio-max, 8px));
+  color: var(--texto);
+  font-size: 14px;
+  text-decoration: none;
+}
+.maisLink svg {
+  color: var(--texto-fraco);
+  flex-shrink: 0;
+}
+.maisLink:hover {
+  background: var(--linha-hover, var(--superficie-2));
+}
+.maisLinkAtivo,
+.maisLinkAtivo:hover {
+  background: var(--destaque-fundo);
+  font-weight: 600;
+}
+.maisLinkAtivo svg {
+  color: var(--destaque-texto);
+}
+.maisRodape {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda);
+}
+.maisPerfil {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.maisPerfil > span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.maisPerfil strong {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.maisPerfil small {
+  font-size: 12px;
+  color: var(--texto-fraco);
+}
+.capsulaEspaco {
+  flex: 1;
+}
+.capsulaBusca {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  min-width: var(--touch);
+  justify-content: center;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--linha-hover, var(--superficie-2));
+  color: var(--texto-suave);
+  font-size: 13.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.capsulaBusca:hover {
+  color: var(--texto);
+}
+.capsulaBusca kbd,
+.capsulaBuscaTexto {
+  display: none;
+}
+.capsulaBusca kbd {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto-suave);
+  font: 600 11px var(--sans);
+  box-shadow: 0 0 0 1px var(--borda);
+}
+@media (min-width: 1440px) {
+  .capsulaBusca {
+    padding: 0 8px 0 14px;
+  }
+  .capsulaBusca kbd,
+  .capsulaBuscaTexto {
+    display: inline;
+  }
+}
+.capsulaAvatar {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primaria);
+  color: var(--primaria-texto);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.capsulaAvatar:hover {
+  box-shadow: 0 0 0 3px var(--destaque-fundo);
 }

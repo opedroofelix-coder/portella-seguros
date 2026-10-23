@@ -29,7 +29,13 @@ export function App({
   const config: ConfigApp = {
     sistema: 'Seguros',
     interface: 'refinada',
+    navegacao: 'topo',
     logo: `${import.meta.env.BASE_URL}logo.svg`,
+    marca: {
+      icone: `${import.meta.env.BASE_URL}marca-icone.svg`,
+      nomeClaro: `${import.meta.env.BASE_URL}marca-nome-marinho.svg`,
+      nomeEscuro: `${import.meta.env.BASE_URL}marca-nome-marfim.svg`,
+    },
     nomeFunil: 'Cotações',
     produtos: RAMOS.map((r) => r.nome),
     menu: [

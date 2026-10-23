@@ -26,8 +26,8 @@ import {
   useAvisos,
 } from '@portella/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useRefinada } from '../config';
 import { mensagemErro } from '../erros';
 import { FormularioProposta } from '../componentes/FormularioProposta';
@@ -76,6 +76,14 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
   const [tipo, setTipo] = useState<TipoNegocio | 'nao' | ''>('');
   const [saldo, setSaldo] = useState<'' | 'aberto' | 'quitado'>('');
   const [editando, setEditando] = useState<Proposta | 'nova' | null>(null);
+  // "Nova proposta" do menu no topo chega com ?nova=1: abre o formulário e limpa o endereço.
+  const [parametros, setParametros] = useSearchParams();
+  const pedirNova = refinada && !somentePendentes && parametros.get('nova') === '1';
+  useEffect(() => {
+    if (!pedirNova) return;
+    setEditando('nova');
+    setParametros({}, { replace: true });
+  }, [pedirNova, setParametros]);
 
   const lista = useMemo(
     () =>

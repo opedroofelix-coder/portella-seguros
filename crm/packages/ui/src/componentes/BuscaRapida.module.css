@@ -1,0 +1,113 @@
+.veu {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: max(10vh, 24px) var(--gutter) 24px;
+  background: var(--veu);
+}
+.caixa {
+  width: min(600px, 100%);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: min(20px, var(--raio-max, 14px));
+  box-shadow: var(--sombra-forte);
+}
+.campo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 0 18px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--borda);
+  color: var(--texto-fraco);
+}
+.campo input {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  border: 0;
+  background: transparent;
+  color: var(--texto);
+  font-size: 16px;
+}
+.campo input:focus {
+  outline: none;
+}
+.lista {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  overflow-y: auto;
+}
+.grupo {
+  display: block;
+  padding: 10px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+.opcao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 8px 12px;
+  border-radius: min(12px, var(--raio-max, 8px));
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+.opcao[aria-selected='true'] {
+  background: var(--destaque-fundo);
+  color: var(--texto);
+}
+.texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.texto strong {
+  font-weight: 500;
+  color: var(--texto);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.texto small {
+  font-size: 12.5px;
+  color: var(--texto-fraco);
+}
+.vazio {
+  margin: 0;
+  padding: 22px 18px;
+  color: var(--texto-suave);
+}
+.dica {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 10px 18px;
+  border-top: 1px solid var(--borda);
+  font-size: 12px;
+  color: var(--texto-fraco);
+}
+.tecla {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 2px 6px;
+  border: 1px solid var(--borda);
+  border-radius: min(6px, var(--raio-max, 6px));
+  background: var(--superficie-2);
+  color: var(--texto-suave);
+  font: 600 11px var(--sans);
+}

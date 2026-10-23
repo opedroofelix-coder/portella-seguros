@@ -1,8 +1,10 @@
 .cartao {
-  background: var(--superficie);
-  border: 1px solid var(--borda);
+  background: var(--cartao-fundo, var(--superficie));
+  border: 1px solid var(--cartao-borda, var(--borda));
   border-radius: var(--raio-cartao);
-  box-shadow: var(--sombra);
+  box-shadow: var(--cartao-sombra, var(--sombra));
+  -webkit-backdrop-filter: var(--cartao-desfoque, none);
+  backdrop-filter: var(--cartao-desfoque, none);
   padding: 16px;
   min-width: 0;
 }

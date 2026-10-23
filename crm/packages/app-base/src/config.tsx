@@ -39,6 +39,13 @@ export interface ConfigApp {
    * com máscara, pilha de modais, avisos de erro que não somem… Sem ela, as telas ficam como eram.
    */
   interface?: 'refinada';
+  /**
+   * 'topo': no computador largo, menu numa cápsula no alto, com busca rápida (Ctrl K) e o botão
+   * "Nova proposta". Sem ela, menu lateral como sempre.
+   */
+  navegacao?: 'topo';
+  /** Marca da cápsula do menu no topo (ícone e nome para fundo claro e escuro). */
+  marca?: { icone: string; nomeClaro: string; nomeEscuro: string };
 }
 
 const Contexto = createContext<ConfigApp | null>(null);
