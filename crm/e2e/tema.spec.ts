@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { irPara } from './fluxos';
+import { abrirMais, irPara, saudacao } from './fluxos';
 import { conferirLayout, LARGURAS } from './responsivo';
 
 // Usa o modo demonstração (dados fictícios, entrada direta).
@@ -11,6 +11,11 @@ const fundoDaPagina = (page: Page) => page.evaluate(() => getComputedStyle(docum
 
 /** Abre o menu (no celular) e escolhe o tema no rodapé dele. */
 async function escolherTema(page: Page, rotulo: 'Claro' | 'Escuro' | 'Automático') {
+  const capsula = await abrirMais(page);
+  if (capsula) {
+    await capsula.getByRole('group', { name: 'Tema' }).getByRole('button', { name: rotulo }).click();
+    return;
+  }
   const abrir = page.getByRole('button', { name: 'Abrir menu' });
   if (await abrir.isVisible()) await abrir.click();
   const menu = page.getByRole('complementary', { name: 'Menu principal' });
@@ -24,7 +29,7 @@ for (const tela of LARGURAS) {
     test('começa no claro, troca para o escuro e continua escuro depois de recarregar', async ({ page }) => {
       test.setTimeout(90_000);
       await page.goto(SEGUROS);
-      await expect(page.getByRole('heading', { name: 'Olá, Administradora' })).toBeVisible({
+      await expect(page.getByRole('heading', { name: saudacao('Administradora') })).toBeVisible({
         timeout: 30_000,
       });
       await expect(page.locator('html')).toHaveAttribute('data-tema', 'claro');
@@ -37,7 +42,7 @@ for (const tela of LARGURAS) {
       expect(await fundoDaPagina(page)).not.toBe(claro);
 
       await page.reload();
-      await expect(page.getByRole('heading', { name: 'Olá, Administradora' })).toBeVisible({
+      await expect(page.getByRole('heading', { name: saudacao('Administradora') })).toBeVisible({
         timeout: 30_000,
       });
       await expect(page.locator('html')).toHaveAttribute('data-tema', 'escuro');
@@ -61,7 +66,7 @@ for (const tela of LARGURAS) {
       await page.emulateMedia({ colorScheme: 'dark' });
       await page.addInitScript(() => localStorage.setItem('portella-crm:tema', 'auto'));
       await page.goto(CONSORCIO);
-      await expect(page.getByRole('heading', { name: 'Olá, Administradora' })).toBeVisible({
+      await expect(page.getByRole('heading', { name: saudacao('Administradora') })).toBeVisible({
         timeout: 30_000,
       });
       await expect(page.locator('html')).not.toHaveAttribute('data-tema', /.*/);

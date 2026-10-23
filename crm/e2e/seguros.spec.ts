@@ -61,7 +61,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
 
     // Painel e fila de renovação
     await irPara(page, 'Painel');
-    await expect(page.getByText('Comissão prevista').locator('..')).toContainText('R$ 300,00');
+    await expect(page.getByText('apólice vence nos próximos 30 dias')).toBeVisible();
     await irPara(page, 'Renovações');
     await page.getByRole('button', { name: 'Renovar' }).click();
     await page.getByRole('button', { name: 'Registrar renovação' }).click();

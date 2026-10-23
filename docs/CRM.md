@@ -379,11 +379,29 @@ crm/
 - **Visual**: layout de painel de gestão (menu lateral marinho com grupos Principal, Relatórios e
   Sistema; barra superior com título e ações; indicadores com faixa e ícone), nas cores
   do site: marinho #1A2B4B e dourado #C9A85E, Lora nos títulos e Jost no resto.
-- **CRM Seguros: direção Noir Dourado aprovada** (revisão de UX/UI de 23/10/2026). Com
-  `<html data-app="seguros">`, `apps/crm-seguros/src/presentation/seguros.css` redefine os tokens:
-  superfícies marfim (#F2ECE1/#FBF9F4/#F7F3EC), cantos de 2 px, fios dourados no lugar das sombras,
-  botão principal dourado com texto marinho (7,3:1), foco marinho visível, bordas de campo com 3:1.
-  Os componentes leem esses tokens com o valor antigo de reserva, por isso o Consórcio não muda.
+- **CRM Seguros: direção "A5 · Vidro + Bento"** (escolhida pela Portella em 23/10/2026; substitui o
+  Noir Dourado de marfim e cantos retos que o CRM usou antes). Com `<html data-app="seguros">`,
+  `apps/crm-seguros/src/presentation/seguros.css` redefine os tokens: fonte **Sora**, cartões de vidro
+  translúcido (`--cartao-fundo`, `--cartao-borda`, `--cartao-desfoque`, `--cartao-sombra`) sobre fundo com
+  brilho dourado e azul (`--brilho`), cantos de 24 px nos cartões e botões em cápsula (`--botao-raio`),
+  botão principal dourado com texto marinho. **Tema claro é o padrão**; o escuro (marinho profundo
+  #0B1426) continua no seletor. Os componentes leem esses tokens com o valor antigo de reserva, por isso
+  o Consórcio não muda (conferido por captura de tela contra a versão anterior).
+- **Menu no topo** (`ConfigApp.navegacao = 'topo'`, só no Seguros): no computador a partir de 1280 px o
+  menu vira uma cápsula no alto, com o grupo Principal à vista e os outros grupos, o tema, o usuário e
+  Sair em "Mais"; tem a **busca rápida** (Ctrl K ou ⌘K: páginas e clientes, sem acento) e o botão
+  **Nova proposta** (abre o formulário em `/propostas?nova=1`). Abaixo de 1280 px fica o menu lateral.
+  A marca da cápsula usa `public/marca-icone.svg` e o nome em marinho (claro) ou marfim (escuro).
+- **Painel inicial do Seguros** (`apps/crm-seguros/src/presentation/paginas/Painel.tsx`, cálculos em
+  `application/painelInicial.ts`): segue a seção 0.7 com filtro Mês / Ano / Tudo. Mostra o aviso de
+  propostas aguardando aprovação; produção (prêmio líquido) com mini-gráfico e variação; comissão recebida,
+  repassada e saldo a receber (sem filtro); crescimento sobre o mês anterior, o mesmo mês do ano anterior e
+  o acumulado do ano; barras dos últimos 12 meses (6 no celular); tabela por produtor (produção, saldo
+  pendente e repasse previsto, com totais); pagamento do mês (repasse − estornos − vales, de
+  `fechamentoDoMes`); novo × renovação; por produto e por seguradora (5 maiores + "Outras") e as
+  renovações dos próximos 30 dias. O **produtor** vê só a própria produção, o próprio repasse, o próprio
+  pagamento do mês e as próprias propostas aguardando aprovação, nunca a comissão que a corretora recebe.
+  O que o painel antigo mostrava das apólices continua em Apólices e Renovações.
 - **Interface refinada** (`ConfigApp.interface = 'refinada'`, ligada só no Seguros): confirmações antes
   de excluir, pagar, aplicar repasse e importar; campos de R$ e % com máscara ("1.500" = R$ 1.500,00);
   CPF/CNPJ, telefone e CEP com máscara; pilha de modais (Esc fecha só a de cima) e aviso de alterações

@@ -93,7 +93,8 @@ Com o cache de 1 dia são cerca de 30 consultas por mês.
 - [ ] Integração do formulário de contato (hoje abre o e-mail via `mailto:`).
 - [ ] Páginas legais (Privacidade, Termos, LGPD, Cookies).
 - [ ] CRM de seguros e consórcio: em `crm/` (React), especificação em `docs/CRM.md`. O CRM de Seguros
-  passou pela revisão de UX/UI (visual Noir Dourado e interface refinada). Falta escolher o backend para
-  os dados serem compartilhados entre computadores.
+  passou pela revisão de UX/UI (interface refinada) e segue o visual "A5 · Vidro + Bento" escolhido pela
+  cliente (tema claro padrão, menu no topo, busca Ctrl K e painel inicial com produção, comissões e
+  pagamento do mês). Falta escolher o backend para os dados serem compartilhados entre computadores.
 
 Os pontos a preencher estão marcados no código com `TODO` ou `[inserir]`.

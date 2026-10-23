@@ -56,3 +56,9 @@
   romanos e cartão de atendimento) e Premium F "Monograma" (padrão discreto com o ícone, medalhão com
   anel de texto girando, título revelado linha a linha).
 - Não escrever "premium", "grife" ou "luxo" nos textos do site: o requinte deve vir do visual.
+
+## CRM de Seguros (23/10/2026)
+- O site continua no Noir Dourado. O **CRM de Seguros** segue a direção **"A5 · Vidro + Bento"** escolhida
+  pela cliente: fonte Sora, cartões de vidro com cantos arredondados, botões em cápsula, marinho e dourado,
+  **tema claro padrão** e escuro opcional, menu no topo com busca Ctrl K. Tokens em
+  `crm/apps/crm-seguros/src/presentation/seguros.css`; o Consórcio não muda.

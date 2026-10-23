@@ -4,6 +4,9 @@ import { expect } from '@playwright/test';
 export const ADMIN = { nome: 'Administradora Teste', login: 'admteste', senha: 'senha-admin-1' };
 export const CORRETOR = { nome: 'Corretor Teste', login: 'corretor', senha: 'senha-corretor-1' };
 
+/** Título do painel inicial: "Olá, Nome" no Consórcio; "Bom dia/Boa tarde/Boa noite, Nome" no Seguros. */
+export const saudacao = (nome = '') => new RegExp(`^(Olá|Bom dia|Boa tarde|Boa noite), ${nome}`);
+
 export async function primeiroAcesso(page: Page, url: string) {
   await page.goto(url);
   await expect(page.getByRole('heading', { name: 'Primeiro acesso' })).toBeVisible();
@@ -12,7 +15,7 @@ export async function primeiroAcesso(page: Page, url: string) {
   await page.getByLabel('Senha', { exact: true }).fill(ADMIN.senha);
   await page.getByLabel('Confirme a senha').fill(ADMIN.senha);
   await page.getByRole('button', { name: 'Criar administrador' }).click();
-  await expect(page.getByRole('heading', { name: /Olá/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: saudacao() })).toBeVisible();
 }
 
 export async function entrar(page: Page, url: string, u: { login: string; senha: string }) {
@@ -29,23 +32,45 @@ export async function entrarPelaPrimeiraVez(page: Page, url: string, u: { login:
   await page.getByLabel('Nova senha', { exact: true }).fill(u.senha);
   await page.getByLabel('Confirme a nova senha').fill(u.senha);
   await page.getByRole('button', { name: 'Salvar nova senha' }).click();
-  await expect(page.getByRole('heading', { name: /Olá/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: saudacao() })).toBeVisible();
+}
+
+/**
+ * Menu no topo (Seguros no computador largo): os itens que não estão na cápsula ficam em "Mais".
+ * Devolve a cápsula, ou null quando o app usa o menu lateral.
+ */
+export async function abrirMais(page: Page) {
+  const capsula = page.getByRole('navigation', { name: 'Menu principal' });
+  if (!(await capsula.isVisible())) return null;
+  const mais = capsula.getByRole('button', { name: 'Mais' });
+  if ((await mais.getAttribute('aria-expanded')) !== 'true') await mais.click();
+  return capsula;
 }
 
 /** Abre um item do menu, inclusive no celular, onde o menu fica escondido atrás do botão. */
 export async function irPara(page: Page, rotulo: string) {
+  // O item pode ter um contador ("Aprovações 2 pendente(s)").
+  const nome = new RegExp(`^${rotulo}( \\d+ pendente\\(s\\))?$`);
+  const capsula = page.getByRole('navigation', { name: 'Menu principal' });
+  const lateral = page.getByRole('complementary', { name: 'Menu principal' });
+  // Logo depois de entrar, o menu ainda pode não ter aparecido.
+  await capsula.or(lateral).first().waitFor({ state: 'attached' });
+  if (await capsula.isVisible()) {
+    if (!(await capsula.getByRole('link', { name: nome }).isVisible())) await abrirMais(page);
+    await capsula.getByRole('link', { name: nome }).click();
+    return;
+  }
   const abrir = page.getByRole('button', { name: 'Abrir menu' });
   const movel = await abrir.isVisible();
   if (movel) await abrir.click();
-  const menu = page.getByRole('complementary', { name: 'Menu principal' });
-  // O item pode ter um contador ("Aprovações 2 pendente(s)").
-  await menu.getByRole('link', { name: new RegExp(`^${rotulo}( \\d+ pendente\\(s\\))?$`) }).click();
-  if (movel) await expect(menu).not.toBeInViewport();
+  await lateral.getByRole('link', { name: nome }).click();
+  if (movel) await expect(lateral).not.toBeInViewport();
 }
 
 export async function sair(page: Page) {
   const abrir = page.getByRole('button', { name: 'Abrir menu' });
   if (await abrir.isVisible()) await abrir.click();
+  await abrirMais(page);
   await page.getByRole('button', { name: 'Sair' }).click();
   await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible();
 }
