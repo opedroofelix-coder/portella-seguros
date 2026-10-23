@@ -1,0 +1,30 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "cd crm && npm ci",
+  "buildCommand": "sh scripts/build-vercel.sh",
+  "outputDirectory": "publico",
+  "redirects": [
+    {
+      "source": "/seguro",
+      "destination": "/seguro/",
+      "permanent": false
+    },
+    {
+      "source": "/seguros",
+      "destination": "/seguro/",
+      "permanent": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "/seguro/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    }
+  ]
+}

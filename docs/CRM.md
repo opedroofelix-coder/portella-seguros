@@ -415,3 +415,4 @@ de `core/application/permissoes.ts` viram políticas no servidor.
 | `npm run typecheck` | TypeScript estrito |
 | `npm run lint` | ESLint, incluindo as regras de camadas |
 | `npm run build` | build de produção dos dois apps (PWA) |
+| `sh ../scripts/build-vercel.sh` | build de publicação do site: o CRM de Seguros em modo demonstração vai para `/seguro` (`VITE_BASE=/seguro/`) |
