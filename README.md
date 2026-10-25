@@ -86,8 +86,8 @@ Com o cache de 1 dia são cerca de 30 consultas por mês.
 - [ ] Nomes das outras 10 seguradoras parceiras (das 22), para incluir os logos na faixa.
 - [x] Fotos dos 10 seguros: Unsplash (licença livre), em `assets/img/seguros/`.
 - [x] Número de WhatsApp: (11) 94784-1580 em `WHATSAPP_NUMBER` (`assets/js/main.js`) e nos links `wa.me` do site.
-- [ ] Horário de atendimento (seção Contato).
-- [ ] CNPJ e SUSEP (footer).
+- [x] Horário de atendimento (seção Contato): segunda a sexta, das 9h às 18h.
+- [x] CNPJ e SUSEP (footer): CNPJ 17.965.782/0001-04, SUSEP 202014277.
 - [ ] **Avaliações do Google:** o código está pronto (`api/avaliacoes.js` + `assets/js/main.js`). Falta criar a chave da API do Google Places e cadastrar `GOOGLE_PLACES_API_KEY` na Vercel (passo a passo abaixo).
 - [x] Resposta da pergunta "A cotação tem algum custo?": não tem custo.
 - [ ] Integração do formulário de contato (hoje abre o e-mail via `mailto:`).

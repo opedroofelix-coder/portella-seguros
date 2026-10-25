@@ -22,7 +22,9 @@
   (produtores, comissões, valores, faturamento) vai para o site.
 - Cores e fonte ficam em `:root` no `assets/css/style.css`.
 - **Direção escolhida pela cliente (21/10/2026): Premium A "Noir Dourado".** O site inteiro (index.html, style.css, main.js) já segue essa direção: predominantemente azul e dourado (pedido da cliente: sem seções marfim; seções alternam #0F1E3C, #1A2B4B e #15274A; logos das seguradoras em placas marfim com fio dourado), Lora nos títulos e Jost nos textos, consultora num arco com fio dourado e brasão com o ícone.
-- Não inventar números, depoimentos ou dados (CNPJ, SUSEP, horário). Usar `[inserir]` até a Portella informar.
+- Não inventar números, depoimentos ou dados. Usar `[inserir]` até a Portella informar.
+- Dados confirmados (25/10/2026): CNPJ 17.965.782/0001-04 · SUSEP 202014277 (rodapé); horário de atendimento
+  segunda a sexta, das 9h às 18h (seção Contato).
 - Lista de pendências: README.md.
 - Ordem dos seguros (pedido da cliente): 1. Seguro Auto, 2. Plano de Saúde, 3. Consórcio, 4. Celular e
   Portáteis; os demais sem ordem definida.
