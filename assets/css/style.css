@@ -48,8 +48,9 @@ input, select, textarea, button { font: inherit; }
 
 /* ---------- Seções ---------- */
 .section { padding: 120px 0; position: relative; }
-/* Soluções: o link do menu para logo abaixo do menu (os cards inteiros cabem na tela); no celular o espaço é menor e não precisa */
-@media (min-width: 561px) { #seguros { scroll-margin-top: -92px; } }
+/* links do menu: a seção para logo abaixo do menu, que cobre parte do espaço de 120px (o conteúdo cabe na tela);
+   no celular o espaço é de 84px, menor que o menu, e vale o scroll-padding-top do html */
+@media (min-width: 561px) { .section[id] { scroll-margin-top: -92px; } }
 .section + .section::before { content: ""; position: absolute; top: 0; left: 50%; width: min(360px, 60%); height: 1px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--gold-line), transparent); pointer-events: none; }
 .section + .section::after { content: ""; position: absolute; top: -4px; left: 50%; width: 7px; height: 7px; margin-left: -4px; transform: rotate(45deg); background: var(--navy-deep); border: 1px solid var(--gold-line); pointer-events: none; }
 .dark { background: var(--navy-deep); color: var(--text-light); }
