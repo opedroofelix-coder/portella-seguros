@@ -28,7 +28,9 @@ crm/                           # CRM de seguros e consórcio (React); especifica
 vercel.json, scripts/build-vercel.sh  # publicação: site na raiz e demonstração do CRM em /seguro
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
-assets/img/seguradoras/*.png   # logos da faixa Seguradoras & Operadoras (26)
+assets/img/seguradoras/         # logos da faixa (26): *.png originais 600x240; o site usa *.webp 300x120 (mais leves)
+assets/fonts/                  # Jost e Lora (Google Fonts) servidas pelo próprio site
+robots.txt, sitemap.xml        # para o Google (copiados para publico/ no build)
 assets/img/seguros/*.webp      # fotos dos 10 cards de seguros (Unsplash, tratadas em marinho e dourado)
 ```
 
@@ -77,6 +79,31 @@ Para ativar:
 3. Faça um novo deploy.
 
 Com o cache de 1 dia são cerca de 30 consultas por mês.
+
+## SEO (Google)
+
+O site é preparado para o domínio oficial **https://portellacorretora.com.br/** (sem www): `canonical`,
+`og:url`, `sitemap.xml` e os dados da corretora em schema.org (`InsuranceAgency` no `<head>`: nome, endereço,
+WhatsApp, e-mail, horário, CNPJ, Instagram e Facebook). Esses dados precisam ser **idênticos** no rodapé, na
+seção Contato e no Perfil da Empresa no Google. Se mudar endereço, telefone ou horário, atualize os três.
+
+Velocidade (Lighthouse no celular, 25/10/2026): fontes servidas pelo próprio site (antes vinham do
+fonts.googleapis.com e travavam a primeira pintura), logos em WebP 300x120 (754 KB → 212 KB), foto da
+consultora com versão de 440px para o celular e cache longo para fontes e imagens no `vercel.json`.
+Primeira pintura caiu de 3,0 s para 1,2 s; SEO, acessibilidade e boas práticas em 96–100.
+
+O que depende da Portella (contas próprias):
+1. **Domínio:** na Vercel, *Settings → Domains*, adicionar `portellacorretora.com.br` e `www.portellacorretora.com.br`
+   (o www redireciona para o sem www) e trocar o DNS no registro do domínio conforme a Vercel indicar.
+2. **Google Search Console:** criar a propriedade do tipo *Domínio* (verificação por registro TXT no DNS),
+   enviar `https://portellacorretora.com.br/sitemap.xml` e pedir a indexação da página inicial.
+3. **Teste de pesquisa aprimorada do Google (Rich Results Test)** e **PageSpeed Insights:** rodar no domínio oficial depois da troca.
+4. **Perfil da Empresa no Google:** categoria principal "Corretora de seguros"; nome, endereço, telefone e
+   horário iguais aos do site; site `https://portellacorretora.com.br/`; fotos da fachada e da equipe;
+   pedir avaliações aos clientes e responder todas.
+5. **Pesquisa de palavras-chave** (Planejador do Google Ads, Google Trends, Ubersuggest, AnswerThePublic):
+   com os dados em mãos, dá para criar páginas próprias por seguro (ex.: seguro auto em Osasco), que é o
+   que mais ajuda a aparecer em buscas específicas. Hoje o site é uma página só.
 
 ## Pendências
 

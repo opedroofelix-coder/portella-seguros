@@ -8,7 +8,7 @@ saida="$raiz/publico"
 
 rm -rf "$saida"
 mkdir -p "$saida"
-cp "$raiz/index.html" "$saida/"
+cp "$raiz/index.html" "$raiz/robots.txt" "$raiz/sitemap.xml" "$saida/"
 cp -R "$raiz/assets" "$saida/assets"
 
 cd "$raiz/crm"

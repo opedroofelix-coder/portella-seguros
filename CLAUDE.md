@@ -30,7 +30,11 @@
   Portáteis; os demais sem ordem definida.
 - Seção "Nossa equipe" (depois do Sobre): cards com [Nome]/[Cargo] até a Portella enviar as fotos.
 - A cotação não tem custo (confirmado pela cliente).
-- Logos das seguradoras: versões oficiais em `assets/img/seguradoras/` (PNG 600x240 transparente).
+- Logos das seguradoras: versões oficiais em `assets/img/seguradoras/` (PNG 600x240 transparente); o site usa
+  as cópias WebP 300x120 (logo novo: gerar o .webp junto).
+- Domínio oficial do site: https://portellacorretora.com.br/ (sem www). canonical, og:url, sitemap e o schema.org
+  `InsuranceAgency` do `<head>` usam esse endereço; dados da corretora iguais no schema, no rodapé e na seção Contato.
+- Fontes Jost e Lora servidas de `assets/fonts/` (não voltar a carregar do fonts.googleapis.com).
 
 ## Identidade visual (recebida em 21/10/2026)
 - Cores: branco #FFFFFF, laranja #F49629, azul-marinho #1A2B4B.

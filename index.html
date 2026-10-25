@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Portella Corretora de Seguros e Consórcio | Osasco – SP</title>
-  <meta name="description" content="Portella Corretora de Seguros, em Osasco – SP: consultoria e gerenciamento de riscos em seguro auto, vida, previdência, saúde, odontológico, residencial, fiança locatícia, responsabilidade civil, empresarial e consórcio, com 22 seguradoras parceiras.">
+  <title>Corretora de Seguros em Osasco – SP | Portella Seguros e Consórcio</title>
+  <meta name="description" content="Corretora de seguros em Osasco – SP: seguro auto, plano de saúde, consórcio, vida, residencial e empresarial com 22 seguradoras parceiras. Cotação sem custo pelo WhatsApp.">
+  <link rel="canonical" href="https://portellacorretora.com.br/">
   <meta name="theme-color" content="#0F1E3C">
   <link rel="icon" type="image/svg+xml" href="assets/img/brand/icon-gold-navy.svg">
   <meta property="og:type" content="website">
@@ -12,16 +13,63 @@
   <meta property="og:site_name" content="Portella Corretora de Seguros">
   <meta property="og:title" content="Portella Corretora de Seguros e Consórcio | Osasco – SP">
   <meta property="og:description" content="Seguros e consórcio para você, sua família e sua empresa, com 22 seguradoras parceiras. Atendimento em Osasco – SP.">
-  <meta property="og:url" content="https://portella-one.vercel.app/">
-  <meta property="og:image" content="https://portella-one.vercel.app/assets/img/og-portella.jpg">
+  <meta property="og:url" content="https://portellacorretora.com.br/">
+  <meta property="og:image" content="https://portellacorretora.com.br/assets/img/og-portella.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Portella Corretora de Seguros: proteção sob medida para o que é seu">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="preload" href="assets/fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/lora-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/style.css">
+  <!-- Dados da corretora para o Google (schema.org). Manter igual ao rodapé, à seção Contato e ao Perfil da Empresa no Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "InsuranceAgency",
+        "@id": "https://portellacorretora.com.br/#corretora",
+        "name": "Portella Corretora de Seguros",
+        "url": "https://portellacorretora.com.br/",
+        "logo": "https://portellacorretora.com.br/assets/img/logo-portella.png",
+        "image": "https://portellacorretora.com.br/assets/img/og-portella.jpg",
+        "description": "Corretora de seguros e consórcio em Osasco – SP, com 22 seguradoras parceiras: seguro auto, plano de saúde, consórcio, vida, previdência, residencial, fiança locatícia, celular e portáteis, responsabilidade civil e empresarial.",
+        "telephone": "+55-11-94784-1580",
+        "email": "contato@portellacorretora.com.br",
+        "taxID": "17.965.782/0001-04",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Rua Ana Pereira Melo, 253 – Vila Campesina",
+          "addressLocality": "Osasco",
+          "addressRegion": "SP",
+          "postalCode": "06023-080",
+          "addressCountry": "BR"
+        },
+        "openingHoursSpecification": [{
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "09:00",
+          "closes": "18:00"
+        }],
+        "areaServed": { "@type": "City", "name": "Osasco" },
+        "sameAs": [
+          "https://www.instagram.com/portellacorretora/",
+          "https://www.facebook.com/PortellaCorretoraDeSeguros"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://portellacorretora.com.br/#site",
+        "url": "https://portellacorretora.com.br/",
+        "name": "Portella Corretora de Seguros",
+        "inLanguage": "pt-BR",
+        "publisher": { "@id": "https://portellacorretora.com.br/#corretora" }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -97,7 +145,7 @@
           <img class="hero__mark" src="assets/img/brand/icon-gold-mono.svg" alt="" aria-hidden="true">
           <div class="arch" aria-hidden="true"></div>
           <svg class="arch-line" viewBox="0 0 480 640" preserveAspectRatio="none" aria-hidden="true"><path d="M 1 640 L 1 240 A 239 239 0 0 1 479 240 L 479 640" fill="none" stroke="#D9BC7E" stroke-width="1.5"></path></svg>
-          <img class="hero__photo" src="assets/img/hero/consultora-1.webp" srcset="assets/img/hero/consultora-1.webp 673w, assets/img/hero/consultora-1-2x.webp 1347w" sizes="(max-width: 900px) 291px, 377px" alt="Consultora da Portella Corretora de Seguros" width="673" height="1252" fetchpriority="high">
+          <img class="hero__photo" src="assets/img/hero/consultora-1.webp" srcset="assets/img/hero/consultora-1-sm.webp 440w, assets/img/hero/consultora-1.webp 673w, assets/img/hero/consultora-1-2x.webp 1347w" sizes="(max-width: 900px) 291px, 377px" alt="Consultora da Portella Corretora de Seguros" width="673" height="1252" fetchpriority="high">
           <div class="crest"><img src="assets/img/brand/icon-gold-ivory.svg" alt=""></div>
           <a class="hero__tag fu d4" href="https://wa.me/5511947841580?text=Ol%C3%A1%2C%20Portella!%20Vim%20pelo%20site." target="_blank" rel="noopener"><small>WhatsApp</small><span>(11) 94784-1580</span></a>
         </div>
@@ -114,32 +162,32 @@
           </div>
         <div class="carousel__viewport" data-viewport>
           <div class="carousel__track" data-track>
-            <div class="insurer"><img src="assets/img/seguradoras/porto.png" alt="Porto Seguro" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/allianz.png" alt="Allianz" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/bradesco.png" alt="Bradesco Seguros" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/sulamerica.png" alt="SulAmérica" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/tokio.png" alt="Tokio Marine Seguradora" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/hdi.png" alt="HDI Seguros" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/mapfre.png" alt="Mapfre Seguros" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/yelum.png" alt="Yelum Seguradora (antiga Liberty Seguros)" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/azul.png" alt="Azul Seguros" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/suhai.png" alt="Suhai Seguros" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/ituran.png" alt="Ituran" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/justos.png" alt="Justos" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/youse.png" alt="Youse" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/pier.png" alt="Pier" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/bradesco-saude.png" alt="Bradesco Saúde" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/porto-saude.png" alt="Porto Saúde" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/alice.png" alt="Alice" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/amil.png" alt="Amil" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/hapvida.png" alt="Hapvida" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/omint.png" alt="Omint" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/trasmontano.png" alt="Trasmontano Saúde" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/prevent-senior.png" alt="Prevent Senior" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/medsenior.png" alt="MedSênior" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/sagrada-familia.png" alt="Sagrada Família Saúde" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/sao-cristovao.png" alt="São Cristóvão Saúde" loading="lazy"></div>
-            <div class="insurer"><img src="assets/img/seguradoras/unica-saude.png" alt="Única Saúde" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/porto.webp" width="300" height="120" alt="Porto Seguro" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/allianz.webp" width="300" height="120" alt="Allianz" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/bradesco.webp" width="300" height="120" alt="Bradesco Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/sulamerica.webp" width="300" height="120" alt="SulAmérica" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/tokio.webp" width="300" height="120" alt="Tokio Marine Seguradora" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/hdi.webp" width="300" height="120" alt="HDI Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/mapfre.webp" width="300" height="120" alt="Mapfre Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/yelum.webp" width="300" height="120" alt="Yelum Seguradora (antiga Liberty Seguros)" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/azul.webp" width="300" height="120" alt="Azul Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/suhai.webp" width="300" height="120" alt="Suhai Seguros" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/ituran.webp" width="300" height="120" alt="Ituran" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/justos.webp" width="300" height="120" alt="Justos" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/youse.webp" width="300" height="120" alt="Youse" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/pier.webp" width="300" height="120" alt="Pier" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/bradesco-saude.webp" width="300" height="120" alt="Bradesco Saúde" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/porto-saude.webp" width="300" height="120" alt="Porto Saúde" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/alice.webp" width="300" height="120" alt="Alice" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/amil.webp" width="300" height="120" alt="Amil" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/hapvida.webp" width="300" height="120" alt="Hapvida" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/omint.webp" width="300" height="120" alt="Omint" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/trasmontano.webp" width="300" height="120" alt="Trasmontano Saúde" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/prevent-senior.webp" width="300" height="120" alt="Prevent Senior" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/medsenior.webp" width="300" height="120" alt="MedSênior" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/sagrada-familia.webp" width="300" height="120" alt="Sagrada Família Saúde" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/sao-cristovao.webp" width="300" height="120" alt="São Cristóvão Saúde" loading="lazy"></div>
+            <div class="insurer"><img src="assets/img/seguradoras/unica-saude.webp" width="300" height="120" alt="Única Saúde" loading="lazy"></div>
           </div>
         </div>
         <div class="carousel__progress" aria-hidden="true"><span data-progress></span></div>
