@@ -51,7 +51,7 @@ input, select, textarea, button { font: inherit; }
 /* links do menu: a seção para logo abaixo do menu, que cobre parte do espaço no alto (sobram 28px até o rótulo);
    no computador o espaço é de 120px (-92px), no celular é de 84px (-56px) */
 .section[id] { scroll-margin-top: -92px; }
-@media (max-width: 560px) { .section[id] { scroll-margin-top: -56px; } }
+@media (max-width: 560px) { .section[id] { scroll-margin-top: -56px; } #seguradoras { scroll-margin-top: -28px; } } /* Seguradoras: espaço de 56px */
 .section + .section::before { content: ""; position: absolute; top: 0; left: 50%; width: min(360px, 60%); height: 1px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--gold-line), transparent); pointer-events: none; }
 .section + .section::after { content: ""; position: absolute; top: -4px; left: 50%; width: 7px; height: 7px; margin-left: -4px; transform: rotate(45deg); background: var(--navy-deep); border: 1px solid var(--gold-line); pointer-events: none; }
 .dark { background: var(--navy-deep); color: var(--text-light); }
