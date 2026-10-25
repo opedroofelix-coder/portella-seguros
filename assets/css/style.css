@@ -273,6 +273,9 @@ a.contact__row:hover span { color: var(--gold-text); }
 .contact-form textarea { resize: vertical; }
 .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { outline: none; border-bottom-color: var(--gold-line); }
 .contact-form .btn { margin-top: 20px; }
+.contact-form .qs__button { padding: 16px 2px; border-bottom: 1px solid #DCD2BE; }
+.contact-form .qs.is-open .qs__button, .contact-form .qs__button:focus-visible { outline: none; border-bottom-color: var(--gold-line); }
+.contact-form .qs__panel { left: 0; width: 100%; max-width: none; }
 .form-note { margin: 4px 0 0; font-size: 13px; line-height: 1.5; text-align: center; color: var(--text-faint-dark); }
 
 /* ---------- 10. Footer ---------- */
@@ -437,4 +440,7 @@ a.contact__row:hover span { color: var(--gold-text); }
 .dark .contact-form input, .dark .contact-form select, .dark .contact-form textarea { color: var(--text-light); border-bottom-color: rgba(217, 188, 126, .35); }
 .dark .contact-form ::placeholder { color: var(--text-faint-dark); }
 .dark .contact-form select option { color: var(--navy-deep); }
+.dark .contact-form .qs__button { border-bottom-color: rgba(217, 188, 126, .35); }
+.dark .contact-form .qs__value.is-empty { color: var(--text-faint-dark); }
+.dark .contact-form .qs.is-open .qs__button, .dark .contact-form .qs__button:focus-visible { border-bottom-color: var(--gold-light); }
 .dark .contact-form input:focus, .dark .contact-form select:focus, .dark .contact-form textarea:focus { border-bottom-color: var(--gold-light); }

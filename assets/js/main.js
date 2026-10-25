@@ -179,12 +179,16 @@
   });
 
   /* ---------- Seletor de seguro (lista personalizada sobre o select nativo) ---------- */
-  (function quoteSelect() {
-    var select = $('[data-type-select]');
-    if (!select) return;
+  // o assunto do formulário de contato usa a mesma lista de seguros do "Cotar", antes dos outros assuntos
+  var subjectSelect = $('[data-subject-select]'), typeOptions = $('[data-type-select]');
+  if (subjectSelect && typeOptions) {
+    var others = $('optgroup', subjectSelect);
+    $$('optgroup', typeOptions).forEach(function (g) { subjectSelect.insertBefore(g.cloneNode(true), others); });
+  }
+  var qsUid = 0;
+  $$('[data-type-select], [data-subject-select]').forEach(function quoteSelect(select) {
     var label = select.closest('label');
     var placeholder = select.options[0].text;
-    var uid = 0;
     var ICONS = {
       auto: '<path d="M3 15l2-5.5A2 2 0 0 1 6.9 8h10.2a2 2 0 0 1 1.9 1.5L21 15v3h-2.5M3 15v3h2.5M3 15h18M8.5 18h7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>',
       vida: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
@@ -196,7 +200,9 @@
       celular: '<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
       empresa: '<path d="M4 21V7l6-3v17M10 9h10v12M4 21h17M7 10v.01M7 13v.01M7 16v.01M14 13h2M14 16h2"/>',
       rc: '<path d="M12 3l7 3v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"/><path d="M9 12l2 2 4-4"/>',
-      consorcio: '<path d="M4 9.5h16M5 9.5V19h14V9.5M3 19.5h18M12 3l9 5H3z"/><path d="M8.5 12.5v4M12 12.5v4M15.5 12.5v4"/>'
+      consorcio: '<path d="M4 9.5h16M5 9.5V19h14V9.5M3 19.5h18M12 3l9 5H3z"/><path d="M8.5 12.5v4M12 12.5v4M15.5 12.5v4"/>',
+      sinistro: '<path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5M12 17v.01"/>',
+      outro: '<path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.1-4A8 8 0 1 1 20 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>'
     };
     function icon(key) {
       return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[key] || ICONS.rc) + '</svg>';
@@ -215,7 +221,7 @@
 
     var panel = document.createElement('div');
     panel.className = 'qs__panel';
-    panel.id = 'qs-panel';
+    panel.id = 'qs-panel' + (++qsUid);
     panel.setAttribute('role', 'listbox');
     panel.setAttribute('aria-label', placeholder);
     panel.tabIndex = -1;
@@ -230,14 +236,14 @@
       group.setAttribute('role', 'group');
       var title = document.createElement('span');
       title.className = 'qs__title';
-      title.id = 'qs-g' + (++uid);
+      title.id = 'qs-g' + (++qsUid);
       title.textContent = node.label;
       group.setAttribute('aria-labelledby', title.id);
       group.appendChild(title);
       Array.prototype.forEach.call(node.children, function (opt) {
         var item = document.createElement('div');
         item.className = 'qs__option';
-        item.id = 'qs-o' + (++uid);
+        item.id = 'qs-o' + (++qsUid);
         item.setAttribute('role', 'option');
         item.setAttribute('aria-selected', 'false');
         item.dataset.value = opt.value || opt.text;
@@ -344,7 +350,7 @@
       if (!wrap.contains(e.relatedTarget)) close(false);
     });
     document.addEventListener('click', function (e) { if (!wrap.contains(e.target) && !panel.hidden) close(false); });
-  })();
+  });
 
   /* ---------- Modal de cotação ---------- */
   var modal = $('[data-modal]');

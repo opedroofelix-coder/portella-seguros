@@ -326,20 +326,13 @@
           <label><span class="sr-only">Nome</span><input type="text" name="nome" placeholder="Seu nome" autocomplete="name" required></label>
           <label><span class="sr-only">E-mail (opcional)</span><input type="email" name="email" placeholder="E-mail (opcional)" autocomplete="email"></label>
           <label><span class="sr-only">Assunto</span>
-            <select name="assunto">
+            <!-- os grupos de seguros são copiados da lista "Cotar" (data-type-select) pelo main.js -->
+            <select name="assunto" data-subject-select>
               <option value="">Sobre o que quer falar?</option>
-              <option>Seguro Auto</option>
-              <option>Seguro de Vida</option>
-              <option>Saúde e Odontológico</option>
-              <option>Previdência</option>
-              <option>Seguro Residencial</option>
-              <option>Fiança Locatícia</option>
-              <option>Celular e Portáteis</option>
-              <option>Responsabilidade Civil</option>
-              <option>Seguro Empresarial</option>
-              <option>Consórcio</option>
-              <option>Sinistro (já sou cliente)</option>
-              <option>Outro assunto</option>
+              <optgroup label="Outros assuntos">
+                <option data-icon="sinistro" data-desc="Acionar o seguro ou acompanhar um sinistro">Sinistro (já sou cliente)</option>
+                <option data-icon="outro" data-desc="Dúvidas, renovação ou outro tema">Outro assunto</option>
+              </optgroup>
             </select>
           </label>
           <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="4" placeholder="Como podemos ajudar?" required></textarea></label>
