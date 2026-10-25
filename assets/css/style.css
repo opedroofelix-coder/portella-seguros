@@ -269,6 +269,7 @@ a.contact__row:hover span { color: var(--gold-text); }
 .contact-form { background: #FFFFFF; border-top: 2px solid var(--gold); padding: 48px 44px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 50px 80px -50px rgba(26, 43, 75, .45); }
 .contact-form h3 { margin: 0 0 14px; font-family: var(--serif); font-weight: 400; font-size: 28px; }
 .contact-form label { display: block; }
+.contact-form label[hidden] { display: none; }
 .contact-form input, .contact-form select, .contact-form textarea { width: 100%; border: 0; border-bottom: 1px solid #DCD2BE; background: transparent; padding: 16px 2px; font-size: 16px; font-family: inherit; color: var(--text-on-light); border-radius: 0; }
 .contact-form textarea { resize: vertical; }
 .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { outline: none; border-bottom-color: var(--gold-line); }
