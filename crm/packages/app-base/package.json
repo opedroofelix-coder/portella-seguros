@@ -13,7 +13,8 @@
     "@portella/ui": "*",
     "jspdf": "2.5.2",
     "jspdf-autotable": "3.8.4",
-    "exceljs": "4.4.0"
+    "exceljs": "4.4.0",
+    "@portella/importer": "*"
   },
   "peerDependencies": {
     "@hookform/resolvers": "5.1.1",

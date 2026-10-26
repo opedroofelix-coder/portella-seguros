@@ -61,6 +61,14 @@ export function App({
       MENU_COMUM.importar,
       MENU_COMUM.conta,
     ],
+    catalogosExtras: [
+      {
+        tipo: 'origensRecebimento',
+        titulo: 'Origens de recebimento',
+        descricao:
+          'No Financeiro, as entradas são escolhidas entre as seguradoras e estas origens: inclua aqui quem mais paga comissão à corretora, como o cliente que paga direto no plano de saúde.',
+      },
+    ],
     importacao: criarImportacao(servicos),
     produtoresIniciais: PRODUTORES_INICIAIS,
     abasCliente: [

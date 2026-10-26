@@ -8,7 +8,7 @@ import {
   pendentesPorProdutor,
 } from './relatorios';
 import type { Proposta } from './proposta';
-import { fatiaProducao, repassePrevisto } from './proposta';
+import { descontoDoEstorno, fatiaProducao, propostaDoEstorno, repassePrevisto } from './proposta';
 
 let n = 0;
 const base = { responsavelId: 'admin', criadoEm: '', atualizadoEm: '' };
@@ -185,5 +185,24 @@ describe('vitalício', () => {
       marcarVitalicios({ comissaoReceber: 0, recebimentos: [{ id: 'x', data: '2026-01-01', valor: 5 }] })[0]
         ?.vitalicio,
     ).toBeUndefined();
+  });
+});
+
+describe('estorno do produtor', () => {
+  const vendas = [
+    { numero: '123.456-7', produtores: [{ produtorId: 'gisele', percentual: 50 }] },
+    { numero: '1234567', produtores: [{ produtorId: 'mary', percentual: 40 }] },
+  ];
+  it('acha a proposta pelo nº da apólice, de preferência a do produtor', () => {
+    expect(propostaDoEstorno(vendas, '1234567', 'mary')).toBe(vendas[1]);
+    expect(propostaDoEstorno(vendas, '123456-7', 'gisele')).toBe(vendas[0]);
+    expect(propostaDoEstorno(vendas, '123456-7')).toBe(vendas[0]);
+    expect(propostaDoEstorno(vendas, '999')).toBeUndefined();
+    expect(propostaDoEstorno(vendas, '  ')).toBeUndefined();
+  });
+  it('desconta do produtor só o % dele sobre a comissão estornada', () => {
+    expect(descontoDoEstorno(100000, 40)).toBe(40000);
+    expect(descontoDoEstorno(100000, 50)).toBe(50000);
+    expect(descontoDoEstorno(33333, 15)).toBe(5000);
   });
 });

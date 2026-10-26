@@ -87,6 +87,10 @@ Tokio Marine, Yelum, Youse e Zurich, com a opção de incluir outras.
 
 - **Estorno**: nome do segurado, nº da apólice, seguradora, produto, produtor, data e valor.
   Desconta do pagamento do produtor no mês.
+  - **% do produtor** (pedido de 26/10/2026): o produtor devolve só a parte dele da comissão estornada.
+    Vale nos **dois CRMs** (Seguros e Consórcio). O CRM sugere o % da venda (proposta com o mesmo
+    nº de apólice) ou, sem ela, o repasse padrão do produtor, e calcula **desconto do produtor =
+    comissão estornada × %** (ex.: R$ 1.000 × 40% = R$ 400). O % e o desconto podem ser ajustados.
 - **Vale**: produtor, data, valor e motivo. Desconta do pagamento do mês.
 
 ### 0.6 Relatórios
@@ -216,6 +220,7 @@ Regras extras:
 **Cotações (funil)**
 - Etapas: Novo → Em contato → Proposta enviada → Fechado / Perdido (com motivo: mover para Perdido pede o
   motivo). Os produtos são os mesmos de Propostas (lista de Configurações).
+- Sem valor estimado: o campo saiu da cotação a pedido da Portella (26/10/2026).
 - Indicadores: em aberto, propostas enviadas, fechadas e taxa de conversão.
 
 ## 4. CRM de Consórcio (sistema separado)
@@ -270,7 +275,10 @@ Substitui as abas "Bradesco", "Demonstrativo" e "Faturamento". A poupança ficou
 
 - **Resumo do mês**: saldo da conta corrente, entradas, saídas, despesas em aberto, saldos por
   conta, faturamento mensal e próximas despesas.
-- **Extrato**: movimentos da conta (Bradesco) com saldo acumulado.
+- **Extrato**: movimentos da conta (Bradesco) com saldo acumulado. Nas **entradas**, o campo **Recebido de**
+  lista as seguradoras e as **origens de recebimento** (Configurações), como o cliente que paga a comissão
+  direto no plano de saúde; a descrição vira um detalhe opcional. Entradas importadas sem origem continuam
+  editáveis só com a descrição.
 - **Despesas**: contas a pagar com vencimento, pagamento e situação (paga, em aberto, vencida). **Pagar…**
   pede a data e, se marcado, lança a saída no extrato Bradesco, para despesas e conta baterem.
 - **Faturamento**: fechamento mensal (comissões recebidas e crédito de consórcio vendido), com total por ano.
@@ -279,16 +287,22 @@ Substitui as abas "Bradesco", "Demonstrativo" e "Faturamento". A poupança ficou
 
 ## 5. Importação da planilha
 
+No CRM, o administrador abre **Importar** e escolhe a **planilha da corretora (.xlsx)**, do jeito que
+está no Excel (pedido de 26/10/2026: nada de JSON). Se a planilha tiver senha, o CRM pede a senha e
+abre o arquivo **só em memória, no próprio navegador**: a senha e os dados não vão para nenhum servidor
+nem ficam guardados. Depois é conferir o resumo (clientes, propostas, recebimentos, estornos,
+pagamentos aos produtores…) e os avisos e confirmar. Reimportar a mesma planilha **atualiza**
+os registros, sem duplicar.
+
+A tela ainda aceita o `.json` do importador de linha de comando, que continua disponível para
+conferir a conversão no computador:
+
 ```bash
 cd crm
 PLANILHA_SENHA='…' npm run importar --silent -- /caminho/Portella_Corretora_Seguros_Dezembro.xlsx
 ```
 
-A planilha é protegida por senha. O importador a abre **só em memória**: a senha e os dados
-nunca vão para o Git. Os arquivos gerados ficam em `crm/dados/` (fora do Git):
-`seguros.seed.json`, `consorcio.seed.json` e `relatorio.json`. No CRM, o administrador abre
-**Importar**, confere o resumo e os avisos e confirma. Reimportar o mesmo arquivo **atualiza**
-os registros, sem duplicar.
+Ele gera em `crm/dados/` (fora do Git) `seguros.seed.json`, `consorcio.seed.json` e `relatorio.json`.
 
 Os produtores da planilha (Carla, Deliziane, Gabriel, Gisele, Silvana, Renata, Felippe) já são
 cadastrados no primeiro acesso. O importador liga cada venda ao usuário de mesmo nome (ou mesmo

@@ -30,21 +30,53 @@ export function PaginaImportar() {
   const [erro, setErro] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState(false);
   const [concluida, setConcluida] = useState(false);
+  // Planilha com senha: guarda o arquivo até a senha ser informada.
+  const [protegida, setProtegida] = useState<File | null>(null);
+  const [senha, setSenha] = useState('');
   const refinada = useRefinada();
 
   if (!importacao) return null;
 
-  const escolher = async (arquivo: File | undefined) => {
+  /** A planilha (.xlsx) é convertida aqui mesmo, no navegador; o .json do importador também vale. */
+  const lerArquivo = async (arquivo: File, senhaPlanilha?: string) => {
+    if (/\.json$/i.test(arquivo.name)) {
+      try {
+        return { dados: JSON.parse(await arquivo.text()) as unknown, avisos: [] };
+      } catch (e) {
+        if (e instanceof SyntaxError) throw new Error('O arquivo não é um JSON válido.');
+        throw e;
+      }
+    }
+    const { converterPlanilha } = await import('@portella/importer/navegador');
+    const r = await converterPlanilha(
+      new Uint8Array(await arquivo.arrayBuffer()),
+      arquivo.name,
+      senhaPlanilha,
+    );
+    return { dados: r[importacao.parte] as unknown, avisos: r.avisos };
+  };
+
+  const escolher = async (arquivo: File | undefined, senhaPlanilha?: string) => {
     setPrevia(null);
     setErro(null);
     setConcluida(false);
     if (!arquivo) return;
     setAnalisando(true);
     try {
-      const dados: unknown = JSON.parse(await arquivo.text());
-      setPrevia(await importacao.analisar(dados, usuario, equipe));
+      const { dados, avisos } = await lerArquivo(arquivo, senhaPlanilha);
+      const p = await importacao.analisar(dados, usuario, equipe);
+      setPrevia({ ...p, avisos: [...avisos, ...p.avisos] });
+      setProtegida(null);
+      setSenha('');
     } catch (e) {
-      setErro(e instanceof SyntaxError ? 'O arquivo não é um JSON válido.' : mensagemErro(e));
+      const { ErroSenhaPlanilha } = await import('@portella/importer/navegador');
+      if (e instanceof ErroSenhaPlanilha) {
+        setProtegida(arquivo);
+        if (e.motivo === 'incorreta') setErro(e.message);
+      } else {
+        setProtegida(null);
+        setErro(mensagemErro(e));
+      }
     } finally {
       setAnalisando(false);
     }
@@ -80,17 +112,17 @@ export function PaginaImportar() {
       <div className="grade-2">
         <Cartao titulo="1. Arquivo">
           <Campo
-            rotulo="Arquivo gerado pelo importador (.json)"
+            rotulo="Planilha da corretora (.xlsx)"
             dica={
               refinada
-                ? 'O arquivo .json que o importador gera a partir da planilha da corretora. Escolher de novo o mesmo arquivo também funciona.'
-                : 'Gere com: npm run importar -- planilha.xlsx'
+                ? 'A planilha de controle da Portella, do jeito que está no Excel (A Receber, comissões de cada produtor…). Escolher de novo o mesmo arquivo também funciona.'
+                : 'A planilha da Portella (.xlsx), do jeito que está no Excel.'
             }
-            erro={erro ?? undefined}
+            erro={protegida ? undefined : (erro ?? undefined)}
           >
             <Entrada
               type="file"
-              accept="application/json,.json"
+              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.json,application/json"
               onChange={(e) => {
                 void escolher(e.target.files?.[0]);
                 // Limpa a escolha para que o mesmo arquivo possa ser escolhido de novo.
@@ -99,6 +131,34 @@ export function PaginaImportar() {
               disabled={analisando || importando}
             />
           </Campo>
+          {protegida && (
+            <form
+              className="acoes-linha"
+              style={{ justifyContent: 'stretch', alignItems: 'flex-end', marginTop: 14 }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (senha) void escolher(protegida, senha);
+              }}
+            >
+              <Campo
+                rotulo="Senha da planilha"
+                className="span-todo"
+                erro={erro ?? undefined}
+                dica="A planilha tem senha. Ela é usada só para abrir o arquivo aqui e não fica guardada."
+              >
+                <Entrada
+                  type="password"
+                  autoComplete="off"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  autoFocus
+                />
+              </Campo>
+              <Botao type="submit" carregando={analisando} disabled={!senha}>
+                Abrir planilha
+              </Botao>
+            </form>
+          )}
         </Cartao>
         <Cartao titulo="2. Conferir e importar">
           {!previa ? (
@@ -115,7 +175,11 @@ export function PaginaImportar() {
               </EstadoVazio>
             ) : (
               <p className="texto-suave">
-                {analisando ? 'Analisando…' : 'Escolha o arquivo para ver o que será importado.'}
+                {analisando
+                  ? 'Lendo a planilha…'
+                  : protegida
+                    ? 'Informe a senha da planilha para continuar.'
+                    : 'Escolha a planilha para ver o que será importado.'}
               </p>
             )
           ) : (

@@ -1,12 +1,14 @@
 import ExcelJS from 'exceljs';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import { createHash, randomBytes } from 'node:crypto';
 import { join } from 'node:path';
 import officeCrypto from 'officecrypto-tool';
 import { describe, expect, it } from 'vitest';
 import { converter, tipoDaAba } from './converter';
 import { lerPlanilha } from './ler';
 import { identificarCampo } from './mapeamento';
+import { sha512 } from './sha512';
 import { data, dinheiro, percentual, periodo } from './valores';
 
 describe('valores', () => {
@@ -225,5 +227,14 @@ describe('lerPlanilha', () => {
     await expect(lerPlanilha(caminho)).rejects.toThrow(/protegida por senha/);
     await expect(lerPlanilha(caminho, 'errada')).rejects.toThrow(/incorreta/);
     expect((await lerPlanilha(caminho, 'segredo'))[0]?.linhas[1]?.[0]).toBe('Ana Teste');
+  });
+});
+
+describe('sha512', () => {
+  it('confere com o SHA-512 do Node em vários tamanhos', () => {
+    for (const n of [0, 3, 68, 111, 112, 128, 129, 1000]) {
+      const b = new Uint8Array(randomBytes(n));
+      expect(Buffer.from(sha512(b)).toString('hex')).toBe(createHash('sha512').update(b).digest('hex'));
+    }
   });
 });

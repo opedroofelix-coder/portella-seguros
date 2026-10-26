@@ -33,4 +33,15 @@ describe('catálogos', () => {
     await s.incluir(u('admin'), 'seguradoras', ['Yelum', 'hdi']);
     expect(await s.obter('seguradoras')).toEqual(['HDI', 'Yelum']);
   });
+
+  it('origens de recebimento começam vazias sem padrão e podem ficar vazias', async () => {
+    const s = new ServicoCatalogos(new RepositorioMemoria<Catalogo>(), {
+      produtos: ['Auto'],
+      seguradoras: ['HDI'],
+    });
+    expect(await s.obter('origensRecebimento')).toEqual([]);
+    await s.salvar(u('admin'), 'origensRecebimento', ['Cliente (pagamento direto)']);
+    expect(await s.salvar(u('admin'), 'origensRecebimento', [])).toEqual([]);
+    await expect(s.salvar(u('admin'), 'produtos', [])).rejects.toThrow('vazia');
+  });
 });

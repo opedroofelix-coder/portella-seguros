@@ -29,7 +29,7 @@ import {
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { EntradaDinheiro, EntradaMascara } from '../componentes/Entradas';
+import { EntradaMascara } from '../componentes/Entradas';
 import { SeletorResponsavel } from '../componentes/SeletorResponsavel';
 import { useConfig, useRefinada } from '../config';
 import { aplicarErros, limparVazios, mensagemErro } from '../erros';
@@ -136,7 +136,7 @@ function CartaoOportunidade({
       <strong>{o.nomeContato}</strong>
       <div className={styles.meta}>
         <span>{o.produto}</span>
-        {o.valorEstimado != null && <span>{formatarDinheiro(o.valorEstimado)}</span>}
+        {!refinada && o.valorEstimado != null && <span>{formatarDinheiro(o.valorEstimado)}</span>}
         {o.telefone && <span>{formatarTelefone(o.telefone)}</span>}
         {pode('carteira:ver_todos') && <span>{nomeDe(o.responsavelId)}</span>}
       </div>
@@ -342,16 +342,12 @@ function FormularioOportunidade({
               ))}
             </Selecao>
           </Campo>
-          <Campo
-            rotulo={refinada ? 'Valor estimado' : 'Valor estimado (R$)'}
-            erro={erros.valorEstimado?.message}
-          >
-            {refinada ? (
-              <EntradaDinheiro {...register('valorEstimado')} />
-            ) : (
+          {/* Interface refinada: a Portella não usa o valor estimado na cotação (pedido de 26/10/2026). */}
+          {!refinada && (
+            <Campo rotulo="Valor estimado (R$)" erro={erros.valorEstimado?.message}>
               <Entrada inputMode="decimal" placeholder="0,00" {...register('valorEstimado')} />
-            )}
-          </Campo>
+            </Campo>
+          )}
           {watch('etapa') === 'perdido' && (
             <Campo
               rotulo="Motivo da perda"

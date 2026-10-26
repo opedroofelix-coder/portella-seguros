@@ -164,10 +164,30 @@ export interface Estorno extends Registro {
   data: DataISO;
   /** Comissão devolvida à seguradora. */
   valor: Centavos;
+  /** % do produtor sobre o valor estornado (o mesmo repasse da venda); dele sai o desconto. */
+  percentualProdutor?: number;
   /** Quanto desconta do pagamento do produtor. */
   descontoProdutor: Centavos;
   observacoes?: string;
 }
+
+const chaveNumero = (n?: string) => (n ?? '').replace(/[^0-9a-z]/gi, '').toLowerCase();
+
+/** A proposta do estorno: a de mesmo nº de apólice, de preferência uma em que o produtor participa. */
+export function propostaDoEstorno<P extends Pick<Proposta, 'numero' | 'produtores'>>(
+  propostas: P[],
+  numeroApolice: string | undefined,
+  produtorId?: string,
+): P | undefined {
+  const chave = chaveNumero(numeroApolice);
+  if (!chave) return undefined;
+  const mesmas = propostas.filter((p) => chaveNumero(p.numero) === chave);
+  return (produtorId ? mesmas.find((p) => participa(p, produtorId)) : undefined) ?? mesmas[0];
+}
+
+/** Desconto do produtor: comissão estornada pela seguradora × % do produtor na venda. */
+export const descontoDoEstorno = (valor: Centavos, percentualProdutor: number): Centavos =>
+  porcentagem(valor, percentualProdutor);
 
 /** Adiantamento ao produtor, descontado no pagamento do mês. */
 export interface Vale extends Registro {
@@ -192,6 +212,8 @@ export function validarEstorno(e: Partial<Estorno>): void {
   if (!e.data || !dataValida(e.data)) campos.data = 'Data inválida.';
   if (e.valor == null || e.valor < 0) campos.valor = 'Valor inválido.';
   if (e.descontoProdutor == null || e.descontoProdutor < 0) campos.descontoProdutor = 'Valor inválido.';
+  if (e.percentualProdutor != null && (e.percentualProdutor < 0 || e.percentualProdutor > 100))
+    campos.percentualProdutor = 'Entre 0 e 100%.';
   if (Object.keys(campos).length) throw new ErroValidacao('Confira o estorno.', campos);
 }
 

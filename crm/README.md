@@ -11,5 +11,5 @@ npm test                   # Vitest
 npm run test:e2e           # Playwright: fluxos e responsividade
 npm run typecheck && npm run lint
 npm run build              # gera apps/*/dist
-PLANILHA_SENHA='…' npm run importar --silent -- planilha.xlsx   # gera dados/*.seed.json (fora do Git)
+PLANILHA_SENHA='…' npm run importar --silent -- planilha.xlsx   # opcional: a tela Importar já lê o .xlsx; gera dados/*.seed.json (fora do Git)
 ```

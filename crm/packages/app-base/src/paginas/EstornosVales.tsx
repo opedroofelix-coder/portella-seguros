@@ -1,13 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { DadosRegistro, Estorno, Registro, Vale } from '@portella/core';
+import type { DadosRegistro, Estorno, Proposta, Registro, Vale } from '@portella/core';
 import {
   centavosParaTexto,
   corresponde,
+  descontoDoEstorno,
   formatarData,
   formatarDinheiro,
   hojeISO,
   lerDinheiro,
   paraCentavos,
+  percentualDe,
+  propostaDoEstorno,
   textoDinheiro,
 } from '@portella/core';
 import {
@@ -29,7 +32,7 @@ import {
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { EntradaDinheiro } from '../componentes/Entradas';
+import { EntradaDinheiro, EntradaPercentual } from '../componentes/Entradas';
 import { useRefinada } from '../config';
 import { aplicarErros, mensagemErro } from '../erros';
 import { useCatalogo, useColecao, useEquipe, useRemover, useSalvar } from '../hooks/dados';
@@ -40,6 +43,8 @@ const valor = z.string().refine((v) => paraCentavos(v) != null && paraCentavos(v
 const cent = (t: string, refinada = false) => (refinada ? lerDinheiro : paraCentavos)(t) ?? 0;
 const textoValor = (c: number | undefined, refinada: boolean) =>
   (refinada ? textoDinheiro : centavosParaTexto)(c);
+const textoPct = (n?: number) => (n == null ? '' : String(n).replace('.', ','));
+const lerPct = (t: string) => (t.trim() ? (lerDinheiro(t) ?? NaN) / 100 : undefined);
 
 export function PaginaEstornosVales() {
   const [aba, setAba] = useState<'estornos' | 'vales'>('estornos');
@@ -170,6 +175,14 @@ function ListaEstornos({ gestao }: { gestao: boolean }) {
                 ]
               : []),
             {
+              chave: 'pct',
+              titulo: '% produtor',
+              alinharDireita: true,
+              ocultarNoMobile: true,
+              render: (e: Estorno) =>
+                e.percentualProdutor == null ? '—' : `${textoPct(e.percentualProdutor)}%`,
+            },
+            {
               chave: 'desconto',
               titulo: 'Desconto do produtor',
               alinharDireita: true,
@@ -196,13 +209,18 @@ const esquemaEstorno = z.object({
   produto: z.string().trim().min(1, 'Informe o produto.'),
   data: z.string().min(1, 'Informe a data.'),
   valor,
+  percentualProdutor: z.string().refine((v) => {
+    const n = lerPct(v);
+    return n == null || (n >= 0 && n <= 100);
+  }, 'Entre 0 e 100.'),
   descontoProdutor: valor,
   observacoes: z.string(),
 });
 
 function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar: () => void }) {
-  const { estornos } = useServicos();
+  const { estornos, propostas } = useServicos();
   const { equipe } = useEquipe();
+  const vendas = useColecao<Proposta>('propostas', propostas).data;
   const produtos = useCatalogo('produtos');
   const seguradoras = useCatalogo('seguradoras');
   const salvar = useSalvar<Estorno>('estornos', estornos);
@@ -220,7 +238,9 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
       // Sem a interface refinada a exclusão ficava sem aviso de erro; mantido igual.
       onError: (e) => refinada && avisar(mensagemErro(e), 'erro'),
     });
-  const { register, handleSubmit, formState, setError } = useForm<z.infer<typeof esquemaEstorno>>({
+  const { register, handleSubmit, formState, setError, getValues, setValue, watch } = useForm<
+    z.infer<typeof esquemaEstorno>
+  >({
     resolver: zodResolver(esquemaEstorno),
     defaultValues: {
       responsavelId: estorno?.responsavelId ?? '',
@@ -230,10 +250,49 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
       produto: estorno?.produto ?? '',
       data: estorno?.data ?? hojeISO(),
       valor: textoValor(estorno?.valor, refinada),
+      percentualProdutor: textoPct(estorno?.percentualProdutor),
       descontoProdutor: textoValor(estorno?.descontoProdutor, refinada),
       observacoes: estorno?.observacoes ?? '',
     },
   });
+  // Nos dois CRMs, o % do produtor vem da venda (mesmo nº de apólice) ou do repasse padrão dele,
+  // e o desconto é calculado: comissão estornada × %. O % digitado à mão não é trocado depois.
+  const [pctDigitado, setPctDigitado] = useState(estorno?.percentualProdutor != null);
+  const opcao = { shouldDirty: true, shouldValidate: true } as const;
+  const recalcularDesconto = () => {
+    const pct = lerPct(getValues('percentualProdutor'));
+    const estornado = (refinada ? lerDinheiro : paraCentavos)(getValues('valor'));
+    if (pct == null || Number.isNaN(pct) || estornado == null) return;
+    setValue('descontoProdutor', textoValor(descontoDoEstorno(estornado, pct), refinada), opcao);
+  };
+  const venda = propostaDoEstorno(vendas ?? [], watch('numeroApolice'), watch('responsavelId'));
+  const sugerirPercentual = () => {
+    const produtorId = getValues('responsavelId');
+    const achada = propostaDoEstorno(vendas ?? [], getValues('numeroApolice'), produtorId);
+    if (achada) {
+      // Completa o que estiver em branco com os dados da proposta.
+      if (!getValues('segurado').trim()) setValue('segurado', achada.clienteNome, opcao);
+      if (!getValues('companhia').trim()) setValue('companhia', achada.companhia, opcao);
+      if (!getValues('produto').trim()) setValue('produto', achada.produto, opcao);
+      if (!produtorId && achada.produtores.length === 1)
+        setValue('responsavelId', achada.produtores[0]!.produtorId, opcao);
+    }
+    if (pctDigitado) return;
+    const id = getValues('responsavelId');
+    const pct =
+      achada && id && achada.produtores.some((x) => x.produtorId === id)
+        ? percentualDe(achada, id)
+        : equipe.find((u) => u.id === id)?.percentualRepasse;
+    if (pct == null) return;
+    setValue('percentualProdutor', textoPct(pct), opcao);
+    recalcularDesconto();
+  };
+  const origemPct = (() => {
+    const id = watch('responsavelId');
+    if (venda && id && venda.produtores.some((x) => x.produtorId === id))
+      return `O % de ${equipe.find((u) => u.id === id)?.nome ?? 'produtor'} na proposta ${venda.numero}.`;
+    return 'O repasse do produtor na venda. Sem a proposta, vem o % padrão dele.';
+  })();
   const enviar = handleSubmit(async (v) => {
     const dados: DadosRegistro<Estorno> = {
       ...(estorno ?? {}),
@@ -241,6 +300,7 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
       numeroApolice: v.numeroApolice.trim() || undefined,
       observacoes: v.observacoes.trim() || undefined,
       valor: cent(v.valor, refinada),
+      percentualProdutor: lerPct(v.percentualProdutor),
       descontoProdutor: cent(v.descontoProdutor, refinada),
     };
     try {
@@ -284,8 +344,11 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
         <Campo rotulo="Nome do segurado" obrigatorio erro={erros.segurado?.message} className="span-todo">
           <Entrada {...register('segurado')} />
         </Campo>
-        <Campo rotulo="Nº da apólice">
-          <Entrada {...register('numeroApolice')} />
+        <Campo
+          rotulo="Nº da apólice"
+          dica={venda ? `Proposta de ${venda.clienteNome} encontrada.` : undefined}
+        >
+          <Entrada {...register('numeroApolice', { onBlur: sugerirPercentual })} />
         </Campo>
         <Campo rotulo="Data" obrigatorio erro={erros.data?.message}>
           <Entrada type="date" {...register('data')} />
@@ -307,7 +370,7 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
           ))}
         </datalist>
         <Campo rotulo="Produtor" obrigatorio erro={erros.responsavelId?.message}>
-          <Selecao {...register('responsavelId')}>
+          <Selecao {...register('responsavelId', { onChange: sugerirPercentual })}>
             <option value="">Escolha…</option>
             {equipe
               .filter((u) => !refinada || u.ativo || u.id === estorno?.responsavelId)
@@ -321,13 +384,24 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
         {refinada ? (
           <>
             <Campo rotulo="Comissão estornada pela seguradora" obrigatorio erro={erros.valor?.message}>
-              <EntradaDinheiro {...register('valor')} />
+              <EntradaDinheiro {...register('valor', { onChange: recalcularDesconto })} />
+            </Campo>
+            <Campo rotulo="% do produtor" erro={erros.percentualProdutor?.message} dica={origemPct}>
+              <EntradaPercentual
+                placeholder="Ex.: 40"
+                {...register('percentualProdutor', {
+                  onChange: () => {
+                    setPctDigitado(true);
+                    recalcularDesconto();
+                  },
+                })}
+              />
             </Campo>
             <Campo
               rotulo="Desconto do produtor"
               obrigatorio
               erro={erros.descontoProdutor?.message}
-              dica="Em geral, o valor estornado × o % do produtor na venda."
+              dica="Calculado: comissão estornada × % do produtor. Dá para ajustar."
             >
               <EntradaDinheiro {...register('descontoProdutor')} />
             </Campo>
@@ -335,9 +409,26 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
         ) : (
           <>
             <Campo rotulo="Comissão estornada pela seguradora (R$)" obrigatorio erro={erros.valor?.message}>
-              <Entrada inputMode="decimal" {...register('valor')} />
+              <Entrada inputMode="decimal" {...register('valor', { onChange: recalcularDesconto })} />
             </Campo>
-            <Campo rotulo="Desconto do produtor (R$)" obrigatorio erro={erros.descontoProdutor?.message}>
+            <Campo rotulo="% do produtor" erro={erros.percentualProdutor?.message} dica={origemPct}>
+              <Entrada
+                inputMode="decimal"
+                placeholder="Ex.: 40"
+                {...register('percentualProdutor', {
+                  onChange: () => {
+                    setPctDigitado(true);
+                    recalcularDesconto();
+                  },
+                })}
+              />
+            </Campo>
+            <Campo
+              rotulo="Desconto do produtor (R$)"
+              obrigatorio
+              erro={erros.descontoProdutor?.message}
+              dica="Calculado: comissão estornada × % do produtor. Dá para ajustar."
+            >
               <Entrada inputMode="decimal" {...register('descontoProdutor')} />
             </Campo>
           </>
