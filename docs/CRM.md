@@ -87,6 +87,10 @@ Tokio Marine, Yelum, Youse e Zurich, com a opção de incluir outras.
 
 - **Estorno**: nome do segurado, nº da apólice, seguradora, produto, produtor, data e valor.
   Desconta do pagamento do produtor no mês.
+  - **% do produtor** (pedido de 26/10/2026): o produtor devolve só a parte dele da comissão estornada.
+    O CRM de Seguros sugere o % da venda (proposta com o mesmo nº de apólice) ou, sem ela, o repasse padrão
+    do produtor, e calcula **desconto do produtor = comissão estornada × %** (ex.: R$ 1.000 × 40% = R$ 400).
+    O % e o desconto podem ser ajustados.
 - **Vale**: produtor, data, valor e motivo. Desconta do pagamento do mês.
 
 ### 0.6 Relatórios
@@ -216,6 +220,7 @@ Regras extras:
 **Cotações (funil)**
 - Etapas: Novo → Em contato → Proposta enviada → Fechado / Perdido (com motivo: mover para Perdido pede o
   motivo). Os produtos são os mesmos de Propostas (lista de Configurações).
+- Sem valor estimado: o campo saiu da cotação a pedido da Portella (26/10/2026).
 - Indicadores: em aberto, propostas enviadas, fechadas e taxa de conversão.
 
 ## 4. CRM de Consórcio (sistema separado)
@@ -270,7 +275,10 @@ Substitui as abas "Bradesco", "Demonstrativo" e "Faturamento". A poupança ficou
 
 - **Resumo do mês**: saldo da conta corrente, entradas, saídas, despesas em aberto, saldos por
   conta, faturamento mensal e próximas despesas.
-- **Extrato**: movimentos da conta (Bradesco) com saldo acumulado.
+- **Extrato**: movimentos da conta (Bradesco) com saldo acumulado. Nas **entradas**, o campo **Recebido de**
+  lista as seguradoras e as **origens de recebimento** (Configurações), como o cliente que paga a comissão
+  direto no plano de saúde; a descrição vira um detalhe opcional. Entradas importadas sem origem continuam
+  editáveis só com a descrição.
 - **Despesas**: contas a pagar com vencimento, pagamento e situação (paga, em aberto, vencida). **Pagar…**
   pede a data e, se marcado, lança a saída no extrato Bradesco, para despesas e conta baterem.
 - **Faturamento**: fechamento mensal (comissões recebidas e crédito de consórcio vendido), com total por ano.

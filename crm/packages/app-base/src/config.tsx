@@ -1,4 +1,4 @@
-import type { Acao, Cliente, Perfil, ProdutorInicial, Usuario } from '@portella/core';
+import type { Acao, Cliente, Perfil, ProdutorInicial, TipoCatalogo, Usuario } from '@portella/core';
 import { ROTULO_PERFIL } from '@portella/core';
 import type { ItemMenu } from '@portella/ui';
 import type { ReactNode } from 'react';
@@ -44,6 +44,8 @@ export interface ConfigApp {
    * "Nova proposta". Sem ela, menu lateral como sempre.
    */
   navegacao?: 'topo';
+  /** Listas editáveis só deste app, mostradas em Configurações (ex.: origens de recebimento do Financeiro). */
+  catalogosExtras?: Array<{ tipo: TipoCatalogo; titulo: string; descricao: string }>;
   /** Marca da cápsula do menu no topo (ícone e nome para fundo claro e escuro). */
   marca?: { icone: string; nomeClaro: string; nomeEscuro: string };
 }

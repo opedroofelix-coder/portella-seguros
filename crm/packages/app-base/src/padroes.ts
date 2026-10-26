@@ -16,7 +16,10 @@ export const PRODUTORES_INICIAIS: ProdutorInicial[] = [
   { nome: 'Jessica Naiane' },
 ];
 
-/** Listas iniciais de produtos e seguradoras da proposta; a administradora edita em Configurações. */
+/**
+ * Listas iniciais de produtos e seguradoras da proposta e das origens de recebimento do Financeiro
+ * (além das seguradoras); a administradora edita em Configurações.
+ */
 export const CATALOGOS_PADRAO: Record<TipoCatalogo, string[]> = {
   produtos: [
     'Automóvel',
@@ -70,4 +73,5 @@ export const CATALOGOS_PADRAO: Record<TipoCatalogo, string[]> = {
     'Youse',
     'Zurich',
   ],
+  origensRecebimento: ['Cliente (pagamento direto)'],
 };

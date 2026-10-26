@@ -6,6 +6,7 @@ import {
   resumirMes,
   saldosPorConta,
   situacaoDespesa,
+  textoMovimento,
   validarDespesa,
   validarFechamento,
   validarMovimento,
@@ -78,5 +79,16 @@ describe('financeiro', () => {
     expect(() => validarDespesa(desp({ valor: 0 }))).toThrow(ErroValidacao);
     expect(() => validarFechamento({ mes: '2024-13' })).toThrow(ErroValidacao);
     expect(() => validarFechamento({ mes: '2024-12' })).not.toThrow();
+  });
+});
+
+describe('origem do recebimento', () => {
+  it('mostra a origem da entrada e o detalhe, sem repetir', () => {
+    expect(textoMovimento(mov({ origem: 'Porto Seguro', descricao: 'Porto Seguro' }))).toBe('Porto Seguro');
+    expect(textoMovimento(mov({ origem: 'Cliente (pagamento direto)', descricao: 'Saúde Ana' }))).toBe(
+      'Cliente (pagamento direto) · Saúde Ana',
+    );
+    expect(textoMovimento(mov({ descricao: 'TED recebida' }))).toBe('TED recebida');
+    expect(textoMovimento(mov({ tipo: 'saldo_inicial', descricao: 'Jan' }))).toBe('Saldo inicial · Jan');
   });
 });

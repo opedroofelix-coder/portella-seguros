@@ -12,7 +12,7 @@ import {
 } from '@portella/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useRefinada, useRotuloPerfil } from '../config';
+import { useConfig, useRefinada, useRotuloPerfil } from '../config';
 import { mensagemErro } from '../erros';
 import { useCatalogo, useEquipe } from '../hooks/dados';
 import { useServicos } from '../servicos';
@@ -21,6 +21,7 @@ import styles from './Configuracoes.module.css';
 
 export function PaginaConfiguracoes() {
   const { pode } = useSessao();
+  const { catalogosExtras = [] } = useConfig();
   return (
     <>
       <CabecalhoPagina
@@ -33,6 +34,9 @@ export function PaginaConfiguracoes() {
           <EditorCatalogo tipo="produtos" titulo="Produtos" />
           <EditorCatalogo tipo="seguradoras" titulo="Seguradoras" />
         </div>
+        {catalogosExtras.map((c) => (
+          <EditorCatalogo key={c.tipo} tipo={c.tipo} titulo={c.titulo} descricao={c.descricao} />
+        ))}
       </div>
     </>
   );
@@ -174,7 +178,15 @@ function LinhaRepasse({
   );
 }
 
-function EditorCatalogo({ tipo, titulo }: { tipo: TipoCatalogo; titulo: string }) {
+function EditorCatalogo({
+  tipo,
+  titulo,
+  descricao,
+}: {
+  tipo: TipoCatalogo;
+  titulo: string;
+  descricao?: string;
+}) {
   const itens = useCatalogo(tipo);
   const usuario = useUsuario();
   const { catalogos } = useServicos();
@@ -211,6 +223,11 @@ function EditorCatalogo({ tipo, titulo }: { tipo: TipoCatalogo; titulo: string }
 
   return (
     <Cartao titulo={`${titulo} (${itens.length})`}>
+      {descricao && (
+        <p className="texto-suave" style={{ marginTop: 0 }}>
+          {descricao}
+        </p>
+      )}
       <form
         className="acoes-linha"
         style={{ justifyContent: 'stretch', alignItems: 'flex-end', marginBottom: 14 }}
@@ -252,7 +269,11 @@ function EditorCatalogo({ tipo, titulo }: { tipo: TipoCatalogo; titulo: string }
         <ConfirmarAcao
           aberto={removendo != null}
           titulo={`Excluir "${removendo}" da lista?`}
-          mensagem="Some das opções das propostas novas. As propostas já lançadas continuam com esse nome."
+          mensagem={
+            descricao
+              ? 'Some das opções dos lançamentos novos. Os já lançados continuam com esse nome.'
+              : 'Some das opções das propostas novas. As propostas já lançadas continuam com esse nome.'
+          }
           textoConfirmar="Excluir da lista"
           perigo
           carregando={salvar.isPending}

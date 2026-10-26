@@ -6,9 +6,16 @@ import { ambientePadrao } from '../ports/relogio';
 import type { Repositorio } from '../ports/repositorio';
 import { exigir } from './permissoes';
 
-export type TipoCatalogo = 'produtos' | 'seguradoras';
+/**
+ * Listas editáveis: produtos e seguradoras (propostas e estornos) e as origens de recebimento do
+ * Financeiro que não são seguradoras (ex.: o cliente que paga a comissão do plano de saúde direto).
+ */
+export type TipoCatalogo = 'produtos' | 'seguradoras' | 'origensRecebimento';
 
-/** Lista editável (produtos, seguradoras). O id do registro é o tipo do catálogo. */
+/** Listas que precisam de pelo menos um item (as opções obrigatórias da proposta). */
+const OBRIGATORIOS: TipoCatalogo[] = ['produtos', 'seguradoras'];
+
+/** Lista editável. O id do registro é o tipo do catálogo. */
 export interface Catalogo {
   id: TipoCatalogo;
   itens: string[];
@@ -29,18 +36,19 @@ export function limparItens(itens: string[]): string[] {
 export class ServicoCatalogos {
   constructor(
     private readonly repositorio: Repositorio<Catalogo>,
-    private readonly padroes: Record<TipoCatalogo, string[]>,
+    private readonly padroes: Partial<Record<TipoCatalogo, string[]>>,
     private readonly ambiente: Ambiente = ambientePadrao,
   ) {}
 
   async obter(tipo: TipoCatalogo): Promise<string[]> {
-    return (await this.repositorio.obter(tipo))?.itens ?? limparItens(this.padroes[tipo]);
+    return (await this.repositorio.obter(tipo))?.itens ?? limparItens(this.padroes[tipo] ?? []);
   }
 
   async salvar(usuario: Usuario, tipo: TipoCatalogo, itens: string[]): Promise<string[]> {
     exigir(usuario, 'financeiro:gerenciar');
     const limpos = limparItens(itens);
-    if (!limpos.length) throw new ErroValidacao('A lista não pode ficar vazia.');
+    if (!limpos.length && OBRIGATORIOS.includes(tipo))
+      throw new ErroValidacao('A lista não pode ficar vazia.');
     await this.repositorio.salvar({
       id: tipo,
       itens: limpos,

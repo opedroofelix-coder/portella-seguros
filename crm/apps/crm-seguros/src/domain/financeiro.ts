@@ -11,6 +11,15 @@ export interface Movimento extends Registro {
   tipo: 'entrada' | 'saida' | 'saldo_inicial';
   valor: Centavos;
   documento?: string;
+  /** Entradas: de quem veio o dinheiro (uma seguradora ou uma origem de Configurações, como o cliente). */
+  origem?: string;
+}
+
+/** Texto do movimento no extrato: a origem da entrada e, se houver, o detalhe da descrição. */
+export function textoMovimento(m: Pick<Movimento, 'descricao' | 'origem' | 'tipo'>): string {
+  if (m.tipo === 'saldo_inicial') return `Saldo inicial · ${m.descricao}`;
+  if (!m.origem || m.descricao === m.origem) return m.descricao;
+  return `${m.origem} · ${m.descricao}`;
 }
 
 /** Conta a pagar da empresa (aba "Demonstrativo", seção Despesas). */
