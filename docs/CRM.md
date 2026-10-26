@@ -88,9 +88,9 @@ Tokio Marine, Yelum, Youse e Zurich, com a opção de incluir outras.
 - **Estorno**: nome do segurado, nº da apólice, seguradora, produto, produtor, data e valor.
   Desconta do pagamento do produtor no mês.
   - **% do produtor** (pedido de 26/10/2026): o produtor devolve só a parte dele da comissão estornada.
-    O CRM de Seguros sugere o % da venda (proposta com o mesmo nº de apólice) ou, sem ela, o repasse padrão
-    do produtor, e calcula **desconto do produtor = comissão estornada × %** (ex.: R$ 1.000 × 40% = R$ 400).
-    O % e o desconto podem ser ajustados.
+    Vale nos **dois CRMs** (Seguros e Consórcio). O CRM sugere o % da venda (proposta com o mesmo
+    nº de apólice) ou, sem ela, o repasse padrão do produtor, e calcula **desconto do produtor =
+    comissão estornada × %** (ex.: R$ 1.000 × 40% = R$ 400). O % e o desconto podem ser ajustados.
 - **Vale**: produtor, data, valor e motivo. Desconta do pagamento do mês.
 
 ### 0.6 Relatórios

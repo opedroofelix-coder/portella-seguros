@@ -123,7 +123,6 @@ function ListaEstornos({ gestao }: { gestao: boolean }) {
   const { data, isPending } = useColecao<Estorno>('estornos', estornos);
   const { nomeDe } = useEquipe();
   const { filtros, filtrar } = useFiltroProdutor();
-  const refinada = useRefinada();
   const [editando, setEditando] = useState<Estorno | 'novo' | null>(null);
   const lista = filtrar(
     data ?? [],
@@ -175,18 +174,14 @@ function ListaEstornos({ gestao }: { gestao: boolean }) {
                   },
                 ]
               : []),
-            ...(refinada
-              ? [
-                  {
-                    chave: 'pct',
-                    titulo: '% produtor',
-                    alinharDireita: true,
-                    ocultarNoMobile: true,
-                    render: (e: Estorno) =>
-                      e.percentualProdutor == null ? '—' : `${textoPct(e.percentualProdutor)}%`,
-                  },
-                ]
-              : []),
+            {
+              chave: 'pct',
+              titulo: '% produtor',
+              alinharDireita: true,
+              ocultarNoMobile: true,
+              render: (e: Estorno) =>
+                e.percentualProdutor == null ? '—' : `${textoPct(e.percentualProdutor)}%`,
+            },
             {
               chave: 'desconto',
               titulo: 'Desconto do produtor',
@@ -260,15 +255,15 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
       observacoes: estorno?.observacoes ?? '',
     },
   });
-  // Interface refinada: o % do produtor vem da venda (mesmo nº de apólice) ou do repasse padrão dele,
+  // Nos dois CRMs, o % do produtor vem da venda (mesmo nº de apólice) ou do repasse padrão dele,
   // e o desconto é calculado: comissão estornada × %. O % digitado à mão não é trocado depois.
   const [pctDigitado, setPctDigitado] = useState(estorno?.percentualProdutor != null);
   const opcao = { shouldDirty: true, shouldValidate: true } as const;
   const recalcularDesconto = () => {
     const pct = lerPct(getValues('percentualProdutor'));
-    const estornado = lerDinheiro(getValues('valor'));
+    const estornado = (refinada ? lerDinheiro : paraCentavos)(getValues('valor'));
     if (pct == null || Number.isNaN(pct) || estornado == null) return;
-    setValue('descontoProdutor', textoDinheiro(descontoDoEstorno(estornado, pct)), opcao);
+    setValue('descontoProdutor', textoValor(descontoDoEstorno(estornado, pct), refinada), opcao);
   };
   const venda = propostaDoEstorno(vendas ?? [], watch('numeroApolice'), watch('responsavelId'));
   const sugerirPercentual = () => {
@@ -305,7 +300,7 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
       numeroApolice: v.numeroApolice.trim() || undefined,
       observacoes: v.observacoes.trim() || undefined,
       valor: cent(v.valor, refinada),
-      percentualProdutor: refinada ? lerPct(v.percentualProdutor) : estorno?.percentualProdutor,
+      percentualProdutor: lerPct(v.percentualProdutor),
       descontoProdutor: cent(v.descontoProdutor, refinada),
     };
     try {
@@ -351,9 +346,9 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
         </Campo>
         <Campo
           rotulo="Nº da apólice"
-          dica={refinada && venda ? `Proposta de ${venda.clienteNome} encontrada.` : undefined}
+          dica={venda ? `Proposta de ${venda.clienteNome} encontrada.` : undefined}
         >
-          <Entrada {...register('numeroApolice', refinada ? { onBlur: sugerirPercentual } : undefined)} />
+          <Entrada {...register('numeroApolice', { onBlur: sugerirPercentual })} />
         </Campo>
         <Campo rotulo="Data" obrigatorio erro={erros.data?.message}>
           <Entrada type="date" {...register('data')} />
@@ -375,7 +370,7 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
           ))}
         </datalist>
         <Campo rotulo="Produtor" obrigatorio erro={erros.responsavelId?.message}>
-          <Selecao {...register('responsavelId', refinada ? { onChange: sugerirPercentual } : undefined)}>
+          <Selecao {...register('responsavelId', { onChange: sugerirPercentual })}>
             <option value="">Escolha…</option>
             {equipe
               .filter((u) => !refinada || u.ativo || u.id === estorno?.responsavelId)
@@ -414,9 +409,26 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
         ) : (
           <>
             <Campo rotulo="Comissão estornada pela seguradora (R$)" obrigatorio erro={erros.valor?.message}>
-              <Entrada inputMode="decimal" {...register('valor')} />
+              <Entrada inputMode="decimal" {...register('valor', { onChange: recalcularDesconto })} />
             </Campo>
-            <Campo rotulo="Desconto do produtor (R$)" obrigatorio erro={erros.descontoProdutor?.message}>
+            <Campo rotulo="% do produtor" erro={erros.percentualProdutor?.message} dica={origemPct}>
+              <Entrada
+                inputMode="decimal"
+                placeholder="Ex.: 40"
+                {...register('percentualProdutor', {
+                  onChange: () => {
+                    setPctDigitado(true);
+                    recalcularDesconto();
+                  },
+                })}
+              />
+            </Campo>
+            <Campo
+              rotulo="Desconto do produtor (R$)"
+              obrigatorio
+              erro={erros.descontoProdutor?.message}
+              dica="Calculado: comissão estornada × % do produtor. Dá para ajustar."
+            >
               <Entrada inputMode="decimal" {...register('descontoProdutor')} />
             </Campo>
           </>
