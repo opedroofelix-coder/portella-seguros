@@ -7,7 +7,7 @@ import { isoData, somarMeses, sorteador } from './gerador';
 
 /** Contas da demonstração (só existem no banco da demo, no navegador de quem abre). */
 export const ADMIN_DEMO = { nome: 'Administradora (demo)', login: 'admin', senha: 'demo1234' };
-export const PRODUTORA_DEMO = { nome: 'Gisele', login: 'gisele', senha: 'demo1234' };
+export const PRODUTORA_DEMO = { nome: 'Gisele Costa', login: 'gisele', senha: 'demo1234' };
 
 export interface OpcoesSemear {
   importacao: Importacao;
@@ -66,7 +66,7 @@ export async function prepararDemo(servicos: ServicosBase, o: OpcoesSemear): Pro
   // Vales do mês, descontados no pagamento.
   for (const [login, valor, motivo] of [
     ['deliziane', 300, 'Adiantamento'],
-    ['carla', 150, 'Combustível'],
+    ['jessica', 150, 'Combustível'],
   ] as const) {
     await servicos.vales.salvar(admin, {
       responsavelId: porLogin(login).id,
@@ -79,7 +79,7 @@ export async function prepararDemo(servicos: ServicosBase, o: OpcoesSemear): Pro
   // Funil de vendas com oportunidades em todas as etapas.
   const etapas: Etapa[] = ['novo', 'novo', 'contato', 'contato', 'proposta', 'proposta', 'ganho', 'perdido'];
   for (const [i, etapa] of etapas.entries()) {
-    const dono = porLogin(['gisele', 'deliziane', 'carla', 'mary'][i % 4]!);
+    const dono = porLogin(['gisele', 'deliziane', 'jessica', 'marielly'][i % 4]!);
     await servicos.oportunidades.salvar(admin, {
       nomeContato: `Contato Teste ${['Aguiar', 'Brito', 'Costa', 'Dias', 'Fontes', 'Garcia', 'Lima', 'Neves'][i]}`,
       telefone: `(11) 9${8000 + i * 111}-${4000 + i * 37}`,

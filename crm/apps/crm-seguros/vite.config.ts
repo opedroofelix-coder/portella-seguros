@@ -4,6 +4,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // Demonstração (VITE_DEMO=1): caminhos relativos para rodar dentro de outra página, sem service worker.
 const demo = process.env.VITE_DEMO === '1';
+// Publicado numa subpasta do site (ex.: /seguro/): o manifesto do app instalável usa a raiz, então fica sem.
+const subpasta = (process.env.VITE_BASE ?? '/') !== '/';
 
 export default defineConfig({
   // VITE_BASE fixa o caminho de publicação (ex.: /seguro/ no site, ver scripts/build-vercel.sh).
@@ -12,7 +14,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      disable: demo,
+      disable: demo || subpasta,
       registerType: 'autoUpdate',
       includeAssets: ['logo.svg', 'icone.svg'],
       manifest: {

@@ -51,7 +51,7 @@ describe('demonstração do CRM de Seguros', () => {
 
     const admin = await s.autenticacao.usuarioAtual();
     expect(admin?.login).toBe(ADMIN_DEMO.login);
-    expect(await s.usuarios.listar()).toHaveLength(11);
+    expect(await s.usuarios.listar()).toHaveLength(10);
     const propostas = await s.propostas.listar(admin!);
     expect(propostas).toHaveLength(223);
     expect(propostas.filter((p) => p.status === 'pendente')).toHaveLength(3);

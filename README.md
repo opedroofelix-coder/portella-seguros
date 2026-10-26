@@ -25,7 +25,7 @@ assets/css/style.css           # estilos; cores e fontes em :root (variáveis CS
 assets/js/main.js              # pó dourado, menu mobile, carrosséis, contadores, FAQ e modal de cotação
 api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
 crm/                           # CRM de seguros e consórcio (React); especificação em docs/CRM.md
-vercel.json, scripts/build-vercel.sh  # publicação: site na raiz e demonstração do CRM em /seguro
+vercel.json, scripts/build-vercel.sh  # publicação: site na raiz e CRM de Seguros em /seguro
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
 assets/img/seguradoras/         # logos da faixa (26): *.png originais 600x240; o site usa *.webp 300x120 (mais leves)
@@ -55,9 +55,11 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 ## Publicação na Vercel
 
 O `vercel.json` instala o CRM (`cd crm && npm ci`) e roda `scripts/build-vercel.sh`, que monta a
-pasta `publico/` com o site na raiz e a **demonstração do CRM de Seguros em `/seguro`** (dados
-fictícios, que ficam só no navegador; `/seguros` também leva para lá). A função `api/avaliacoes.js`
-continua publicada. A demonstração não é indexada pelo Google (`X-Robots-Tag: noindex`).
+pasta `publico/` com o site na raiz e o **CRM de Seguros em `/seguro`**, sem dados de teste: no primeiro
+acesso pede para criar o administrador e cadastra os produtores (os dados ficam só no navegador de quem
+usa até o backend ser escolhido; `/seguros` também leva para lá). Quem abriu a demonstração antiga tem
+os clientes de teste dela apagados do navegador. A função `api/avaliacoes.js` continua publicada. O CRM
+não é indexado pelo Google (`X-Robots-Tag: noindex`).
 
 Para testar o build na máquina: `sh scripts/build-vercel.sh` e depois `cd publico && python3 -m http.server`.
 

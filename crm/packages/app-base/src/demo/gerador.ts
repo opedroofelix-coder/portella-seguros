@@ -46,9 +46,9 @@ export interface GeracaoDemo {
 /** Produtores da demonstração (os mesmos nomes de `PRODUTORES_INICIAIS`) com o % usado. */
 export const PRODUTORES_DEMO = [
   { nome: 'Deliziane', percentual: 40, peso: 5 },
-  { nome: 'Gisele', percentual: 50, peso: 4 },
-  { nome: 'Carla', percentual: 20, peso: 3 },
-  { nome: 'Mary', percentual: 15, peso: 2 },
+  { nome: 'Gisele Costa', percentual: 50, peso: 4 },
+  { nome: 'Jessica Naiane', percentual: 20, peso: 3 },
+  { nome: 'Marielly', percentual: 15, peso: 2 },
   { nome: 'Danila', percentual: 50, peso: 2 },
   { nome: 'Luana', percentual: 50, peso: 2 },
 ];
@@ -155,7 +155,7 @@ export function gerarDemo(o: OpcoesDemo): GeracaoDemo {
         ? []
         : sorte < 0.24
           ? [
-              { nome: 'Carla', percentual: 20 },
+              { nome: 'Jessica Naiane', percentual: 20 },
               { nome: 'Deliziane', percentual: 20 },
             ]
           : [{ nome: principal.nome, percentual: principal.percentual }];

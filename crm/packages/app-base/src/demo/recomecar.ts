@@ -13,17 +13,23 @@ export function recomecarDemo(banco: string) {
 }
 
 export async function limparDemoSePedido(banco: string): Promise<void> {
-  let pedido = false;
   try {
-    pedido = localStorage.getItem(chave(banco)) === '1';
-    if (pedido) {
-      localStorage.removeItem(chave(banco));
-      localStorage.removeItem(`${banco}:sessao`);
-    }
+    if (localStorage.getItem(chave(banco)) !== '1') return;
   } catch {
     return;
   }
-  if (!pedido || typeof indexedDB === 'undefined') return;
+  await apagarBanco(banco);
+}
+
+/** Apaga do navegador o banco e a sessão salva (não faz nada se o banco não existe). */
+export async function apagarBanco(banco: string): Promise<void> {
+  try {
+    localStorage.removeItem(chave(banco));
+    localStorage.removeItem(`${banco}:sessao`);
+  } catch {
+    // Sem localStorage não há sessão salva.
+  }
+  if (typeof indexedDB === 'undefined') return;
   await new Promise<void>((pronto) => {
     const pedidoExclusao = indexedDB.deleteDatabase(banco);
     pedidoExclusao.onsuccess = pedidoExclusao.onerror = pedidoExclusao.onblocked = () => pronto();
