@@ -55,8 +55,9 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 ## Publicação na Vercel
 
 O `vercel.json` instala o CRM (`cd crm && npm ci`) e roda `scripts/build-vercel.sh`, que monta a
-pasta `publico/` com o site na raiz e a **demonstração do CRM de Seguros em `/seguro`** (dados
-fictícios, que ficam só no navegador; `/seguros` também leva para lá). A função `api/avaliacoes.js`
+pasta `publico/` com o site na raiz e a **demonstração do CRM de Seguros em `/seguro`**, só com a
+equipe (administradora e produtores), sem clientes de teste; os dados ficam só no navegador e quem
+abriu a demonstração antiga tem os clientes de teste dela apagados (`/seguros` também leva para lá). A função `api/avaliacoes.js`
 continua publicada. A demonstração não é indexada pelo Google (`X-Robots-Tag: noindex`).
 
 Para testar o build na máquina: `sh scripts/build-vercel.sh` e depois `cd publico && python3 -m http.server`.

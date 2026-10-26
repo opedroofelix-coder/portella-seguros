@@ -7,7 +7,14 @@ import styles from './BarraDemo.module.css';
 import { ADMIN_DEMO, PRODUTORA_DEMO } from './semear';
 
 /** Faixa fixa da demonstração: troca entre a visão da administradora e a de uma produtora. */
-export function BarraDemo({ aoRecomecar }: { aoRecomecar: () => void }) {
+export function BarraDemo({
+  aoRecomecar,
+  ficticios = true,
+}: {
+  aoRecomecar: () => void;
+  /** false quando a demonstração abre só com a equipe, sem dados de teste. */
+  ficticios?: boolean;
+}) {
   const { usuario, entrar } = useSessao();
   const navegar = useNavigate();
   const { avisar } = useAvisos();
@@ -30,7 +37,8 @@ export function BarraDemo({ aoRecomecar }: { aoRecomecar: () => void }) {
   return (
     <aside className={styles.barra} aria-label="Demonstração">
       <span className={styles.selo}>
-        <strong>Demonstração</strong> · dados fictícios
+        <strong>Demonstração</strong>
+        {ficticios && ' · dados fictícios'}
       </span>
       <label className={styles.visao}>
         <span>Ver como</span>

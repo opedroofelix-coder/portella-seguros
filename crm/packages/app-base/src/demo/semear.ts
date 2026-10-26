@@ -7,7 +7,7 @@ import { isoData, somarMeses, sorteador } from './gerador';
 
 /** Contas da demonstração (só existem no banco da demo, no navegador de quem abre). */
 export const ADMIN_DEMO = { nome: 'Administradora (demo)', login: 'admin', senha: 'demo1234' };
-export const PRODUTORA_DEMO = { nome: 'Gisele', login: 'gisele', senha: 'demo1234' };
+export const PRODUTORA_DEMO = { nome: 'Gisele Costa', login: 'gisele', senha: 'demo1234' };
 
 export interface OpcoesSemear {
   importacao: Importacao;
@@ -28,16 +28,9 @@ export interface OpcoesSemear {
 export async function prepararDemo(servicos: ServicosBase, o: OpcoesSemear): Promise<boolean> {
   if (await servicos.usuarios.existeAlgum()) return false;
   const r = sorteador(77);
-  const admin = await servicos.usuarios.configurarAdministrador(ADMIN_DEMO);
-  await servicos.usuarios.criarProdutoresIniciais(admin, PRODUTORES_INICIAIS);
-  let equipe = await servicos.usuarios.listar();
+  const admin = await criarEquipeDemo(servicos);
+  const equipe = await servicos.usuarios.listar();
   const porLogin = (login: string) => equipe.find((u) => u.login === login)!;
-  await servicos.usuarios.alterarPropriaSenha(
-    porLogin(PRODUTORA_DEMO.login),
-    SENHA_PADRAO,
-    PRODUTORA_DEMO.senha,
-  );
-  equipe = await servicos.usuarios.listar();
 
   await (await o.importacao.analisar(o.arquivo, admin, equipe)).confirmar();
 
@@ -66,7 +59,7 @@ export async function prepararDemo(servicos: ServicosBase, o: OpcoesSemear): Pro
   // Vales do mês, descontados no pagamento.
   for (const [login, valor, motivo] of [
     ['deliziane', 300, 'Adiantamento'],
-    ['carla', 150, 'Combustível'],
+    ['jessica', 150, 'Combustível'],
   ] as const) {
     await servicos.vales.salvar(admin, {
       responsavelId: porLogin(login).id,
@@ -79,7 +72,7 @@ export async function prepararDemo(servicos: ServicosBase, o: OpcoesSemear): Pro
   // Funil de vendas com oportunidades em todas as etapas.
   const etapas: Etapa[] = ['novo', 'novo', 'contato', 'contato', 'proposta', 'proposta', 'ganho', 'perdido'];
   for (const [i, etapa] of etapas.entries()) {
-    const dono = porLogin(['gisele', 'deliziane', 'carla', 'mary'][i % 4]!);
+    const dono = porLogin(['gisele', 'deliziane', 'jessica', 'marielly'][i % 4]!);
     await servicos.oportunidades.salvar(admin, {
       nomeContato: `Contato Teste ${['Aguiar', 'Brito', 'Costa', 'Dias', 'Fontes', 'Garcia', 'Lima', 'Neves'][i]}`,
       telefone: `(11) 9${8000 + i * 111}-${4000 + i * 37}`,
@@ -94,4 +87,24 @@ export async function prepararDemo(servicos: ServicosBase, o: OpcoesSemear): Pro
   await o.extras?.(admin, equipe);
   await servicos.autenticacao.entrar(ADMIN_DEMO.login, ADMIN_DEMO.senha);
   return true;
+}
+
+/**
+ * Demonstração só com a equipe (administradora e produtores), sem clientes, propostas nem
+ * lançamentos de teste. Termina com a administradora conectada. Se o banco já tem usuários, não faz nada.
+ */
+export async function prepararEquipeDemo(servicos: ServicosBase): Promise<boolean> {
+  if (await servicos.usuarios.existeAlgum()) return false;
+  await criarEquipeDemo(servicos);
+  await servicos.autenticacao.entrar(ADMIN_DEMO.login, ADMIN_DEMO.senha);
+  return true;
+}
+
+/** Administradora, produtores iniciais e a produtora da demo já com a senha da demo. */
+async function criarEquipeDemo(servicos: ServicosBase): Promise<Usuario> {
+  const admin = await servicos.usuarios.configurarAdministrador(ADMIN_DEMO);
+  await servicos.usuarios.criarProdutoresIniciais(admin, PRODUTORES_INICIAIS);
+  const produtora = (await servicos.usuarios.listar()).find((u) => u.login === PRODUTORA_DEMO.login)!;
+  await servicos.usuarios.alterarPropriaSenha(produtora, SENHA_PADRAO, PRODUTORA_DEMO.senha);
+  return admin;
 }

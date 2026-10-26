@@ -40,11 +40,11 @@ CRM atual. A seção 0 é a especificação de negócio; as seções seguintes d
   nem lança a comissão recebida da seguradora.
 - **Senha inicial padrão `1234`** para todos, com **troca obrigatória no primeiro acesso**. A
   administradora pode redefinir a senha de um produtor para `1234` quando ele esquecer.
-- Produtores atuais (pela conversa): Deliziane, Mary, Gisele, Gabriel, Danila, Luana e Renata
-  (Cadu foi retirado). A planilha de dezembro/2024 traz também Carla, Felippe e Silvana. A lista
-  deve ser editável: incluir e retirar produtores.
+- Produtores atuais (lista da Portella, 26/10/2026): Deliziane, Marielly, Gisele Costa, Gabriel,
+  Berdum, Luana, Renata, Danila e Jessica Naiane. Carla, Felippe e Silvana (planilha de
+  dezembro/2024) e Cadu não fazem mais parte. A lista deve ser editável: incluir e retirar produtores.
 - **% de repasse padrão por produtor**, sugerido ao lançar a proposta e editável caso a caso:
-  Deliziane 40%, Danila 50%, Luana 50%, Gisele 50%, Mary 15%.
+  Deliziane 40%, Danila 50%, Luana 50%, Gisele Costa 50%, Marielly 15% (o da "Mary" da conversa).
 
 ### 0.3 Fluxo de aprovação
 
@@ -161,9 +161,9 @@ produtor envolvido (ranking de vendas), e não o prêmio dividido pelo % de cada
 Regras extras:
 - Entra-se com **usuário** (ex.: `deliziane`), não com e-mail.
 - No primeiro acesso, o sistema pede para criar o administrador e já cadastra os produtores
-  Deliziane (40%), Mary (15%), Gisele (50%), Gabriel, Danila (50%), Luana (50%), Renata,
-  Carla (20%), Felippe e Silvana, com usuário igual ao primeiro nome e senha `1234`. Os % vêm da
-  conversa com a Portella (Carla: o % mais usado na planilha); quem está sem % recebe o padrão em
+  Deliziane (40%), Marielly (15%), Gisele Costa (50%), Gabriel, Berdum, Luana (50%), Renata,
+  Danila (50%) e Jessica Naiane, com usuário igual ao primeiro nome (ex.: `gisele`, `jessica`) e
+  senha `1234`. Os % vêm da conversa com a Portella; quem está sem % recebe o padrão em
   **Usuários**. A lista se edita em Usuários (incluir, desativar).
 - Usuário novo entra com a senha `1234` e, no primeiro login, só segue depois de criar a própria
   senha (mínimo de 6 caracteres, diferente de `1234`). O administrador pode **redefinir a senha para 1234**.
@@ -433,4 +433,4 @@ de `core/application/permissoes.ts` viram políticas no servidor.
 | `npm run typecheck` | TypeScript estrito |
 | `npm run lint` | ESLint, incluindo as regras de camadas |
 | `npm run build` | build de produção dos dois apps (PWA) |
-| `sh ../scripts/build-vercel.sh` | build de publicação do site: o CRM de Seguros em modo demonstração vai para `/seguro` (`VITE_BASE=/seguro/`) |
+| `sh ../scripts/build-vercel.sh` | build de publicação do site: o CRM de Seguros em modo demonstração vai para `/seguro` (`VITE_BASE=/seguro/`), só com a equipe, sem clientes de teste |
