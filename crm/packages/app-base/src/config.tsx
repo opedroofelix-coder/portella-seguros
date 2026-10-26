@@ -17,6 +17,8 @@ export interface PreviaImportacao {
 
 export interface Importacao {
   descricao: string;
+  /** Parte da planilha convertida que este CRM importa. */
+  parte: 'seguros' | 'consorcio';
   analisar: (dados: unknown, usuario: Usuario, equipe: Usuario[]) => Promise<PreviaImportacao>;
 }
 

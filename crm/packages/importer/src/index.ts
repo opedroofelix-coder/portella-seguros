@@ -3,3 +3,4 @@ export * from './ler';
 export * from './mapeamento';
 export * from './valores';
 export * from './comissoes';
+export * from './planilha';

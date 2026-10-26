@@ -33,6 +33,7 @@ export function identificarStatus(texto = '', temContemplacao = false): StatusCo
 
 export function criarImportacao(servicos: ServicosConsorcio): Importacao {
   return {
+    parte: 'consorcio',
     descricao:
       'Clientes, cotas e comissões de consórcio separados da planilha da Portella. Reimportar o mesmo arquivo atualiza os registros.',
     async analisar(dados: unknown, ator: Usuario, equipe: Usuario[]) {

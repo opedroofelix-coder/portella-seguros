@@ -54,6 +54,7 @@ const motivo = (e: unknown) =>
 
 export function criarImportacao(servicos: ServicosSeguros): Importacao {
   return {
+    parte: 'seguros',
     descricao:
       'Clientes, apólices, propostas com os recebimentos, estornos, pagamentos aos produtores e financeiro da planilha da Portella. Reimportar o mesmo arquivo atualiza os registros, sem duplicar.',
     async analisar(dados: unknown, ator: Usuario, equipe: Usuario[]) {

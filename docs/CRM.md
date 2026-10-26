@@ -287,16 +287,22 @@ Substitui as abas "Bradesco", "Demonstrativo" e "Faturamento". A poupança ficou
 
 ## 5. Importação da planilha
 
+No CRM, o administrador abre **Importar** e escolhe a **planilha da corretora (.xlsx)**, do jeito que
+está no Excel (pedido de 26/10/2026: nada de JSON). Se a planilha tiver senha, o CRM pede a senha e
+abre o arquivo **só em memória, no próprio navegador**: a senha e os dados não vão para nenhum servidor
+nem ficam guardados. Depois é conferir o resumo (clientes, propostas, recebimentos, estornos,
+pagamentos aos produtores…) e os avisos e confirmar. Reimportar a mesma planilha **atualiza**
+os registros, sem duplicar.
+
+A tela ainda aceita o `.json` do importador de linha de comando, que continua disponível para
+conferir a conversão no computador:
+
 ```bash
 cd crm
 PLANILHA_SENHA='…' npm run importar --silent -- /caminho/Portella_Corretora_Seguros_Dezembro.xlsx
 ```
 
-A planilha é protegida por senha. O importador a abre **só em memória**: a senha e os dados
-nunca vão para o Git. Os arquivos gerados ficam em `crm/dados/` (fora do Git):
-`seguros.seed.json`, `consorcio.seed.json` e `relatorio.json`. No CRM, o administrador abre
-**Importar**, confere o resumo e os avisos e confirma. Reimportar o mesmo arquivo **atualiza**
-os registros, sem duplicar.
+Ele gera em `crm/dados/` (fora do Git) `seguros.seed.json`, `consorcio.seed.json` e `relatorio.json`.
 
 Os produtores da planilha (Carla, Deliziane, Gabriel, Gisele, Silvana, Renata, Felippe) já são
 cadastrados no primeiro acesso. O importador liga cada venda ao usuário de mesmo nome (ou mesmo

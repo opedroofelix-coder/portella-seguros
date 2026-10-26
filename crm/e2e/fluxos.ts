@@ -94,7 +94,7 @@ export async function cadastrarUsuario(
 
 export async function importar(page: Page, arquivo: string, esperado: RegExp) {
   await irPara(page, 'Importar');
-  await page.getByLabel(/Arquivo gerado/).setInputFiles(arquivo);
+  await page.getByLabel(/Planilha da corretora/).setInputFiles(arquivo);
   await expect(page.getByText(esperado).first()).toBeVisible();
   await page.getByRole('button', { name: 'Importar agora' }).click();
   // No Seguros (interface refinada) a importação pede confirmação; no Consórcio, não.
