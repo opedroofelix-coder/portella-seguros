@@ -28,16 +28,9 @@ export interface OpcoesSemear {
 export async function prepararDemo(servicos: ServicosBase, o: OpcoesSemear): Promise<boolean> {
   if (await servicos.usuarios.existeAlgum()) return false;
   const r = sorteador(77);
-  const admin = await servicos.usuarios.configurarAdministrador(ADMIN_DEMO);
-  await servicos.usuarios.criarProdutoresIniciais(admin, PRODUTORES_INICIAIS);
-  let equipe = await servicos.usuarios.listar();
+  const admin = await criarEquipeDemo(servicos);
+  const equipe = await servicos.usuarios.listar();
   const porLogin = (login: string) => equipe.find((u) => u.login === login)!;
-  await servicos.usuarios.alterarPropriaSenha(
-    porLogin(PRODUTORA_DEMO.login),
-    SENHA_PADRAO,
-    PRODUTORA_DEMO.senha,
-  );
-  equipe = await servicos.usuarios.listar();
 
   await (await o.importacao.analisar(o.arquivo, admin, equipe)).confirmar();
 
@@ -94,4 +87,24 @@ export async function prepararDemo(servicos: ServicosBase, o: OpcoesSemear): Pro
   await o.extras?.(admin, equipe);
   await servicos.autenticacao.entrar(ADMIN_DEMO.login, ADMIN_DEMO.senha);
   return true;
+}
+
+/**
+ * Demonstração só com a equipe (administradora e produtores), sem clientes, propostas nem
+ * lançamentos de teste. Termina com a administradora conectada. Se o banco já tem usuários, não faz nada.
+ */
+export async function prepararEquipeDemo(servicos: ServicosBase): Promise<boolean> {
+  if (await servicos.usuarios.existeAlgum()) return false;
+  await criarEquipeDemo(servicos);
+  await servicos.autenticacao.entrar(ADMIN_DEMO.login, ADMIN_DEMO.senha);
+  return true;
+}
+
+/** Administradora, produtores iniciais e a produtora da demo já com a senha da demo. */
+async function criarEquipeDemo(servicos: ServicosBase): Promise<Usuario> {
+  const admin = await servicos.usuarios.configurarAdministrador(ADMIN_DEMO);
+  await servicos.usuarios.criarProdutoresIniciais(admin, PRODUTORES_INICIAIS);
+  const produtora = (await servicos.usuarios.listar()).find((u) => u.login === PRODUTORA_DEMO.login)!;
+  await servicos.usuarios.alterarPropriaSenha(produtora, SENHA_PADRAO, PRODUTORA_DEMO.senha);
+  return admin;
 }
