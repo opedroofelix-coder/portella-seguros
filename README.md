@@ -108,7 +108,8 @@ O que depende da Portella (contas próprias):
 
 ## Pendências
 
-- [ ] **Nossa equipe:** fotos, nomes e cargos (a Portella vai enviar). Hoje os cards mostram `[Nome]` e `[Cargo]`.
+- [ ] **Nossa equipe:** 5 produtores com foto (`assets/img/equipe/`), cargo "Produtor". Faltam os nomes de
+  `produtor-1..4` (hoje `[Nome]`) e as fotos deles em melhor qualidade; a da Gisele Costa veio do original.
 
 - [x] **Logos das seguradoras em alta qualidade:** versões oficiais (sites das seguradoras e Wikimedia Commons), em PNG 600x240 transparente. A Liberty virou Yelum (`yelum.png`).
 - [ ] Nomes das outras 10 seguradoras parceiras (das 22), para incluir os logos na faixa.

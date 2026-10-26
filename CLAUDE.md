@@ -28,7 +28,9 @@
 - Lista de pendências: README.md.
 - Ordem dos seguros (pedido da cliente): 1. Seguro Auto, 2. Plano de Saúde, 3. Consórcio, 4. Celular e
   Portáteis; os demais sem ordem definida.
-- Seção "Nossa equipe" (depois do Sobre): cards com [Nome]/[Cargo] até a Portella enviar as fotos.
+- Seção "Nossa equipe" (depois do Sobre): 5 produtores com foto (26/10/2026), cargo "Produtor". Gisele Costa
+  tem nome; os outros 4 ficam com [Nome] até a Portella informar. Fotos em `assets/img/equipe/` (WebP 600x800);
+  as 4 sem nome vieram em baixa qualidade e serão trocadas pelas originais.
 - A cotação não tem custo (confirmado pela cliente).
 - Logos das seguradoras: versões oficiais em `assets/img/seguradoras/` (PNG 600x240 transparente); o site usa
   as cópias WebP 300x120 (logo novo: gerar o .webp junto).
