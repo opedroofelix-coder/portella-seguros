@@ -16,6 +16,11 @@
       "permanent": false
     },
     {
+      "source": "/consorcio",
+      "destination": "/consorcio/",
+      "permanent": false
+    },
+    {
       "source": "/index.html",
       "destination": "/",
       "permanent": true
@@ -24,6 +29,15 @@
   "headers": [
     {
       "source": "/seguro/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/consorcio/(.*)",
       "headers": [
         {
           "key": "X-Robots-Tag",
