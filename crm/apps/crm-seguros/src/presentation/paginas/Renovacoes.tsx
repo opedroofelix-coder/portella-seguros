@@ -101,7 +101,7 @@ export function PaginaRenovacoes() {
               onChange={(e) => setBusca(e.target.value)}
             />
           </Campo>
-          <Campo rotulo="Vence em até" dica="As vencidas há até 30 dias aparecem sempre.">
+          <Campo rotulo="Vence em até">
             <Selecao value={janela} onChange={(e) => setJanela(Number(e.target.value))}>
               {[15, 30, 60, 90].map((d) => (
                 <option key={d} value={d}>
@@ -118,6 +118,10 @@ export function PaginaRenovacoes() {
             </Selecao>
           </Campo>
         </BarraFiltros>
+        {/* A observação fica abaixo da barra: dentro do campo, ela subia "Vence em até" acima dos outros. */}
+        <p className="texto-suave" style={{ margin: '-6px 0 14px', fontSize: 12 }}>
+          As vencidas há até 30 dias aparecem sempre.
+        </p>
         {isError ? (
           <EstadoErro oque="a fila de renovação" aoTentar={() => refetch()} />
         ) : isPending ? (
