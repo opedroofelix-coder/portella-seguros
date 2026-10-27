@@ -125,7 +125,9 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
       chave: 'numero',
       titulo: 'Nº',
       ocultarNoMobile: !refinada,
-      render: (p) => p.numero ?? '—',
+      // O nº não quebra no meio ("TESTE-" / "1000").
+      render: (p) =>
+        refinada ? <span style={{ whiteSpace: 'nowrap' }}>{p.numero ?? '—'}</span> : (p.numero ?? '—'),
     },
     { chave: 'produto', titulo: 'Seguradora · produto', render: (p) => `${p.companhia} · ${p.produto}` },
     {
@@ -135,7 +137,12 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
       render: (p) =>
         p.tipoNegocio ? (
           <Selo tom={p.tipoNegocio === 'novo' ? 'info' : 'dourado'}>
-            {ROTULO_TIPO_NEGOCIO[p.tipoNegocio]}
+            {/* Na tabela, o rótulo curto ("Novo", "Renovação") para as colunas caberem. */}
+            {refinada
+              ? p.tipoNegocio === 'novo'
+                ? 'Novo'
+                : 'Renovação'
+              : ROTULO_TIPO_NEGOCIO[p.tipoNegocio]}
           </Selo>
         ) : (
           '—'
@@ -193,17 +200,16 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
       titulo: 'Situação',
       render: (p) =>
         refinada ? (
-          // Aprovação e recebimento são coisas diferentes: um selo para cada.
-          <span className="acoes-linha" style={{ justifyContent: 'flex-start' }}>
-            <Selo tom={p.status === 'pendente' ? 'alerta' : 'sucesso'}>
-              {p.status === 'pendente' ? 'Aguardando aprovação' : ROTULO_STATUS_PROPOSTA.aprovada}
-            </Selo>
-            {gestao && p.status === 'aprovada' && (
-              <Selo tom={saldoReceber(p) > 0 ? 'info' : 'neutro'}>
-                {saldoReceber(p) > 0 ? 'Saldo a receber' : 'Quitada'}
-              </Selo>
-            )}
-          </span>
+          // Um selo só: "Saldo a receber" e "Quitada" já são de propostas aprovadas.
+          p.status === 'pendente' ? (
+            <Selo tom="alerta">Aguardando aprovação</Selo>
+          ) : !gestao ? (
+            <Selo tom="sucesso">{ROTULO_STATUS_PROPOSTA.aprovada}</Selo>
+          ) : saldoReceber(p) > 0 ? (
+            <Selo tom="info">Saldo a receber</Selo>
+          ) : (
+            <Selo tom="sucesso">Quitada</Selo>
+          )
         ) : p.status === 'pendente' ? (
           <Selo tom="alerta">Pendente</Selo>
         ) : saldoReceber(p) > 0 ? (

@@ -5,7 +5,8 @@ const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' 
 
 export function formatarDinheiro(centavos: Centavos | null | undefined): string {
   if (centavos == null) return '—';
-  return BRL.format(centavos / 100);
+  // `|| 0` troca o -0 por 0: um desconto zerado aparece "R$ 0,00", não "-R$ 0,00".
+  return BRL.format((centavos || 0) / 100);
 }
 
 /** Converte "R$ 1.234,56", "1234,56" ou "1234.56" em centavos. Retorna null se não for número. */

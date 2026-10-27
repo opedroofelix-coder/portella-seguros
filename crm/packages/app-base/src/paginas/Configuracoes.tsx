@@ -159,6 +159,12 @@ function LinhaRepasse({
           variante="secundario"
           carregando={salvar.isPending}
           disabled={!valido || (!mudou && !aplicar)}
+          // Interface refinada: o botão só aparece na linha alterada (não dez "Salvar" iguais na tela).
+          style={
+            refinada && !(valido && mudou) && !aplicar && !salvar.isPending
+              ? { visibility: 'hidden' }
+              : undefined
+          }
         >
           {aplicar ? (refinada ? 'Salvar e aplicar…' : 'Salvar e aplicar') : 'Salvar'}
         </Botao>

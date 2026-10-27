@@ -224,22 +224,25 @@ export function montarPainel(todas: Proposta[], periodo: Periodo = {}): Painel {
     porAno.set(p.data.slice(0, 4), (porAno.get(p.data.slice(0, 4)) ?? 0) + (p.premioLiquido ?? 0));
   }
   const meses = [...porMes.keys()].sort();
-  const crescimentoMensal = meses.map((mes, i) => {
-    const anterior = meses[i - 1];
+  // A base é sempre o mês (e o ano) do calendário imediatamente anterior: sem produção nele, não há
+  // variação ("—"), em vez de comparar com o último mês que teve produção.
+  const crescimentoMensal = meses.map((mes) => {
+    const [a, m] = mes.split('-').map(Number) as [number, number];
+    const anterior = m === 1 ? `${a - 1}-12` : `${a}-${String(m - 1).padStart(2, '0')}`;
     const mesmoMesAnoAnterior = `${Number(mes.slice(0, 4)) - 1}${mes.slice(4)}`;
     const premio = porMes.get(mes)!;
     return {
       periodo: mes,
       premio,
-      variacaoAnterior: variacao(premio, anterior ? porMes.get(anterior) : undefined),
+      variacaoAnterior: variacao(premio, porMes.get(anterior)),
       variacaoAnoAnterior: variacao(premio, porMes.get(mesmoMesAnoAnterior)),
     };
   });
   const anos = [...porAno.keys()].sort();
-  const crescimentoAnual = anos.map((ano, i) => ({
+  const crescimentoAnual = anos.map((ano) => ({
     periodo: ano,
     premio: porAno.get(ano)!,
-    variacaoAnterior: variacao(porAno.get(ano)!, i ? porAno.get(anos[i - 1]!) : undefined),
+    variacaoAnterior: variacao(porAno.get(ano)!, porAno.get(String(Number(ano) - 1))),
   }));
 
   const ordenar = (m: Map<string, Agrupado>) => [...m.values()].sort((a, b) => b.premio - a.premio);
