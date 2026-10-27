@@ -98,7 +98,9 @@
 /* Interface refinada: o resumo fica fixo no alto da janela enquanto se preenche o formulário. */
 .resumoFixo {
   position: sticky;
-  top: 0;
+  /* O corpo do modal tem 16px (24px no computador) de recuo: a faixa gruda na borda de cima dele,
+     senão desce sobre o primeiro campo e deixa uma fresta por onde o conteúdo aparece ao rolar. */
+  top: -16px;
   z-index: 2;
   margin: -16px -16px 0;
   padding: 12px 16px;
@@ -107,7 +109,7 @@
 }
 @media (min-width: 720px) {
   .resumoFixo {
-    top: 0;
+    top: -24px;
     margin: -24px -24px 0;
     padding: 14px 24px;
   }

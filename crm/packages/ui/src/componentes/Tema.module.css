@@ -33,7 +33,7 @@
 }
 /* No menu lateral (sempre marinho): botões compactos, rótulo só no item escolhido. */
 .menu {
-  display: grid;
+  display: flex;
   width: 100%;
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--menu-linha);
@@ -53,6 +53,21 @@
 .menu .opcao[aria-pressed='true'] {
   background: var(--menu-ativo-fundo);
   color: var(--menu-ativo);
+}
+/* O escolhido ocupa o espaço que sobra; os outros ficam só com o ícone (o nome fica no título). */
+.menu .opcao {
+  flex: 0 0 auto;
+  min-width: 44px;
+}
+.menu .opcao[aria-pressed='true'] {
+  flex: 1 1 auto;
+}
+.menu .opcao[aria-pressed='false'] span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 @media (pointer: coarse), (max-width: 1023px) {
   .opcao,

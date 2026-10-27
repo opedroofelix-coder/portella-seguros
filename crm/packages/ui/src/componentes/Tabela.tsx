@@ -1,5 +1,5 @@
 import type { KeyboardEvent, MouseEvent, ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Botao } from './Botao';
 import { EstadoVazio } from './Cartao';
 import { useInterface } from './Interface';
@@ -58,6 +58,29 @@ export function Tabela<T>({
     if (refinada) setPagina(0);
   }, [itens, refinada]);
 
+  // Quando as colunas não cabem, a borda do lado que ainda tem conteúdo esmaece: mostra que dá para rolar.
+  const envoltorio = useRef<HTMLDivElement>(null);
+  const [rola, setRola] = useState({ esquerda: false, direita: false });
+  const temItens = itens.length > 0;
+  useEffect(() => {
+    const el = envoltorio.current;
+    if (!el) return;
+    const medir = () => {
+      const esquerda = el.scrollLeft > 4;
+      const direita = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+      setRola((r) => (r.esquerda === esquerda && r.direita === direita ? r : { esquerda, direita }));
+    };
+    medir();
+    el.addEventListener('scroll', medir, { passive: true });
+    const observador = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(medir);
+    observador?.observe(el);
+    if (el.firstElementChild) observador?.observe(el.firstElementChild);
+    return () => {
+      el.removeEventListener('scroll', medir);
+      observador?.disconnect();
+    };
+  }, [temItens]);
+
   const ordenados = useMemo(() => {
     if (!ordem) return itens;
     const coluna = colunas.find((c) => c.chave === ordem.chave);
@@ -81,7 +104,12 @@ export function Tabela<T>({
   };
 
   return (
-    <div className={styles.envoltorio}>
+    <div
+      ref={envoltorio}
+      className={styles.envoltorio}
+      data-rola-esquerda={rola.esquerda || undefined}
+      data-rola-direita={rola.direita || undefined}
+    >
       <table className={styles.tabela} aria-label={rotulo}>
         <thead>
           <tr>

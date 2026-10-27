@@ -64,7 +64,12 @@ textarea.controle {
   min-height: 90px;
   resize: vertical;
 }
-select.controle {
+input.controle[list]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+select.controle,
+input.controle[list] {
   appearance: none;
   padding-right: 36px;
   background-image:

@@ -44,6 +44,8 @@
 }
 .nav {
   flex: 1;
+  /* Sem isso a lista não encolhe na coluna e passa por baixo do rodapé em vez de rolar. */
+  min-height: 0;
   overflow-y: auto;
   padding: 8px 10px 12px;
   display: flex;
@@ -111,6 +113,7 @@
   justify-content: center;
 }
 .rodape {
+  flex-shrink: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;

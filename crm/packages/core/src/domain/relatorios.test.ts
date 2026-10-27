@@ -155,6 +155,8 @@ describe('pendentes e painel', () => {
     expect(out.premio).toBe(120000);
     expect(out.variacaoAnterior).toBeCloseTo(0.5);
     expect(out.variacaoAnoAnterior).toBeCloseTo(1.4);
+    // Setembro não tem agosto para comparar: sem variação (não compara com outubro de 2025).
+    expect(painel.crescimentoMensal.find((l) => l.periodo === '2026-09')!.variacaoAnterior).toBeNull();
     expect(painel.crescimentoAnual.map((l) => [l.periodo, l.premio])).toEqual([
       ['2025', 50000],
       ['2026', 200000],
