@@ -6,7 +6,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 const demo = process.env.VITE_DEMO === '1';
 
 export default defineConfig({
-  base: demo ? './' : '/',
+  // VITE_BASE fixa o caminho de publicação (ex.: /consorcio/ no site, ver scripts/build-vercel.sh).
+  base: process.env.VITE_BASE ?? (demo ? './' : '/'),
   build: { outDir: demo ? 'dist-demo' : 'dist' },
   plugins: [
     react(),
