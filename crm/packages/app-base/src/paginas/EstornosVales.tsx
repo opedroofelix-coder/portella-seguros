@@ -383,7 +383,13 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
         </Campo>
         {refinada ? (
           <>
-            <Campo rotulo="Comissão estornada pela seguradora" obrigatorio erro={erros.valor?.message}>
+            {/* Rótulo curto: o longo quebrava em duas linhas e descia o campo abaixo de "Produtor". */}
+            <Campo
+              rotulo="Comissão estornada"
+              obrigatorio
+              erro={erros.valor?.message}
+              dica="O valor que a seguradora estornou."
+            >
               <EntradaDinheiro {...register('valor', { onChange: recalcularDesconto })} />
             </Campo>
             <Campo rotulo="% do produtor" erro={erros.percentualProdutor?.message} dica={origemPct}>
@@ -408,7 +414,12 @@ function FormularioEstorno({ estorno, aoFechar }: { estorno?: Estorno; aoFechar:
           </>
         ) : (
           <>
-            <Campo rotulo="Comissão estornada pela seguradora (R$)" obrigatorio erro={erros.valor?.message}>
+            <Campo
+              rotulo="Comissão estornada (R$)"
+              obrigatorio
+              erro={erros.valor?.message}
+              dica="O valor que a seguradora estornou."
+            >
               <Entrada inputMode="decimal" {...register('valor', { onChange: recalcularDesconto })} />
             </Campo>
             <Campo rotulo="% do produtor" erro={erros.percentualProdutor?.message} dica={origemPct}>
