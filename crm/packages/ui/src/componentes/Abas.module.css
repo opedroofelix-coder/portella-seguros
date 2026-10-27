@@ -36,3 +36,14 @@
     min-height: var(--touch);
   }
 }
+/* Celular: as abas quebram em mais de uma linha em vez de sumirem na borda ("Faturame…"). */
+@media (max-width: 719px) {
+  .abas {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  .aba {
+    flex: 1 1 auto;
+    padding: 6px 10px;
+  }
+}

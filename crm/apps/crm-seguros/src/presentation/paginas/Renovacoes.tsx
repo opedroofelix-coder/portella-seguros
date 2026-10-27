@@ -11,6 +11,7 @@ import {
   ConfirmarAcao,
   Entrada,
   EstadoVazio,
+  Icone,
   Selecao,
   useAvisos,
 } from '@portella/ui';
@@ -139,20 +140,22 @@ export function PaginaRenovacoes() {
               const whatsapp = cliente?.telefone ? linkWhatsApp(cliente.telefone) : null;
               const ocupado = salvar.isPending && salvar.variables?.id === a.id;
               return (
-                <div className="acoes-linha">
+                // Uma linha só: Renovar é a ação principal; WhatsApp e "Não renovou" ficam como ícones.
+                <div className="acoes-linha" style={{ flexWrap: 'nowrap' }}>
                   {whatsapp ? (
                     <a
-                      className={classesBotao({ variante: 'secundario', pequeno: true })}
+                      className={classesBotao({ variante: 'secundario', pequeno: true, soIcone: true })}
                       href={`${whatsapp}?text=${encodeURIComponent(mensagemRenovacao(cliente?.nome, a, hoje))}`}
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`WhatsApp de ${cliente?.nome ?? 'cliente'} (abre em nova aba)`}
+                      title="WhatsApp"
                       onClick={() =>
                         a.renovacao === 'pendente' &&
                         marcar(a, { renovacao: 'em_contato' }, 'Marcada como "em contato".')
                       }
                     >
-                      WhatsApp
+                      <Icone nome="whatsapp" tamanho={18} />
                     </a>
                   ) : (
                     a.renovacao === 'pendente' && (
@@ -172,6 +175,8 @@ export function PaginaRenovacoes() {
                   <Botao
                     variante="fantasma"
                     pequeno
+                    soIcone
+                    icone="fechar"
                     disabled={ocupado}
                     onClick={() => {
                       setMotivo(MOTIVOS_NAO_RENOVACAO[0]);

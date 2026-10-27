@@ -480,6 +480,8 @@ span.soCompacto {
   .tabela td {
     display: flex;
     flex-direction: column;
+    /* Rótulo em cima, valor embaixo: com um rótulo de duas linhas, os valores continuam alinhados. */
+    justify-content: space-between;
     text-align: left;
     white-space: normal;
   }

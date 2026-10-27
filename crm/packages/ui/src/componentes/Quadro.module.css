@@ -13,6 +13,18 @@
   .quadro {
     grid-auto-columns: minmax(260px, 46%);
   }
+  .seletor {
+    display: none;
+  }
+}
+@media (max-width: 719px) {
+  .quadro {
+    display: block;
+    overflow-x: visible;
+  }
+  .coluna:not([data-ativa]) {
+    display: none;
+  }
 }
 @media (min-width: 1280px) {
   .quadro {

@@ -401,10 +401,14 @@ function MiniGrafico({ serie }: { serie: Serie }) {
 }
 
 /** Topo redondo do eixo: 80 mil, 1,5 mi… */
+/** Passos "redondos" para o topo do eixo; a metade (a outra linha da grade) também fica redonda. */
+const PASSOS = [1, 1.2, 1.4, 1.6, 2, 2.4, 3, 4, 5, 6, 8, 10];
+
+/** Menor valor redondo acima do máximo: 10,1 mil → 12 mil (antes 20 mil, com metade do gráfico vazia). */
 function topoDoEixo(maxReais: number) {
   if (maxReais <= 0) return 1000;
   const casa = 10 ** Math.floor(Math.log10(maxReais));
-  return Math.ceil(maxReais / casa) * casa;
+  return PASSOS.find((p) => p * casa >= maxReais)! * casa;
 }
 
 /** Barras por mês; `compacto` (celular) usa menos meses e letras maiores no mesmo desenho. */
