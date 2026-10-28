@@ -457,7 +457,12 @@
         <button class="btn btn-gold btn-lg" type="submit">Continuar</button>
       </form>
       <form class="modal__step" data-step="2" hidden>
-        <label class="field" data-only="sem-tipo">Qual seguro ou consórcio?<select name="tipo" data-modal-type required></select></label>
+        <div class="field" data-only="sem-tipo">
+          <span id="modal-tipo-rotulo">Qual seguro ou consórcio?</span>
+          <!-- o main.js troca a lista nativa pelo mesmo seletor da barra "Cotar" (data-qs-inline: o rótulo continua visível) -->
+          <select name="tipo" data-modal-type data-qs-inline aria-labelledby="modal-tipo-rotulo" required></select>
+          <span class="field__erro" data-modal-type-erro role="alert" hidden>Escolha o seguro ou consórcio.</span>
+        </div>
         <div class="step-group" data-only="saude">
           <fieldset class="plans">
             <legend>Tipo de plano</legend>

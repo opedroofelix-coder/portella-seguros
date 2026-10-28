@@ -185,9 +185,15 @@
     var others = $('optgroup', subjectSelect);
     $$('optgroup', typeOptions).forEach(function (g) { subjectSelect.insertBefore(g.cloneNode(true), others); });
   }
+  // o campo "Qual seguro ou consórcio?" do modal usa a mesma lista da barra "Cotar"
+  var modalTypeSelect = $('[data-modal-type]');
+  if (modalTypeSelect && typeOptions) modalTypeSelect.innerHTML = typeOptions.innerHTML;
   var qsUid = 0;
-  $$('[data-type-select], [data-subject-select]').forEach(function quoteSelect(select) {
-    var label = select.closest('label');
+  $$('[data-type-select], [data-subject-select], [data-modal-type]').forEach(function quoteSelect(select) {
+    // data-qs-inline (modal): o seletor entra no lugar da lista, e o rótulo do campo continua visível
+    var inline = select.hasAttribute('data-qs-inline');
+    var label = inline ? select.parentNode : select.closest('label');
+    var rotulo = inline && select.getAttribute('aria-labelledby');
     var placeholder = select.options[0].text;
     var ICONS = {
       auto: '<path d="M3 15l2-5.5A2 2 0 0 1 6.9 8h10.2a2 2 0 0 1 1.9 1.5L21 15v3h-2.5M3 15v3h2.5M3 15h18M8.5 18h7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>',
@@ -215,15 +221,16 @@
     btn.className = 'qs__button';
     btn.setAttribute('aria-haspopup', 'listbox');
     btn.setAttribute('aria-expanded', 'false');
-    btn.innerHTML = '<span class="qs__value is-empty"></span><svg class="qs__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>';
+    btn.innerHTML = '<span class="qs__value is-empty" id="qs-v' + (++qsUid) + '"></span><svg class="qs__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>';
     var valueEl = $('.qs__value', btn);
     valueEl.textContent = placeholder;
+    if (rotulo) btn.setAttribute('aria-labelledby', rotulo + ' ' + valueEl.id);
 
     var panel = document.createElement('div');
     panel.className = 'qs__panel';
     panel.id = 'qs-panel' + (++qsUid);
     panel.setAttribute('role', 'listbox');
-    panel.setAttribute('aria-label', placeholder);
+    panel.setAttribute('aria-label', rotulo ? document.getElementById(rotulo).textContent : placeholder);
     panel.tabIndex = -1;
     panel.hidden = true;
     btn.setAttribute('aria-controls', panel.id);
@@ -262,8 +269,15 @@
 
     wrap.appendChild(btn);
     wrap.appendChild(panel);
-    label.parentNode.insertBefore(wrap, label);
-    label.hidden = true;
+    if (inline) {
+      select.parentNode.insertBefore(wrap, select.nextSibling);
+      select.hidden = true;
+      // a lista escondida não pode ser "obrigatória" (o navegador não consegue focá-la): o envio confere
+      select.required = false;
+    } else {
+      label.parentNode.insertBefore(wrap, label);
+      label.hidden = true;
+    }
     select.tabIndex = -1;
 
     var active = -1;
@@ -303,7 +317,8 @@
       panel.style.left = r.left + 'px';
       panel.style.width = r.width + 'px';
       place();
-      window.addEventListener('scroll', place, { passive: true });
+      // capture: acompanha também a rolagem de dentro do modal
+      window.addEventListener('scroll', place, { passive: true, capture: true });
       window.addEventListener('resize', onResize);
       setActive(Math.max(0, selectedIndex()));
       panel.focus({ preventScroll: true });
@@ -312,7 +327,7 @@
       panel.hidden = true;
       panel.classList.remove('is-fixed');
       panel.removeAttribute('style');
-      window.removeEventListener('scroll', place);
+      window.removeEventListener('scroll', place, { capture: true });
       window.removeEventListener('resize', onResize);
       wrap.classList.remove('is-open');
       btn.setAttribute('aria-expanded', 'false');
@@ -324,7 +339,16 @@
       valueEl.textContent = item.dataset.value;
       valueEl.classList.remove('is-empty');
       close(true);
+      select.dispatchEvent(new Event('change', { bubbles: true }));
     }
+    // o formulário foi limpo (ex.: o modal fechou): volta ao texto inicial
+    if (select.form) select.form.addEventListener('reset', function () {
+      setTimeout(function () {
+        items.forEach(function (it) { it.setAttribute('aria-selected', 'false'); });
+        valueEl.textContent = placeholder;
+        valueEl.classList.add('is-empty');
+      });
+    });
 
     btn.addEventListener('click', function () { if (panel.hidden) open(); else close(true); });
     btn.addEventListener('keydown', function (e) {
@@ -373,7 +397,6 @@
     'Responsabilidade Civil': 'Ex.: sua profissão ou atividade',
     'Consórcio': 'Ex.: imóvel, veículo ou serviço, e o valor da carta'
   };
-  if (modalType && typeSelect) modalType.innerHTML = typeSelect.innerHTML;
   function isHealth(t) { return /^(Saúde|Odontológico)$/.test(t); }
   function show(group, on) {
     $$('[data-only="' + group + '"]', modal).forEach(function (el) {
@@ -387,13 +410,22 @@
     show('saude', isHealth(t));
     if (details) details.placeholder = HINTS[t] || 'Conte rapidamente o que você precisa';
   }
-  if (modalType) modalType.addEventListener('change', configStep2);
+  var tipoErro = $('[data-modal-type-erro]', modal);
+  function erroTipo(on) {
+    if (!tipoErro) return;
+    tipoErro.hidden = !on;
+    tipoErro.parentNode.classList.toggle('is-invalid', on);
+  }
+  if (modalType) modalType.addEventListener('change', function () { erroTipo(false); configStep2(); });
 
   function setStep(n) {
     step1.hidden = n !== 1; step2.hidden = n !== 2; stepEl.textContent = n;
     var lead1 = $('.modal__lead', modal); if (lead1) lead1.hidden = n !== 1;
     if (n === 2) configStep2();
-    var first = $('input, button.plan', n === 1 ? step1 : step2); if (first) first.focus();
+    // foco no primeiro campo visível: o seletor de seguro, o tipo de plano (saúde) ou o detalhe
+    var first = n === 1 ? $('input', step1)
+      : $('.field:not([hidden]) .qs__button', step2) || $('.step-group:not([hidden]) button.plan', step2) || details;
+    if (first) first.focus();
   }
   function openQuote(type) {
     currentType = type || (typeSelect && typeSelect.value) || '';
@@ -404,7 +436,7 @@
   }
   function closeQuote() {
     modal.hidden = true; document.body.style.overflow = '';
-    step1.reset(); step2.reset();
+    step1.reset(); step2.reset(); erroTipo(false);
     if (lastFocus) lastFocus.focus();
   }
 
@@ -432,6 +464,12 @@
 
   step2.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (modalType && !modalType.disabled && !modalType.value) {
+      erroTipo(true);
+      var seletor = $('[data-only="sem-tipo"] .qs__button', modal);
+      if (seletor) seletor.focus();
+      return;
+    }
     var t = currentType || (modalType && modalType.value) || '', health = isHealth(t);
     var msg = [
       'Olá, Portella! Gostaria de uma cotação.',

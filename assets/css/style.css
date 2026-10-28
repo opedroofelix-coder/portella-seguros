@@ -315,7 +315,8 @@ a.contact__row:hover span { color: var(--gold-text); }
 /* ---------- Modal de cotação ---------- */
 .modal { position: fixed; inset: 0; z-index: 100; background: rgba(8, 13, 24, .72); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fade .3s ease both; }
 .modal[hidden] { display: none; }
-.modal__box { position: relative; width: 100%; max-width: 480px; max-height: calc(100vh - 40px); overflow-y: auto; background: var(--navy-deep); color: var(--text-light); border: 1px solid rgba(217, 188, 126, .4); padding: 48px 40px 40px; display: flex; flex-direction: column; gap: 18px; animation: pop .45s var(--ease) both; }
+.modal__box { position: relative; width: 100%; max-width: 480px; max-height: calc(100vh - 40px); overflow-y: auto; background: var(--navy-deep); color: var(--text-light); border: 1px solid rgba(217, 188, 126, .4); padding: 48px 40px 40px; display: flex; flex-direction: column; gap: 18px; animation: pop .45s var(--ease) backwards; }
+/* (backwards: sem transform depois da entrada, a lista de seguros, que é fixa na tela, se posiciona certo) */
 .modal__close { position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border: 0; background: transparent; color: var(--gold-light); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .modal__tag { font-size: 12px; letter-spacing: .32em; text-transform: uppercase; color: var(--gold-light); }
 .modal h3 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 34px; }
@@ -325,12 +326,32 @@ a.contact__row:hover span { color: var(--gold-text); }
 .field input, .field select, .field textarea { border: 0; border-bottom: 1px solid rgba(217, 188, 126, .4); background: transparent; color: var(--text-light); padding: 12px 2px; font-size: 16px; letter-spacing: normal; text-transform: none; border-radius: 0; width: 100%; }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-bottom-color: var(--gold-light); }
 .field select option { color: var(--navy-deep); }
+.field input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.field input[type="number"]::-webkit-inner-spin-button, .field input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+/* Seletor de seguro dentro do modal: mesmo fio dourado e espaçamento dos outros campos */
+.field .qs { letter-spacing: normal; text-transform: none; }
+.field .qs__button { padding: 12px 2px; border-bottom: 1px solid rgba(217, 188, 126, .4); }
+.field .qs.is-open .qs__button, .field .qs__button:focus-visible { outline: none; border-bottom-color: var(--gold-light); }
+.field .qs__value.is-empty { color: var(--text-faint-dark); }
+.field .qs__panel { left: 0; width: 100%; max-width: none; }
+.field__erro { font-size: 13px; letter-spacing: normal; text-transform: none; color: #F2B2A8; }
+.field.is-invalid .qs__button { border-bottom-color: #F2B2A8; }
+/* Preenchimento automático do navegador: sem o fundo azul-claro, no mesmo visual dos outros campos */
+.field input:-webkit-autofill, .field input:-webkit-autofill:hover, .field input:-webkit-autofill:focus,
+.dark .contact-form input:-webkit-autofill, .dark .contact-form input:-webkit-autofill:hover, .dark .contact-form input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-light); caret-color: var(--text-light);
+  -webkit-box-shadow: 0 0 0 1000px var(--navy-deep) inset; transition: background-color 99999s ease-out;
+}
+.contact-form input:-webkit-autofill, .contact-form input:-webkit-autofill:hover, .contact-form input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-on-light); -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset; transition: background-color 99999s ease-out;
+}
 .field textarea { resize: vertical; font-family: inherit; line-height: 1.5; }
 .field ::placeholder { color: var(--text-faint-dark); opacity: .8; }
 .field[hidden], .step-group[hidden] { display: none; }
 .step-group { display: flex; flex-direction: column; gap: 14px; }
 .modal__lead { margin: -4px 0 6px; font-size: 15px; line-height: 1.6; color: var(--text-muted-dark); }
-.field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: end; }
+/* (end: com um rótulo de duas linhas no celular, os campos lado a lado continuam na mesma linha) */
 .plans { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .plans legend { padding: 0; margin-bottom: 10px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--text-faint-dark); }
 .plan { min-height: 48px; padding: 13px 16px; text-align: left; font-size: 15px; background: transparent; color: var(--text-light); border: 1px solid rgba(217, 188, 126, .25); cursor: pointer; transition: border-color .3s, background-color .3s; }
