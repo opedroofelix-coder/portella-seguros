@@ -5,7 +5,7 @@
   gap: 10px;
   padding: 14px;
   border: 1px solid var(--borda);
-  border-radius: min(10px, var(--raio-max, 10px));
+  border-radius: var(--caixa-raio, min(10px, var(--raio-max, 10px)));
   background: var(--superficie-2);
 }
 .blocoTitulo {
@@ -17,10 +17,10 @@
 }
 .blocoTitulo h3 {
   font-family: var(--sans);
-  font-size: 11.5px;
+  font-size: var(--bloco-titulo-tamanho, 11.5px);
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: var(--campo-rotulo-espaco, 0.08em);
+  text-transform: var(--campo-rotulo-caixa, uppercase);
   color: var(--primaria);
 }
 .linha {
@@ -70,13 +70,13 @@
   padding: 9px 12px;
   background: var(--superficie);
   border: 1px solid var(--borda);
-  border-radius: min(8px, var(--raio-max, 8px));
+  border-radius: var(--caixa-raio, min(8px, var(--raio-max, 8px)));
 }
 .resumo dt {
-  font-size: 10.5px;
+  font-size: var(--rotulo-dado-tamanho, 10.5px);
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: var(--rotulo-dado-espaco, 0.06em);
+  text-transform: var(--campo-rotulo-caixa, uppercase);
   color: var(--texto-fraco);
 }
 .resumo dd {
@@ -90,7 +90,7 @@
   margin: 0;
   padding: 10px 12px;
   border: 1px solid var(--alerta-borda);
-  border-radius: min(8px, var(--raio-max, 8px));
+  border-radius: var(--caixa-raio, min(8px, var(--raio-max, 8px)));
   background: var(--alerta-fundo);
   font-size: 14px;
 }

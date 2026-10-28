@@ -1,0 +1,99 @@
+/* Painel das listas (interface refinada): o mesmo em todas as telas, nos dois temas. */
+.painel {
+  position: fixed;
+  z-index: 90;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--lista-raio, min(10px, var(--raio-max, 10px)));
+  box-shadow: var(--sombra-forte);
+  font-size: 14.5px;
+  animation: abrir 0.14s var(--ease, ease-out);
+}
+.grupo {
+  padding: 10px 12px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto-fraco);
+}
+.opcao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: var(--lista-item-raio, min(7px, var(--raio-max, 7px)));
+  color: var(--texto);
+  cursor: pointer;
+}
+.opcao.ativa {
+  background: var(--linha-hover, var(--superficie-2));
+  box-shadow: inset 0 0 0 1px var(--borda);
+}
+.opcao[aria-selected='true'] {
+  font-weight: 600;
+  color: var(--destaque-texto, var(--texto));
+}
+.opcao[aria-disabled='true'] {
+  color: var(--texto-fraco);
+  cursor: default;
+}
+.texto {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.marca {
+  flex: none;
+}
+@media (pointer: coarse) {
+  .opcao {
+    min-height: var(--touch, 44px);
+  }
+}
+@keyframes abrir {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .painel {
+    animation: none;
+  }
+}
+
+/* Lista de escolha: o <select> continua no formulário, escondido; o botão mostra a escolha. */
+.selecao {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+.nativo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+.gatilho {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+}
+.gatilho:disabled {
+  cursor: not-allowed;
+}
+.valor {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

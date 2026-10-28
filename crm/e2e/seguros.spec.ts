@@ -10,6 +10,7 @@ import {
   irPara,
   primeiroAcesso,
   sair,
+  escolher,
 } from './fluxos';
 import { conferirLayout, LARGURAS } from './responsivo';
 
@@ -46,7 +47,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     // Apólice que vence em 20 dias, cadastrada pela ficha do cliente
     await page.getByRole('button', { name: 'Nova apólice' }).click();
     const ap = page.getByRole('dialog', { name: 'Nova apólice' });
-    await ap.getByLabel('Seguradora').selectOption({ label: 'Porto Seguro' });
+    await escolher(ap.getByLabel('Seguradora'), { label: 'Porto Seguro' });
     const fim = new Date(Date.now() + 20 * 86_400_000).toISOString().slice(0, 10);
     const inicio = new Date(Date.now() - 345 * 86_400_000).toISOString().slice(0, 10);
     await ap.getByLabel('Início da vigência').fill(inicio);
@@ -73,7 +74,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page.getByRole('button', { name: 'Nova oportunidade' }).click();
     await page.getByRole('dialog').getByLabel('Contato').fill('Lead Teste');
     await page.getByRole('button', { name: 'Salvar' }).click();
-    await page.getByLabel('Etapa de Lead Teste').selectOption({ label: 'Proposta enviada' });
+    await escolher(page.getByLabel('Etapa de Lead Teste'), { label: 'Proposta enviada' });
     await expect(page.getByRole('region', { name: 'Proposta enviada' })).toContainText('Lead Teste');
 
     // Corretor: troca a senha 1234 no primeiro acesso; não vê a carteira da administradora nem usuários
@@ -96,7 +97,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await cadastrarUsuario(page, CORRETOR, 'Produtor');
     await importar(page, FIXTURE, /Propostas/);
     await irPara(page, 'Apólices');
-    await page.getByLabel('Situação').selectOption({ label: 'Todas' });
+    await escolher(page.getByLabel('Situação'), { label: 'Todas' });
     await expect(page.getByText(/12 de 12 apólices/)).toBeVisible();
     await irPara(page, 'Propostas');
     // 12 propostas + cabeçalho + linha de totais
@@ -104,7 +105,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await sair(page);
     await entrarPelaPrimeiraVez(page, URL, CORRETOR);
     await irPara(page, 'Apólices');
-    await page.getByLabel('Situação').selectOption({ label: 'Todas' });
+    await escolher(page.getByLabel('Situação'), { label: 'Todas' });
     await expect(page.getByText(/6 de 6 apólices/)).toBeVisible();
     // Corretor vê só as propostas em que participa, sem os valores da corretora, e não acessa o financeiro
     await irPara(page, 'Propostas');
@@ -130,12 +131,12 @@ test.describe('CRM Seguros — fluxo completo', () => {
     const form = page.getByRole('dialog', { name: 'Nova proposta' });
     await form.getByLabel('Nome completo do cliente').fill('Cliente Teste Proposta');
     await form.getByLabel('Nº da proposta / apólice').fill('TESTE-900');
-    await form.getByLabel('Seguradora').selectOption({ label: 'Porto Seguro' });
-    await form.getByLabel('Produto', { exact: true }).selectOption({ label: 'Automóvel' });
+    await escolher(form.getByLabel('Seguradora'), { label: 'Porto Seguro' });
+    await escolher(form.getByLabel('Produto', { exact: true }), { label: 'Automóvel' });
     // Tipo de negócio e prêmio são obrigatórios
     await page.getByRole('button', { name: 'Enviar para aprovação' }).click();
     await expect(form.getByText('Escolha o tipo de negócio.')).toBeVisible();
-    await form.getByLabel('Tipo de negócio').selectOption({ label: 'Seguro novo' });
+    await escolher(form.getByLabel('Tipo de negócio'), { label: 'Seguro novo' });
     await form.getByLabel('Prêmio líquido').fill('1.000');
     await form.getByLabel('Comissão trabalhada').fill('20');
     await expect(form.getByText('Receberá R$ 60,00')).toBeVisible();
@@ -186,7 +187,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page.getByRole('tab', { name: 'Vales' }).click();
     await page.getByRole('button', { name: 'Novo vale' }).click();
     const vale = page.getByRole('dialog', { name: 'Novo vale' });
-    await vale.getByLabel('Produtor').selectOption({ label: CORRETOR.nome });
+    await escolher(vale.getByLabel('Produtor'), { label: CORRETOR.nome });
     await vale.getByLabel('Valor', { exact: true }).fill('10');
     await vale.getByLabel('Motivo').fill('Adiantamento');
     await vale.getByRole('button', { name: 'Salvar' }).click();
@@ -216,7 +217,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
 
     // Painel de produção
     await irPara(page, 'Painel de produção');
-    await page.getByLabel('Período').selectOption({ label: 'Todo o período' });
+    await escolher(page.getByLabel('Período'), { label: 'Todo o período' });
     await expect(page.getByText('Produção (prêmio líquido)').locator('..')).toContainText('R$ 1.000,00');
     await expect(page.getByText('Seguro novo').locator('..')).toContainText('R$ 1.000,00');
 
@@ -236,7 +237,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(page.getByText('Saldo Bradesco')).toBeVisible();
     await expect(page.getByText(/Poupança/)).toHaveCount(0);
     await page.getByRole('tab', { name: 'Despesas' }).click();
-    await page.getByLabel('Mês do vencimento').selectOption({ label: 'Todos' });
+    await escolher(page.getByLabel('Mês do vencimento'), { label: 'Todos' });
     await page
       .getByRole('row', { name: /Contador \(teste\)/ })
       .getByRole('button', { name: 'Pagar…' })
@@ -248,7 +249,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(page.getByText('Despesa paga e lançada no extrato Bradesco.')).toBeVisible();
     await page.getByRole('tab', { name: 'Extrato' }).click();
     await expect(page).toHaveURL(/aba=extrato/);
-    await page.getByLabel('Mês').selectOption({ label: 'Todos' });
+    await escolher(page.getByLabel('Mês'), { label: 'Todos' });
     await expect(page.getByRole('table', { name: 'Extrato Bradesco' })).toContainText(
       'Pagamento: Contador (teste)',
     );
@@ -341,7 +342,7 @@ for (const tela of LARGURAS) {
       });
       await page.keyboard.press('Escape');
       await irPara(page, 'Relatórios');
-      await page.getByLabel('Produtor').selectOption({ index: 1 });
+      await escolher(page.getByLabel('Produtor'), { index: 1 });
       await conferirLayout(page, tela.width);
       await page.screenshot({
         path: `test-results/telas/seguros-relatorio-produtor-${tela.nome}.png`,

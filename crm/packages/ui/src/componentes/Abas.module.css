@@ -7,7 +7,9 @@
   background: var(--abas-fundo, var(--superficie-2));
   border: var(--abas-borda, 1px solid var(--borda));
   border-bottom: var(--abas-fio, 1px solid var(--borda));
-  border-radius: min(9px, var(--raio-max, 9px));
+  border-radius: var(--abas-raio, min(9px, var(--raio-max, 9px)));
+  width: var(--abas-largura, auto);
+  max-width: 100%;
   scrollbar-width: none;
 }
 .aba {
@@ -16,11 +18,11 @@
   padding: 6px 14px;
   background: none;
   border: 0;
-  border-radius: min(6px, var(--raio-max, 6px));
+  border-radius: var(--aba-raio, min(6px, var(--raio-max, 6px)));
   color: var(--texto-suave);
   cursor: pointer;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--aba-peso, 600);
 }
 .aba:hover {
   color: var(--texto);

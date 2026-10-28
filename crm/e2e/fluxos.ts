@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 export const ADMIN = { nome: 'Administradora Teste', login: 'admteste', senha: 'senha-admin-1' };
@@ -86,7 +86,7 @@ export async function cadastrarUsuario(
   const dialogo = page.getByRole('dialog', { name: 'Novo usuário' });
   await dialogo.getByLabel('Nome').fill(u.nome);
   await dialogo.getByLabel('Usuário (para entrar)').fill(u.login);
-  await dialogo.getByLabel('Perfil').selectOption({ label: perfil });
+  await escolher(dialogo.getByLabel('Perfil'), { label: perfil });
   if (u.percentual) await dialogo.getByLabel('Repasse padrão (%)').fill(u.percentual);
   await page.getByRole('button', { name: 'Cadastrar' }).click();
   await expect(page.getByText(`${u.nome} foi cadastrado.`, { exact: false })).toBeVisible();
@@ -104,4 +104,23 @@ export async function importar(page: Page, arquivo: string, esperado: RegExp) {
   if (await confirmar.isVisible())
     await confirmar.getByRole('button', { name: 'Importar', exact: true }).click();
   await expect(concluida).toBeVisible();
+}
+
+/**
+ * Escolhe uma opção de uma lista: a do navegador (<select>, Consórcio) ou a do painel do app
+ * (botão "combobox" da interface refinada, Seguros).
+ */
+export async function escolher(campo: Locator, opcao: { label: string } | { index: number }) {
+  if (await campo.evaluate((e) => e.tagName === 'SELECT')) {
+    await campo.selectOption(opcao);
+    return;
+  }
+  await campo.click();
+  const lista = campo.page().getByRole('listbox');
+  await lista.waitFor();
+  const item =
+    'label' in opcao
+      ? lista.getByRole('option', { name: opcao.label, exact: true })
+      : lista.getByRole('option').nth(opcao.index);
+  await item.click();
 }

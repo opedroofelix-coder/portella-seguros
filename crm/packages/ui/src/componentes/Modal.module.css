@@ -15,7 +15,8 @@
   display: flex;
   flex-direction: column;
   background: var(--superficie);
-  border-radius: min(14px, var(--raio-max, 14px)) min(14px, var(--raio-max, 14px)) 0 0;
+  border-radius: var(--modal-raio-celular, min(14px, var(--raio-max, 14px)))
+    var(--modal-raio-celular, min(14px, var(--raio-max, 14px))) 0 0;
   border-top: var(--modal-fio, 0);
   box-shadow: var(--sombra-forte);
   animation: subir 0.25s var(--ease);
@@ -61,7 +62,7 @@
     max-width: var(--largura, 640px);
     max-height: 88vh;
     border: 1px solid var(--modal-borda, var(--borda));
-    border-radius: min(13px, var(--raio-max, 13px));
+    border-radius: var(--modal-raio, min(13px, var(--raio-max, 13px)));
   }
   .cabecalho {
     padding: 18px 24px;

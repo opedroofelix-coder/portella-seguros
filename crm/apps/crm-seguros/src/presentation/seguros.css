@@ -9,11 +9,49 @@
   --sans: 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --serif: var(--sans);
   --radius: 12px;
-  --raio-cartao: 24px;
+  --raio-cartao: 28px;
   --raio-max: 999px;
   --botao-raio: 999px;
   --botao-texto: #101a2e;
-  --campo-rotulo-tamanho: 12.5px;
+  /*
+   * Padrão de componentes "Opção A · Cápsula" (escolhido em 28/10/2026): campos, listas, abas,
+   * selos e botões em cápsula, com a mesma altura (44px); rótulos e títulos de tabela em texto
+   * normal; cartões e janelas com cantos de 28px. As listas abrem no painel do app (Lista.tsx).
+   */
+  --campo-rotulo-tamanho: 13px;
+  --campo-rotulo-peso: 500;
+  --campo-rotulo-espaco: normal;
+  --campo-rotulo-caixa: none;
+  --campo-rotulo-recuo: 16px;
+  --campo-raio: 999px;
+  --campo-raio-area: 22px;
+  --campo-fundo: var(--superficie);
+  --campo-recuo: 18px;
+  --campo-altura: 44px;
+  --campo-afixo-fio: 0;
+  --campo-afixo-recuo: 16px;
+  --botao-altura: 44px;
+  --botao-altura-p: 36px;
+  --botao-recuo: 22px;
+  --botao-perigo-fundo: transparent;
+  --abas-raio: 999px;
+  --aba-raio: 999px;
+  --abas-largura: fit-content;
+  --aba-peso: 500;
+  --tabela-cab-tamanho: 12.5px;
+  --tabela-cab-peso: 500;
+  --tabela-cab-espaco: normal;
+  --tabela-cab-caixa: none;
+  --tabela-cab-fundo: transparent;
+  --modal-raio: 28px;
+  --modal-raio-celular: 28px;
+  --lista-raio: 20px;
+  --lista-item-raio: 999px;
+  --caixa-raio: 18px;
+  --rotulo-dado-tamanho: 12.5px;
+  --rotulo-dado-espaco: normal;
+  --tabela-cartao-rotulo-tamanho: 12px;
+  --bloco-titulo-tamanho: 14px;
   --campo-foco-contorno: 2px solid var(--foco);
   --campo-foco-afastamento: 1px;
   --campo-foco-borda: var(--foco);
