@@ -387,7 +387,7 @@
               </optgroup>
             </select>
           </label>
-          <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="4" placeholder="Como podemos ajudar?" required></textarea></label>
+          <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="2" placeholder="Como podemos ajudar?" required data-autogrow></textarea></label>
           <button class="btn btn-gold btn-lg" type="submit">Enviar pelo WhatsApp</button>
           <p class="form-note">Abrimos o WhatsApp com a sua mensagem pronta. É só tocar em enviar.</p>
         </form>
@@ -457,7 +457,12 @@
         <button class="btn btn-gold btn-lg" type="submit">Continuar</button>
       </form>
       <form class="modal__step" data-step="2" hidden>
-        <label class="field" data-only="sem-tipo">Qual seguro ou consórcio?<select name="tipo" data-modal-type required></select></label>
+        <div class="field" data-only="sem-tipo">
+          <span id="modal-tipo-rotulo">Qual seguro ou consórcio?</span>
+          <!-- o main.js troca a lista nativa pelo mesmo seletor da barra "Cotar" (data-qs-inline: o rótulo continua visível) -->
+          <select name="tipo" data-modal-type data-qs-inline aria-labelledby="modal-tipo-rotulo" required></select>
+          <span class="field__erro" data-modal-type-erro role="alert" hidden>Escolha o seguro ou consórcio.</span>
+        </div>
         <div class="step-group" data-only="saude">
           <fieldset class="plans">
             <legend>Tipo de plano</legend>
@@ -471,7 +476,7 @@
             <label class="field">Nº de pessoas<input type="number" name="pessoas" min="1" inputmode="numeric"></label>
           </div>
         </div>
-        <label class="field">Algum detalhe? (opcional)<textarea name="detalhes" rows="3" data-modal-details></textarea></label>
+        <label class="field">Algum detalhe? (opcional)<textarea name="detalhes" rows="1" data-modal-details data-autogrow></textarea></label>
         <button class="btn btn-gold btn-lg" type="submit">Enviar pelo WhatsApp</button>
       </form>
     </div>
