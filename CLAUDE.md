@@ -70,3 +70,7 @@
   pela cliente: fonte Sora, cartões de vidro com cantos arredondados, botões em cápsula, marinho e dourado,
   **tema claro padrão** e escuro opcional, menu no topo com busca Ctrl K. Tokens em
   `crm/apps/crm-seguros/src/presentation/seguros.css`; o Consórcio não muda.
+- **Padrão de componentes do CRM de Seguros (28/10/2026): Opção A "Cápsula".** Campos, listas, abas, selos e botões
+  em cápsula, todos com 44px; rótulos e títulos de tabela em texto normal; cartões e janelas com 28px. As listas
+  (Selecao e campos com sugestões) abrem no painel do app (`packages/ui/src/componentes/Lista.tsx`), nunca na
+  lista do navegador. Os valores ficam nos tokens do `seguros.css`; o Consórcio continua com os de reserva.

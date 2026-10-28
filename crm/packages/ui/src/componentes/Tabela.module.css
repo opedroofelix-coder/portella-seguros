@@ -34,12 +34,12 @@
 .tabela th {
   padding: 9px 12px;
   text-align: left;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: var(--tabela-cab-tamanho, 11.5px);
+  font-weight: var(--tabela-cab-peso, 600);
+  letter-spacing: var(--tabela-cab-espaco, 0.08em);
+  text-transform: var(--tabela-cab-caixa, uppercase);
   color: var(--texto-suave);
-  background: var(--superficie-2);
+  background: var(--tabela-cab-fundo, var(--superficie-2));
   border-bottom: var(--tabela-cabecalho-fio, 1px solid var(--borda));
   white-space: nowrap;
 }
@@ -124,10 +124,10 @@
     /* Rótulos longos quebram linha em vez de empurrar o valor para fora do cartão. */
     flex: 0 1 auto;
     max-width: 55%;
-    font-size: 10.5px;
+    font-size: var(--tabela-cartao-rotulo-tamanho, 10.5px);
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: var(--tabela-cab-espaco, 0.08em);
+    text-transform: var(--tabela-cab-caixa, uppercase);
     color: var(--texto-fraco);
     text-align: left;
   }

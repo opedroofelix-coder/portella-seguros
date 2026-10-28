@@ -304,9 +304,9 @@ h3 em {
   min-width: 0;
 }
 .lista-dados dt {
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: var(--rotulo-dado-tamanho, 11px);
+  letter-spacing: var(--rotulo-dado-espaco, 0.16em);
+  text-transform: var(--campo-rotulo-caixa, uppercase);
   color: var(--texto-fraco);
 }
 .lista-dados dd {

@@ -54,9 +54,10 @@
     grid-template-columns: 1fr 140px 170px;
     gap: 12px;
     padding: 0 0 8px;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-size: var(--tabela-cab-tamanho, 11px);
+    font-weight: var(--tabela-cab-peso, 400);
+    letter-spacing: var(--tabela-cab-espaco, 0.14em);
+    text-transform: var(--tabela-cab-caixa, uppercase);
     color: var(--texto-suave);
   }
   .linha {

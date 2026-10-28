@@ -83,7 +83,8 @@ export function Modal({
 
     const teclado = (e: KeyboardEvent) => {
       if (!noTopo()) return;
-      if (e.key === 'Escape') {
+      // Esc já usado por um controle (lista aberta) não fecha a janela.
+      if (e.key === 'Escape' && !e.defaultPrevented) {
         e.stopPropagation();
         if (refinada) e.stopImmediatePropagation();
         pedir.current();
