@@ -376,6 +376,13 @@
     document.addEventListener('click', function (e) { if (!wrap.contains(e.target) && !panel.hidden) close(false); });
   });
 
+  /* ---------- Caixas de texto: crescem conforme o texto (o fio fica logo abaixo dele) ---------- */
+  function autoAltura(t) { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
+  $$('textarea[data-autogrow]').forEach(function (t) {
+    t.addEventListener('input', function () { autoAltura(t); });
+    if (t.form) t.form.addEventListener('reset', function () { setTimeout(function () { t.style.height = ''; }); });
+  });
+
   /* ---------- Modal de cotação ---------- */
   var modal = $('[data-modal]');
   var typeSelect = $('[data-type-select]');
@@ -409,6 +416,7 @@
     show('sem-tipo', !currentType);
     show('saude', isHealth(t));
     if (details) details.placeholder = HINTS[t] || 'Conte rapidamente o que você precisa';
+    if (details) autoAltura(details);
   }
   var tipoErro = $('[data-modal-type-erro]', modal);
   function erroTipo(on) {

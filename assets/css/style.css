@@ -35,6 +35,9 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+/* O site é todo escuro: avisa o navegador, que desenha no escuro listas, barras de rolagem e o
+   preenchimento automático dos campos (sem o fundo azul-claro). */
+html { color-scheme: dark; }
 html { scroll-behavior: smooth; scroll-padding-top: 92px; } /* altura do menu fixo: o link (#equipe etc.) não fica escondido atrás dele */
 body { margin: 0; font-family: var(--sans); font-weight: 400; color: var(--text-light); background: var(--navy-deep); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 img { max-width: 100%; display: block; }
@@ -109,7 +112,7 @@ input, select, textarea, button { font: inherit; }
 .quote-bar { width: 100%; max-width: 540px; display: flex; align-items: center; gap: 12px; padding: 6px 6px 6px 24px; border: 1px solid rgba(217, 188, 126, .45); border-radius: 2px; background: rgba(255, 255, 255, .03); }
 .quote-bar label { position: relative; flex-grow: 1; }
 .quote-bar select { appearance: none; -webkit-appearance: none; width: 100%; border: 0; background: transparent; color: var(--text-light); font-size: 16px; padding: 14px 26px 14px 0; cursor: pointer; }
-.quote-bar select option { color: var(--navy-deep); }
+.quote-bar select option { color: var(--text-light); background: var(--navy-deep); }
 .quote-bar label > svg { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); pointer-events: none; }
 .quote-bar { position: relative; z-index: 5; }
 /* sem transform depois da entrada: a lista de seguros (position: fixed) precisa se posicionar pela tela */
@@ -285,7 +288,7 @@ a.contact__row:hover span { color: var(--gold-text); }
 .contact-form label { display: block; }
 .contact-form label[hidden] { display: none; }
 .contact-form input, .contact-form select, .contact-form textarea { width: 100%; border: 0; border-bottom: 1px solid #DCD2BE; background: transparent; padding: 16px 2px; font-size: 16px; font-family: inherit; color: var(--text-on-light); border-radius: 0; }
-.contact-form textarea { resize: vertical; }
+.contact-form textarea { resize: none; overflow: hidden; line-height: 1.5; }
 .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { outline: none; border-bottom-color: var(--gold-line); }
 .contact-form .btn { margin-top: 20px; }
 .contact-form .qs__button { padding: 16px 2px; border-bottom: 1px solid #DCD2BE; }
@@ -325,7 +328,7 @@ a.contact__row:hover span { color: var(--gold-text); }
 .field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--text-faint-dark); }
 .field input, .field select, .field textarea { border: 0; border-bottom: 1px solid rgba(217, 188, 126, .4); background: transparent; color: var(--text-light); padding: 12px 2px; font-size: 16px; letter-spacing: normal; text-transform: none; border-radius: 0; width: 100%; }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-bottom-color: var(--gold-light); }
-.field select option { color: var(--navy-deep); }
+.field select option { color: var(--text-light); background: var(--navy-deep); }
 .field input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .field input[type="number"]::-webkit-inner-spin-button, .field input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 /* Seletor de seguro dentro do modal: mesmo fio dourado e espaçamento dos outros campos */
@@ -345,7 +348,8 @@ a.contact__row:hover span { color: var(--gold-text); }
 .contact-form input:-webkit-autofill, .contact-form input:-webkit-autofill:hover, .contact-form input:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--text-on-light); -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset; transition: background-color 99999s ease-out;
 }
-.field textarea { resize: vertical; font-family: inherit; line-height: 1.5; }
+.field textarea { resize: none; overflow: hidden; font-family: inherit; line-height: 1.5; }
+/* (as caixas de texto começam com 1 ou 2 linhas, com o fio logo abaixo do texto, e crescem ao digitar) */
 .field ::placeholder { color: var(--text-faint-dark); opacity: .8; }
 .field[hidden], .step-group[hidden] { display: none; }
 .step-group { display: flex; flex-direction: column; gap: 14px; }
@@ -476,7 +480,7 @@ a.contact__row:hover span { color: var(--gold-text); }
 .dark .contact-form { background: var(--navy-deep); border: 1px solid rgba(217, 188, 126, .3); border-top: 2px solid var(--gold); box-shadow: 0 50px 80px -50px rgba(0, 0, 0, .6); }
 .dark .contact-form input, .dark .contact-form select, .dark .contact-form textarea { color: var(--text-light); border-bottom-color: rgba(217, 188, 126, .35); }
 .dark .contact-form ::placeholder { color: var(--text-faint-dark); }
-.dark .contact-form select option { color: var(--navy-deep); }
+.dark .contact-form select option { color: var(--text-light); background: var(--navy-deep); }
 .dark .contact-form .qs__button { border-bottom-color: rgba(217, 188, 126, .35); }
 .dark .contact-form .qs__value.is-empty { color: var(--text-faint-dark); }
 .dark .contact-form .qs.is-open .qs__button, .dark .contact-form .qs__button:focus-visible { border-bottom-color: var(--gold-light); }
