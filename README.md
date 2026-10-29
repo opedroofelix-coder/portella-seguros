@@ -110,8 +110,8 @@ O que depende da Portella (contas próprias):
 
 ## Pendências
 
-- [ ] **Nossa equipe:** 5 produtores com foto (`assets/img/equipe/`), cargo "Produtor": Mary, Gabriel, Camilly,
-  Cadu e Gisele. Faltam as fotos de Mary, Gabriel, Camilly e Cadu em melhor qualidade; a da Gisele veio do original.
+- [ ] **Nossa equipe:** 5 pessoas com foto (`assets/img/equipe/`): Mary (Consultora de Seguros), Gabriel
+  (Especialista em Consórcio), Camilly e Cadu (Assistentes de Seguros) e Gisele (Especialista em Seguros e Saúde). Faltam as fotos de Mary, Gabriel, Camilly e Cadu em melhor qualidade; a da Gisele veio do original.
 
 - [x] **Logos das seguradoras em alta qualidade:** versões oficiais (sites das seguradoras e Wikimedia Commons), em PNG 600x240 transparente. A Liberty virou Yelum (`yelum.png`).
 - [ ] Nomes das outras 10 seguradoras parceiras (das 22), para incluir os logos na faixa.
