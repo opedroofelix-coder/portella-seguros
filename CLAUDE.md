@@ -28,8 +28,9 @@
 - Lista de pendências: README.md.
 - Ordem dos seguros (pedido da cliente): 1. Seguro Auto, 2. Plano de Saúde, 3. Consórcio, 4. Celular e
   Portáteis; os demais sem ordem definida.
-- Seção "Nossa equipe" (depois do Sobre): 5 produtores com foto (26/10/2026), cargo "Produtor", nesta ordem:
-  Mary, Gabriel, Camilly, Cadu e Gisele. Fotos em `assets/img/equipe/<nome>.webp` (WebP 600x800); as de Mary,
+- Seção "Nossa equipe" (depois do Sobre): 5 pessoas com foto (26/10/2026), nesta ordem e com estas funções
+  (29/10/2026): Mary (Consultora de Seguros), Gabriel (Especialista em Consórcio), Camilly (Assistente de Seguros),
+  Cadu (Assistente de Seguros) e Gisele (Especialista em Seguros e Saúde). Fotos em `assets/img/equipe/<nome>.webp` (WebP 600x800); as de Mary,
   Gabriel, Camilly e Cadu vieram em baixa qualidade e serão trocadas pelas originais.
 - A cotação não tem custo (confirmado pela cliente).
 - Logos das seguradoras: versões oficiais em `assets/img/seguradoras/` (PNG 600x240 transparente); o site usa
