@@ -1,5 +1,5 @@
-import type { Centavos, DataISO, Registro } from '@portella/core';
-import { dataValida, diasEntre, ErroValidacao, porcentagem } from '@portella/core';
+import type { Centavos, DataISO, Registro, TipoNegocio } from '@portella/core';
+import { dataValida, diasEntre, ErroValidacao, porcentagem, somarMeses } from '@portella/core';
 import type { Ramo } from './catalogo';
 
 export const STATUS_RENOVACAO = ['pendente', 'em_contato', 'renovada', 'nao_renovada'] as const;
@@ -11,23 +11,56 @@ export const ROTULO_RENOVACAO: Record<StatusRenovacao, string> = {
   nao_renovada: 'Não renovada',
 };
 
+/** Parcela do prêmio paga pelo cliente à seguradora (acompanhamento do checklist). */
+export interface ParcelaApolice {
+  valor?: Centavos;
+  vencimento?: DataISO;
+  /** Quando a baixa foi conferida no site da seguradora (a Porto leva alguns dias para dar baixa). */
+  consulta?: DataISO;
+  pago?: boolean;
+}
+
+/** Ocorrência no acompanhamento da apólice (contato com o cliente, aviso de atraso, endosso…). */
+export interface OcorrenciaApolice {
+  data: DataISO;
+  descricao: string;
+  atuacao?: string;
+  dataComunicado?: DataISO;
+  responsavel?: string;
+}
+
 export interface Apolice extends Registro {
   clienteId: string;
   seguradora: string;
   ramo: Ramo;
   numero?: string;
-  /** Bem segurado: placa e modelo do veículo, endereço do imóvel etc. */
+  /** Seguro novo, renovação ou endosso. */
+  tipo?: TipoNegocio;
+  /** Nº da proposta transmitida à seguradora (liga a apólice à proposta do CRM). */
+  numeroProposta?: string;
+  /** Bem segurado: modelo do veículo, endereço do imóvel etc. */
   item?: string;
+  /** Placa do carro ou da moto. */
+  placa?: string;
   inicioVigencia: DataISO;
   /** Vazio em contratos contínuos (vida, saúde, dental…). */
   fimVigencia?: DataISO;
   /** Fim calculado (início + 12 meses) na importação; precisa ser confirmado. */
   vigenciaEstimada?: boolean;
+  /** Valores financeiros da proposta: saíram do formulário (29/10/2026), ficam nos dados importados. */
   premioLiquido?: Centavos;
   premioTotal?: Centavos;
   comissaoPercentual?: number;
+  /** Texto livre das apólices antigas; a forma de pagamento agora é lançada na proposta. */
   formaPagamento?: string;
+  quantidadeParcelas?: number;
+  parcelas?: ParcelaApolice[];
+  /** Status: ativa (padrão) ou cancelada, com data e motivo. */
   cancelada?: boolean;
+  dataCancelamento?: DataISO;
+  motivoCancelamento?: string;
+  ocorrencias?: OcorrenciaApolice[];
+  /** Acompanhamento interno da tela Renovações (não aparece no formulário). */
   renovacao: StatusRenovacao;
   /** Por que o cliente não renovou (preço, outra corretora…), quando `renovacao` é "nao_renovada". */
   motivoNaoRenovacao?: string;
@@ -42,6 +75,42 @@ export const MOTIVOS_NAO_RENOVACAO = [
   'Sem retorno do cliente',
   'Outro',
 ] as const;
+
+/** Motivos sugeridos ao cancelar a apólice. */
+export const MOTIVOS_CANCELAMENTO = [
+  'Falta de pagamento',
+  'Sinistro (perda total)',
+  'Venda do bem',
+  'Pedido do cliente',
+  'Outro',
+] as const;
+
+/** Placa no padrão antigo (ABC1234) ou Mercosul (ABC1D23), sem hífen e em maiúsculas. */
+export const normalizarPlaca = (placa: string) => placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
+export const placaValida = (placa: string) => /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(normalizarPlaca(placa));
+/** Placa para exibir: ABC-1234 no padrão antigo, ABC1D23 no Mercosul. */
+export function formatarPlaca(placa?: string): string {
+  if (!placa) return '';
+  const p = normalizarPlaca(placa);
+  return /^[A-Z]{3}[0-9]{4}$/.test(p) ? `${p.slice(0, 3)}-${p.slice(3)}` : p;
+}
+
+/**
+ * Divide o prêmio total em parcelas mensais a partir do 1º vencimento. Os centavos que sobram da
+ * divisão vão para a 1ª parcela, para a soma bater exatamente com o prêmio (sem diferença de centavos).
+ */
+export function gerarParcelas(total: Centavos | undefined, quantidade: number, primeiroVencimento?: DataISO) {
+  const n = Math.max(0, Math.floor(quantidade));
+  const base = total == null ? undefined : Math.floor(total / n);
+  const sobra = total == null || base == null ? 0 : total - base * n;
+  return Array.from(
+    { length: n },
+    (_, i): ParcelaApolice => ({
+      valor: base == null ? undefined : base + (i === 0 ? sobra : 0),
+      vencimento: primeiroVencimento ? somarMeses(primeiroVencimento, i) : undefined,
+    }),
+  );
+}
 
 export type Situacao = 'a_iniciar' | 'vigente' | 'a_vencer' | 'vencida' | 'renovada' | 'cancelada';
 export const ROTULO_SITUACAO: Record<Situacao, string> = {
@@ -72,6 +141,14 @@ export function situacao(
   return dias <= JANELA_A_VENCER ? 'a_vencer' : 'vigente';
 }
 
+/** Situações da lista padrão de Apólices: as que estão em acompanhamento, inclusive as canceladas. */
+export const EM_ACOMPANHAMENTO: ReadonlySet<Situacao> = new Set<Situacao>([
+  'a_iniciar',
+  'vigente',
+  'a_vencer',
+  'cancelada',
+]);
+
 /** Vigentes e a vencer: as apólices que estão valendo hoje. */
 export const estaValendo = (a: Apolice, hoje: DataISO) => {
   const s = situacao(a, hoje);
@@ -98,6 +175,20 @@ export function validarApolice(a: Partial<Apolice>): void {
     campos.comissaoPercentual = 'Entre 0 e 100%.';
   }
   if (a.premioLiquido != null && a.premioLiquido < 0) campos.premioLiquido = 'Valor inválido.';
+  if (a.premioTotal != null && a.premioTotal < 0) campos.premioTotal = 'Valor inválido.';
+  if (a.placa && !placaValida(a.placa)) campos.placa = 'Placa inválida (ex.: ABC1D23).';
+  if (a.quantidadeParcelas != null && (a.quantidadeParcelas < 1 || a.quantidadeParcelas > 24)) {
+    campos.quantidadeParcelas = 'Entre 1 e 24.';
+  }
+  const somaParcelas = (a.parcelas ?? []).reduce((t, p) => t + (p.valor ?? 0), 0);
+  if (a.premioTotal != null && somaParcelas > a.premioTotal) {
+    campos.parcelas = 'A soma das parcelas passa do prêmio total.';
+  }
+  if (a.cancelada) {
+    if (!a.dataCancelamento || !dataValida(a.dataCancelamento))
+      campos.dataCancelamento = 'Informe a data do cancelamento.';
+    if (!a.motivoCancelamento?.trim()) campos.motivoCancelamento = 'Informe o motivo.';
+  }
   if (Object.keys(campos).length) throw new ErroValidacao('Confira os dados da apólice.', campos);
 }
 

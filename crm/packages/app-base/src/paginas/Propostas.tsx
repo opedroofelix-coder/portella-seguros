@@ -136,13 +136,9 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
       ocultarNoMobile: true,
       render: (p) =>
         p.tipoNegocio ? (
-          <Selo tom={p.tipoNegocio === 'novo' ? 'info' : 'dourado'}>
+          <Selo tom={p.tipoNegocio === 'novo' ? 'info' : p.tipoNegocio === 'endosso' ? 'neutro' : 'dourado'}>
             {/* Na tabela, o rótulo curto ("Novo", "Renovação") para as colunas caberem. */}
-            {refinada
-              ? p.tipoNegocio === 'novo'
-                ? 'Novo'
-                : 'Renovação'
-              : ROTULO_TIPO_NEGOCIO[p.tipoNegocio]}
+            {refinada && p.tipoNegocio === 'novo' ? 'Novo' : ROTULO_TIPO_NEGOCIO[p.tipoNegocio]}
           </Selo>
         ) : (
           '—'
@@ -316,6 +312,7 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
               <option value="">Todos</option>
               <option value="novo">{ROTULO_TIPO_NEGOCIO.novo}</option>
               <option value="renovacao">{ROTULO_TIPO_NEGOCIO.renovacao}</option>
+              <option value="endosso">{ROTULO_TIPO_NEGOCIO.endosso}</option>
               <option value="nao">Não informado</option>
             </Selecao>
           </Campo>

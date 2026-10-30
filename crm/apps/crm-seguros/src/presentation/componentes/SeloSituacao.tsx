@@ -22,6 +22,15 @@ export function SeloSituacao({ apolice }: { apolice: Apolice }) {
       <Selo tom="alerta">{dias === 0 ? 'Vence hoje' : `Vence em ${dias} dia${dias > 1 ? 's' : ''}`}</Selo>
     );
   }
+  if (s === 'cancelada') {
+    return (
+      <span title={apolice.motivoCancelamento}>
+        <Selo tom="perigo">
+          {apolice.dataCancelamento ? `Cancelada em ${formatarData(apolice.dataCancelamento)}` : 'Cancelada'}
+        </Selo>
+      </span>
+    );
+  }
   if (s === 'a_iniciar') {
     return <Selo tom="neutro">Começa em {formatarData(apolice.inicioVigencia)}</Selo>;
   }

@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { DadosRegistro, Proposta, TipoNegocio } from '@portella/core';
 import {
   centavosParaTexto,
+  FORMAS_PAGAMENTO,
   comissaoCalculada,
   formatarData,
   formatarDinheiro,
@@ -14,6 +15,7 @@ import {
   ROTULO_STATUS_PROPOSTA,
   ROTULO_TIPO_NEGOCIO,
   saldoReceber,
+  TIPOS_NEGOCIO,
   textoDinheiro,
   valorVitalicio,
 } from '@portella/core';
@@ -30,7 +32,7 @@ import {
 } from '@portella/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { useRefinada } from '../config';
+import { useConfig, useRefinada } from '../config';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { aplicarErros, mensagemErro } from '../erros';
@@ -55,7 +57,17 @@ const esquema = z.object({
   data: z.string().min(1, 'Informe a data.'),
   companhia: z.string().trim().min(1, 'Informe a seguradora.'),
   produto: z.string().trim().min(1, 'Informe o produto.'),
-  tipoNegocio: z.enum(['novo', 'renovacao', '']),
+  tipoNegocio: z.enum(['novo', 'renovacao', 'endosso', '']),
+  formaPagamento: z.string(),
+  quantidadeParcelas: z
+    .string()
+    .refine((v) => !v.trim() || (/^\d+$/.test(v.trim()) && +v >= 1 && +v <= 24), 'De 1 a 24.'),
+  placa: z
+    .string()
+    .refine(
+      (v) => !v.trim() || /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(v.toUpperCase().replace(/[^A-Z0-9]/g, '')),
+      'Placa inválida (ex.: ABC1D23).',
+    ),
   premioLiquido: valor,
   comissaoPercentual: pct(1000),
   comissaoReceber: valor,
@@ -91,11 +103,15 @@ const ORIGINAL = conversores(paraCentavos);
 const REFINADO = conversores(lerDinheiro);
 const textoPct = (n?: number) => (n == null ? '' : String(n).replace('.', ','));
 const OUTRA = '__outra__';
+/** Produtos com veículo: a proposta pede a placa. */
+const temVeiculo = (produto: string) => /autom|moto|carro|ve[ií]culo|auto\b/i.test(produto);
 
 /** Interface refinada: tipo de negócio e prêmio obrigatórios e soma dos produtores até 100%. */
 const esquemaRefinado = esquema
   .extend({
-    tipoNegocio: z.enum(['novo', 'renovacao', '']).refine((v) => v !== '', 'Escolha o tipo de negócio.'),
+    tipoNegocio: z
+      .enum(['novo', 'renovacao', 'endosso', ''])
+      .refine((v) => v !== '', 'Escolha o tipo de negócio.'),
     premioLiquido: valor.refine((v) => v.trim() !== '', 'Informe o prêmio líquido.'),
   })
   .superRefine((v, ctx) => {
@@ -122,6 +138,9 @@ function iniciais(
     companhia: p?.companhia ?? '',
     produto: p?.produto ?? '',
     tipoNegocio: p?.tipoNegocio ?? '',
+    formaPagamento: p?.formaPagamento ?? '',
+    quantidadeParcelas: p?.quantidadeParcelas == null ? '' : String(p.quantidadeParcelas),
+    placa: p?.placa ?? '',
     premioLiquido: (refinada ? textoDinheiro : centavosParaTexto)(p?.premioLiquido),
     comissaoPercentual: textoPct(p?.comissaoPercentual),
     comissaoReceber: (refinada ? textoDinheiro : centavosParaTexto)(p?.comissaoReceber),
@@ -147,6 +166,7 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
   const usuario = useUsuario();
   const { propostas, clientes } = useServicos();
   const { pode } = useSessao();
+  const { propostaPagamento, acoesProposta } = useConfig();
   const { equipe, nomeDe } = useEquipe();
   const { data: listaClientes = [] } = useColecao('clientes', clientes);
   const produtos = useCatalogo('produtos');
@@ -195,6 +215,15 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
       })),
     };
   const ativos = useMemo(() => equipe.filter((u) => u.ativo), [equipe]);
+  // Controle por saldo (29/10/2026): cada recebimento mostra quanto ainda falta a seguradora pagar,
+  // somando os recebimentos até a data dele (o vitalício não abate o saldo).
+  const saldosDepois = previa.recebimentos.map((r, i) => {
+    const ate = previa.recebimentos.filter((x, j) => x.data < r.data || (x.data === r.data && j <= i));
+    let acumulado = 0;
+    for (const x of ate)
+      if (previa.percentualVitalicio == null || acumulado < comissaoReceber) acumulado += x.valor;
+    return Math.max(0, comissaoReceber - acumulado);
+  });
   const somaProdutores = v.produtores.reduce((t, x) => t + (numero(x.percentual) ?? 0), 0);
 
   const montar = (valores: Valores): DadosRegistro<Proposta> => {
@@ -210,6 +239,18 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
       companhia: valores.companhia.trim(),
       produto: valores.produto.trim(),
       tipoNegocio: (valores.tipoNegocio || undefined) as TipoNegocio | undefined,
+      ...(propostaPagamento
+        ? {
+            formaPagamento: valores.formaPagamento.trim() || undefined,
+            quantidadeParcelas: valores.quantidadeParcelas.trim()
+              ? Number(valores.quantidadeParcelas)
+              : undefined,
+            placa:
+              temVeiculo(valores.produto) && valores.placa.trim()
+                ? valores.placa.toUpperCase().replace(/[^A-Z0-9]/g, '')
+                : undefined,
+          }
+        : {}),
       premioLiquido: centavos(valores.premioLiquido),
       comissaoPercentual: numero(valores.comissaoPercentual),
       comissaoReceber,
@@ -288,6 +329,7 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                 {refinada ? 'Excluir proposta' : 'Excluir'}
               </Botao>
             )}
+            {proposta?.status === 'aprovada' && acoesProposta?.(proposta)}
             <Botao variante="secundario" onClick={aoFechar}>
               {somenteLeitura ? 'Fechar' : 'Cancelar'}
             </Botao>
@@ -457,18 +499,49 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                 <option key={p} value={p} />
               ))}
             </datalist>
-            <Campo
-              rotulo="Tipo de negócio"
-              obrigatorio={refinada}
-              erro={erros.tipoNegocio?.message}
-              dica="Renovação da própria carteira (não de congênere)."
-            >
+            <Campo rotulo="Tipo de negócio" obrigatorio={refinada} erro={erros.tipoNegocio?.message}>
               <Selecao {...register('tipoNegocio')}>
                 <option value="">{refinada ? 'Escolha…' : 'Não informado'}</option>
-                <option value="novo">{ROTULO_TIPO_NEGOCIO.novo}</option>
-                <option value="renovacao">{ROTULO_TIPO_NEGOCIO.renovacao}</option>
+                {TIPOS_NEGOCIO.map((t) => (
+                  <option key={t} value={t}>
+                    {ROTULO_TIPO_NEGOCIO[t]}
+                  </option>
+                ))}
               </Selecao>
             </Campo>
+            {propostaPagamento && temVeiculo(v.produto) && (
+              <Campo rotulo="Placa" erro={erros.placa?.message} dica="Do carro ou da moto.">
+                <Entrada
+                  autoComplete="off"
+                  placeholder="ABC1D23"
+                  style={{ textTransform: 'uppercase' }}
+                  {...register('placa')}
+                />
+              </Campo>
+            )}
+            {propostaPagamento && (
+              <>
+                <Campo rotulo="Forma de pagamento" dica="Como o cliente paga o prêmio.">
+                  <Selecao {...register('formaPagamento')}>
+                    <option value="">Escolha…</option>
+                    {[...new Set([...FORMAS_PAGAMENTO, ...(v.formaPagamento ? [v.formaPagamento] : [])])].map(
+                      (f) => (
+                        <option key={f}>{f}</option>
+                      ),
+                    )}
+                  </Selecao>
+                </Campo>
+                <Campo rotulo="Quantidade de parcelas" erro={erros.quantidadeParcelas?.message}>
+                  <Entrada
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={24}
+                    {...register('quantidadeParcelas')}
+                  />
+                </Campo>
+              </>
+            )}
             {refinada ? (
               <>
                 <Campo rotulo="Prêmio líquido" obrigatorio erro={erros.premioLiquido?.message}>
@@ -522,13 +595,16 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                 </Campo>
               </>
             )}
-            <Campo rotulo="Regra de recebimento">
-              <Selecao {...register('regra')}>
-                <option value="normal">Normal (controle por saldo)</option>
-                <option value="vitalicio">Com vitalício depois</option>
-              </Selecao>
-            </Campo>
-            {v.regra === 'vitalicio' && (
+            {/* Comissão normal ou vitalícia: só a administração define (decisão de 29/10/2026). */}
+            {(gestao || !refinada) && (
+              <Campo rotulo="Regra de recebimento">
+                <Selecao {...register('regra')}>
+                  <option value="normal">Normal (controle por saldo)</option>
+                  <option value="vitalicio">Com vitalício depois</option>
+                </Selecao>
+              </Campo>
+            )}
+            {(gestao || !refinada) && v.regra === 'vitalicio' && (
               <Campo
                 rotulo="% vitalício sobre o prêmio líquido"
                 erro={erros.percentualVitalicio?.message}
@@ -656,9 +732,16 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                         <Entrada inputMode="decimal" {...register(`recebimentos.${i}.valor`)} />
                       )}
                     </Campo>
-                    <Campo rotulo="Parcela">
-                      <Entrada placeholder="1ª, 6.6, 156…" {...register(`recebimentos.${i}.parcela`)} />
-                    </Campo>
+                    {refinada ? (
+                      <p className={styles.saldoDepois} aria-live="polite">
+                        <span>Saldo depois</span>
+                        {formatarDinheiro(saldosDepois[i] ?? 0)}
+                      </p>
+                    ) : (
+                      <Campo rotulo="Parcela">
+                        <Entrada placeholder="1ª, 6.6, 156…" {...register(`recebimentos.${i}.parcela`)} />
+                      </Campo>
+                    )}
                     <Botao
                       variante="fantasma"
                       soIcone

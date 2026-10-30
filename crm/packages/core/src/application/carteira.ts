@@ -13,7 +13,7 @@ import { enxerga, exigir } from './permissoes';
 export class ServicoCarteira<T extends Registro> {
   constructor(
     protected readonly repositorio: Repositorio<T>,
-    private readonly validar: (dados: DadosRegistro<T>) => void = () => {},
+    protected readonly validarDados: (dados: DadosRegistro<T>) => void = () => {},
     protected readonly ambiente: Ambiente = ambientePadrao,
   ) {}
 
@@ -29,7 +29,7 @@ export class ServicoCarteira<T extends Registro> {
   }
 
   async salvar(usuario: Usuario, dados: DadosRegistro<T>): Promise<T> {
-    this.validar(dados);
+    this.validarDados(dados);
     const agora = this.ambiente.agora().toISOString();
     const existente = dados.id ? await this.repositorio.obter(dados.id) : null;
 

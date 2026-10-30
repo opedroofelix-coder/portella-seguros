@@ -4,7 +4,7 @@ import type { Coluna } from '@portella/ui';
 import { Tabela } from '@portella/ui';
 import type { ReactNode } from 'react';
 import type { Apolice } from '../../domain/apolice';
-import { comissao } from '../../domain/apolice';
+import { formatarPlaca } from '../../domain/apolice';
 import { nomeRamo, nomeSeguradora } from '../../domain/catalogo';
 import { useServicosSeguros } from '../hooks';
 import { SeloRenovacao, SeloSituacao } from './SeloSituacao';
@@ -25,7 +25,7 @@ export function TabelaApolices({
   mostrarRenovacao?: boolean;
   acoes?: (a: Apolice) => ReactNode;
   vazio?: ReactNode;
-  /** Linha com a soma do prêmio líquido e da comissão das apólices listadas. */
+  /** Linha com a soma do prêmio total das apólices listadas. */
   totais?: boolean;
   /** Ordem inicial pelo fim da vigência. */
   ordem?: 'asc' | 'desc';
@@ -35,8 +35,6 @@ export function TabelaApolices({
   const indice = useIndice(data);
   const { pode } = useSessao();
   const { nomeDe } = useEquipe();
-  // A comissão é da corretora: o produtor não a vê (como em Propostas).
-  const verComissao = pode('financeiro:gerenciar');
   const nomeCliente = (a: Apolice) => indice.get(a.clienteId)?.nome ?? '—';
 
   const colunas: Coluna<Apolice>[] = [
@@ -55,7 +53,8 @@ export function TabelaApolices({
       chave: 'ramo',
       titulo: 'Ramo',
       principal: !mostrarCliente,
-      render: (a) => `${nomeRamo(a.ramo)}${a.item ? ` · ${a.item}` : ''}`,
+      render: (a) =>
+        [nomeRamo(a.ramo), a.item, a.placa && formatarPlaca(a.placa)].filter(Boolean).join(' · '),
     },
     {
       chave: 'seg',
@@ -83,25 +82,15 @@ export function TabelaApolices({
           },
         ]
       : []),
+    // Prêmio líquido e comissão ficam na proposta (29/10/2026): a apólice mostra o prêmio total.
     {
       chave: 'premio',
-      titulo: 'Prêmio líquido',
+      titulo: 'Prêmio total',
       alinharDireita: true,
       ocultarNoMobile: mostrarRenovacao,
-      render: (a) => formatarDinheiro(a.premioLiquido),
-      ordenar: (a, b) => (a.premioLiquido ?? 0) - (b.premioLiquido ?? 0),
+      render: (a) => formatarDinheiro(a.premioTotal),
+      ordenar: (a, b) => (a.premioTotal ?? 0) - (b.premioTotal ?? 0),
     },
-    ...(verComissao && !mostrarRenovacao
-      ? [
-          {
-            chave: 'comissao',
-            titulo: 'Comissão',
-            alinharDireita: true,
-            ocultarNoMobile: true,
-            render: (a: Apolice) => formatarDinheiro(comissao(a)),
-          },
-        ]
-      : []),
     ...(pode('carteira:ver_todos')
       ? [
           {
@@ -129,10 +118,7 @@ export function TabelaApolices({
           ? {
               rotulo: `Total de ${apolices.length} apólice${apolices.length === 1 ? '' : 's'}`,
               valores: {
-                premio: formatarDinheiro(apolices.reduce((t, a) => t + (a.premioLiquido ?? 0), 0)),
-                ...(verComissao && !mostrarRenovacao
-                  ? { comissao: formatarDinheiro(apolices.reduce((t, a) => t + (comissao(a) ?? 0), 0)) }
-                  : {}),
+                premio: formatarDinheiro(apolices.reduce((t, a) => t + (a.premioTotal ?? 0), 0)),
               },
             }
           : undefined

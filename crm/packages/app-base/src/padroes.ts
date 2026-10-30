@@ -1,4 +1,5 @@
 import type { ProdutorInicial, TipoCatalogo } from '@portella/core';
+import { ORIGENS_LEAD_PADRAO } from '@portella/core';
 
 /**
  * Produtores cadastrados no primeiro acesso (senha 1234, troca obrigatória): a lista enviada pela
@@ -23,6 +24,7 @@ export const PRODUTORES_INICIAIS: ProdutorInicial[] = [
 export const CATALOGOS_PADRAO: Record<TipoCatalogo, string[]> = {
   produtos: [
     'Automóvel',
+    'Moto',
     'Residencial',
     'Saúde',
     'Vida',
@@ -74,4 +76,5 @@ export const CATALOGOS_PADRAO: Record<TipoCatalogo, string[]> = {
     'Zurich',
   ],
   origensRecebimento: ['Cliente (pagamento direto)'],
+  origensLead: ORIGENS_LEAD_PADRAO,
 };

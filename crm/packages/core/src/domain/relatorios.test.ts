@@ -5,6 +5,7 @@ import {
   fechamentoDoMes,
   montarPainel,
   pagamentoMensal,
+  pendentesPorCliente,
   pendentesPorProdutor,
 } from './relatorios';
 import type { Proposta } from './proposta';
@@ -107,6 +108,40 @@ describe('pendentes e painel', () => {
     expect(repassePrevisto({ comissaoReceber: 10000 }, 40)).toBe(4000);
   });
 
+  it('lista o saldo a receber por cliente, com o nome completo do cadastro e o repasse de cada produtor', () => {
+    const propostas = [
+      proposta({
+        clienteId: 'c1',
+        clienteNome: 'Ana',
+        produtores: [
+          { produtorId: 'deliziane', percentual: 40 },
+          { produtorId: 'mary', percentual: 15 },
+        ],
+        recebimentos: [{ id: 'r', data: '2026-10-05', valor: 4000 }],
+      }),
+      proposta({ clienteId: 'c1', clienteNome: 'Ana', produtores: [{ produtorId: 'mary', percentual: 15 }] }),
+      proposta({ clienteNome: 'José da Silva' }),
+      proposta({
+        clienteNome: 'jose da silva',
+        recebimentos: [{ id: 'r', data: '2026-10-05', valor: 10000 }],
+      }),
+      proposta({ clienteNome: 'Pendente', status: 'pendente' }),
+    ];
+    const nomes: Record<string, string> = { c1: 'Ana Maria Souza' };
+    const pend = pendentesPorCliente(propostas, { nomeCliente: (id) => nomes[id] });
+    expect(pend.map((g) => [g.clienteNome, g.itens.length, g.comissao, g.recebido, g.saldo])).toEqual([
+      ['Ana Maria Souza', 2, 20000, 4000, 16000],
+      ['José da Silva', 1, 10000, 0, 10000],
+    ]);
+    // 6.000 × (40% + 15%) + 10.000 × 15%
+    expect(pend[0]!.repasseProjetado).toBe(2400 + 900 + 1500);
+
+    const daMary = pendentesPorCliente(propostas, { produtorId: 'mary', nomeCliente: (id) => nomes[id] });
+    expect(daMary.map((g) => [g.clienteNome, g.saldo, g.repasseProjetado])).toEqual([
+      ['Ana Maria Souza', 16000, 900 + 1500],
+    ]);
+  });
+
   it('produção por produtor é proporcional ao % dentro da divisão', () => {
     const p = proposta({
       produtores: [
@@ -143,6 +178,7 @@ describe('pendentes e painel', () => {
     expect(painel.porTipo).toEqual({
       novo: { premio: 100000, quantidade: 1 },
       renovacao: { premio: 80000, quantidade: 1 },
+      endosso: { premio: 0, quantidade: 0 },
       nao_informado: { premio: 20000, quantidade: 1 },
     });
     expect(painel.porCompanhia).toEqual([

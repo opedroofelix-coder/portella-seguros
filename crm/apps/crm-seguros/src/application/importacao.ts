@@ -38,7 +38,8 @@ export function identificarRamo(nome: string): Apolice['ramo'] {
   // O id só vale como palavra inteira: "Comércio" e "Consórcio" contêm "rc", mas não são RC.
   const achado = RAMOS.find((r) => n.includes(normalizar(r.nome)) || new RegExp(`\\b${r.id}\\b`).test(n));
   if (achado) return achado.id;
-  if (/automovel|veiculo|carro|moto/.test(n)) return 'auto';
+  if (/moto|ciclomotor|scooter/.test(n)) return 'moto';
+  if (/automovel|veiculo|carro/.test(n)) return 'auto';
   if (/resid|casa|apartamento/.test(n)) return 'residencial';
   if (/empres|condominio|comercial/.test(n)) return 'empresarial';
   if (/aluguel|fianca/.test(n)) return 'fianca';

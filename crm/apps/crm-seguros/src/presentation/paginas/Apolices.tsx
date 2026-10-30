@@ -14,7 +14,7 @@ import {
 import { useMemo, useState } from 'react';
 import type { Apolice, Situacao, StatusRenovacao } from '../../domain/apolice';
 import {
-  estaValendo,
+  EM_ACOMPANHAMENTO,
   ROTULO_RENOVACAO,
   ROTULO_SITUACAO,
   situacao,
@@ -26,13 +26,16 @@ import { FormularioApolice } from '../componentes/FormularioApolice';
 import { TabelaApolices } from '../componentes/TabelaApolices';
 import { useApolices, useServicosSeguros } from '../hooks';
 
-/** "valendo" = vigentes e a vencer, o filtro padrão: a lista abre pelo que precisa de atenção. */
-type FiltroSituacao = Situacao | 'valendo' | '';
+/**
+ * "acompanhamento" = a iniciar, vigentes, a vencer e canceladas, o filtro padrão: a lista abre pelo que
+ * precisa de atenção, e a apólice cancelada continua à vista com a data do cancelamento (29/10/2026).
+ */
+type FiltroSituacao = Situacao | 'acompanhamento' | '';
 const PADRAO = {
   busca: '',
   seguradora: '',
   ramo: '',
-  sit: 'valendo' as FiltroSituacao,
+  sit: 'acompanhamento' as FiltroSituacao,
   vigencia: '',
   renovacao: '',
   responsavel: '',
@@ -68,13 +71,25 @@ export function PaginaApolices() {
         .filter((a) => !f.seguradora || a.seguradora === f.seguradora)
         .filter((a) => !f.ramo || a.ramo === f.ramo)
         .filter((a) =>
-          !f.sit ? true : f.sit === 'valendo' ? estaValendo(a, hoje) : situacao(a, hoje) === f.sit,
+          !f.sit
+            ? true
+            : f.sit === 'acompanhamento'
+              ? EM_ACOMPANHAMENTO.has(situacao(a, hoje))
+              : situacao(a, hoje) === f.sit,
         )
         .filter((a) => !f.vigencia || (f.vigencia === 'estimada' ? a.vigenciaEstimada : !a.vigenciaEstimada))
         .filter((a) => !f.renovacao || a.renovacao === f.renovacao)
         .filter((a) => !f.responsavel || a.responsavelId === f.responsavel)
         .filter((a) =>
-          corresponde(f.busca, indice.get(a.clienteId)?.nome, a.numero, a.item, nomeSeguradora(a.seguradora)),
+          corresponde(
+            f.busca,
+            indice.get(a.clienteId)?.nome,
+            a.numero,
+            a.numeroProposta,
+            a.item,
+            a.placa,
+            nomeSeguradora(a.seguradora),
+          ),
         ),
     [data, f, indice, hoje],
   );
@@ -88,7 +103,7 @@ export function PaginaApolices() {
           isPending
             ? 'Carregando a carteira…'
             : `${filtradas.length.toLocaleString('pt-BR')} de ${total.toLocaleString('pt-BR')} apólices${
-                f.sit === 'valendo' ? ' (vigentes e a vencer)' : ''
+                f.sit === 'acompanhamento' ? ' em acompanhamento (inclui as canceladas)' : ''
               }, pela vigência mais próxima.`
         }
         acoes={
@@ -109,7 +124,7 @@ export function PaginaApolices() {
           </Campo>
           <Campo rotulo="Situação">
             <Selecao value={f.sit} onChange={mudar('sit')}>
-              <option value="valendo">Vigentes e a vencer</option>
+              <option value="acompanhamento">Em acompanhamento</option>
               <option value="">Todas</option>
               {(Object.keys(ROTULO_SITUACAO) as Situacao[]).map((s) => (
                 <option key={s} value={s}>

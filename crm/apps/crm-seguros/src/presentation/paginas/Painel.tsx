@@ -369,10 +369,7 @@ export function PaginaPainel() {
             itens={maioresEOutros(painel.porCompanhia, 5, (q) => `Outras ${q}`)}
           />
         </Cartao>
-        <Cartao
-          className={`${styles.cartao} ${styles.terco} ${styles.renovacoes}`}
-          titulo="Renovações da carteira"
-        >
+        <Cartao className={`${styles.cartao} ${styles.terco} ${styles.renovacoes}`} titulo="Renovações">
           <strong className={styles.numeroGrande}>{renovar30}</strong>
           <span className={styles.nota}>
             apólice{renovar30 === 1 ? ' vence' : 's vencem'} nos próximos 30 dias
@@ -590,9 +587,10 @@ function TabelaProdutores({
 }
 
 function NovoRenovacao({ painel }: { painel: ReturnType<typeof montarPainel> }) {
-  const { novo, renovacao, nao_informado: semTipo } = painel.porTipo;
+  const { novo, renovacao, endosso, nao_informado: semTipo } = painel.porTipo;
   const total = novo.premio + renovacao.premio;
-  if (!total && !semTipo.quantidade) return <p className={styles.nota}>Nada no período.</p>;
+  if (!total && !semTipo.quantidade && !endosso.quantidade)
+    return <p className={styles.nota}>Nada no período.</p>;
   const circ = 2 * Math.PI * 40;
   const parteNovo = total ? novo.premio / total : 0;
   const folga = novo.premio && renovacao.premio ? 4 : 0;
@@ -651,6 +649,14 @@ function NovoRenovacao({ painel }: { painel: ReturnType<typeof montarPainel> }) 
             <Dinheiro centavos={renovacao.premio} /> <small>· {renovacao.quantidade}</small>
           </dd>
         </div>
+        {endosso.quantidade > 0 && (
+          <div>
+            <dt className={styles.nota}>Endosso</dt>
+            <dd className={styles.nota}>
+              <Dinheiro centavos={endosso.premio} /> · {endosso.quantidade}
+            </dd>
+          </div>
+        )}
         {semTipo.quantidade > 0 && (
           <div>
             <dt className={styles.nota}>Sem tipo informado</dt>

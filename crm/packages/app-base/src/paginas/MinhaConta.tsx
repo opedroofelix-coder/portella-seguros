@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useConfig, useRefinada, useRotuloPerfil } from '../config';
 import { mensagemErro } from '../erros';
+import { InstalarAplicativo } from '../instalacao';
 import { useServicos } from '../servicos';
 import { useSessao, useUsuario } from '../sessao/Sessao';
 import styles from './Entrar.module.css';
@@ -96,6 +97,9 @@ export function PaginaMinhaConta() {
             </p>
             <SeletorTema />
           </div>
+        </Cartao>
+        <Cartao titulo="Aplicativo">
+          <InstalarAplicativo />
         </Cartao>
       </div>
     </>

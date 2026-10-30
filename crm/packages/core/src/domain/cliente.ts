@@ -22,6 +22,10 @@ export interface Cliente extends Registro {
   telefone?: string;
   dataNascimento?: DataISO;
   endereco?: Endereco;
+  /** Como chegou à corretora (Indicação, Instagram, Google…). */
+  origem?: string;
+  /** Quem indicou (cliente ou não). */
+  indicadoPor?: string;
   observacoes?: string;
 }
 

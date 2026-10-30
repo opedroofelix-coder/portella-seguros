@@ -65,16 +65,18 @@ CRM atual. A seção 0 é a especificação de negócio; as seções seguintes d
 | Data da proposta | |
 | Seguradora | lista editável (abaixo) |
 | Produto (ramo) | lista editável (abaixo) |
-| **Tipo de negócio** | **Seguro novo** ou **Renovação da carteira** (renovação da própria corretora, não de congênere) |
+| **Tipo de negócio** | **Seguro novo**, **Renovação** ou **Endosso** (29/10/2026: sai a palavra "carteira") |
+| Forma de pagamento e parcelas (Seguros) | boleto, débito em conta, cartão de crédito, Pix ou carnê, e a quantidade de parcelas do prêmio: orientam o financeiro (29/10/2026) |
+| Placa (Seguros) | aparece quando o produto é Automóvel ou Moto |
 | Prêmio líquido (R$) | |
 | Comissão trabalhada (%) | 0% a 40% em geral; pode passar de 100% (saúde) |
 | Comissão a receber (R$) | calculada: prêmio líquido × comissão trabalhada |
-| Regra de recebimento | **Normal** (por saldo) ou **com vitalício depois** + **% vitalício** sobre o prêmio líquido |
+| Regra de recebimento | **Normal** (por saldo) ou **com vitalício depois** + **% vitalício** sobre o prêmio líquido. Só a administração vê e preenche (29/10/2026) |
 | Produtores | um ou mais, cada um com o **% de repasse**; ao digitar o %, mostra na hora **"Receberá R$ X"** sobre a comissão total |
-| Recebimentos (só administradora) | cada um com **data**, **valor** e **parcela em texto livre** ("1ª", "6.6", "9.12", "156") |
+| Recebimentos (só administradora) | cada um com **data** e **valor**; o controle é pelo **saldo** (29/10/2026): cada linha mostra o saldo que fica, sem o campo de parcela (a parcela das propostas importadas continua guardada e aparece nos relatórios) |
 | Calculados | comissão recebida (soma), **saldo a receber**, quantidade de recebimentos |
 
-**Produtos**: Automóvel, Residencial, Saúde, Vida, Dental, Consórcio, Rastreador, Assinatura
+**Produtos**: Automóvel, Moto, Residencial, Saúde, Vida, Dental, Consórcio, Rastreador, Assinatura
 Mensal, Celular, Equipamentos Portáteis, Empresarial, Aluguel, Responsabilidade Civil,
 RC Profissional e Fiança Locatícia, com a opção de incluir outros.
 
@@ -101,6 +103,9 @@ Tokio Marine, Yelum, Youse e Zurich, com a opção de incluir outras.
   `.xlsx`, que abre direto no computador.)
 - **Comissões pendentes / futuras por produtor**: tudo o que ainda tem saldo a receber da
   seguradora e quanto disso será repassado a cada produtor, para controlar o que está em aberto.
+- **Comissões pendentes por cliente** (29/10/2026): o mesmo saldo agrupado por cliente, com busca, para
+  cruzar com o controle da administradora e achar atrasos de seguradora. O cliente aparece com o nome
+  completo do cadastro.
 
 ### 0.7 Painel (dashboard)
 
@@ -141,10 +146,12 @@ produtor envolvido (ranking de vendas), e não o prêmio dividido pelo % de cada
 | Administradora altera o % de repasse dos produtores | ✔ **Configurações › Repasse dos produtores**, com opção de aplicar às propostas em aberto |
 | Estornos (segurado, nº da apólice, seguradora, produto, produtor, valor) e vales | ✔ menu **Estornos e vales** |
 | Relatório de pagamento mensal (repasse − estornos − vales) com PDF e Excel | ✔ menu **Relatórios**, com "Registrar pagamento" |
-| Relatório de comissões pendentes por produtor | ✔ PDF e Excel |
+| Relatório de comissões pendentes por produtor e por cliente | ✔ PDF e Excel |
 | Painel: produção por produtor (proporcional ao %), novo × renovação, por produto e seguradora em R$, recebida × repassada, pendente por produtor, crescimento mês a mês e ano a ano | ✔ menu **Painel de produção** |
 | Consórcio | ✔ CRM separado, com as mesmas telas de propostas e relatórios |
 | Dados compartilhados entre computadores | ✘ falta: depende da escolha do backend |
+| Aniversário dos clientes por e-mail (29/10/2026) | ✘ vem com o backend (envio automático precisa de servidor); a data de nascimento já fica no cadastro |
+| Consórcio dentro do CRM de Seguros (29/10/2026) | ✘ aguardando a planilha de consórcio e os dados de assembleia e contemplação |
 
 ## 2. Perfis de usuário
 
@@ -184,9 +191,14 @@ Regras extras:
 - O produtor não vê a comissão da corretora: no lugar dela aparecem as cotações em aberto.
 
 **Clientes**
-- Pessoa física ou jurídica, com validação de CPF/CNPJ, telefone/WhatsApp, e-mail, endereço e observações.
+- Pessoa física ou jurídica, com validação de CPF/CNPJ, telefone/WhatsApp, e-mail, data de nascimento,
+  endereço, **origem** (Indicação, Instagram, Google…) com **indicado por**, e observações.
+- **Endereço automático** (29/10/2026): o CEP completo preenche rua, bairro, cidade e UF (ViaCEP, com a
+  BrasilAPI de reserva); na pessoa jurídica, o CNPJ preenche razão social, e-mail, telefone e endereço
+  (BrasilAPI, dados públicos da Receita). Só os campos vazios são preenchidos. Não existe consulta pública
+  de endereço pelo CPF. Se o serviço estiver fora do ar, aparece "preencha à mão".
 - Busca por nome, documento, telefone ou cidade.
-- A ficha do cliente mostra os dados e as apólices dele, com botão para o WhatsApp.
+- A ficha do cliente mostra os dados (com nascimento e origem) e as apólices dele, com botão para o WhatsApp.
 
 **Apólices**
 - Seguradora: uma das parceiras (as mesmas da faixa do site: Porto Seguro, Allianz, Bradesco Seguros,
@@ -194,22 +206,40 @@ Regras extras:
   Sompo, que não faz mais automóvel e por isso não aparece no ramo Auto) ou "Outra".
 - A Liberty virou Yelum: as apólices antigas guardadas como Liberty aparecem como "Yelum (antiga Liberty)",
   e a importação reconhece os dois nomes.
-- Ramo: Auto, Vida, Previdência, Saúde, Residencial, Fiança Locatícia, Responsabilidade Civil, Empresarial,
+- Ramo: Auto, **Moto / ciclomotor** (29/10/2026), Vida, Previdência, Saúde, Residencial, Fiança Locatícia, Responsabilidade Civil, Empresarial,
   Dental, Transportes, Equipamentos portáteis (bike, celular, câmera), Pet ou Outros.
 - Seguradoras fora das parceiras (GNDI, Mitsui, Akad, Aliro…) ficam pelo nome e aparecem no filtro.
-- Campos: nº da apólice, bem segurado, vigência, prêmio líquido, prêmio total, comissão (%) e forma de pagamento.
+- O controle principal das apólices continua no Seg Flex; o CRM foca em propostas e comissões. Por isso
+  (29/10/2026) a apólice ficou com: **tipo** (seguro novo, renovação ou endosso), nº da proposta, nº da
+  apólice, modelo do veículo ou bem segurado, **placa** (Auto e Moto), vigência, **status ativa ou
+  cancelada** (cancelada pede data e motivo: falta de pagamento, sinistro, venda do bem, pedido do
+  cliente ou outro), prêmio total, quantidade de parcelas, **parcelas** (valor, vencimento, data da
+  consulta e pago) e **ocorrências** (data, descrição, atuação, data do comunicado e responsável).
+- Saíram do formulário o prêmio líquido, a comissão, a forma de pagamento e o status de renovação (este
+  continua só na tela Renovações). A forma de pagamento vem da proposta de mesmo número e aparece na
+  apólice e no checklist; nas apólices antigas aparece o texto que já estava salvo.
+- **Gerar parcelas**: com o prêmio total, a quantidade e o 1º vencimento, cria as parcelas mensais em
+  centavos; a sobra da divisão fica na 1ª parcela, para a soma bater com o prêmio.
+- Um cliente pode ter vários bens (dois carros e uma moto): cada um é uma apólice, com a sua placa.
+- **Checklist (PDF)**, no formulário da apólice: o modelo da Portella (`check_Gisele.xlsx`), com o tipo
+  marcado, corretor, segurado, CPF/CNPJ, vigência, cia, produto, veículo, placa, proposta, apólice, valor
+  total, forma de pagamento, parcelas (na Porto com cartão, "Cartão Porto Seguro") e ocorrências, com
+  linhas em branco para anotar à mão.
+- Na **proposta aprovada**, o botão **Cadastrar apólice** abre a apólice já preenchida (cliente,
+  seguradora, ramo, tipo, nº da proposta, placa e parcelas).
 - Situação calculada pela data: **a iniciar** (início no futuro, como a apólice nova de uma renovação),
   **vigente**, **a vencer** (até 30 dias), **vencida**, **renovada** (venceu, mas já foi renovada) ou
   **cancelada**. Assim a renovação não conta em dobro no Painel.
 - Contratos contínuos (vida, saúde, dental…) ficam sem fim de vigência e não entram na fila de renovação:
   ao escolher um desses ramos, o formulário limpa o fim da vigência.
-- A lista abre pelas vigentes e a vencer, com filtros de situação, seguradora, ramo, vigência estimada,
-  renovação e produtor, colunas ordenáveis e o total de prêmio líquido e comissão.
+- A lista abre **em acompanhamento** (a iniciar, vigentes, a vencer e **canceladas**): a cancelada não some,
+  aparece como "Cancelada em dd/mm/aaaa" com o motivo. Filtros de situação, seguradora, ramo, vigência
+  estimada, renovação e produtor; busca também por placa e nº da proposta; colunas ordenáveis e o total
+  do prêmio total.
 - **Vigência estimada**: a planilha não tem o fim da vigência; nas apólices importadas de ramos anuais
   o fim é a data da proposta + 12 meses e aparece como "(estimada)" até alguém confirmar na edição
   (mudar a data já confirma). O filtro "Vigência: estimada" lista as que faltam conferir.
-- Comissão prevista = prêmio líquido × comissão (%), mostrada ao digitar. Administração e gestão excluem
-  apólices, com confirmação.
+- Administração e gestão excluem apólices, com confirmação.
 
 **Renovações**
 - Fila das apólices que vencem em 15, 30, 60 ou 90 dias (e das vencidas há até 30 dias) e ainda não foram renovadas.
@@ -221,6 +251,16 @@ Regras extras:
 - Etapas: Novo → Em contato → Proposta enviada → Fechado / Perdido (com motivo: mover para Perdido pede o
   motivo). Os produtos são os mesmos de Propostas (lista de Configurações).
 - Sem valor estimado: o campo saiu da cotação a pedido da Portella (26/10/2026).
+- **Origem do lead** (Indicação, Instagram, Google, Facebook, Site, WhatsApp, Cliente da carteira, Outro;
+  lista em Configurações) e **indicado por** (texto livre com sugestão dos clientes, porque quem indica pode
+  ainda não ser cliente). Base para o relatório futuro de quem mais indica.
+- O lead não precisa estar no cadastro: a cotação mostra "Já é cliente" quando o nome ou o telefone bate
+  com um cliente, ou o botão **Cadastrar como cliente** (abre o cadastro preenchido e liga a cotação).
+- **Distribuição automática**: em **Usuários**, cada pessoa pode "receber as cotações novas de" alguns
+  produtos (ex.: Consórcio → Gabriel). A cotação nova desse produto vai direto para ela, mesmo quando outro
+  produtor cadastra ("Cotação encaminhada para Gabriel").
+- **Histórico**: a cotação registra quando foi cadastrada e cada mudança de etapa e de responsável, com
+  quem fez e quando.
 - Indicadores: em aberto, propostas enviadas, fechadas e taxa de conversão.
 
 ## 4. CRM de Consórcio (sistema separado)
@@ -428,6 +468,11 @@ crm/
   (`--fundo`, `--superficie`, `--texto`, `--primaria`, `--destaque`, `--sucesso`…); os componentes só usam tokens.
 - **Responsividade**: menu lateral fixo no desktop e menu deslizante no celular. Tabelas
   viram cartões abaixo de 900 px, formulários viram painel inferior no celular e alvos de toque têm ≥ 44 px.
+- **Aplicativo (PWA)** (29/10/2026): o CRM de Seguros se instala como aplicativo no computador e no
+  celular, com ícone próprio, também na publicação em `/seguro/` (manifesto e service worker seguem o
+  `VITE_BASE`). **Minha conta › Aplicativo** tem o botão "Instalar aplicativo" (Chrome e Edge) ou o passo
+  a passo do iPhone (Safari › Compartilhar › Adicionar à Tela de Início). A versão nova baixa sozinha e
+  entra quando o aplicativo é aberto de novo; o acesso pelo navegador continua igual.
 
 ### Backend (decisão pendente)
 

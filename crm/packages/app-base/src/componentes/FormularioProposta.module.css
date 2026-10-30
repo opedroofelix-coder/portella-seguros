@@ -140,3 +140,18 @@
   font-weight: 600;
   color: var(--perigo);
 }
+.saldoDepois {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.saldoDepois span {
+  font-size: var(--rotulo-tamanho, 12px);
+  font-weight: 500;
+  color: var(--texto-suave);
+}

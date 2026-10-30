@@ -1,12 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Cliente } from '@portella/core';
-import { formatarDocumento, formatarTelefone, somenteDigitos } from '@portella/core';
+import type { Cliente, DadosRegistro } from '@portella/core';
+import {
+  cnpjValido,
+  formatarDocumento,
+  formatarTelefone,
+  mascararCep,
+  ORIGEM_INDICACAO,
+  somenteDigitos,
+} from '@portella/core';
 import { AreaTexto, Botao, Campo, Entrada, Modal, Selecao, useAvisos } from '@portella/ui';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useRefinada } from '../config';
+import { consultarCep, consultarCnpj } from '../consultas';
 import { aplicarErros, limparVazios, mensagemErro } from '../erros';
-import { useSalvar } from '../hooks/dados';
+import { useCatalogo, useColecao, useSalvar } from '../hooks/dados';
 import { useServicos } from '../servicos';
 import { useUsuario } from '../sessao/Sessao';
 import { EntradaMascara } from './Entradas';
@@ -31,12 +40,14 @@ const esquema = z.object({
   bairro: z.string(),
   cidade: z.string(),
   uf: z.string().max(2),
+  origem: z.string(),
+  indicadoPor: z.string(),
   observacoes: z.string(),
   responsavelId: z.string().optional(),
 });
 type Valores = z.infer<typeof esquema>;
 
-function valoresIniciais(c: Cliente | undefined, usuarioId: string): Valores {
+function valoresIniciais(c: Partial<Cliente> | undefined, usuarioId: string): Valores {
   const e = c?.endereco ?? {};
   return {
     tipoPessoa: c?.tipoPessoa ?? 'PF',
@@ -52,17 +63,24 @@ function valoresIniciais(c: Cliente | undefined, usuarioId: string): Valores {
     bairro: e.bairro ?? '',
     cidade: e.cidade ?? '',
     uf: e.uf ?? '',
+    origem: c?.origem ?? '',
+    indicadoPor: c?.indicadoPor ?? '',
     observacoes: c?.observacoes ?? '',
     responsavelId: c?.responsavelId ?? usuarioId,
   };
 }
 
+type Consulta = 'cep' | 'cnpj';
+
 export function FormularioCliente({
   cliente,
+  inicial,
   aoFechar,
   aoSalvar,
 }: {
   cliente?: Cliente;
+  /** Dados de um cliente novo (ex.: o lead de uma cotação). */
+  inicial?: Partial<DadosRegistro<Cliente>>;
   aoFechar: () => void;
   aoSalvar?: (c: Cliente) => void;
 }) {
@@ -71,11 +89,69 @@ export function FormularioCliente({
   const { avisar } = useAvisos();
   const salvar = useSalvar('clientes', clientes);
   const refinada = useRefinada();
-  const { register, handleSubmit, formState, setError, watch } = useForm<Valores>({
+  const origens = useCatalogo('origensLead');
+  const { data: listaClientes = [] } = useColecao('clientes', clientes);
+  const { register, handleSubmit, formState, setError, watch, getValues, setValue } = useForm<Valores>({
     resolver: zodResolver(esquema),
-    defaultValues: valoresIniciais(cliente, usuario.id),
+    defaultValues: valoresIniciais(cliente ?? inicial, usuario.id),
   });
   const tipo = watch('tipoPessoa');
+
+  // Endereço pelo CEP e dados da empresa pelo CNPJ: só preenchem os campos vazios.
+  const [consultando, setConsultando] = useState<Consulta | null>(null);
+  const [falhou, setFalhou] = useState<Consulta | null>(null);
+  const consultados = useRef({ cep: cliente?.endereco?.cep ?? '', cnpj: cliente?.documento ?? '' });
+  const preencher = (campo: keyof Valores, valor?: string) => {
+    if (valor && !getValues(campo)?.trim()) setValue(campo, valor, { shouldDirty: true });
+  };
+  const cep = somenteDigitos(watch('cep') ?? '');
+  const documento = somenteDigitos(watch('documento') ?? '');
+  useEffect(() => {
+    if (cep.length !== 8 || consultados.current.cep === cep) return;
+    consultados.current.cep = cep;
+    setConsultando('cep');
+    setFalhou(null);
+    void consultarCep(cep).then((e) => {
+      setConsultando(null);
+      if (!e) return setFalhou('cep');
+      preencher('logradouro', e.logradouro);
+      preencher('bairro', e.bairro);
+      preencher('cidade', e.cidade);
+      preencher('uf', e.uf);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cep]);
+  useEffect(() => {
+    if (tipo !== 'PJ' || !cnpjValido(documento) || consultados.current.cnpj === documento) return;
+    consultados.current.cnpj = documento;
+    setConsultando('cnpj');
+    setFalhou(null);
+    void consultarCnpj(documento).then((d) => {
+      setConsultando(null);
+      if (!d) return setFalhou('cnpj');
+      preencher('nome', d.razaoSocial);
+      preencher('email', d.email);
+      if (d.telefone) preencher('telefone', formatarTelefone(d.telefone));
+      const e = d.endereco;
+      if (e.cep && !getValues('cep')) {
+        consultados.current.cep = e.cep;
+        setValue('cep', mascararCep(e.cep), { shouldDirty: true });
+      }
+      preencher('logradouro', e.logradouro);
+      preencher('numero', e.numero);
+      preencher('complemento', e.complemento);
+      preencher('bairro', e.bairro);
+      preencher('cidade', e.cidade);
+      preencher('uf', e.uf);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tipo, documento]);
+  const avisoConsulta = (c: Consulta) =>
+    consultando === c
+      ? 'Consultando…'
+      : falhou === c
+        ? 'Não foi possível consultar agora; preencha à mão.'
+        : undefined;
 
   const enviar = handleSubmit(async (v) => {
     const { cep, logradouro, numero, complemento, bairro, cidade, uf, ...resto } = limparVazios(v);
@@ -90,8 +166,9 @@ export function FormularioCliente({
     });
     try {
       const salvo = await salvar.mutateAsync({
-        ...(cliente ?? {}),
+        ...(cliente ?? inicial ?? {}),
         ...resto,
+        indicadoPor: resto.origem === ORIGEM_INDICACAO ? resto.indicadoPor : undefined,
         // Pessoa jurídica não tem data de nascimento (o campo some, o valor não fica guardado).
         ...(refinada && resto.tipoPessoa === 'PJ' ? { dataNascimento: undefined } : {}),
         documento: resto.documento ? somenteDigitos(resto.documento) : undefined,
@@ -141,7 +218,15 @@ export function FormularioCliente({
         >
           <Entrada autoComplete="off" {...register('nome')} />
         </Campo>
-        <Campo rotulo={tipo === 'PF' ? 'CPF' : 'CNPJ'} erro={erros.documento?.message}>
+        <Campo
+          rotulo={tipo === 'PF' ? 'CPF' : 'CNPJ'}
+          erro={erros.documento?.message}
+          dica={
+            tipo === 'PJ'
+              ? (avisoConsulta('cnpj') ?? 'O CNPJ preenche a razão social e o endereço.')
+              : undefined
+          }
+        >
           {refinada ? (
             <EntradaMascara
               mascara="documento"
@@ -172,7 +257,7 @@ export function FormularioCliente({
             <Entrada type="date" {...register('dataNascimento')} />
           </Campo>
         )}
-        <Campo rotulo="CEP">
+        <Campo rotulo="CEP" dica={avisoConsulta('cep') ?? 'O CEP preenche o endereço.'}>
           {refinada ? (
             <EntradaMascara mascara="cep" placeholder="00000-000" {...register('cep')} />
           ) : (
@@ -206,6 +291,29 @@ export function FormularioCliente({
             <Entrada maxLength={2} {...register('uf')} />
           )}
         </Campo>
+        <Campo rotulo="Origem" dica="Como o cliente chegou à corretora.">
+          <Selecao {...register('origem')}>
+            <option value="">—</option>
+            {[...new Set([...origens, cliente?.origem ?? inicial?.origem].filter(Boolean) as string[])].map(
+              (o) => (
+                <option key={o}>{o}</option>
+              ),
+            )}
+          </Selecao>
+        </Campo>
+        {watch('origem') === ORIGEM_INDICACAO && (
+          <Campo rotulo="Indicado por" dica="Cliente ou não: quem fez a indicação.">
+            <Entrada list="indicacao-cliente" autoComplete="off" {...register('indicadoPor')} />
+          </Campo>
+        )}
+        <datalist id="indicacao-cliente">
+          {listaClientes
+            .filter((c) => c.id !== cliente?.id)
+            .slice(0, 300)
+            .map((c) => (
+              <option key={c.id} value={c.nome} />
+            ))}
+        </datalist>
         <SeletorResponsavel {...register('responsavelId')} />
         <Campo rotulo="Observações" className="span-todo">
           <AreaTexto {...register('observacoes')} />

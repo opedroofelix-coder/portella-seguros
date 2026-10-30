@@ -9,11 +9,11 @@ export function sugerirRenovacao(a: Apolice): DadosRegistro<Apolice> {
     clienteId: a.clienteId,
     seguradora: a.seguradora,
     ramo: a.ramo,
+    tipo: 'renovacao',
     item: a.item,
+    placa: a.placa,
     inicioVigencia: inicio,
     fimVigencia: somarMeses(inicio, 12),
-    comissaoPercentual: a.comissaoPercentual,
-    formaPagamento: a.formaPagamento,
     renovacao: 'pendente',
     responsavelId: a.responsavelId,
   };
