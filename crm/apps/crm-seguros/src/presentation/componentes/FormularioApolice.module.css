@@ -42,6 +42,10 @@
   border-bottom: 0;
   padding-bottom: 0;
 }
+.descricao,
+.atuacao {
+  grid-column: span 2;
+}
 .numeroParcela {
   grid-column: 1 / -1;
   margin: 0;
@@ -73,11 +77,17 @@
   .linhaParcela {
     grid-template-columns: 44px minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) auto auto;
   }
-  .linhaParcela .numeroParcela {
+  .linhaParcela .descricao {
+    grid-column: span 2;
+  }
+  .numeroParcela {
     grid-column: auto;
     padding-bottom: 14px;
   }
   .linhaOcorrencia {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  }
+  .atuacao {
+    grid-column: auto;
   }
 }

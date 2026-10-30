@@ -18,6 +18,8 @@ export interface DocumentoRelatorio {
   subtitulo?: string;
   /** Pares rótulo/valor mostrados antes das tabelas (ex.: líquido a pagar). */
   resumo?: Array<[string, CelulaRelatorio]>;
+  /** No PDF, o resumo em dois pares por linha na largura toda (fichas com muitos dados, como o checklist). */
+  resumoEmColunas?: boolean;
   secoes: SecaoRelatorio[];
   /** Nome do arquivo, sem extensão. */
   arquivo: string;
@@ -77,7 +79,23 @@ export async function exportarPdf(doc: DocumentoRelatorio, baixarArquivo = true)
     pdf.text(doc.subtitulo, 40, y);
     y += 18;
   }
-  if (doc.resumo?.length) {
+  if (doc.resumo?.length && doc.resumoEmColunas) {
+    const pares = doc.resumo.map(([rotulo, valor]) => [rotulo, texto(valor)]);
+    const linhas: string[][] = [];
+    for (let i = 0; i < pares.length; i += 2) linhas.push([...pares[i]!, ...(pares[i + 1] ?? ['', ''])]);
+    autoTable(pdf, {
+      startY: y,
+      body: linhas,
+      theme: 'plain',
+      styles: { fontSize: 10, cellPadding: 3 },
+      columnStyles: {
+        0: { fontStyle: 'bold', cellWidth: 110 },
+        2: { fontStyle: 'bold', cellWidth: 110 },
+      },
+      margin: { left: 40, right: 40 },
+    });
+    y = (pdf as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 16;
+  } else if (doc.resumo?.length) {
     autoTable(pdf, {
       startY: y,
       body: doc.resumo.map(([rotulo, valor]) => [rotulo, texto(valor)]),
@@ -88,7 +106,13 @@ export async function exportarPdf(doc: DocumentoRelatorio, baixarArquivo = true)
     });
     y = (pdf as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 16;
   }
+  const altura = pdf.internal.pageSize.getHeight();
   for (const secao of doc.secoes) {
+    // O título não fica sozinho no pé da página: sem espaço para ele e algumas linhas, começa na próxima.
+    if (y > altura - 120) {
+      pdf.addPage();
+      y = 48;
+    }
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(11);
     pdf.text(secao.titulo, 40, y);
