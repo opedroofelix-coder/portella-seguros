@@ -134,6 +134,7 @@ export function montarChecklist(
     subtitulo: marcas,
     arquivo: nomeArquivo('checklist', cliente?.nome ?? 'apolice', a.numero ?? a.numeroProposta ?? ''),
     resumo,
+    resumoEmColunas: true,
     secoes: [
       {
         titulo: tituloPagamentos(a, forma),

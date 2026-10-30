@@ -587,14 +587,9 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
           )}
           {ocorrenciasCampos.fields.map((campo, i) => (
             <div key={campo.id} className={`${styles.linha} ${styles.linhaOcorrencia}`}>
+              {/* Duas linhas: datas e responsável em cima; descrição e atuação embaixo, com espaço para o texto. */}
               <Campo rotulo="Data" erro={erros.ocorrencias?.[i]?.data?.message}>
                 <Entrada type="date" {...register(`ocorrencias.${i}.data`)} />
-              </Campo>
-              <Campo rotulo="Descrição" erro={erros.ocorrencias?.[i]?.descricao?.message}>
-                <Entrada {...register(`ocorrencias.${i}.descricao`)} />
-              </Campo>
-              <Campo rotulo="Atuação">
-                <Entrada {...register(`ocorrencias.${i}.atuacao`)} />
               </Campo>
               <Campo rotulo="Data do comunicado">
                 <Entrada type="date" {...register(`ocorrencias.${i}.dataComunicado`)} />
@@ -605,6 +600,16 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
               <Botao variante="fantasma" soIcone icone="lixeira" onClick={() => ocorrenciasCampos.remove(i)}>
                 {`Remover ocorrência ${i + 1}`}
               </Botao>
+              <Campo
+                rotulo="Descrição"
+                className={styles.descricao}
+                erro={erros.ocorrencias?.[i]?.descricao?.message}
+              >
+                <Entrada {...register(`ocorrencias.${i}.descricao`)} />
+              </Campo>
+              <Campo rotulo="Atuação" className={styles.atuacao}>
+                <Entrada {...register(`ocorrencias.${i}.atuacao`)} />
+              </Campo>
             </div>
           ))}
         </section>

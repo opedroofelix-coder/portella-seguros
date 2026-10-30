@@ -67,6 +67,8 @@ describe('checklist da apólice', () => {
       nomeDe: (id) => (id === 'gisele' ? 'Gisele Costa' : id),
     });
     expect(doc.titulo).toBe('Check-list · Seguro Auto');
+    // Muitos dados: no PDF o resumo vai em duas colunas na largura toda.
+    expect(doc.resumoEmColunas).toBe(true);
     expect(doc.subtitulo).toContain('(x) Renovação');
     expect(doc.subtitulo).toContain('(  ) Seguro novo');
     const resumo = Object.fromEntries(doc.resumo!);
