@@ -42,3 +42,11 @@ export function dataValida(data: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return false;
   return new Date(paraUTC(data)).toISOString().slice(0, 10) === data;
 }
+
+/** Data e hora de um instante ISO no horário local: "29/10/2026 18:05". */
+export function formatarDataHora(instante: string): string {
+  const d = new Date(instante);
+  if (Number.isNaN(d.getTime())) return '';
+  const dois = (n: number) => String(n).padStart(2, '0');
+  return `${dois(d.getDate())}/${dois(d.getMonth() + 1)}/${d.getFullYear()} ${dois(d.getHours())}:${dois(d.getMinutes())}`;
+}

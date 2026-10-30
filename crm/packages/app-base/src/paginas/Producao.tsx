@@ -177,9 +177,9 @@ export function PaginaProducao() {
             <Indicador
               tom="info"
               icone="calendario"
-              rotulo="Renovação da carteira"
+              rotulo="Renovação"
               valor={formatarDinheiro(painel.porTipo.renovacao.premio)}
-              detalhe={`${painel.porTipo.renovacao.quantidade} proposta(s)`}
+              detalhe={`${painel.porTipo.renovacao.quantidade} proposta(s)${painel.porTipo.endosso.quantidade ? ` · endosso: ${formatarDinheiro(painel.porTipo.endosso.premio)} (${painel.porTipo.endosso.quantidade})` : ''}`}
             />
             <Indicador
               tom="primaria"

@@ -15,6 +15,8 @@ export interface Usuario {
   trocarSenha?: boolean;
   /** % de repasse sugerido quando o usuário é produtor de uma proposta (ex.: 40 = 40%). */
   percentualRepasse?: number;
+  /** Produtos cujas cotações novas vão direto para este usuário (ex.: Consórcio → Gabriel). */
+  produtosAtendidos?: string[];
 }
 
 /** Senha provisória de todo usuário novo ou com senha redefinida; a troca é obrigatória no 1º acesso. */

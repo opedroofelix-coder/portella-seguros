@@ -1,11 +1,19 @@
-import type { DadosComissao, PagamentoMensal, PagamentoProdutor, PendenteProdutor } from '@portella/core';
+import type {
+  DadosComissao,
+  PagamentoMensal,
+  PagamentoProdutor,
+  PendenteCliente,
+  PendenteProdutor,
+} from '@portella/core';
 import {
   CORRETORA,
+  normalizar,
   fechamentoDoMes,
   formatarData,
   formatarDinheiro,
   hojeISO,
   pagamentoMensal,
+  pendentesPorCliente,
   pendentesPorProdutor,
   lerDinheiro,
   recebidoPrincipal,
@@ -585,6 +593,23 @@ function somaUnica(grupos: PendenteProdutor[]) {
 }
 
 function RelatorioPendentes() {
+  const [visao, setVisao] = useState<'produtor' | 'cliente'>('produtor');
+  return (
+    <div className="grade">
+      <div style={{ maxWidth: 320 }}>
+        <Campo rotulo="Ver por">
+          <Selecao value={visao} onChange={(e) => setVisao(e.target.value as 'produtor' | 'cliente')}>
+            <option value="produtor">Produtor</option>
+            <option value="cliente">Cliente</option>
+          </Selecao>
+        </Campo>
+      </div>
+      {visao === 'produtor' ? <PendentesPorProdutor /> : <PendentesPorCliente />}
+    </div>
+  );
+}
+
+function PendentesPorProdutor() {
   const { dados, carregando } = useDadosComissao();
   const { nomeDe } = useEquipe();
   const { pode } = useSessao();
@@ -676,5 +701,201 @@ function RelatorioPendentes() {
           </Cartao>
         ))}
     </div>
+  );
+}
+
+function documentoPendentesCliente(
+  grupos: PendenteCliente[],
+  nomeDe: (id: string) => string,
+  produtor?: string,
+): DocumentoRelatorio {
+  return {
+    titulo: 'Comissões pendentes por cliente',
+    subtitulo: `${produtor ? `${produtor} · ` : ''}Posição em ${formatarData(hojeISO())}`,
+    arquivo: nomeArquivo('comissoes-pendentes-por-cliente', hojeISO()),
+    resumo: [
+      ['Clientes com saldo', String(grupos.length)],
+      ['Saldo a receber das seguradoras', { dinheiro: grupos.reduce((t, g) => t + g.saldo, 0) }],
+      ['Repasse projetado aos produtores', { dinheiro: grupos.reduce((t, g) => t + g.repasseProjetado, 0) }],
+    ],
+    secoes: [
+      {
+        titulo: 'Saldo por cliente',
+        colunas: [
+          'Cliente',
+          'Data',
+          'Nº',
+          'Seguradora',
+          'Produto',
+          'Comissão',
+          'Recebido',
+          'Saldo',
+          'Produtores',
+          'Repasse previsto',
+        ],
+        linhas: grupos.flatMap((g) =>
+          g.itens.map((i) => [
+            g.clienteNome,
+            formatarData(i.proposta.data),
+            i.proposta.numero ?? '',
+            i.proposta.companhia,
+            i.proposta.produto,
+            { dinheiro: i.comissao },
+            { dinheiro: i.recebido },
+            { dinheiro: i.saldo },
+            i.repasses.length
+              ? i.repasses
+                  .map((r) => `${nomeDe(r.produtorId)} ${String(r.percentual).replace('.', ',')}%`)
+                  .join(', ')
+              : 'Corretora',
+            { dinheiro: i.repasses.reduce((t, r) => t + r.repasseProjetado, 0) },
+          ]),
+        ),
+        total: [
+          'Total',
+          '',
+          '',
+          '',
+          '',
+          { dinheiro: grupos.reduce((t, g) => t + g.comissao, 0) },
+          { dinheiro: grupos.reduce((t, g) => t + g.recebido, 0) },
+          { dinheiro: grupos.reduce((t, g) => t + g.saldo, 0) },
+          '',
+          { dinheiro: grupos.reduce((t, g) => t + g.repasseProjetado, 0) },
+        ],
+      },
+    ],
+  };
+}
+
+/** Saldo a receber por cliente: para cruzar com o controle da administradora e achar atrasos. */
+function PendentesPorCliente() {
+  const { dados, carregando } = useDadosComissao();
+  const { nomeDe } = useEquipe();
+  const { pode } = useSessao();
+  const usuario = useUsuario();
+  const gestao = pode('financeiro:gerenciar');
+  const [busca, setBusca] = useState('');
+  const [aberto, setAberto] = useState<string | null>(null);
+  const todos = useMemo(
+    () => pendentesPorCliente(dados.propostas, gestao ? {} : { produtorId: usuario.id }),
+    [dados.propostas, gestao, usuario.id],
+  );
+  const grupos = useMemo(() => {
+    const alvo = normalizar(busca.trim());
+    return alvo ? todos.filter((g) => normalizar(g.clienteNome).includes(alvo)) : todos;
+  }, [todos, busca]);
+  const selecionado = grupos.find((g) => g.chave === aberto);
+
+  if (carregando) return <Carregando />;
+  return (
+    <>
+      <Cartao
+        titulo="Saldo a receber por cliente"
+        acoes={
+          <BotoesExportar
+            documento={() => documentoPendentesCliente(grupos, nomeDe, gestao ? undefined : usuario.nome)}
+          />
+        }
+      >
+        <div style={{ marginBottom: 12, maxWidth: 420 }}>
+          <Campo rotulo="Buscar cliente">
+            <Entrada
+              type="search"
+              placeholder="Nome do cliente"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
+          </Campo>
+        </div>
+        <Tabela
+          rotulo="Pendentes por cliente"
+          itens={grupos}
+          chave={(g) => g.chave}
+          porPagina={50}
+          aoClicar={(g) => setAberto(aberto === g.chave ? null : g.chave)}
+          vazio={
+            <EstadoVazio titulo={busca ? 'Nenhum cliente encontrado' : 'Nada pendente'}>
+              {busca ? 'Tente outro nome.' : 'Todas as comissões aprovadas já foram recebidas.'}
+            </EstadoVazio>
+          }
+          colunas={[
+            { chave: 'cliente', titulo: 'Cliente', principal: true, render: (g) => g.clienteNome },
+            { chave: 'qtd', titulo: 'Propostas', alinharDireita: true, render: (g) => g.itens.length },
+            {
+              chave: 'comissao',
+              titulo: 'Comissão',
+              alinharDireita: true,
+              ocultarNoMobile: true,
+              render: (g) => formatarDinheiro(g.comissao),
+            },
+            {
+              chave: 'recebido',
+              titulo: 'Recebido',
+              alinharDireita: true,
+              ocultarNoMobile: true,
+              render: (g) => formatarDinheiro(g.recebido),
+            },
+            {
+              chave: 'saldo',
+              titulo: 'Saldo a receber',
+              alinharDireita: true,
+              render: (g) => formatarDinheiro(g.saldo),
+            },
+            {
+              chave: 'repasse',
+              titulo: gestao ? 'Repasse previsto' : 'Meu repasse previsto',
+              alinharDireita: true,
+              render: (g) => formatarDinheiro(g.repasseProjetado),
+            },
+          ]}
+        />
+      </Cartao>
+      {selecionado && (
+        <Cartao titulo={selecionado.clienteNome}>
+          <Tabela
+            rotulo={`Pendentes de ${selecionado.clienteNome}`}
+            itens={selecionado.itens}
+            chave={(i) => i.proposta.id}
+            colunas={[
+              {
+                chave: 'data',
+                titulo: 'Data',
+                principal: true,
+                render: (i) => formatarData(i.proposta.data),
+              },
+              { chave: 'numero', titulo: 'Nº', render: (i) => i.proposta.numero ?? '—' },
+              {
+                chave: 'cia',
+                titulo: 'Seguradora · produto',
+                render: (i) => `${i.proposta.companhia} · ${i.proposta.produto}`,
+              },
+              {
+                chave: 'produtores',
+                titulo: 'Produtores',
+                render: (i) =>
+                  i.repasses.length
+                    ? i.repasses
+                        .map((r) => `${nomeDe(r.produtorId)} ${String(r.percentual).replace('.', ',')}%`)
+                        .join(', ')
+                    : 'Corretora',
+              },
+              {
+                chave: 'saldo',
+                titulo: 'Saldo',
+                alinharDireita: true,
+                render: (i) => formatarDinheiro(i.saldo),
+              },
+              {
+                chave: 'repasse',
+                titulo: 'Repasse previsto',
+                alinharDireita: true,
+                render: (i) => formatarDinheiro(i.repasses.reduce((t, r) => t + r.repasseProjetado, 0)),
+              },
+            ]}
+          />
+        </Cartao>
+      )}
+    </>
   );
 }

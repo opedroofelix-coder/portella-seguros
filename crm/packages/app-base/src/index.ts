@@ -10,6 +10,7 @@ export * from './sessao/Rotas';
 export * from './sessao/Sessao';
 export * from './paginas/Propostas';
 export * from './exportar';
+export * from './instalacao';
 export * from './padroes';
 export * from './importacaoComissoes';
 export * from './demo';

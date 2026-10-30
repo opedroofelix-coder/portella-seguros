@@ -25,7 +25,7 @@ export const SEGURADORAS: readonly Seguradora[] = [
   { id: 'youse', nome: 'Youse' },
   { id: 'pier', nome: 'Pier' },
   // A Sompo não faz mais seguro de automóvel.
-  { id: 'sompo', nome: 'Sompo', semRamos: ['auto'] },
+  { id: 'sompo', nome: 'Sompo', semRamos: ['auto', 'moto'] },
 ];
 
 /** Seguradoras parceiras que oferecem o ramo. */
@@ -33,6 +33,7 @@ export const seguradorasDoRamo = (ramo: string) => SEGURADORAS.filter((s) => !s.
 
 export const RAMOS = [
   { id: 'auto', nome: 'Auto' },
+  { id: 'moto', nome: 'Moto / ciclomotor' },
   { id: 'vida', nome: 'Vida' },
   { id: 'previdencia', nome: 'Previdência' },
   { id: 'saude', nome: 'Saúde' },
@@ -52,6 +53,7 @@ export type Ramo = (typeof RAMOS)[number]['id'];
 /** Ramos com vigência anual (renovação todo ano). Os demais são contratos contínuos (vida, saúde…). */
 export const RAMOS_ANUAIS: ReadonlySet<Ramo> = new Set<Ramo>([
   'auto',
+  'moto',
   'residencial',
   'empresarial',
   'rc',
@@ -66,3 +68,6 @@ const nomesRamos = new Map<string, string>(RAMOS.map((r) => [r.id, r.nome]));
 /** A seguradora é guardada pelo id quando é parceira; outras ficam pelo nome digitado. */
 export const nomeSeguradora = (id: string) => nomesSeguradoras.get(id) ?? id;
 export const nomeRamo = (id: string) => nomesRamos.get(id) ?? id;
+
+/** Ramos com veículo: pedem a placa. */
+export const RAMOS_VEICULO: ReadonlySet<string> = new Set(['auto', 'moto']);

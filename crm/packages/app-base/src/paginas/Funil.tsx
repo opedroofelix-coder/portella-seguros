@@ -1,11 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Etapa, Oportunidade } from '@portella/core';
+import type { Etapa, MovimentacaoOportunidade, Oportunidade } from '@portella/core';
 import {
   centavosParaTexto,
   ETAPAS,
+  formatarDataHora,
   formatarDinheiro,
   formatarTelefone,
   lerDinheiro,
+  normalizar,
+  ORIGEM_INDICACAO,
   paraCentavos,
   resumirFunil,
   ROTULO_ETAPA,
@@ -26,10 +29,12 @@ import {
   Selecao,
   useAvisos,
 } from '@portella/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { EntradaMascara } from '../componentes/Entradas';
+import { FormularioCliente } from '../componentes/FormularioCliente';
 import { SeletorResponsavel } from '../componentes/SeletorResponsavel';
 import { useConfig, useRefinada } from '../config';
 import { aplicarErros, limparVazios, mensagemErro } from '../erros';
@@ -138,6 +143,7 @@ function CartaoOportunidade({
         <span>{o.produto}</span>
         {!refinada && o.valorEstimado != null && <span>{formatarDinheiro(o.valorEstimado)}</span>}
         {o.telefone && <span>{formatarTelefone(o.telefone)}</span>}
+        {o.origem && <span>{o.indicadoPor ? `Indicação de ${o.indicadoPor}` : o.origem}</span>}
         {pode('carteira:ver_todos') && <span>{nomeDe(o.responsavelId)}</span>}
       </div>
       <div className={styles.acoes}>
@@ -201,10 +207,18 @@ const esquema = z.object({
   etapa: z.enum(ETAPAS),
   valorEstimado: z.string().refine((v) => !v.trim() || paraCentavos(v) != null, 'Valor inválido.'),
   motivoPerda: z.string(),
+  origem: z.string(),
+  indicadoPor: z.string(),
   observacoes: z.string(),
   responsavelId: z.string().optional(),
 });
 type Valores = z.infer<typeof esquema>;
+
+const ROTULO_ACAO: Record<MovimentacaoOportunidade['acao'], string> = {
+  criada: 'Cadastrada',
+  etapa: 'Etapa',
+  responsavel: 'Responsável',
+};
 const esquemaRefinado = esquema.superRefine((v, ctx) => {
   if (v.etapa === 'perdido' && !v.motivoPerda.trim())
     ctx.addIssue({ code: 'custom', path: ['motivoPerda'], message: 'Informe o motivo da perda.' });
@@ -218,8 +232,13 @@ function FormularioOportunidade({
   aoFechar: () => void;
 }) {
   const usuario = useUsuario();
-  const { oportunidades } = useServicos();
+  const { oportunidades, clientes } = useServicos();
   const { produtos: produtosApp } = useConfig();
+  const origens = useCatalogo('origensLead');
+  const { data: listaClientes = [] } = useColecao('clientes', clientes);
+  const { nomeDe } = useEquipe();
+  const [cadastrando, setCadastrando] = useState(false);
+  const consultas = useQueryClient();
   const refinada = useRefinada();
   // Interface refinada: os mesmos produtos de Propostas (lista editável em Configurações).
   const catalogo = useCatalogo('produtos');
@@ -240,7 +259,7 @@ function FormularioOportunidade({
       onError: (e) => refinada && avisar(mensagemErro(e), 'erro'),
     });
   const somenteLeitura = oportunidade ? !pode('registro:editar', oportunidade) : false;
-  const { register, handleSubmit, formState, setError, watch } = useForm<Valores>({
+  const { register, handleSubmit, formState, setError, watch, getValues } = useForm<Valores>({
     resolver: zodResolver(refinada ? esquemaRefinado : esquema),
     defaultValues: {
       nomeContato: oportunidade?.nomeContato ?? '',
@@ -250,23 +269,48 @@ function FormularioOportunidade({
       etapa: oportunidade?.etapa ?? 'novo',
       valorEstimado: (refinada ? textoDinheiro : centavosParaTexto)(oportunidade?.valorEstimado),
       motivoPerda: oportunidade?.motivoPerda ?? '',
+      origem: oportunidade?.origem ?? '',
+      indicadoPor: oportunidade?.indicadoPor ?? '',
       observacoes: oportunidade?.observacoes ?? '',
       responsavelId: oportunidade?.responsavelId ?? usuario.id,
     },
   });
 
+  // O lead pode ainda não ser cliente: procura o cadastro pelo vínculo, pelo nome ou pelo telefone.
+  const nomeDigitado = normalizar(watch('nomeContato') ?? '');
+  const foneDigitado = somenteDigitos(watch('telefone') ?? '');
+  const [clienteVinculado, setClienteVinculado] = useState(oportunidade?.clienteId);
+  const jaCliente = useMemo(
+    () =>
+      listaClientes.find((c) => c.id === clienteVinculado) ??
+      listaClientes.find(
+        (c) =>
+          (nomeDigitado.length >= 5 && normalizar(c.nome) === nomeDigitado) ||
+          (foneDigitado.length >= 10 && c.telefone === foneDigitado),
+      ),
+    [listaClientes, clienteVinculado, nomeDigitado, foneDigitado],
+  );
+
   const enviar = handleSubmit(async (v) => {
     const d = limparVazios(v);
     try {
-      await salvar.mutateAsync({
+      const salva = await salvar.mutateAsync({
         ...(oportunidade ?? {}),
         ...d,
+        clienteId: jaCliente?.id ?? oportunidade?.clienteId,
+        indicadoPor: d.origem === ORIGEM_INDICACAO ? d.indicadoPor : undefined,
         telefone: d.telefone ? somenteDigitos(d.telefone) : undefined,
         valorEstimado: d.valorEstimado
           ? ((refinada ? lerDinheiro : paraCentavos)(d.valorEstimado) ?? undefined)
           : undefined,
       });
-      avisar(oportunidade ? 'Oportunidade atualizada.' : 'Oportunidade criada.');
+      avisar(
+        !oportunidade && salva.responsavelId !== usuario.id
+          ? `Cotação encaminhada para ${nomeDe(salva.responsavelId)}.`
+          : oportunidade
+            ? 'Oportunidade atualizada.'
+            : 'Oportunidade criada.',
+      );
       aoFechar();
     } catch (e) {
       aplicarErros(e, setError);
@@ -358,12 +402,92 @@ function FormularioOportunidade({
               <Entrada {...register('motivoPerda')} />
             </Campo>
           )}
+          <Campo rotulo="Origem" dica="Como o lead chegou: Instagram, Google, indicação…">
+            <Selecao {...register('origem')}>
+              <option value="">—</option>
+              {[...new Set([...origens, oportunidade?.origem].filter(Boolean) as string[])].map((o) => (
+                <option key={o}>{o}</option>
+              ))}
+            </Selecao>
+          </Campo>
+          {watch('origem') === ORIGEM_INDICACAO && (
+            <Campo rotulo="Indicado por" dica="Nome de quem indicou, cliente ou não.">
+              <Entrada list="indicacao-oportunidade" autoComplete="off" {...register('indicadoPor')} />
+            </Campo>
+          )}
+          <datalist id="indicacao-oportunidade">
+            {listaClientes.slice(0, 300).map((c) => (
+              <option key={c.id} value={c.nome} />
+            ))}
+          </datalist>
           <SeletorResponsavel {...register('responsavelId')} />
           <Campo rotulo="Observações" className="span-todo">
             <AreaTexto {...register('observacoes')} />
           </Campo>
         </fieldset>
       </form>
+      <div className={styles.cadastro}>
+        {jaCliente ? (
+          <p>
+            <strong>Já é cliente:</strong> {jaCliente.nome}
+          </p>
+        ) : (
+          !somenteLeitura && (
+            <>
+              <p>Este contato ainda não está no cadastro de clientes.</p>
+              <Botao variante="secundario" pequeno icone="mais" onClick={() => setCadastrando(true)}>
+                Cadastrar como cliente
+              </Botao>
+            </>
+          )
+        )}
+      </div>
+      {oportunidade?.historico?.length ? (
+        <section className={styles.historico} aria-label="Histórico da cotação">
+          <h3>Histórico</h3>
+          <ol>
+            {[...oportunidade.historico].reverse().map((m, i) => (
+              <li key={`${m.em}-${i}`}>
+                <time dateTime={m.em}>{formatarDataHora(m.em)}</time>
+                <span>
+                  {ROTULO_ACAO[m.acao]}
+                  {m.acao === 'etapa' &&
+                    `: ${ROTULO_ETAPA[m.de as Etapa]} → ${ROTULO_ETAPA[m.para as Etapa]}`}
+                  {m.acao === 'responsavel' && `: ${nomeDe(m.de ?? '')} → ${nomeDe(m.para ?? '')}`}
+                  {m.acao === 'criada' && m.para && ` em ${ROTULO_ETAPA[m.para as Etapa]}`}
+                </span>
+                <span className={styles.quem}>{nomeDe(m.usuarioId)}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+      {cadastrando && (
+        <FormularioCliente
+          inicial={{
+            nome: getValues('nomeContato').trim(),
+            tipoPessoa: 'PF',
+            telefone: somenteDigitos(getValues('telefone')) || undefined,
+            email: getValues('email').trim() || undefined,
+            origem: getValues('origem') || undefined,
+            indicadoPor:
+              getValues('origem') === ORIGEM_INDICACAO
+                ? getValues('indicadoPor').trim() || undefined
+                : undefined,
+          }}
+          aoFechar={() => setCadastrando(false)}
+          aoSalvar={async (c) => {
+            setClienteVinculado(c.id);
+            if (oportunidade && !somenteLeitura) {
+              // Liga a cotação ao cadastro na hora, mesmo que o formulário seja fechado sem salvar.
+              await oportunidades
+                .salvar(usuario, { ...oportunidade, clienteId: c.id })
+                .then(() => consultas.invalidateQueries({ queryKey: ['oportunidades'] }))
+                .catch(() => undefined);
+            }
+          }}
+        />
+      )}
       {oportunidade && (
         <ConfirmarAcao
           aberto={confirmarRemocao}

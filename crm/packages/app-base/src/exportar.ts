@@ -9,6 +9,8 @@ export interface SecaoRelatorio {
   colunas: string[];
   linhas: CelulaRelatorio[][];
   total?: CelulaRelatorio[];
+  /** Altura mínima das linhas no PDF (pt): linhas em branco para preencher à mão, como no checklist. */
+  alturaLinha?: number;
 }
 
 export interface DocumentoRelatorio {
@@ -100,7 +102,7 @@ export async function exportarPdf(doc: DocumentoRelatorio, baixarArquivo = true)
         ? secao.linhas.map((l) => l.map(texto))
         : [[{ content: 'Nenhum lançamento.', colSpan: secao.colunas.length }]],
       foot: secao.total ? [secao.total.map(texto)] : undefined,
-      styles: { fontSize: 8, cellPadding: 3 },
+      styles: { fontSize: 8, cellPadding: 3, minCellHeight: secao.alturaLinha },
       headStyles: { fillColor: MARINHO, textColor: [244, 238, 226] },
       footStyles: { fillColor: [242, 236, 225], textColor: [26, 43, 75], fontStyle: 'bold' },
       columnStyles: Object.fromEntries([...numericas].map((i) => [i, { halign: 'right' as const }])),

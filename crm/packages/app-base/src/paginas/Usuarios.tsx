@@ -22,7 +22,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useRefinada, useRotuloPerfil } from '../config';
 import { aplicarErros, mensagemErro } from '../erros';
-import { useEquipe } from '../hooks/dados';
+import { useCatalogo, useEquipe } from '../hooks/dados';
 import { useServicos } from '../servicos';
 import { CHAVE_SESSAO, useUsuario } from '../sessao/Sessao';
 
@@ -227,6 +227,9 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
   const [repasse, setRepasse] = useState(
     usuario.percentualRepasse != null ? String(usuario.percentualRepasse) : '',
   );
+  const [atendidos, setAtendidos] = useState<string[]>(usuario.produtosAtendidos ?? []);
+  const produtos = useCatalogo('produtos');
+  const { equipe } = useEquipe();
   const [confirmarSenha, setConfirmarSenha] = useState(false);
   const [confirmarDesativar, setConfirmarDesativar] = useState(false);
   const refinada = useRefinada();
@@ -239,7 +242,11 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
     nome !== usuario.nome ||
     perfil !== usuario.perfil ||
     ativo !== usuario.ativo ||
-    repasse !== (usuario.percentualRepasse != null ? String(usuario.percentualRepasse) : '');
+    repasse !== (usuario.percentualRepasse != null ? String(usuario.percentualRepasse) : '') ||
+    [...atendidos].sort().join('|') !== [...(usuario.produtosAtendidos ?? [])].sort().join('|');
+  /** Quem já atende cada produto (um produto vai para uma pessoa só). */
+  const atendidoPor = (produto: string) =>
+    equipe.find((u) => u.id !== usuario.id && u.ativo && u.produtosAtendidos?.includes(produto));
   // Desativar tira o acesso na hora (e derruba a sessão aberta): confirma antes.
   const pedirSalvar = () => {
     if (!repasseValido || !nomeValido) return;
@@ -258,6 +265,7 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
         perfil,
         ativo,
         percentualRepasse: paraNumero(repasse),
+        produtosAtendidos: atendidos.length ? atendidos : undefined,
       }),
     onSuccess: async () => {
       await atualizarCache();
@@ -347,6 +355,42 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
           <Campo rotulo="Repasse padrão (%)" erro={repasseValido ? undefined : 'Entre 0 e 100.'}>
             <Entrada inputMode="decimal" value={repasse} onChange={(e) => setRepasse(e.target.value)} />
           </Campo>
+          <fieldset className="span-todo" style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+            <legend style={{ fontSize: 13, fontWeight: 500, marginBottom: 4, padding: 0 }}>
+              Recebe as cotações novas de
+            </legend>
+            <p className="texto-suave" style={{ margin: '0 0 8px', fontSize: 13 }}>
+              A cotação nova destes produtos vai direto para {nome.trim().split(' ')[0] || 'esta pessoa'},
+              mesmo quando outro produtor cadastra (ex.: Consórcio → Gabriel).
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px' }}>
+              {[...new Set([...produtos, ...atendidos])].map((p) => {
+                const outro = atendidoPor(p);
+                return (
+                  <label
+                    key={p}
+                    style={{
+                      display: 'inline-flex',
+                      gap: 8,
+                      alignItems: 'center',
+                      fontSize: 14,
+                      minHeight: 44,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={atendidos.includes(p)}
+                      onChange={(e) =>
+                        setAtendidos((a) => (e.target.checked ? [...a, p] : a.filter((x) => x !== p)))
+                      }
+                    />
+                    {p}
+                    {outro && <span className="texto-suave">({outro.nome})</span>}
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
         </Envoltorio>
       </Modal>
       {refinada && (

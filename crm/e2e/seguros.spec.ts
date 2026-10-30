@@ -52,10 +52,21 @@ test.describe('CRM Seguros — fluxo completo', () => {
     const inicio = new Date(Date.now() - 345 * 86_400_000).toISOString().slice(0, 10);
     await ap.getByLabel('Início da vigência').fill(inicio);
     await ap.getByLabel('Fim da vigência').fill(fim);
-    await ap.getByLabel('Prêmio líquido').fill('2.000');
-    await ap.getByLabel('Comissão', { exact: true }).fill('15');
-    // O valor com ponto de milhar é lido como R$ 2.000,00 e a comissão aparece na hora
-    await expect(ap.getByText('Comissão prevista: R$ 300,00')).toBeVisible();
+    await escolher(ap.getByLabel('Tipo', { exact: true }), { label: 'Seguro novo' });
+    await ap.getByLabel('Modelo do veículo').fill('Onix 1.0 2022');
+    await ap.getByLabel('Placa').fill('abc1d23');
+    // Prêmio líquido e comissão ficam na proposta: a apólice tem o prêmio total e as parcelas
+    await expect(ap.getByLabel('Prêmio líquido')).toHaveCount(0);
+    await ap.getByLabel('Prêmio total').fill('2.000');
+    await ap.getByLabel('Quantidade de parcelas').fill('3');
+    await ap.getByLabel('1º vencimento').fill(inicio);
+    await ap.getByRole('button', { name: 'Gerar parcelas' }).click();
+    // R$ 2.000,00 em 3: a sobra de centavos fica na 1ª parcela
+    await expect(ap.getByLabel('Valor').first()).toHaveValue('666,68');
+    await expect(ap.getByText('Soma das parcelas: R$ 2.000,00 de R$ 2.000,00')).toBeVisible();
+    const checklist = page.waitForEvent('download');
+    await ap.getByRole('button', { name: 'Checklist (PDF)' }).click();
+    expect((await checklist).suggestedFilename()).toMatch(/^checklist-maria-teste.*\.pdf$/);
     await page.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByText('Apólice cadastrada.')).toBeVisible();
     await expect(page.getByText(/Vence em (19|20) dias/)).toBeVisible();
@@ -69,11 +80,16 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(page.getByText('Renovação registrada.')).toBeVisible();
     await expect(page.getByText('Tudo em dia')).toBeVisible();
 
-    // Cotação no funil
+    // Cotação no funil, com a origem do lead
     await irPara(page, 'Cotações');
     await page.getByRole('button', { name: 'Nova oportunidade' }).click();
-    await page.getByRole('dialog').getByLabel('Contato').fill('Lead Teste');
+    const lead = page.getByRole('dialog');
+    await lead.getByLabel('Contato').fill('Lead Teste');
+    await escolher(lead.getByLabel('Origem'), { label: 'Indicação' });
+    await lead.getByLabel('Indicado por').fill('Maria Teste');
+    await expect(lead.getByRole('button', { name: 'Cadastrar como cliente' })).toBeVisible();
     await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByRole('region', { name: 'Novo' })).toContainText('Indicação de Maria Teste');
     await escolher(page.getByLabel('Etapa de Lead Teste'), { label: 'Proposta enviada' });
     await expect(page.getByRole('region', { name: 'Proposta enviada' })).toContainText('Lead Teste');
 
@@ -137,6 +153,11 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page.getByRole('button', { name: 'Enviar para aprovação' }).click();
     await expect(form.getByText('Escolha o tipo de negócio.')).toBeVisible();
     await escolher(form.getByLabel('Tipo de negócio'), { label: 'Seguro novo' });
+    await form.getByLabel('Placa').fill('XYZ9A87');
+    await escolher(form.getByLabel('Forma de pagamento'), { label: 'Cartão de crédito' });
+    await form.getByLabel('Quantidade de parcelas').fill('10');
+    // Comissão normal ou vitalícia: só a administração define
+    await expect(form.getByLabel('Regra de recebimento')).toHaveCount(0);
     await form.getByLabel('Prêmio líquido').fill('1.000');
     await form.getByLabel('Comissão trabalhada').fill('20');
     await expect(form.getByText('Receberá R$ 60,00')).toBeVisible();
@@ -174,8 +195,12 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page.getByRole('row', { name: /Cliente Teste Proposta/ }).click();
     const aprovar = page.getByRole('dialog', { name: /Cliente Teste Proposta/ });
     await aprovar.getByRole('button', { name: 'Adicionar recebimento' }).click();
+    await expect(aprovar.getByLabel('Regra de recebimento')).toBeVisible();
+    await aprovar.getByLabel('Valor', { exact: true }).fill('150');
+    // Controle por saldo: sem a parcela, cada recebimento mostra o saldo que fica
+    await expect(aprovar.getByLabel('Parcela', { exact: true })).toHaveCount(0);
+    await expect(aprovar.getByText('Saldo depois').locator('..')).toContainText('R$ 50,00');
     await aprovar.getByLabel('Valor', { exact: true }).fill('200');
-    await aprovar.getByLabel('Parcela').fill('1ª');
     await expect(aprovar.getByText('Saldo a receber').locator('..')).toContainText('R$ 0,00');
     await aprovar.getByRole('button', { name: 'Aprovar proposta' }).click();
     await expect(page.getByText('Proposta aprovada.')).toBeVisible();
@@ -228,6 +253,90 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await page.getByRole('row', { name: /Cliente Teste Proposta/ }).click();
     await expect(page.getByText(/só a administração altera/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Excluir' })).toHaveCount(0);
+  });
+
+  test('apólice da proposta aprovada, cancelamento visível e cotação encaminhada pelo produto', async ({
+    page,
+  }) => {
+    await primeiroAcesso(page, URL);
+    await cadastrarUsuario(page, CORRETOR, 'Produtor');
+
+    // Cliente e proposta aprovada (a administração lança já aprovada)
+    await irPara(page, 'Clientes');
+    await page.getByRole('button', { name: 'Novo cliente' }).click();
+    const cli = page.getByRole('dialog', { name: 'Novo cliente' });
+    await cli.getByLabel('Nome completo').fill('Joana Pereira Lima');
+    await escolher(cli.getByLabel('Origem'), { label: 'Instagram' });
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByText('Instagram')).toBeVisible();
+
+    await irPara(page, 'Propostas');
+    await page.getByRole('button', { name: 'Nova proposta' }).click();
+    const form = page.getByRole('dialog', { name: 'Nova proposta' });
+    await form.getByLabel('Nome completo do cliente').fill('Joana Pereira Lima');
+    await form.getByLabel('Nº da proposta / apólice').fill('P-321');
+    await escolher(form.getByRole('combobox', { name: 'Seguradora' }), { label: 'Porto Seguro' });
+    await escolher(form.getByLabel('Produto', { exact: true }), { label: 'Moto' });
+    await escolher(form.getByLabel('Tipo de negócio'), { label: 'Endosso' });
+    await form.getByLabel('Placa').fill('MOT0A12');
+    await escolher(form.getByLabel('Forma de pagamento'), { label: 'Boleto' });
+    await form.getByLabel('Quantidade de parcelas').fill('4');
+    await form.getByLabel('Prêmio líquido').fill('800');
+    await form.getByLabel('Comissão trabalhada').fill('15');
+    await page.getByRole('button', { name: 'Salvar (já aprovada)' }).click();
+    await expect(page.getByText('Proposta salva.')).toBeVisible();
+
+    // A proposta aprovada vira apólice já preenchida
+    await page.getByRole('row', { name: /Joana Pereira Lima/ }).click();
+    await page.getByRole('button', { name: 'Cadastrar apólice' }).click();
+    const ap = page.getByRole('dialog', { name: 'Nova apólice' });
+    await expect(ap.getByRole('combobox', { name: 'Ramo' })).toHaveText(/Moto \/ ciclomotor/);
+    await expect(ap.getByRole('combobox', { name: 'Tipo', exact: true })).toHaveText(/Endosso/);
+    await expect(ap.getByLabel('Nº da proposta')).toHaveValue('P-321');
+    await expect(ap.getByLabel('Placa')).toHaveValue('MOT0A12');
+    await expect(ap.getByText('Forma de pagamento: Boleto (proposta nº P-321)')).toBeVisible();
+    await ap.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByText('Apólice cadastrada.')).toBeVisible();
+    await page.keyboard.press('Escape');
+
+    // Cancelada continua na lista de Apólices, com a data
+    await irPara(page, 'Apólices');
+    await page.getByRole('row', { name: /Joana Pereira Lima/ }).click();
+    const editar = page.getByRole('dialog', { name: 'Editar apólice' });
+    await escolher(editar.getByLabel('Status'), { label: 'Cancelada' });
+    await editar.getByRole('button', { name: 'Salvar' }).click();
+    await expect(editar.getByText('Informe a data do cancelamento.')).toBeVisible();
+    await editar.getByLabel('Data do cancelamento').fill('2026-10-29');
+    await escolher(editar.getByLabel('Motivo do cancelamento'), { label: 'Venda do bem' });
+    await editar.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByText('Apólice atualizada.')).toBeVisible();
+    await expect(page.getByRole('row', { name: /Joana Pereira Lima/ })).toContainText(
+      'Cancelada em 29/10/2026',
+    );
+
+    // Comissões pendentes por cliente
+    await irPara(page, 'Relatórios');
+    await page.getByRole('tab', { name: 'Comissões pendentes' }).click();
+    await escolher(page.getByLabel('Ver por'), { label: 'Cliente' });
+    await expect(page.getByRole('table', { name: 'Pendentes por cliente' })).toContainText(
+      'Joana Pereira Lima',
+    );
+
+    // Consórcio vai direto para o produtor que atende o produto
+    await irPara(page, 'Usuários');
+    await page.getByRole('row', { name: new RegExp(CORRETOR.nome) }).click();
+    await page.getByRole('dialog').getByLabel('Consórcio').check();
+    await page.getByRole('dialog').getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByText('Usuário atualizado.')).toBeVisible();
+    await irPara(page, 'Cotações');
+    await page.getByRole('button', { name: 'Nova oportunidade' }).click();
+    const lead = page.getByRole('dialog');
+    await lead.getByLabel('Contato').fill('Lead Consórcio');
+    await escolher(lead.getByLabel('Produto'), { label: 'Consórcio' });
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByText(`Cotação encaminhada para ${CORRETOR.nome}.`)).toBeVisible();
+    await page.getByRole('button', { name: 'Abrir Lead Consórcio' }).click();
+    await expect(page.getByRole('region', { name: 'Histórico da cotação' })).toContainText('Cadastrada');
   });
 
   test('financeiro sem a poupança', async ({ page }) => {
@@ -356,6 +465,23 @@ for (const tela of LARGURAS) {
         fullPage: true,
         animations: 'disabled',
       });
+      await escolher(page.getByLabel('Ver por'), { label: 'Cliente' });
+      await conferirLayout(page, tela.width);
+      await page.screenshot({
+        path: `test-results/telas/seguros-relatorio-pendentes-cliente-${tela.nome}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
+
+      await irPara(page, 'Cotações');
+      await page.getByRole('button', { name: 'Nova oportunidade' }).click();
+      await escolher(page.getByRole('dialog').getByLabel('Origem'), { label: 'Indicação' });
+      await conferirLayout(page, tela.width);
+      await page.screenshot({
+        path: `test-results/telas/seguros-form-cotacao-${tela.nome}.png`,
+        animations: 'disabled',
+      });
+      await page.keyboard.press('Escape');
     });
   });
 }

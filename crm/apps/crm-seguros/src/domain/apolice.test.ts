@@ -1,7 +1,17 @@
 import { ErroValidacao } from '@portella/core';
 import { describe, expect, it } from 'vitest';
 import type { Apolice } from './apolice';
-import { comissao, filaRenovacao, resumirCarteira, situacao, validarApolice } from './apolice';
+import {
+  comissao,
+  EM_ACOMPANHAMENTO,
+  filaRenovacao,
+  formatarPlaca,
+  gerarParcelas,
+  placaValida,
+  resumirCarteira,
+  situacao,
+  validarApolice,
+} from './apolice';
 
 const HOJE = '2026-10-22';
 let n = 0;
@@ -109,5 +119,50 @@ describe('apólice', () => {
       { ramo: 'auto', quantidade: 2 },
       { ramo: 'vida', quantidade: 1 },
     ]);
+  });
+
+  it('apólice cancelada exige data e motivo e continua na lista padrão (em acompanhamento)', () => {
+    const erro = (() => {
+      try {
+        validarApolice(apolice({ cancelada: true }));
+      } catch (e) {
+        return e as ErroValidacao;
+      }
+    })();
+    expect(erro?.campos).toMatchObject({
+      dataCancelamento: expect.any(String),
+      motivoCancelamento: expect.any(String),
+    });
+    const cancelada = apolice({
+      cancelada: true,
+      dataCancelamento: '2026-10-01',
+      motivoCancelamento: 'Venda do bem',
+    });
+    expect(() => validarApolice(cancelada)).not.toThrow();
+    expect(EM_ACOMPANHAMENTO.has(situacao(cancelada, HOJE))).toBe(true);
+    expect(EM_ACOMPANHAMENTO.has(situacao(apolice({ fimVigencia: '2026-10-01' }), HOJE))).toBe(false);
+  });
+
+  it('divide o prêmio total em parcelas mensais sem perder centavos', () => {
+    const parcelas = gerarParcelas(100000, 3, '2026-11-10');
+    expect(parcelas.map((p) => p.valor)).toEqual([33334, 33333, 33333]);
+    expect(parcelas.reduce((t, p) => t + (p.valor ?? 0), 0)).toBe(100000);
+    expect(parcelas.map((p) => p.vencimento)).toEqual(['2026-11-10', '2026-12-10', '2027-01-10']);
+    expect(gerarParcelas(undefined, 2)).toEqual([
+      { valor: undefined, vencimento: undefined },
+      { valor: undefined, vencimento: undefined },
+    ]);
+    expect(() =>
+      validarApolice(apolice({ premioTotal: 1000, parcelas: [{ valor: 600 }, { valor: 600 }] })),
+    ).toThrow(ErroValidacao);
+  });
+
+  it('aceita placa no padrão antigo e no Mercosul', () => {
+    expect(placaValida('abc-1234')).toBe(true);
+    expect(placaValida('ABC1D23')).toBe(true);
+    expect(placaValida('AB12345')).toBe(false);
+    expect(formatarPlaca('abc1234')).toBe('ABC-1234');
+    expect(formatarPlaca('abc1d23')).toBe('ABC1D23');
+    expect(() => validarApolice(apolice({ ramo: 'moto', placa: 'XYZ' }))).toThrow(ErroValidacao);
   });
 });

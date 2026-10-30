@@ -18,7 +18,9 @@ export interface NovoUsuario {
   percentualRepasse?: number;
 }
 
-export type AlteracaoUsuario = Partial<Pick<Usuario, 'nome' | 'perfil' | 'ativo' | 'percentualRepasse'>>;
+export type AlteracaoUsuario = Partial<
+  Pick<Usuario, 'nome' | 'perfil' | 'ativo' | 'percentualRepasse' | 'produtosAtendidos'>
+>;
 
 export interface ProdutorInicial {
   nome: string;

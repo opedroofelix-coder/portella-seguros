@@ -8,11 +8,16 @@ import type { DataISO, Registro } from './registro';
  * Proposta transmitida à seguradora (ou administradora de consórcio): é o centro do controle de
  * comissões. A comissão é controlada por saldo: comissão a receber − recebimentos = saldo a receber.
  */
-export type TipoNegocio = 'novo' | 'renovacao';
+export const TIPOS_NEGOCIO = ['novo', 'renovacao', 'endosso'] as const;
+export type TipoNegocio = (typeof TIPOS_NEGOCIO)[number];
 export const ROTULO_TIPO_NEGOCIO: Record<TipoNegocio, string> = {
   novo: 'Seguro novo',
-  renovacao: 'Renovação da carteira',
+  renovacao: 'Renovação',
+  endosso: 'Endosso',
 };
+
+/** Formas de pagamento do prêmio pelo cliente (orientam o financeiro sobre o repasse da seguradora). */
+export const FORMAS_PAGAMENTO = ['Boleto', 'Débito em conta', 'Cartão de crédito', 'Pix', 'Carnê'] as const;
 
 export type StatusProposta = 'pendente' | 'aprovada';
 export const ROTULO_STATUS_PROPOSTA: Record<StatusProposta, string> = {
@@ -48,6 +53,12 @@ export interface Proposta extends Registro {
   companhia: string;
   produto: string;
   tipoNegocio?: TipoNegocio;
+  /** Forma de pagamento do prêmio pelo cliente (boleto, débito, cartão, Pix, carnê). */
+  formaPagamento?: string;
+  /** Quantidade de parcelas do prêmio pago pelo cliente (não confundir com as parcelas da comissão). */
+  quantidadeParcelas?: number;
+  /** Placa do carro ou da moto (seguro auto). */
+  placa?: string;
   /** Prêmio líquido (no consórcio, o valor do crédito). */
   premioLiquido?: Centavos;
   /** Comissão trabalhada sobre o prêmio líquido; pode passar de 100% (ex.: saúde 300%). */
@@ -142,6 +153,11 @@ export function validarProposta(p: Partial<Proposta>): void {
     campos.comissaoReceber = 'Informe a comissão a receber.';
   if (p.percentualVitalicio != null && (p.percentualVitalicio < 0 || p.percentualVitalicio > 100))
     campos.percentualVitalicio = 'Entre 0 e 100%.';
+  if (
+    p.quantidadeParcelas != null &&
+    (!Number.isInteger(p.quantidadeParcelas) || p.quantidadeParcelas < 1 || p.quantidadeParcelas > 24)
+  )
+    campos.quantidadeParcelas = 'De 1 a 24 parcelas.';
   const produtores = p.produtores ?? [];
   if (produtores.some((x) => x.percentual < 0 || x.percentual > 100))
     campos.produtores = 'O % de cada produtor vai de 0 a 100.';

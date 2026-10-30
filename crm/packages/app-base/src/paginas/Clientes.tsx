@@ -216,7 +216,23 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
     ],
     ['Telefone', cliente.telefone ? formatarTelefone(cliente.telefone) : '—'],
     ['E-mail', cliente.email ?? '—'],
+    ...(cliente.tipoPessoa === 'PF'
+      ? [
+          ['Nascimento', cliente.dataNascimento ? formatarData(cliente.dataNascimento) : '—'] as [
+            string,
+            string,
+          ],
+        ]
+      : []),
     ['Endereço', endereco || '—'],
+    ...(cliente.origem
+      ? [
+          ['Origem', cliente.indicadoPor ? `${cliente.origem} · ${cliente.indicadoPor}` : cliente.origem] as [
+            string,
+            string,
+          ],
+        ]
+      : []),
     [refinada ? 'Produtor' : 'Responsável', nomeDe(cliente.responsavelId)],
   ];
 

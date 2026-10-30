@@ -127,5 +127,12 @@ O que depende da Portella (contas próprias):
   passou pela revisão de UX/UI (interface refinada) e segue o visual "A5 · Vidro + Bento" escolhido pela
   cliente (tema claro padrão, menu no topo, busca Ctrl K e painel inicial com produção, comissões e
   pagamento do mês). Falta escolher o backend para os dados serem compartilhados entre computadores.
+  Ajustes da reunião de 29/10/2026 feitos (apólice simplificada com status e checklist em PDF, ramo Moto,
+  proposta com forma de pagamento e placa, saldo no lugar da parcela, comissões pendentes por cliente,
+  origem e distribuição dos leads, endereço pelo CEP/CNPJ e instalação como aplicativo). Pendentes:
+  - [ ] Backend com banco de dados (entrega combinada para terça).
+  - [ ] Aniversário dos clientes por e-mail (vem com o backend).
+  - [ ] Consórcio dentro do CRM de Seguros: aguardando a planilha e os dados de assembleia e contemplação da Deliziane.
+  - [ ] Acesso para publicar o site (Deliziane vai pedir ao Bruno).
 
 Os pontos a preencher estão marcados no código com `TODO` ou `[inserir]`.

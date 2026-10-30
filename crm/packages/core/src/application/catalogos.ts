@@ -8,9 +8,10 @@ import { exigir } from './permissoes';
 
 /**
  * Listas editáveis: produtos e seguradoras (propostas e estornos) e as origens de recebimento do
- * Financeiro que não são seguradoras (ex.: o cliente que paga a comissão do plano de saúde direto).
+ * Financeiro que não são seguradoras (ex.: o cliente que paga a comissão do plano de saúde direto),
+ * e as origens dos leads das cotações (Indicação, Instagram, Google…).
  */
-export type TipoCatalogo = 'produtos' | 'seguradoras' | 'origensRecebimento';
+export type TipoCatalogo = 'produtos' | 'seguradoras' | 'origensRecebimento' | 'origensLead';
 
 /** Listas que precisam de pelo menos um item (as opções obrigatórias da proposta). */
 const OBRIGATORIOS: TipoCatalogo[] = ['produtos', 'seguradoras'];

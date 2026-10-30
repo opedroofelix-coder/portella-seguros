@@ -1,7 +1,15 @@
+import { normalizar } from './cliente';
 import type { Centavos } from './dinheiro';
 import { porcentagem } from './dinheiro';
 import type { Estorno, PagamentoProdutor, Proposta, Recebimento, TipoNegocio, Vale } from './proposta';
-import { fatiaProducao, percentualDe, repasseDoRecebimento, saldoReceber } from './proposta';
+import {
+  fatiaProducao,
+  participa,
+  percentualDe,
+  recebidoPrincipal,
+  repasseDoRecebimento,
+  saldoReceber,
+} from './proposta';
 
 /** Produtor "vazio": vendas da própria corretora, sem repasse. */
 export const CORRETORA = '';
@@ -129,6 +137,71 @@ export function pendentesPorProdutor(propostas: Proposta[]): PendenteProdutor[] 
   return [...grupos.values()].sort((a, b) => b.saldo - a.saldo);
 }
 
+export interface PendenteCliente {
+  /** clienteId, ou o nome normalizado quando a proposta não está ligada a um cadastro. */
+  chave: string;
+  clienteId?: string;
+  clienteNome: string;
+  itens: Array<{
+    proposta: Proposta;
+    comissao: Centavos;
+    recebido: Centavos;
+    saldo: Centavos;
+    repasses: Array<{ produtorId: string; percentual: number; repasseProjetado: Centavos }>;
+  }>;
+  comissao: Centavos;
+  recebido: Centavos;
+  saldo: Centavos;
+  repasseProjetado: Centavos;
+}
+
+/**
+ * O que ainda falta a seguradora pagar, por cliente (para cruzar com o controle da administradora e
+ * achar atrasos). Com `produtorId`, só as vendas dele e só o repasse dele.
+ * `nomeCliente` devolve o nome do cadastro, para mostrar o nome completo.
+ */
+export function pendentesPorCliente(
+  propostas: Proposta[],
+  opcoes: { produtorId?: string; nomeCliente?: (clienteId: string) => string | undefined } = {},
+): PendenteCliente[] {
+  const grupos = new Map<string, PendenteCliente>();
+  for (const p of aprovadas(propostas)) {
+    const saldo = saldoReceber(p);
+    if (saldo <= 0) continue;
+    if (opcoes.produtorId && !participa(p, opcoes.produtorId)) continue;
+    const nome = (p.clienteId && opcoes.nomeCliente?.(p.clienteId)) || p.clienteNome;
+    const chave = p.clienteId ?? `nome:${normalizar(nome)}`;
+    const g = grupos.get(chave) ?? {
+      chave,
+      clienteId: p.clienteId,
+      clienteNome: nome,
+      itens: [],
+      comissao: 0,
+      recebido: 0,
+      saldo: 0,
+      repasseProjetado: 0,
+    };
+    const repasses = p.produtores
+      .filter((x) => !opcoes.produtorId || x.produtorId === opcoes.produtorId)
+      .map((x) => ({
+        produtorId: x.produtorId,
+        percentual: x.percentual,
+        repasseProjetado: porcentagem(saldo, x.percentual),
+      }));
+    const recebido = recebidoPrincipal(p);
+    g.itens.push({ proposta: p, comissao: p.comissaoReceber, recebido, saldo, repasses });
+    g.comissao += p.comissaoReceber;
+    g.recebido += recebido;
+    g.saldo += saldo;
+    g.repasseProjetado += repasses.reduce((t, r) => t + r.repasseProjetado, 0);
+    grupos.set(chave, g);
+  }
+  for (const g of grupos.values()) g.itens.sort((a, b) => a.proposta.data.localeCompare(b.proposta.data));
+  return [...grupos.values()].sort(
+    (a, b) => b.saldo - a.saldo || a.clienteNome.localeCompare(b.clienteNome, 'pt-BR'),
+  );
+}
+
 // ---------------------------------------------------------------- Painel
 
 export interface Periodo {
@@ -187,6 +260,7 @@ export function montarPainel(todas: Proposta[], periodo: Periodo = {}): Painel {
   const porTipo: Painel['porTipo'] = {
     novo: { premio: 0, quantidade: 0 },
     renovacao: { premio: 0, quantidade: 0 },
+    endosso: { premio: 0, quantidade: 0 },
     nao_informado: { premio: 0, quantidade: 0 },
   };
   const produtores = new Map<string, Agrupado>();

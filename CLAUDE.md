@@ -75,3 +75,11 @@
   em cápsula, todos com 44px; rótulos e títulos de tabela em texto normal; cartões e janelas com 28px. As listas
   (Selecao e campos com sugestões) abrem no painel do app (`packages/ui/src/componentes/Lista.tsx`), nunca na
   lista do navegador. Os valores ficam nos tokens do `seguros.css`; o Consórcio continua com os de reserva.
+- **Reunião de 29/10/2026 (CRM de Seguros):** apólice sem prêmio líquido, comissão e forma de pagamento (ficam
+  na proposta); apólice com tipo (novo/renovação/endosso), status ativa/cancelada (data e motivo), placa,
+  parcelas e ocorrências, e checklist em PDF no modelo da Gisele; cancelada continua na lista de Apólices.
+  Ramo Moto. Proposta com forma de pagamento, parcelas e placa; regra normal/vitalícia só para a administração;
+  recebimentos por saldo. Comissões pendentes também por cliente. Cotações com origem, indicação, histórico e
+  distribuição por produto (Usuários › "Recebe as cotações novas de"). Endereço pelo CEP e pelo CNPJ (não há
+  consulta pública por CPF). CRM instalável como aplicativo (PWA). Ficam para depois: backend, aniversário por
+  e-mail (com o backend) e consórcio dentro do CRM de Seguros.

@@ -1,4 +1,4 @@
-import type { Acao, Cliente, Perfil, ProdutorInicial, TipoCatalogo, Usuario } from '@portella/core';
+import type { Acao, Cliente, Perfil, ProdutorInicial, Proposta, TipoCatalogo, Usuario } from '@portella/core';
 import { ROTULO_PERFIL } from '@portella/core';
 import type { ItemMenu } from '@portella/ui';
 import type { ReactNode } from 'react';
@@ -50,6 +50,10 @@ export interface ConfigApp {
   catalogosExtras?: Array<{ tipo: TipoCatalogo; titulo: string; descricao: string }>;
   /** Marca da cápsula do menu no topo (ícone e nome para fundo claro e escuro). */
   marca?: { icone: string; nomeClaro: string; nomeEscuro: string };
+  /** Proposta com forma de pagamento, quantidade de parcelas e placa (seguros). */
+  propostaPagamento?: boolean;
+  /** Ações extras no rodapé da proposta aprovada (ex.: cadastrar a apólice). */
+  acoesProposta?: (proposta: Proposta) => ReactNode;
 }
 
 const Contexto = createContext<ConfigApp | null>(null);

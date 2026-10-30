@@ -54,15 +54,19 @@ describe('renovação', () => {
       inicioVigencia: '2025-11-10',
       fimVigencia: '2026-11-10',
       renovacao: 'em_contato',
+      placa: 'ABC1D23',
       comissaoPercentual: 15,
     });
     const sugestao = sugerirRenovacao(anterior);
     expect(sugestao).toMatchObject({
+      tipo: 'renovacao',
+      placa: 'ABC1D23',
       inicioVigencia: '2026-11-10',
       fimVigencia: '2027-11-10',
-      comissaoPercentual: 15,
       responsavelId: 'c1',
     });
+    // Comissão e forma de pagamento ficam na proposta da renovação (29/10/2026).
+    expect(sugestao.comissaoPercentual).toBeUndefined();
     const nova = await renovarApolice(s.apolices, carlos, anterior, { ...sugestao, seguradora: 'hdi' });
     const todas = await s.apolices.listar(carlos);
     expect(todas).toHaveLength(2);
@@ -81,6 +85,9 @@ describe('importação de seguros', () => {
     expect(identificarSeguradora('Yelum Seguros')).toBe('liberty');
     expect(identificarSeguradora('Akad')).toBe('Akad');
     expect(identificarRamo('AUTOMÓVEL')).toBe('auto');
+    expect(identificarRamo('Moto')).toBe('moto');
+    expect(identificarRamo('Motocicleta')).toBe('moto');
+    expect(identificarRamo('Ciclomotor')).toBe('moto');
     expect(identificarRamo('Seguro de Vida em Grupo')).toBe('vida');
     expect(identificarRamo('Residencial')).toBe('residencial');
     expect(identificarRamo('Fiança locatícia')).toBe('fianca');

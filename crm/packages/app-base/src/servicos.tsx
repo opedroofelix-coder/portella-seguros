@@ -16,6 +16,7 @@ import {
   ServicoCarteira,
   ServicoCatalogos,
   ServicoLancamentosGestao,
+  ServicoOportunidades,
   ServicoPropostas,
   ServicoUsuarios,
   validarCliente,
@@ -32,7 +33,7 @@ export interface ServicosBase {
   autenticacao: ServicoAutenticacao;
   usuarios: ServicoUsuarios;
   clientes: ServicoCarteira<Cliente>;
-  oportunidades: ServicoCarteira<Oportunidade>;
+  oportunidades: ServicoOportunidades;
   propostas: ServicoPropostas;
   estornos: ServicoLancamentosGestao<Estorno>;
   vales: ServicoLancamentosGestao<Vale>;
@@ -67,11 +68,12 @@ export function montarServicosBase(
   r: RepositoriosBase,
   catalogosPadrao: Record<TipoCatalogo, string[]>,
 ): ServicosBase {
+  const usuarios = new ServicoUsuarios(r.usuarios, r.auth);
   return {
     autenticacao: new ServicoAutenticacao(r.auth, r.usuarios),
-    usuarios: new ServicoUsuarios(r.usuarios, r.auth),
+    usuarios,
     clientes: new ServicoCarteira<Cliente>(r.clientes, validarCliente),
-    oportunidades: new ServicoCarteira<Oportunidade>(r.oportunidades, validarOportunidade),
+    oportunidades: new ServicoOportunidades(r.oportunidades, validarOportunidade, () => usuarios.listar()),
     propostas: new ServicoPropostas(r.propostas),
     estornos: new ServicoLancamentosGestao<Estorno>(r.estornos, validarEstorno),
     vales: new ServicoLancamentosGestao<Vale>(r.vales, validarVale),

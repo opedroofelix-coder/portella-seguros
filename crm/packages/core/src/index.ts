@@ -13,6 +13,7 @@ export * from './domain/usuario';
 export * from './application/autenticacao';
 export * from './application/carteira';
 export * from './application/catalogos';
+export * from './application/oportunidades';
 export * from './application/propostas';
 export * from './application/importacao';
 export * from './application/permissoes';

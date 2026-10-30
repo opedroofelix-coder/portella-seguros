@@ -5,6 +5,7 @@ import { criarImportacao } from '../application/importacao';
 import type { ServicosSeguros } from '../application/servicos';
 import { RAMOS } from '../domain/catalogo';
 import { ApolicesDoCliente } from './componentes/ApolicesDoCliente';
+import { CadastrarApolice } from './componentes/CadastrarApolice';
 import { PaginaApolices } from './paginas/Apolices';
 import { PaginaFinanceiro } from './paginas/Financeiro';
 import { PaginaPainel } from './paginas/Painel';
@@ -61,7 +62,15 @@ export function App({
       MENU_COMUM.importar,
       MENU_COMUM.conta,
     ],
+    propostaPagamento: true,
+    acoesProposta: (proposta) => <CadastrarApolice proposta={proposta} />,
     catalogosExtras: [
+      {
+        tipo: 'origensLead',
+        titulo: 'Origens dos leads',
+        descricao:
+          'Nas cotações e no cadastro do cliente: por onde o contato chegou (Instagram, Google, indicação…). "Indicação" pede o nome de quem indicou.',
+      },
       {
         tipo: 'origensRecebimento',
         titulo: 'Origens de recebimento',
