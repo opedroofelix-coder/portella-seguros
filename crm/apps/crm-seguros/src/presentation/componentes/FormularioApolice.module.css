@@ -77,17 +77,23 @@
   .linhaParcela {
     grid-template-columns: 44px minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) auto auto;
   }
-  .linhaParcela .descricao {
-    grid-column: span 2;
-  }
+  /* Número da parcela e "Pago" centralizados na altura dos campos da linha. */
   .numeroParcela {
     grid-column: auto;
-    padding-bottom: 14px;
+    display: flex;
+    align-items: center;
+    min-height: var(--touch);
   }
   .linhaOcorrencia {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto;
   }
   .atuacao {
     grid-column: auto;
+  }
+}
+@media (min-width: 720px) and (pointer: fine) {
+  .linhaParcela .numeroParcela,
+  .pago {
+    min-height: var(--campo-altura, 40px);
   }
 }

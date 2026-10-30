@@ -735,7 +735,7 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                     {refinada ? (
                       <p className={styles.saldoDepois} aria-live="polite">
                         <span>Saldo depois</span>
-                        {formatarDinheiro(saldosDepois[i] ?? 0)}
+                        <strong>{formatarDinheiro(saldosDepois[i] ?? 0)}</strong>
                       </p>
                     ) : (
                       <Campo rotulo="Parcela">

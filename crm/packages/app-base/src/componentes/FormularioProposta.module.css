@@ -44,10 +44,14 @@
   }
 }
 .previa {
+  /* Mesma altura do campo ao lado, com o texto centralizado nele. */
+  display: flex;
+  align-items: center;
+  min-height: var(--touch);
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
   color: var(--sucesso);
-  padding-bottom: 12px;
 }
 .resumo {
   grid-column: 1 / -1;
@@ -141,17 +145,33 @@
   color: var(--perigo);
 }
 .saldoDepois {
+  /* Lido como um campo: rótulo igual aos outros e o valor na altura do campo, alinhado com Data e Valor. */
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   margin: 0;
-  padding-bottom: 12px;
   font-size: 14px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .saldoDepois span {
-  font-size: var(--rotulo-tamanho, 12px);
-  font-weight: 500;
+  padding-left: var(--campo-rotulo-recuo, 0);
+  font-size: var(--campo-rotulo-tamanho, 11px);
+  font-weight: var(--campo-rotulo-peso, 600);
+  letter-spacing: var(--campo-rotulo-espaco, 0.06em);
+  text-transform: var(--campo-rotulo-caixa, uppercase);
   color: var(--texto-suave);
+}
+.saldoDepois strong {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding-left: var(--campo-rotulo-recuo, 0);
+  font-weight: 600;
+}
+@media (min-width: 720px) and (pointer: fine) {
+  .previa,
+  .saldoDepois strong {
+    min-height: var(--campo-altura, 40px);
+  }
 }
