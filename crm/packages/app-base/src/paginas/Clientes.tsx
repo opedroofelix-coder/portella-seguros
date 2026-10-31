@@ -360,7 +360,7 @@ function PropostasDoCliente({ cliente }: { cliente: Cliente }) {
             titulo: 'Situação',
             render: (p) => (
               <Selo tom={p.status === 'pendente' ? 'alerta' : 'sucesso'}>
-                {p.status === 'pendente' ? 'Aguardando aprovação' : 'Aprovada'}
+                {p.status === 'pendente' ? 'Em aprovação' : 'Aprovada'}
               </Selo>
             ),
           },

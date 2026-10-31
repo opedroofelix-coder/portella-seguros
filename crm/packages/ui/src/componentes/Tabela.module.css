@@ -1,29 +1,11 @@
 .envoltorio {
   width: 100%;
+  container-type: inline-size;
 }
-/* Desktop: se as colunas não couberem, só a tabela rola, nunca a página. */
+/* Rede de segurança: se ainda assim algo passar da borda, só a tabela rola, nunca a página. */
 @media (min-width: 900px) {
   .envoltorio {
     overflow-x: auto;
-  }
-  /* Colunas além da borda: esmaece o lado que continua, para não parecer que a tabela foi cortada. */
-  .envoltorio[data-rola-direita] {
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 56px), transparent);
-    mask-image: linear-gradient(to right, #000 calc(100% - 56px), transparent);
-  }
-  .envoltorio[data-rola-esquerda] {
-    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 56px), transparent);
-    mask-image: linear-gradient(to left, #000 calc(100% - 56px), transparent);
-  }
-  .envoltorio[data-rola-esquerda][data-rola-direita] {
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent,
-      #000 56px,
-      #000 calc(100% - 56px),
-      transparent
-    );
-    mask-image: linear-gradient(to right, transparent, #000 56px, #000 calc(100% - 56px), transparent);
   }
 }
 .tabela {
@@ -32,7 +14,7 @@
   font-size: 14px;
 }
 .tabela th {
-  padding: 9px 12px;
+  padding: 9px 10px;
   text-align: left;
   font-size: var(--tabela-cab-tamanho, 11.5px);
   font-weight: var(--tabela-cab-peso, 600);
@@ -41,7 +23,15 @@
   color: var(--texto-suave);
   background: var(--tabela-cab-fundo, var(--superficie-2));
   border-bottom: var(--tabela-cabecalho-fio, 1px solid var(--borda));
-  white-space: nowrap;
+  vertical-align: bottom;
+}
+.tabela th:first-child,
+.tabela td:first-child {
+  padding-left: 12px;
+}
+.tabela th:last-child,
+.tabela td:last-child {
+  padding-right: 12px;
 }
 .tabela th:first-child {
   border-radius: min(7px, var(--raio-max, 7px)) 0 0 0;
@@ -50,7 +40,7 @@
   border-radius: 0 min(7px, var(--raio-max, 7px)) 0 0;
 }
 .tabela td {
-  padding: 10px 12px;
+  padding: 10px 10px;
   border-bottom: 1px solid var(--borda);
   vertical-align: middle;
   font-variant-numeric: tabular-nums;
@@ -73,89 +63,91 @@
 }
 
 /* A coluna principal (nome) não fica espremida em três linhas. */
-@media (min-width: 900px) {
-  .tabela td.principal {
-    min-width: 11em;
-    font-weight: 500;
-  }
+.tabela td.principal {
+  min-width: 11em;
+  font-weight: 500;
 }
 
-/* Celular e tablet: cada linha vira um cartão com rótulo e valor. */
+/* Cartões (celular, tablet ou colunas que não cabem): cada linha vira um cartão com rótulo e valor. */
+.cartoes .tabela thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.cartoes .tabela,
+.cartoes .tabela tbody,
+.cartoes .tabela tr,
+.cartoes .tabela td {
+  display: block;
+  width: 100%;
+}
+.cartoes .tabela tbody {
+  display: grid;
+  gap: 10px;
+}
+.cartoes .tabela tr {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-left: var(--tabela-cartao-faixa, 3px solid var(--destaque));
+  border-radius: min(10px, var(--raio-max, 10px));
+  box-shadow: var(--sombra);
+}
+.cartoes .tabela td {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+  border: 0;
+  text-align: right;
+  min-width: 0;
+}
+.cartoes .tabela td::before {
+  content: attr(data-rotulo);
+  /* Rótulos longos quebram linha em vez de empurrar o valor para fora do cartão. */
+  flex: 0 1 auto;
+  max-width: 55%;
+  font-size: var(--tabela-cartao-rotulo-tamanho, 10.5px);
+  font-weight: 600;
+  letter-spacing: var(--tabela-cab-espaco, 0.08em);
+  text-transform: var(--tabela-cab-caixa, uppercase);
+  color: var(--texto-fraco);
+  text-align: left;
+}
+.cartoes .tabela td > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cartoes .tabela td.principal {
+  display: block;
+  min-width: 0;
+  text-align: left;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 17px;
+  padding-bottom: 8px;
+}
+.cartoes .tabela td.principal::before {
+  content: none;
+}
+/* Só o celular esconde as colunas secundárias; no computador o cartão mostra tudo. */
 @media (max-width: 899px) {
-  .tabela thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
-  .tabela,
-  .tabela tbody,
-  .tabela tr,
-  .tabela td {
-    display: block;
-    width: 100%;
-  }
-  .tabela tbody {
-    display: grid;
-    gap: 10px;
-  }
-  .tabela tr {
-    margin: 0;
-    padding: 12px 14px;
-    background: var(--superficie);
-    border: 1px solid var(--borda);
-    border-left: var(--tabela-cartao-faixa, 3px solid var(--destaque));
-    border-radius: min(10px, var(--raio-max, 10px));
-    box-shadow: var(--sombra);
-  }
-  .tabela td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 5px 0;
-    border: 0;
-    text-align: right;
-    min-width: 0;
-  }
-  .tabela td::before {
-    content: attr(data-rotulo);
-    /* Rótulos longos quebram linha em vez de empurrar o valor para fora do cartão. */
-    flex: 0 1 auto;
-    max-width: 55%;
-    font-size: var(--tabela-cartao-rotulo-tamanho, 10.5px);
-    font-weight: 600;
-    letter-spacing: var(--tabela-cab-espaco, 0.08em);
-    text-transform: var(--tabela-cab-caixa, uppercase);
-    color: var(--texto-fraco);
-    text-align: left;
-  }
-  .tabela td > * {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
-  .tabela td.principal {
-    display: block;
-    text-align: left;
-    font-family: var(--serif);
-    font-weight: 500;
-    font-size: 17px;
-    padding-bottom: 8px;
-  }
-  .tabela td.principal::before {
-    content: none;
-  }
-  .ocultarMobile {
+  .cartoes .ocultarMobile {
     display: none !important;
   }
-  .direita {
-    text-align: right !important;
+}
+@container (min-width: 640px) {
+  .cartoes .tabela tbody {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@media (min-width: 720px) and (max-width: 899px) {
-  .tabela tbody {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@container (min-width: 1100px) {
+  .cartoes .tabela tbody {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -193,23 +185,25 @@
   border-top: 1px solid var(--destaque-fio);
   border-bottom: 0;
 }
-@media (max-width: 899px) {
-  /* Os cabeçalhos ficam escondidos nos cartões: o botão de ordenar não recebe foco invisível. */
-  .ordenar {
-    visibility: hidden;
-  }
-  .tabela tfoot,
-  .tabela .totais {
-    display: block;
-  }
-  .tabela .totais {
-    margin-top: 10px;
-    padding: 12px 14px;
-    border: 1px solid var(--destaque-fio);
-    border-radius: min(10px, var(--raio-max, 10px));
-    background: var(--destaque-fundo);
-  }
-  .tabela .totais td:first-child::before {
-    content: none;
-  }
+/* Os cabeçalhos ficam escondidos nos cartões: o botão de ordenar não recebe foco invisível. */
+.cartoes .ordenar {
+  visibility: hidden;
+}
+.cartoes .tabela tfoot,
+.cartoes .tabela .totais {
+  display: block;
+}
+.cartoes .tabela .totais {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--destaque-fio);
+  border-radius: min(10px, var(--raio-max, 10px));
+  background: var(--destaque-fundo);
+}
+.cartoes .tabela .totais td:first-child::before {
+  content: none;
+}
+/* Na linha de totais em cartão, só as colunas que têm total. */
+.cartoes .tabela .totais td.semTotal {
+  display: none;
 }

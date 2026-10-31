@@ -164,9 +164,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(form.getByText('Soma dos produtores').locator('..')).toContainText('30%');
     await page.getByRole('button', { name: 'Enviar para aprovação' }).click();
     await expect(page.getByText('Proposta enviada para aprovação.')).toBeVisible();
-    await expect(page.getByRole('row', { name: /Cliente Teste Proposta/ })).toContainText(
-      'Aguardando aprovação',
-    );
+    await expect(page.getByRole('row', { name: /Cliente Teste Proposta/ })).toContainText('Em aprovação');
     await sair(page);
 
     // Administradora: aviso no painel e contador no menu; dá a baixa e aprova
