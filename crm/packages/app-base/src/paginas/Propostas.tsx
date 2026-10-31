@@ -107,7 +107,10 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
     refinada ? (a: Proposta, b: Proposta) => cmp(f(a), f(b)) : undefined;
   const texto = (a: string, b: string) => a.localeCompare(b, 'pt-BR');
   const num = (a: number, b: number) => a - b;
-  const colunas: Coluna<Proposta>[] = [
+  // Em Aprovações todas estão aguardando e nada foi recebido ainda: Situação, Recebido e Saldo
+  // só repetiriam a mesma coisa em cada linha (e empurravam o botão Aprovar para fora da tela).
+  const soNaLista = new Set(somentePendentes ? ['recebido', 'saldo', 'status'] : []);
+  const todas: Coluna<Proposta>[] = [
     {
       chave: 'cliente',
       titulo: 'Cliente',
@@ -198,7 +201,7 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
         refinada ? (
           // Um selo só: "Saldo a receber" e "Quitada" já são de propostas aprovadas.
           p.status === 'pendente' ? (
-            <Selo tom="alerta">Aguardando aprovação</Selo>
+            <Selo tom="alerta">Em aprovação</Selo>
           ) : !gestao ? (
             <Selo tom="sucesso">{ROTULO_STATUS_PROPOSTA.aprovada}</Selo>
           ) : saldoReceber(p) > 0 ? (
@@ -234,6 +237,7 @@ export function PaginaPropostas({ somentePendentes = false }: { somentePendentes
         ]
       : []),
   ];
+  const colunas = todas.filter((c) => !soNaLista.has(c.chave));
 
   const somar = (f: (p: Proposta) => number) => formatarDinheiro(lista.reduce((t, p) => t + f(p), 0));
   const totais = refinada

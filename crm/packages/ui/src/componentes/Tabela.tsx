@@ -1,5 +1,5 @@
 import type { KeyboardEvent, MouseEvent, ReactNode } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Botao } from './Botao';
 import { EstadoVazio } from './Cartao';
 import { useInterface } from './Interface';
@@ -32,8 +32,10 @@ export interface TabelaProps<T> {
 }
 
 const INTERATIVOS = 'a, button, input, select, textarea, label, [role="button"]';
+const telaEstreita = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(max-width: 899px)').matches === true;
 
-/** Tabela no desktop e lista de cartões no celular, com paginação simples. */
+/** Tabela no desktop e lista de cartões no celular (ou quando não cabe), com paginação simples. */
 export function Tabela<T>({
   itens,
   colunas,
@@ -58,27 +60,39 @@ export function Tabela<T>({
     if (refinada) setPagina(0);
   }, [itens, refinada]);
 
-  // Quando as colunas não cabem, a borda do lado que ainda tem conteúdo esmaece: mostra que dá para rolar.
+  // Tabela no computador; cartões no celular e também quando as colunas não cabem na largura
+  // disponível (notebook com menu lateral, quadro estreito): nada fica cortado nem escondido à direita.
   const envoltorio = useRef<HTMLDivElement>(null);
-  const [rola, setRola] = useState({ esquerda: false, direita: false });
+  const [cartoes, setCartoes] = useState(telaEstreita);
+  const precisa = useRef(0);
+  const [versao, medir] = useState(0);
   const temItens = itens.length > 0;
-  useEffect(() => {
+  // Lista nova (filtro, busca): as colunas podem caber de novo, então tenta a tabela outra vez.
+  useLayoutEffect(() => {
+    if (!telaEstreita()) precisa.current = 0;
+  }, [itens]);
+  useLayoutEffect(() => {
     const el = envoltorio.current;
     if (!el) return;
-    const medir = () => {
-      const esquerda = el.scrollLeft > 4;
-      const direita = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
-      setRola((r) => (r.esquerda === esquerda && r.direita === direita ? r : { esquerda, direita }));
-    };
-    medir();
-    el.addEventListener('scroll', medir, { passive: true });
-    const observador = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(medir);
-    observador?.observe(el);
-    if (el.firstElementChild) observador?.observe(el.firstElementChild);
-    return () => {
-      el.removeEventListener('scroll', medir);
-      observador?.disconnect();
-    };
+    if (telaEstreita()) {
+      if (!cartoes) setCartoes(true);
+    } else if (!cartoes) {
+      if (el.scrollWidth > el.clientWidth + 1) {
+        precisa.current = el.scrollWidth;
+        setCartoes(true);
+      }
+    } else if (el.clientWidth >= precisa.current) {
+      setCartoes(false);
+    }
+  }, [cartoes, versao, itens, pagina]);
+  // Mudou a largura da tela, do quadro ou das colunas (fonte carregada, outra página): mede de novo.
+  useEffect(() => {
+    const el = envoltorio.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const observador = new ResizeObserver(() => medir((n) => n + 1));
+    observador.observe(el);
+    if (el.firstElementChild) observador.observe(el.firstElementChild);
+    return () => observador.disconnect();
   }, [temItens]);
 
   const ordenados = useMemo(() => {
@@ -106,9 +120,8 @@ export function Tabela<T>({
   return (
     <div
       ref={envoltorio}
-      className={styles.envoltorio}
-      data-rola-esquerda={rola.esquerda || undefined}
-      data-rola-direita={rola.direita || undefined}
+      className={`${styles.envoltorio} ${cartoes ? styles.cartoes : ''}`}
+      data-cartoes={cartoes || undefined}
     >
       <table className={styles.tabela} aria-label={rotulo}>
         <thead>
@@ -192,7 +205,7 @@ export function Tabela<T>({
                   className={
                     [
                       c.alinharDireita && styles.direita,
-                      i > 0 && !(c.chave in totais.valores) && styles.ocultarMobile,
+                      i > 0 && !(c.chave in totais.valores) && styles.semTotal,
                     ]
                       .filter(Boolean)
                       .join(' ') || undefined
