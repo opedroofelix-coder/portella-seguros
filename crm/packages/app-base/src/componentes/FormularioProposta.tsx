@@ -25,6 +25,7 @@ import {
   Campo,
   ConfirmarAcao,
   Entrada,
+  Icone,
   Modal,
   Selecao,
   Selo,
@@ -101,6 +102,13 @@ function conversores(ler: (t: string) => number | null) {
 const ORIGINAL = conversores(paraCentavos);
 /** Com a interface refinada, "1.500" é lido como mil e quinhentos (ponto de milhar). */
 const REFINADO = conversores(lerDinheiro);
+/** Sigla do produtor no cartão: iniciais do nome e do sobrenome, ou as duas primeiras letras. */
+const sigla = (nome: string) => {
+  const partes = nome.trim().split(/\s+/).filter(Boolean);
+  return (
+    partes.length > 1 ? partes[0]![0]! + partes.at(-1)![0]! : (partes[0] ?? '').slice(0, 2)
+  ).toUpperCase();
+};
 const textoPct = (n?: number) => (n == null ? '' : String(n).replace('.', ','));
 const OUTRA = '__outra__';
 /** Produtos com veículo: a proposta pede a placa. */
@@ -249,6 +257,27 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
     return Math.max(0, comissaoReceber - acumulado);
   });
   const somaProdutores = v.produtores.reduce((t, x) => t + (numero(x.percentual) ?? 0), 0);
+  const erroProdutores = (formState.errors.produtores as { message?: string } | undefined)?.message;
+  /** Lista de produtores ativos; ao escolher, o repasse vem com o % padrão de quem foi escolhido. */
+  const selecaoProdutor = (i: number, atual: string) => (
+    <Selecao
+      {...register(`produtores.${i}.produtorId`, {
+        onChange: (e) => {
+          const padrao = ativos.find((u) => u.id === e.target.value)?.percentualRepasse;
+          if (padrao != null && !v.produtores[i]?.percentual)
+            setValue(`produtores.${i}.percentual`, textoPct(padrao));
+        },
+      })}
+    >
+      <option value="">Escolha…</option>
+      {ativos.map((u) => (
+        <option key={u.id} value={u.id}>
+          {u.nome}
+        </option>
+      ))}
+      {atual && !ativos.some((u) => u.id === atual) && <option value={atual}>{nomeDe(atual)}</option>}
+    </Selecao>
+  );
 
   const montar = (valores: Valores): DadosRegistro<Proposta> => {
     const base: DadosRegistro<Proposta> = {
@@ -625,88 +654,139 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
             <section className={styles.bloco} aria-labelledby="titulo-produtores">
               <div className={styles.blocoTitulo}>
                 <h3 id="titulo-produtores">Produtores e repasse</h3>
-                <Botao
-                  pequeno
-                  variante="secundario"
-                  icone="mais"
-                  onClick={() => produtoresCampos.append({ produtorId: '', percentual: '' })}
-                >
-                  {refinada ? 'Adicionar produtor' : 'Produtor'}
-                </Botao>
+                {refinada ? (
+                  // Divisão da comissão: o que vai para os produtores e o que fica com a corretora.
+                  <p
+                    className={`${styles.divisao} ${somaProdutores > 100 || erroProdutores ? styles.excedeu : ''}`}
+                    role={erroProdutores ? 'alert' : undefined}
+                  >
+                    {erroProdutores ??
+                      (somaProdutores > 100 ? (
+                        `Os produtores somam ${somaProdutores.toLocaleString('pt-BR')}%: o máximo é 100%.`
+                      ) : (
+                        <>
+                          Produtores {somaProdutores.toLocaleString('pt-BR')}% · Corretora{' '}
+                          <strong>
+                            {(100 - somaProdutores).toLocaleString('pt-BR')}% ·{' '}
+                            {formatarDinheiro(
+                              comissaoReceber - repassePrevisto({ comissaoReceber }, somaProdutores),
+                            )}
+                          </strong>
+                        </>
+                      ))}
+                  </p>
+                ) : (
+                  <Botao
+                    pequeno
+                    variante="secundario"
+                    icone="mais"
+                    onClick={() => produtoresCampos.append({ produtorId: '', percentual: '' })}
+                  >
+                    Produtor
+                  </Botao>
+                )}
               </div>
               {!produtoresCampos.fields.length && (
                 <p className="texto-suave" style={{ margin: 0 }}>
                   Sem produtor: venda da corretora, sem repasse.
                 </p>
               )}
-              {produtoresCampos.fields.map((campo, i) => {
-                const pctAtual = numero(v.produtores[i]?.percentual ?? '') ?? 0;
-                return (
-                  <div key={campo.id} className={`${styles.linha} ${styles.linhaProdutor}`}>
-                    <Campo rotulo="Produtor" erro={erros.produtores?.[i]?.produtorId?.message}>
-                      <Selecao
-                        {...register(`produtores.${i}.produtorId`, {
-                          onChange: (e) => {
-                            const padrao = ativos.find((u) => u.id === e.target.value)?.percentualRepasse;
-                            if (padrao != null && !v.produtores[i]?.percentual)
-                              setValue(`produtores.${i}.percentual`, textoPct(padrao));
-                          },
-                        })}
+              {refinada ? (
+                // Opção C (31/10/2026): um cartão por produtor e o "Adicionar produtor" como cartão no fim.
+                <div className={styles.cartoesProdutores}>
+                  {produtoresCampos.fields.map((campo, i) => {
+                    const pctAtual = numero(v.produtores[i]?.percentual ?? '') ?? 0;
+                    const id = v.produtores[i]?.produtorId;
+                    const nome = id ? nomeDe(id) : '';
+                    return (
+                      <article
+                        key={campo.id}
+                        className={styles.cartaoProdutor}
+                        aria-label={nome || `Produtor ${i + 1}`}
                       >
-                        <option value="">Escolha…</option>
-                        {ativos.map((u) => (
-                          <option key={u.id} value={u.id}>
-                            {u.nome}
-                          </option>
-                        ))}
-                        {campo.produtorId && !ativos.some((u) => u.id === campo.produtorId) && (
-                          <option value={campo.produtorId}>{nomeDe(campo.produtorId)}</option>
-                        )}
-                      </Selecao>
-                    </Campo>
-                    <Campo
-                      rotulo={refinada ? 'Repasse' : 'Repasse (%)'}
-                      erro={erros.produtores?.[i]?.percentual?.message}
-                    >
-                      {refinada ? (
-                        <EntradaPercentual {...register(`produtores.${i}.percentual`)} />
-                      ) : (
-                        <Entrada inputMode="decimal" {...register(`produtores.${i}.percentual`)} />
-                      )}
-                    </Campo>
-                    <p
-                      className={`${styles.calculado} ${styles.receber}`}
-                      aria-live={refinada ? undefined : 'polite'}
-                    >
-                      <span>Receberá</span>{' '}
-                      <strong>{formatarDinheiro(repassePrevisto({ comissaoReceber }, pctAtual))}</strong>
-                    </p>
-                    <Botao
-                      variante="fantasma"
-                      soIcone
-                      icone="lixeira"
-                      onClick={() => produtoresCampos.remove(i)}
-                    >{`Remover produtor ${i + 1}`}</Botao>
-                  </div>
-                );
-              })}
-              {refinada
-                ? produtoresCampos.fields.length > 0 && (
-                    <p
-                      className={`${styles.avisoSoma} ${somaProdutores > 100 ? styles.excedeu : ''}`}
-                      role={erros.produtores ? 'alert' : undefined}
-                    >
-                      {(erros.produtores as { message?: string } | undefined)?.message ??
-                        (somaProdutores > 100
-                          ? `Os produtores somam ${somaProdutores.toLocaleString('pt-BR')}%: o máximo é 100%.`
-                          : `Produtores: ${somaProdutores.toLocaleString('pt-BR')}% · corretora: ${(100 - somaProdutores).toLocaleString('pt-BR')}%`)}
-                    </p>
-                  )
-                : (erros.produtores as { message?: string } | undefined)?.message && (
+                        <div className={styles.cartaoTopo}>
+                          <span
+                            className={styles.sigla}
+                            data-tom={i % 2 ? 'dourado' : 'marinho'}
+                            aria-hidden="true"
+                          >
+                            {nome ? sigla(nome) : <Icone nome="usuarios" tamanho={16} />}
+                          </span>
+                          <Campo
+                            rotulo="Produtor"
+                            className={styles.semRotulo}
+                            erro={erros.produtores?.[i]?.produtorId?.message}
+                          >
+                            {selecaoProdutor(i, campo.produtorId)}
+                          </Campo>
+                          <Botao
+                            variante="fantasma"
+                            soIcone
+                            icone="lixeira"
+                            onClick={() => produtoresCampos.remove(i)}
+                          >
+                            {`Remover produtor ${i + 1}`}
+                          </Botao>
+                        </div>
+                        <div className={styles.cartaoBase}>
+                          <Campo
+                            rotulo="Repasse"
+                            className={styles.repasseCartao}
+                            erro={erros.produtores?.[i]?.percentual?.message}
+                          >
+                            <EntradaPercentual {...register(`produtores.${i}.percentual`)} />
+                          </Campo>
+                          <p className={styles.receberCartao}>
+                            <span>Receberá</span>{' '}
+                            <strong>
+                              {formatarDinheiro(repassePrevisto({ comissaoReceber }, pctAtual))}
+                            </strong>
+                          </p>
+                        </div>
+                      </article>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    className={styles.adicionarCartao}
+                    onClick={() => produtoresCampos.append({ produtorId: '', percentual: '' })}
+                  >
+                    <Icone nome="mais" tamanho={22} />
+                    Adicionar produtor
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {produtoresCampos.fields.map((campo, i) => {
+                    const pctAtual = numero(v.produtores[i]?.percentual ?? '') ?? 0;
+                    return (
+                      <div key={campo.id} className={`${styles.linha} ${styles.linhaProdutor}`}>
+                        <Campo rotulo="Produtor" erro={erros.produtores?.[i]?.produtorId?.message}>
+                          {selecaoProdutor(i, campo.produtorId)}
+                        </Campo>
+                        <Campo rotulo="Repasse (%)" erro={erros.produtores?.[i]?.percentual?.message}>
+                          <Entrada inputMode="decimal" {...register(`produtores.${i}.percentual`)} />
+                        </Campo>
+                        <p className={`${styles.calculado} ${styles.receber}`} aria-live="polite">
+                          <span>Receberá</span>{' '}
+                          <strong>{formatarDinheiro(repassePrevisto({ comissaoReceber }, pctAtual))}</strong>
+                        </p>
+                        <Botao
+                          variante="fantasma"
+                          soIcone
+                          icone="lixeira"
+                          onClick={() => produtoresCampos.remove(i)}
+                        >{`Remover produtor ${i + 1}`}</Botao>
+                      </div>
+                    );
+                  })}
+                  {erroProdutores && (
                     <p className="texto-suave" role="alert">
-                      {(erros.produtores as { message?: string }).message}
+                      {erroProdutores}
                     </p>
                   )}
+                </>
+              )}
             </section>
 
             {gestao && (
