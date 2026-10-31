@@ -31,7 +31,7 @@ import {
   useAvisos,
 } from '@portella/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useConfig, useRefinada } from '../config';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -200,9 +200,33 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
   const recebimentosCampos = useFieldArray({ control, name: 'recebimentos' });
   const v = watch();
 
-  // Comissão a receber: o valor digitado, ou prêmio × % quando o campo fica em branco.
+  // Comissão a receber: o campo já vem com prêmio × % e acompanha quando o prêmio ou a % mudam.
+  // Quem digita outro valor (o combinado com a seguradora) fica com o dele; apagar volta ao cálculo.
   const calculada = comissaoCalculada(centavos(v.premioLiquido), numero(v.comissaoPercentual));
   const comissaoReceber = centavos(v.comissaoReceber) ?? calculada ?? 0;
+  const [comissaoManual, setComissaoManual] = useState(
+    () =>
+      proposta?.comissaoReceber != null &&
+      proposta.comissaoReceber !== comissaoCalculada(proposta.premioLiquido, proposta.comissaoPercentual),
+  );
+  const formatar = refinada ? textoDinheiro : centavosParaTexto;
+  useEffect(() => {
+    if (!comissaoManual && !somenteLeitura) setValue('comissaoReceber', formatar(calculada));
+  }, [calculada, comissaoManual, somenteLeitura, formatar, setValue]);
+  const campoComissao = register('comissaoReceber', {
+    // Campo vazio enquanto se digita não é preenchido de novo; só ao sair dele.
+    onChange: (e: { target: { value: string } }) =>
+      setComissaoManual(!e.target.value.trim() || centavos(e.target.value) !== calculada),
+    onBlur: (e: { target: { value: string } }) => {
+      if (!e.target.value.trim()) setComissaoManual(false);
+    },
+  });
+  const dicaComissao =
+    calculada == null
+      ? 'Prêmio × % ou o valor combinado.'
+      : comissaoManual && centavos(v.comissaoReceber) != null
+        ? `Valor combinado. Pelo prêmio × % seria ${formatarDinheiro(calculada)}.`
+        : 'Prêmio × %. Se o combinado for outro valor, é só trocar.';
   const previa: Pick<Proposta, 'comissaoReceber' | 'recebimentos' | 'premioLiquido' | 'percentualVitalicio'> =
     {
       comissaoReceber,
@@ -554,16 +578,8 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                 >
                   <EntradaPercentual placeholder="Ex.: 15" {...register('comissaoPercentual')} />
                 </Campo>
-                <Campo
-                  rotulo="Comissão a receber"
-                  erro={erros.comissaoReceber?.message}
-                  dica={
-                    calculada != null
-                      ? `Deixe em branco para usar ${formatarDinheiro(calculada)} (prêmio × %).`
-                      : 'Prêmio × % ou o valor combinado.'
-                  }
-                >
-                  <EntradaDinheiro placeholder="calculada" {...register('comissaoReceber')} />
+                <Campo rotulo="Comissão a receber" erro={erros.comissaoReceber?.message} dica={dicaComissao}>
+                  <EntradaDinheiro {...campoComissao} />
                 </Campo>
               </>
             ) : (
@@ -581,17 +597,9 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                 <Campo
                   rotulo="Comissão a receber (R$)"
                   erro={erros.comissaoReceber?.message}
-                  dica={
-                    calculada != null
-                      ? `Em branco: ${formatarDinheiro(calculada)} (prêmio × %).`
-                      : 'Prêmio × % ou o valor combinado.'
-                  }
+                  dica={dicaComissao}
                 >
-                  <Entrada
-                    inputMode="decimal"
-                    placeholder={calculada != null ? centavosParaTexto(calculada) : '0,00'}
-                    {...register('comissaoReceber')}
-                  />
+                  <Entrada inputMode="decimal" placeholder="0,00" {...campoComissao} />
                 </Campo>
               </>
             )}

@@ -160,6 +160,16 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(form.getByLabel('Regra de recebimento')).toHaveCount(0);
     await form.getByLabel('Prêmio líquido').fill('1.000');
     await form.getByLabel('Comissão trabalhada').fill('20');
+    // A comissão a receber vem preenchida (prêmio × %); um valor combinado fica; apagar volta ao cálculo.
+    const aReceber = form.getByLabel('Comissão a receber');
+    await expect(aReceber).toHaveValue('200,00');
+    await aReceber.fill('180');
+    await aReceber.blur();
+    await expect(aReceber).toHaveValue('180,00');
+    await expect(form.getByText('Valor combinado. Pelo prêmio × % seria R$ 200,00.')).toBeVisible();
+    await aReceber.fill('');
+    await aReceber.blur();
+    await expect(aReceber).toHaveValue('200,00');
     await expect(form.getByText('Receberá R$ 60,00')).toBeVisible();
     await expect(form.getByText('Soma dos produtores').locator('..')).toContainText('30%');
     await page.getByRole('button', { name: 'Enviar para aprovação' }).click();
