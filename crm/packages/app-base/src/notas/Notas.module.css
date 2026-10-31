@@ -167,6 +167,7 @@
   grid-column: 1 / -1;
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
 }
 
 /* Botão da gaveta no topo e a gaveta */

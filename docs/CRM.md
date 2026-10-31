@@ -191,12 +191,16 @@ Regras extras:
 - O produtor não vê a comissão da corretora: no lugar dela aparecem as cotações em aberto.
 
 **Mural da equipe e bloco de notas** (reunião de 30/10/2026)
-- **Administração e gestão**: o Painel abre com o mural, em três quadros:
+- **Administração e gestão**: o Painel abre com o mural, em três quadros que começam **fechados** (só o
+  título, um resumo como "2 em aberto · 3 enviados" e o número em destaque) e abrem para baixo com um clique;
+  o navegador lembra quais ficaram abertos:
   - **Pendências do CRM**, que aparecem sozinhas e somem quando resolvidas: parcelas de apólice vencidas
     sem a data da consulta nem "pago" (falta conferir a baixa), propostas aguardando aprovação (no lugar do
     aviso que ficava no topo), renovações dos próximos 15 dias (quantas ainda sem contato) e cotações sem
     movimento há 7 dias ou mais. Cada uma leva à tela correspondente.
-  - **Recados da equipe**: recado para um produtor ou para toda a equipe, com prazo opcional; mostra quem
+  - **Recados da equipe**: a lista dos recados enviados; o formulário fica recolhido atrás do botão
+    **Novo recado** e recolhe de novo depois de enviar. Recado para um produtor ou para toda a equipe, com
+    prazo opcional; mostra quem
     já fez ("Em aberto", "Feito", "Feito por Gisele, Mary", "Feito por todos") e pode ser apagado.
   - **Meu checklist**: lista pessoal (digitar e Enter; marcar; "Ver feitas"; "Limpar feitas").
 - **Produtor**: botão **Notas** no topo (no celular, só o ícone; no computador com menu lateral, no rodapé

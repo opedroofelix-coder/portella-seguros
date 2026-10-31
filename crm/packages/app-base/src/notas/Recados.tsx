@@ -3,7 +3,7 @@ import { diasEntre, formatarData, hojeISO, PARA_TODOS, recadoFeitoPor, recadoPar
 import { AreaTexto, Botao, Campo, ConfirmarAcao, Entrada, Selecao, useAvisos } from '@portella/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { FormEvent } from 'react';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { mensagemErro } from '../erros';
 import { useEquipe } from '../hooks/dados';
 import { useServicos } from '../servicos';
@@ -106,9 +106,25 @@ function situacao(r: Recado, nomeDe: (id: string) => string, equipeAtiva: number
   return `Feito por ${quem.map((id) => nomeDe(id).split(' ')[0]).join(', ')}`;
 }
 
+/** O recado já foi feito por quem recebeu (num recado para todos, por toda a equipe ativa)? */
+const recadoConcluido = (r: Recado, equipeAtiva: number) =>
+  r.para === PARA_TODOS ? Object.keys(r.feitos ?? {}).length >= equipeAtiva : recadoFeitoPor(r, r.para);
+
+/** Para o resumo do mural: recados enviados e quantos ainda estão em aberto. */
+export function useResumoRecados() {
+  const usuario = useUsuario();
+  const { equipe } = useEquipe();
+  const { data: recados = [] } = useRecados();
+  const equipeAtiva = equipe.filter((u) => u.ativo && u.id !== usuario.id).length;
+  return {
+    total: recados.length,
+    emAberto: recados.filter((r) => !recadoConcluido(r, equipeAtiva)).length,
+  };
+}
+
 /**
- * Recados da administração para a equipe: escrever (para uma pessoa ou para todos, com prazo),
- * acompanhar quem já fez e apagar.
+ * Recados da administração para a equipe: a lista com quem já fez (e apagar) e, ao clicar em
+ * "Novo recado", o formulário para escrever para uma pessoa ou para todos, com prazo.
  */
 export function RecadosEquipe() {
   const { recados: servico } = useServicos();
@@ -121,6 +137,8 @@ export function RecadosEquipe() {
   const [para, setPara] = useState(PARA_TODOS);
   const [prazo, setPrazo] = useState('');
   const [apagando, setApagando] = useState<Recado | null>(null);
+  const [escrevendo, setEscrevendo] = useState(false);
+  const idFormulario = useId();
   const ativos = useMemo(() => equipe.filter((u) => u.ativo && u.id !== usuario.id), [equipe, usuario.id]);
   const atualizar = () => consultas.invalidateQueries({ queryKey: ['recados'] });
 
@@ -129,6 +147,7 @@ export function RecadosEquipe() {
     onSuccess: async () => {
       setTexto('');
       setPrazo('');
+      setEscrevendo(false);
       await atualizar();
       avisar(
         para === PARA_TODOS ? 'Recado enviado para toda a equipe.' : `Recado enviado para ${nomeDe(para)}.`,
@@ -151,8 +170,7 @@ export function RecadosEquipe() {
     if (texto.trim()) enviar.mutate();
   };
   // Em aberto primeiro (pelo prazo), depois os já feitos.
-  const feitoTotal = (r: Recado) =>
-    r.para === PARA_TODOS ? Object.keys(r.feitos ?? {}).length >= ativos.length : recadoFeitoPor(r, r.para);
+  const feitoTotal = (r: Recado) => recadoConcluido(r, ativos.length);
   const ordenados = [...recados].sort(
     (a, b) =>
       Number(feitoTotal(a)) - Number(feitoTotal(b)) ||
@@ -162,41 +180,61 @@ export function RecadosEquipe() {
 
   return (
     <div className={styles.secao}>
-      <form className={styles.novoRecado} onSubmit={aoEnviar}>
-        <Campo rotulo="Novo recado">
-          <AreaTexto
-            rows={2}
-            maxLength={500}
-            placeholder="Ex.: ligar para a cliente sobre a 2ª parcela"
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-          />
-        </Campo>
-        <Campo rotulo="Para">
-          <Selecao value={para} onChange={(e) => setPara(e.target.value)}>
-            <option value={PARA_TODOS}>Toda a equipe</option>
-            {ativos.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.nome}
-              </option>
-            ))}
-          </Selecao>
-        </Campo>
-        <Campo rotulo="Prazo (opcional)">
-          <Entrada type="date" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
-        </Campo>
-        <div className={styles.novoRecadoAcoes}>
+      {!escrevendo && (
+        <div>
           <Botao
-            type="submit"
             variante="secundario"
+            pequeno
             icone="mais"
-            carregando={enviar.isPending}
-            disabled={!texto.trim()}
+            aria-expanded={false}
+            aria-controls={idFormulario}
+            onClick={() => setEscrevendo(true)}
           >
-            Enviar recado
+            Novo recado
           </Botao>
         </div>
-      </form>
+      )}
+      {escrevendo && (
+        <form id={idFormulario} className={styles.novoRecado} onSubmit={aoEnviar}>
+          <Campo rotulo="Texto do recado">
+            <AreaTexto
+              autoFocus
+              rows={2}
+              maxLength={500}
+              placeholder="Ex.: ligar para a cliente sobre a 2ª parcela"
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+            />
+          </Campo>
+          <Campo rotulo="Para">
+            <Selecao value={para} onChange={(e) => setPara(e.target.value)}>
+              <option value={PARA_TODOS}>Toda a equipe</option>
+              {ativos.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nome}
+                </option>
+              ))}
+            </Selecao>
+          </Campo>
+          <Campo rotulo="Prazo (opcional)">
+            <Entrada type="date" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
+          </Campo>
+          <div className={styles.novoRecadoAcoes}>
+            <Botao variante="fantasma" onClick={() => setEscrevendo(false)}>
+              Cancelar
+            </Botao>
+            <Botao
+              type="submit"
+              variante="secundario"
+              icone="mais"
+              carregando={enviar.isPending}
+              disabled={!texto.trim()}
+            >
+              Enviar recado
+            </Botao>
+          </div>
+        </form>
+      )}
       {!isPending && !recados.length && <p className={styles.vazio}>Nenhum recado enviado.</p>}
       {ordenados.length > 0 && (
         <ul className={styles.recados} aria-label="Recados enviados">

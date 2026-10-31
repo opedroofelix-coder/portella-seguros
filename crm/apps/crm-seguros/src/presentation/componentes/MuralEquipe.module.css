@@ -22,14 +22,89 @@
     grid-column: auto;
   }
 }
-.coluna {
+.mural .quadro {
+  min-width: 0;
+  padding: 0;
+}
+.quadroTitulo {
+  margin: 0;
+  font-size: inherit;
+}
+.quadroTitulo button {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.quadroTitulo button:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: -2px;
+}
+.quadroNome {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.quadroNome small {
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: normal;
+  color: var(--texto-suave);
+}
+.selo {
+  flex-shrink: 0;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--destaque-fundo);
+  color: var(--destaque-texto);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.seta {
+  flex-shrink: 0;
+  color: var(--texto-suave);
+  transform: rotate(90deg);
+  transition: transform 0.18s;
+}
+.quadroAberto .seta {
+  transform: rotate(-90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .seta {
+    transition: none;
+  }
+}
+.quadroConteudo {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 0;
+  padding: 0 20px 20px;
+}
+.quadroConteudo[hidden] {
+  display: none;
 }
 .subtitulo {
-  margin: -4px 0 4px;
+  margin: 0;
   font-size: 12.5px;
   color: var(--texto-suave);
 }
