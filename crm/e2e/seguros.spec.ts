@@ -64,6 +64,10 @@ test.describe('CRM Seguros — fluxo completo', () => {
     // R$ 2.000,00 em 3: a sobra de centavos fica na 1ª parcela
     await expect(ap.getByLabel('Valor').first()).toHaveValue('666,68');
     await expect(ap.getByText('Soma das parcelas: R$ 2.000,00 de R$ 2.000,00')).toBeVisible();
+    // Um checklist só para todos os produtos: a data da consulta é uma opção da apólice
+    await expect(ap.getByLabel('Data da consulta', { exact: true })).toHaveCount(0);
+    await ap.getByLabel(/Acompanhar a data da consulta/).check();
+    await expect(ap.getByLabel('Data da consulta', { exact: true })).toHaveCount(3);
     const checklist = page.waitForEvent('download');
     await ap.getByRole('button', { name: 'Checklist (PDF)' }).click();
     expect((await checklist).suggestedFilename()).toMatch(/^checklist-maria-teste.*\.pdf$/);
@@ -305,6 +309,8 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(ap.getByLabel('Nº da proposta')).toHaveValue('P-321');
     await expect(ap.getByLabel('Placa')).toHaveValue('MOT0A12');
     await expect(ap.getByText('Forma de pagamento: Boleto (proposta nº P-321)')).toBeVisible();
+    // Boleto: sem a data da consulta (ela vem marcada só no cartão Porto Seguro)
+    await expect(ap.getByLabel(/Acompanhar a data da consulta/)).not.toBeChecked();
     await ap.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByText('Apólice cadastrada.')).toBeVisible();
     await page.keyboard.press('Escape');

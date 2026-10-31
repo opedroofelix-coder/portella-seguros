@@ -1,7 +1,7 @@
 import type { Cliente, Proposta } from '@portella/core';
 import { describe, expect, it } from 'vitest';
 import type { Apolice } from '../domain/apolice';
-import { montarChecklist, propostaDaApolice, tituloPagamentos } from './checklist';
+import { apoliceDaProposta, montarChecklist, propostaDaApolice, tituloPagamentos } from './checklist';
 
 const base = { responsavelId: 'gisele', criadoEm: '', atualizadoEm: '' };
 const apolice: Apolice = {
@@ -89,5 +89,22 @@ describe('checklist da apólice', () => {
     expect(pagamentos!.linhas[11]![0]).toBe('12ª');
     expect(ocorrencias!.linhas[0]).toEqual(['20/10/2026', 'Cliente pediu 2ª via do boleto', '', '', 'Mary']);
     expect(ocorrencias!.linhas).toHaveLength(10);
+  });
+
+  it('um modelo só: a coluna "Data da consulta" entra quando a apólice acompanha a consulta', () => {
+    const nomeDe = (id: string) => id;
+    // Apólice antiga, sem a opção salva: usa a coluna porque a parcela já tem a data.
+    const comConsulta = montarChecklist(apolice, { nomeDe }).secoes[0]!;
+    expect(comConsulta.colunas).toContain('Data da consulta');
+
+    const sem = montarChecklist({ ...apolice, consultaBaixa: false }, { nomeDe }).secoes[0]!;
+    expect(sem.colunas).toEqual(['Parc.', 'Valor da parcela', 'Data de vencimento', 'Pgto.']);
+    expect(sem.linhas[0]).toEqual(['1ª', { dinheiro: 100000 }, '10/10/2026', 'Pago']);
+    expect(sem.linhas[5]).toEqual(['6ª', '', '', '']);
+
+    // Apólice nova da proposta: ligada no cartão Porto Seguro; nos demais, desligada.
+    expect(apoliceDaProposta(proposta).consultaBaixa).toBe(true);
+    expect(apoliceDaProposta({ ...proposta, formaPagamento: 'Boleto' }).consultaBaixa).toBe(false);
+    expect(apoliceDaProposta({ ...proposta, companhia: 'Allianz' }).consultaBaixa).toBe(false);
   });
 });

@@ -65,6 +65,37 @@
   width: 20px;
   height: 20px;
 }
+/* "Acompanhar a data da consulta": caixa de marcar com a explicação embaixo. */
+.opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: var(--touch, 44px);
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+.opcao input,
+.opcao label {
+  cursor: pointer;
+}
+.opcao input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--primaria);
+}
+.opcao span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.opcao small {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--texto-suave);
+}
 .nota {
   margin: 0;
   font-size: 13px;
@@ -76,6 +107,9 @@
 @media (min-width: 720px) {
   .linhaParcela {
     grid-template-columns: 44px minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) auto auto;
+  }
+  .linhaParcela.semConsulta {
+    grid-template-columns: 44px minmax(0, 1.2fr) minmax(0, 1.2fr) auto auto;
   }
   /* Número da parcela e "Pago" centralizados na altura dos campos da linha. */
   .numeroParcela {

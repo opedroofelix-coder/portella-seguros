@@ -55,6 +55,11 @@ export interface Apolice extends Registro {
   formaPagamento?: string;
   quantidadeParcelas?: number;
   parcelas?: ParcelaApolice[];
+  /**
+   * Acompanha a data da consulta das parcelas (baixa conferida no site da seguradora, como no
+   * cartão Porto Seguro): mostra o campo nas parcelas e a coluna no checklist (31/10/2026).
+   */
+  consultaBaixa?: boolean;
   /** Status: ativa (padrão) ou cancelada, com data e motivo. */
   cancelada?: boolean;
   dataCancelamento?: DataISO;
@@ -66,6 +71,10 @@ export interface Apolice extends Registro {
   motivoNaoRenovacao?: string;
   observacoes?: string;
 }
+
+/** A apólice usa a data da consulta? Nas antigas, sem a opção salva: se alguma parcela já tem a data. */
+export const usaDataConsulta = (a: Pick<Apolice, 'consultaBaixa' | 'parcelas'>) =>
+  a.consultaBaixa ?? (a.parcelas ?? []).some((p) => p.consulta != null);
 
 /** Motivos sugeridos ao marcar "Não renovou". */
 export const MOTIVOS_NAO_RENOVACAO = [

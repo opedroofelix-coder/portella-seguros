@@ -234,7 +234,7 @@ Regras extras:
   apólice, modelo do veículo ou bem segurado, **placa** (Auto e Moto), vigência, **status ativa ou
   cancelada** (cancelada pede data e motivo: falta de pagamento, sinistro, venda do bem, pedido do
   cliente ou outro), prêmio total, quantidade de parcelas, **parcelas** (valor, vencimento, data da
-  consulta e pago) e **ocorrências** (data, descrição, atuação, data do comunicado e responsável).
+  consulta quando a apólice acompanha a consulta, e pago) e **ocorrências** (data, descrição, atuação, data do comunicado e responsável).
 - Saíram do formulário o prêmio líquido, a comissão, a forma de pagamento e o status de renovação (este
   continua só na tela Renovações). A forma de pagamento vem da proposta de mesmo número e aparece na
   apólice e no checklist; nas apólices antigas aparece o texto que já estava salvo.
@@ -245,6 +245,10 @@ Regras extras:
   marcado, corretor, segurado, CPF/CNPJ, vigência, cia, produto, veículo, placa, proposta, apólice, valor
   total, forma de pagamento, parcelas (na Porto com cartão, "Cartão Porto Seguro") e ocorrências, com
   linhas em branco para anotar à mão.
+- **Um checklist só para todos os produtos** (31/10/2026): o normal. O "curto" (`check_Gisele_Porto.xlsx`)
+  virou a opção **Acompanhar a data da consulta** da apólice: marcada, aparece o campo nas parcelas e a
+  coluna "Data da consulta" no checklist. Vem marcada na apólice criada de proposta da Porto paga no
+  cartão; nas apólices antigas, quando alguma parcela já tem a data.
 - Na **proposta aprovada**, o botão **Cadastrar apólice** abre a apólice já preenchida (cliente,
   seguradora, ramo, tipo, nº da proposta, placa e parcelas).
 - Situação calculada pela data: **a iniciar** (início no futuro, como a apólice nova de uma renovação),

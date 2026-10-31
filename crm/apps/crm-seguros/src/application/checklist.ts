@@ -9,7 +9,7 @@ import {
   TIPOS_NEGOCIO,
 } from '@portella/core';
 import type { Apolice } from '../domain/apolice';
-import { formatarPlaca } from '../domain/apolice';
+import { formatarPlaca, usaDataConsulta } from '../domain/apolice';
 import { nomeRamo, nomeSeguradora, RAMOS_VEICULO } from '../domain/catalogo';
 import { identificarRamo, identificarSeguradora } from './importacao';
 
@@ -40,6 +40,9 @@ export function apoliceDaProposta(p: Proposta): Partial<DadosRegistro<Apolice>> 
     numeroProposta: p.numero,
     placa: p.placa,
     quantidadeParcelas: p.quantidadeParcelas,
+    // Cartão Porto Seguro: a baixa demora alguns dias e é conferida no site (data da consulta).
+    consultaBaixa:
+      identificarSeguradora(p.companhia) === 'porto' && /cart[aã]o/i.test(p.formaPagamento ?? ''),
     inicioVigencia: p.data,
     responsavelId: p.responsavelId,
   };
@@ -105,16 +108,18 @@ export function montarChecklist(
       `${formatarData(a.dataCancelamento)}${a.motivoCancelamento ? ` · ${a.motivoCancelamento}` : ''}`,
     ]);
 
+  // Um modelo só para todos os produtos; a coluna "Data da consulta" entra quando a apólice usa.
+  const consulta = usaDataConsulta(a);
   const linhasParcelas = completar(
     (a.parcelas ?? []).map((p, i) => [
       `${i + 1}ª`,
       p.valor != null ? { dinheiro: p.valor } : '',
       p.vencimento ? formatarData(p.vencimento) : '',
-      p.consulta ? formatarData(p.consulta) : '',
+      ...(consulta ? [p.consulta ? formatarData(p.consulta) : ''] : []),
       p.pago ? 'Pago' : '',
     ]),
     Math.max(LINHAS_PARCELAS, parcelas ?? 0),
-    () => ['', '', '', '', ''],
+    () => (consulta ? ['', '', '', '', ''] : ['', '', '', '']),
   ).map((l, i) => (l[0] ? l : [`${i + 1}ª`, ...l.slice(1)]));
 
   const linhasOcorrencias = completar(
@@ -138,7 +143,13 @@ export function montarChecklist(
     secoes: [
       {
         titulo: tituloPagamentos(a, forma),
-        colunas: ['Parc.', 'Valor da parcela', 'Data de vencimento', 'Data da consulta', 'Pgto.'],
+        colunas: [
+          'Parc.',
+          'Valor da parcela',
+          'Data de vencimento',
+          ...(consulta ? ['Data da consulta'] : []),
+          'Pgto.',
+        ],
         linhas: linhasParcelas,
         alturaLinha: 18,
       },
