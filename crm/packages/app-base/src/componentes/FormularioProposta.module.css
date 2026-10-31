@@ -148,15 +148,6 @@
 .excedeu {
   color: var(--perigo);
 }
-.avisoSoma {
-  margin: 8px 0 0;
-  font-size: 13px;
-  color: var(--texto-suave);
-}
-.avisoSoma.excedeu {
-  font-weight: 600;
-  color: var(--perigo);
-}
 /* Valor calculado ("Receberá", "Saldo depois"): lido como um campo, com rótulo igual aos outros e o
    valor na altura do campo, alinhado com os campos da linha. */
 .calculado {
@@ -191,5 +182,122 @@
 @media (min-width: 720px) and (pointer: fine) {
   .calculado strong {
     min-height: var(--campo-altura, 40px);
+  }
+}
+
+/* Produtores em cartões (opção C, 31/10/2026): um cartão por produtor e o "Adicionar" no fim. */
+.divisao {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.divisao strong {
+  color: var(--texto);
+  font-weight: 600;
+}
+.divisao.excedeu {
+  font-weight: 600;
+  color: var(--perigo);
+}
+.cartoesProdutores {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 12px;
+}
+.cartaoProdutor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border-radius: var(--caixa-raio, 12px);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+}
+.cartaoTopo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cartaoTopo > :nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.sigla {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--primaria);
+  color: var(--primaria-texto, #fff);
+}
+.sigla[data-tom='dourado'] {
+  background: var(--destaque);
+  color: var(--destaque-sobre, #101a2e);
+}
+/* O nome do campo fica só para leitores de tela: a sigla ao lado já diz o que é. */
+.semRotulo > :first-child {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.cartaoBase {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.repasseCartao {
+  width: 7.5rem;
+  flex-shrink: 0;
+}
+.receberCartao {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  margin: 0;
+  padding-bottom: 6px;
+}
+.receberCartao span {
+  font-size: var(--campo-rotulo-tamanho, 11px);
+  font-weight: var(--campo-rotulo-peso, 600);
+  letter-spacing: var(--campo-rotulo-espaco, 0.06em);
+  text-transform: var(--campo-rotulo-caixa, uppercase);
+  color: var(--texto-suave);
+}
+.receberCartao strong {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--sucesso);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* Ao lado de um cartão, estica até a altura dele; sozinho na linha, fica baixo como um botão. */
+.adicionarCartao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--touch);
+  padding: 12px 16px;
+  border: 1.5px dashed var(--destaque-fio);
+  border-radius: var(--caixa-raio, 12px);
+  background: transparent;
+  color: var(--destaque-texto);
+  font: 600 14px var(--sans);
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .adicionarCartao:hover {
+    background: var(--destaque-fundo);
   }
 }
