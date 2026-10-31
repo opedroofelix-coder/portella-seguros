@@ -83,3 +83,6 @@
   distribuição por produto (Usuários › "Recebe as cotações novas de"). Endereço pelo CEP e pelo CNPJ (não há
   consulta pública por CPF). CRM instalável como aplicativo (PWA). Ficam para depois: backend, aniversário por
   e-mail (com o backend) e consórcio dentro do CRM de Seguros.
+- **Bloco de notas (30/10/2026):** produtor tem a gaveta "Notas" (proposta B, só checklist + recados recebidos,
+  sem anotações livres); administração/gestão tem o mural no Painel (proposta C: pendências do CRM, recados da
+  equipe, meu checklist). Canvas das propostas: https://claude.ai/artifact/6mSTs99JfpKx7xKu9tdKW8

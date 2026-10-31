@@ -37,6 +37,11 @@ export interface EstruturaProps {
   marca?: { icone: string; nomeClaro: string; nomeEscuro: string };
   /** Ação fixa na cápsula (ex.: "Nova proposta"). */
   acaoTopo?: ReactNode;
+  /**
+   * Botão que fica sempre à mão (ex.: o bloco de notas): na cápsula, antes de `acaoTopo`; no menu lateral,
+   * no topo do celular e no rodapé do menu no computador.
+   */
+  acaoBarra?: (lugar: 'topo' | 'lateral') => ReactNode;
   /** Liga a busca rápida (Ctrl K) com estes resultados. */
   buscar?: (texto: string) => ResultadoBusca[];
 }
@@ -137,6 +142,7 @@ function EstruturaLateral({
   navegacao,
   marca,
   buscar,
+  acaoBarra,
 }: EstruturaProps) {
   const [aberto, setAberto] = useState(false);
   const [slot, setSlot] = useState<HTMLElement | null>(null);
@@ -227,6 +233,7 @@ function EstruturaLateral({
             Buscar
           </Botao>
         )}
+        {acaoBarra && !desktop && <span className={styles.topoAcao}>{acaoBarra('topo')}</span>}
       </header>
 
       {aberto && <button className={styles.veu} aria-label="Fechar menu" onClick={() => setAberto(false)} />}
@@ -261,6 +268,7 @@ function EstruturaLateral({
           ))}
         </nav>
         <div className={styles.rodape}>
+          {acaoBarra && desktop && acaoBarra('lateral')}
           <div className={styles.perfil}>
             <span className={styles.avatar} aria-hidden="true">
               {iniciais(usuario.nome, refinada)}
@@ -308,6 +316,7 @@ function EstruturaTopo({
   children,
   marca,
   acaoTopo,
+  acaoBarra,
   buscar,
 }: EstruturaProps) {
   const [maisAberto, setMaisAberto] = useState(false);
@@ -433,6 +442,7 @@ function EstruturaTopo({
             <kbd>Ctrl K</kbd>
           </button>
         )}
+        {acaoBarra?.('topo')}
         {acaoTopo}
         <Link to="/conta" className={styles.capsulaAvatar} aria-label={`Minha conta (${usuario.nome})`}>
           {iniciais(usuario.nome)}

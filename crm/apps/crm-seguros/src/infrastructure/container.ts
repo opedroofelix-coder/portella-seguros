@@ -3,6 +3,8 @@ import type {
   Catalogo,
   Cliente,
   Estorno,
+  ItemChecklist,
+  Recado,
   Oportunidade,
   PagamentoProdutor,
   Proposta,
@@ -47,7 +49,7 @@ export async function criarServicos(opcoes: OpcoesBanco = {}): Promise<ServicosS
     const banco = await BancoLocal.abrir(
       nome,
       [...COLECOES_BASE, 'apolices', 'movimentos', 'despesas', 'fechamentos'],
-      3,
+      4,
     );
     repo = (colecao) => banco.repositorio(colecao);
     auth = new AutenticacaoLocal(
@@ -77,6 +79,8 @@ export async function criarServicos(opcoes: OpcoesBanco = {}): Promise<ServicosS
     vales: repo<Vale>('vales'),
     pagamentos: repo<PagamentoProdutor>('pagamentos'),
     catalogos: repo<Catalogo>('catalogos'),
+    checklist: repo<ItemChecklist>('checklist'),
+    recados: repo<Recado>('recados'),
     movimentos: repo<Movimento>('movimentos'),
     despesas: repo<Despesa>('despesas'),
     fechamentos: repo<Fechamento>('fechamentos'),

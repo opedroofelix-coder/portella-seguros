@@ -1,5 +1,7 @@
 import type {
   Catalogo,
+  ItemChecklist,
+  Recado,
   Cliente,
   Estorno,
   Oportunidade,
@@ -37,6 +39,8 @@ function servicos() {
     vales: new RepositorioMemoria<Vale>(),
     pagamentos: new RepositorioMemoria<PagamentoProdutor>(),
     catalogos: new RepositorioMemoria<Catalogo>(),
+    checklist: new RepositorioMemoria<ItemChecklist>(),
+    recados: new RepositorioMemoria<Recado>(),
     apolices: new RepositorioMemoria<Apolice>(),
     movimentos: new RepositorioMemoria<Movimento>(),
     despesas: new RepositorioMemoria<Despesa>(),

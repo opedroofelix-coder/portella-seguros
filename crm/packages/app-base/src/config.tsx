@@ -52,6 +52,11 @@ export interface ConfigApp {
   marca?: { icone: string; nomeClaro: string; nomeEscuro: string };
   /** Proposta com forma de pagamento, quantidade de parcelas e placa (seguros). */
   propostaPagamento?: boolean;
+  /**
+   * Bloco de notas: gaveta com checklist e recados para o produtor; a administração escreve os recados e
+   * tem o próprio checklist no mural do Painel (reunião de 30/10/2026).
+   */
+  notas?: boolean;
   /** Ações extras no rodapé da proposta aprovada (ex.: cadastrar a apólice). */
   acoesProposta?: (proposta: Proposta) => ReactNode;
 }

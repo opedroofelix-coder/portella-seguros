@@ -17,6 +17,7 @@ import { useCallback, useState } from 'react';
 import { BrowserRouter, HashRouter, Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import type { ConfigApp, ItemMenuApp } from './config';
 import { ProvedorConfig, useConfig as useConfigInterno, useRefinada, useRotuloPerfil } from './config';
+import { BotaoNotas, ProvedorGavetaNotas } from './notas/Gaveta';
 import { PaginaCliente, PaginaClientes } from './paginas/Clientes';
 import { PaginaConfiguracoes } from './paginas/Configuracoes';
 import { PaginaEstornosVales } from './paginas/EstornosVales';
@@ -189,13 +190,15 @@ export function AppCrm<S extends ServicosBase>({
 }
 
 function Layout() {
-  const { sistema, logo, menu, navegacao, marca } = useConfigMenu();
+  const { sistema, logo, menu, navegacao, marca, notas } = useConfigMenu();
   const usuario = useUsuario();
-  const { sair } = useSessao();
+  const { sair, pode } = useSessao();
+  // Bloco de notas (gaveta) para o produtor; a administração tem o mural no Painel.
+  const gaveta = Boolean(notas) && !pode('financeiro:gerenciar');
   const navegar = useNavigate();
   const rotuloPerfil = useRotuloPerfil();
   const buscar = useBuscaGlobal(navegacao === 'topo');
-  return (
+  const estrutura = (
     <Estrutura
       sistema={sistema}
       logo={logo}
@@ -203,6 +206,7 @@ function Layout() {
       navegacao={navegacao}
       marca={marca}
       buscar={buscar}
+      acaoBarra={gaveta ? (lugar) => <BotaoNotas lateral={lugar === 'lateral'} /> : undefined}
       acaoTopo={
         navegacao === 'topo' ? (
           <Link className={classesBotao()} to="/propostas?nova=1">
@@ -222,6 +226,7 @@ function Layout() {
       <Outlet />
     </Estrutura>
   );
+  return gaveta ? <ProvedorGavetaNotas>{estrutura}</ProvedorGavetaNotas> : estrutura;
 }
 
 /** Busca rápida (Ctrl K): páginas do menu e clientes, sem acento e sem diferença de maiúsculas. */

@@ -349,6 +349,14 @@
 .topoBusca {
   margin-left: auto;
 }
+/* Ação sempre à mão (bloco de notas) no topo do celular: à direita, depois da busca. */
+.topoAcao {
+  display: flex;
+  margin-left: auto;
+}
+.topoBusca + .topoAcao {
+  margin-left: 0;
+}
 
 /*
  * Modo "topo" no computador largo: cápsula de vidro flutuante com o grupo principal do menu,

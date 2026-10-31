@@ -1,0 +1,274 @@
+/* Checklist pessoal, recados da equipe e a gaveta do produtor (reunião de 30/10/2026). */
+.adicionar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.adicionar input {
+  flex: 1;
+  min-width: 0;
+}
+.progresso {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}
+.barra {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--superficie-3);
+  overflow: hidden;
+}
+.barra > span {
+  display: block;
+  height: 100%;
+  background: var(--destaque);
+}
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--borda);
+}
+.item:last-child {
+  border-bottom: 0;
+}
+.marcar {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 6px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.marcar input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--primaria);
+}
+.feito {
+  color: var(--texto-fraco);
+  text-decoration: line-through;
+}
+.rodapeLista {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.vazio {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--texto-suave);
+}
+.nota {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--texto-fraco);
+}
+
+/* Recados */
+.recados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.recado {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: var(--caixa-raio, 12px);
+  background: var(--destaque-fundo);
+  border: 1px solid var(--destaque-borda);
+}
+.recadoTodos {
+  background: var(--primaria-fundo);
+  border-color: var(--primaria-borda);
+}
+.recadoFeito {
+  background: var(--superficie-2);
+  border-color: var(--borda);
+}
+.recadoFeito .recadoTexto {
+  color: var(--texto-fraco);
+  text-decoration: line-through;
+}
+.recadoTopo {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.recadoTopo .recadoTexto {
+  flex: 1;
+  padding-top: 6px;
+}
+.recadoTexto {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+.recadoMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}
+.recadoMeta .marcar {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0;
+  font-size: 13px;
+  margin-left: auto;
+}
+.atrasado {
+  color: var(--perigo);
+  font-weight: 600;
+}
+.novoRecado {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+@media (min-width: 720px) {
+  .novoRecado {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: end;
+  }
+  .novoRecado > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+.novoRecadoAcoes {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Botão da gaveta no topo e a gaveta */
+.botaoNotas {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  min-width: var(--touch);
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid var(--borda-forte);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: 600 14px var(--sans);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.botaoNotas:hover {
+  border-color: var(--destaque-fio);
+}
+.botaoNotas[aria-expanded='true'] {
+  border-color: var(--primaria);
+  box-shadow: inset 0 0 0 1px var(--primaria);
+}
+.contador {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--destaque);
+  color: var(--destaque-sobre, #101a2e);
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+/* No celular estreito, só o ícone e o número: o nome continua no aria-label. */
+@media (max-width: 479px) {
+  .botaoNotas:not(.botaoNotasLateral) {
+    padding: 0 10px;
+    gap: 6px;
+  }
+  .botaoNotas:not(.botaoNotasLateral) .botaoNotasTexto {
+    display: none;
+  }
+}
+.botaoNotasLateral {
+  width: 100%;
+  justify-content: flex-start;
+}
+.gaveta {
+  position: fixed;
+  z-index: 60;
+  inset: auto 0 0 0;
+  max-height: min(88vh, 720px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  box-sizing: border-box;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--modal-raio, 16px) var(--modal-raio, 16px) 0 0;
+  box-shadow: 0 30px 70px -20px rgba(16, 26, 46, 0.35);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 720px) {
+  .gaveta {
+    inset: 96px 20px 20px auto;
+    width: 400px;
+    max-height: none;
+    border-radius: var(--modal-raio, 16px);
+  }
+}
+.gavetaCabecalho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gavetaCabecalho h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+}
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.secao h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.secaoTitulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}

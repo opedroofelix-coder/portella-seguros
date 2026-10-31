@@ -31,6 +31,8 @@ const CAMINHOS = {
   lua: 'M20.5 14.6A8.5 8.5 0 1 1 9.4 3.5a7 7 0 0 0 11.1 11.1Z',
   automatico: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 2v16a8 8 0 0 1 0-16Z',
   aprovar: 'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4Z',
+  checklist:
+    'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 16H5V5h14ZM10 16.4 6.6 13l1.4-1.4 2 2 5.6-5.6L17 9.4Z',
   tendencia: 'M3 17.6 9 11.6l4 4 6.6-6.6H16V7h7v7h-2V10.4l-8 8-4-4-4.6 4.6Z',
   estorno: 'M12 5V2L7 6l5 4V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8Z',
   ajustes: 'M3 6h10v2H3Zm14 0h4v2h-4Zm-2-2h2v6h-2ZM3 16h4v2H3Zm8 0h10v2H11Zm-2-2h2v6H9Z',

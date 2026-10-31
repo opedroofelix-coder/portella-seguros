@@ -3,6 +3,8 @@ import type {
   Catalogo,
   Cliente,
   Estorno,
+  ItemChecklist,
+  Recado,
   Oportunidade,
   PagamentoProdutor,
   Proposta,
@@ -44,7 +46,7 @@ export async function criarServicos(opcoes: OpcoesBanco = {}): Promise<ServicosC
   let repo: FabricaRepositorio;
   let auth: GatewayAutenticacao;
   try {
-    const banco = await BancoLocal.abrir(nome, [...COLECOES_BASE, 'cotas', 'lances'], 3);
+    const banco = await BancoLocal.abrir(nome, [...COLECOES_BASE, 'cotas', 'lances'], 4);
     repo = (colecao) => banco.repositorio(colecao);
     auth = new AutenticacaoLocal(
       repo<Credencial>(COLECAO_CREDENCIAIS),
@@ -72,6 +74,8 @@ export async function criarServicos(opcoes: OpcoesBanco = {}): Promise<ServicosC
     vales: repo<Vale>('vales'),
     pagamentos: repo<PagamentoProdutor>('pagamentos'),
     catalogos: repo<Catalogo>('catalogos'),
+    checklist: repo<ItemChecklist>('checklist'),
+    recados: repo<Recado>('recados'),
     cotas: repo<Cota>('cotas'),
     lances: repo<Lance>('lances'),
   });
