@@ -171,7 +171,8 @@ test.describe('CRM Seguros — fluxo completo', () => {
 
     // Administradora: aviso no painel e contador no menu; dá a baixa e aprova
     await entrar(page, URL, ADMIN);
-    await expect(page.getByRole('status').filter({ hasText: 'proposta aguardando aprovação' })).toBeVisible();
+    // No Painel da administração, o aviso fica nas pendências do mural.
+    await expect(page.getByRole('link', { name: /Proposta aguardando aprovação/ })).toContainText('Corretor');
     await expect(page.getByRole('link', { name: 'Aprovações 1 pendente(s)' })).toBeVisible();
 
     // Administradora muda o % do produtor de 30% para 25%, também nas propostas em aberto
@@ -337,6 +338,60 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(page.getByText(`Cotação encaminhada para ${CORRETOR.nome}.`)).toBeVisible();
     await page.getByRole('button', { name: 'Abrir Lead Consórcio' }).click();
     await expect(page.getByRole('region', { name: 'Histórico da cotação' })).toContainText('Cadastrada');
+  });
+
+  test('mural da administração e bloco de notas do produtor', async ({ page }) => {
+    await primeiroAcesso(page, URL);
+    await cadastrarUsuario(page, CORRETOR, 'Produtor');
+
+    // Administração: mural no Painel, recado para o produtor e checklist pessoal
+    await irPara(page, 'Painel');
+    const mural = page.getByLabel('Mural da equipe');
+    await expect(mural.getByRole('heading', { name: 'Pendências do CRM' })).toBeVisible();
+    await expect(mural.getByText('Nada pendente agora.')).toBeVisible();
+    await mural.getByLabel('Novo recado').fill('Ligar para a Ana Paula sobre a 2ª parcela');
+    await escolher(mural.getByLabel('Para'), { label: CORRETOR.nome });
+    await mural.getByRole('button', { name: 'Enviar recado' }).click();
+    await expect(page.getByText(`Recado enviado para ${CORRETOR.nome}.`)).toBeVisible();
+    await expect(mural.getByRole('list', { name: 'Recados enviados' })).toContainText('Em aberto');
+    await mural.getByLabel('Novo item do checklist').fill('Fechar pagamento dos produtores');
+    await mural.getByLabel('Novo item do checklist').press('Enter');
+    await expect(mural.getByRole('checkbox', { name: 'Fechar pagamento dos produtores' })).not.toBeChecked();
+    // A administração não tem a gaveta: o mural fica no Painel.
+    await expect(page.getByRole('button', { name: /^Bloco de notas/ })).toHaveCount(0);
+    await sair(page);
+
+    // Produtor: gaveta com o recado e o próprio checklist (não vê o da administração)
+    await entrarPelaPrimeiraVez(page, URL, CORRETOR);
+    await expect(page.getByLabel('Mural da equipe')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Bloco de notas, 1 em aberto' }).click();
+    const gaveta = page.getByRole('dialog', { name: 'Bloco de notas' });
+    await expect(gaveta).toContainText('Ligar para a Ana Paula sobre a 2ª parcela');
+    await expect(gaveta).not.toContainText('Fechar pagamento dos produtores');
+    await gaveta.getByRole('checkbox', { name: 'Feito' }).click();
+    await expect(gaveta.getByRole('checkbox', { name: 'Feito' })).toBeChecked();
+    await gaveta.getByLabel('Novo item do checklist').fill('Mandar a CNH do cliente');
+    await gaveta.getByLabel('Novo item do checklist').press('Enter');
+    await expect(page.getByRole('button', { name: 'Bloco de notas, 1 em aberto' })).toBeVisible();
+    await gaveta.getByRole('checkbox', { name: 'Mandar a CNH do cliente' }).click();
+    // O item feito sai da lista e fica em "Ver 1 feita"
+    await expect(gaveta.getByText('1 de 1 feita')).toBeVisible();
+    await gaveta.getByRole('button', { name: 'Ver 1 feita' }).click();
+    await expect(gaveta.getByRole('checkbox', { name: 'Mandar a CNH do cliente' })).toBeChecked();
+    await expect(page.getByRole('button', { name: 'Bloco de notas', exact: true })).toBeVisible();
+    // A gaveta fecha com Esc e abre em qualquer tela
+    await page.keyboard.press('Escape');
+    await expect(gaveta).toHaveCount(0);
+    await irPara(page, 'Clientes');
+    await page.getByRole('button', { name: 'Bloco de notas', exact: true }).click();
+    await expect(page.getByRole('dialog', { name: 'Bloco de notas' })).toBeVisible();
+    await sair(page);
+
+    // Administração vê que o recado foi feito
+    await entrar(page, URL, ADMIN);
+    await expect(
+      page.getByLabel('Mural da equipe').getByRole('list', { name: 'Recados enviados' }),
+    ).toContainText('Feito');
   });
 
   test('financeiro sem a poupança', async ({ page }) => {

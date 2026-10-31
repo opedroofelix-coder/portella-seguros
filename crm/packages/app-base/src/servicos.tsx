@@ -3,9 +3,11 @@ import type {
   Cliente,
   Estorno,
   GatewayAutenticacao,
+  ItemChecklist,
   Oportunidade,
   PagamentoProdutor,
   Proposta,
+  Recado,
   Repositorio,
   TipoCatalogo,
   Usuario,
@@ -15,9 +17,11 @@ import {
   ServicoAutenticacao,
   ServicoCarteira,
   ServicoCatalogos,
+  ServicoChecklist,
   ServicoLancamentosGestao,
   ServicoOportunidades,
   ServicoPropostas,
+  ServicoRecados,
   ServicoUsuarios,
   validarCliente,
   validarEstorno,
@@ -39,6 +43,10 @@ export interface ServicosBase {
   vales: ServicoLancamentosGestao<Vale>;
   pagamentos: ServicoLancamentosGestao<PagamentoProdutor>;
   catalogos: ServicoCatalogos;
+  /** Checklist pessoal (cada um vê só o seu). */
+  checklist: ServicoChecklist;
+  /** Recados da administração para a equipe. */
+  recados: ServicoRecados;
 }
 
 export interface RepositoriosBase {
@@ -51,6 +59,8 @@ export interface RepositoriosBase {
   vales: Repositorio<Vale>;
   pagamentos: Repositorio<PagamentoProdutor>;
   catalogos: Repositorio<Catalogo>;
+  checklist: Repositorio<ItemChecklist>;
+  recados: Repositorio<Recado>;
 }
 
 /** Coleções de cada app (para o IndexedDB e para a limpeza). */
@@ -62,6 +72,8 @@ export const COLECOES_BASE = [
   'vales',
   'pagamentos',
   'catalogos',
+  'checklist',
+  'recados',
 ] as const;
 
 export function montarServicosBase(
@@ -79,6 +91,8 @@ export function montarServicosBase(
     vales: new ServicoLancamentosGestao<Vale>(r.vales, validarVale),
     pagamentos: new ServicoLancamentosGestao<PagamentoProdutor>(r.pagamentos, validarPagamento),
     catalogos: new ServicoCatalogos(r.catalogos, catalogosPadrao),
+    checklist: new ServicoChecklist(r.checklist),
+    recados: new ServicoRecados(r.recados),
   };
 }
 

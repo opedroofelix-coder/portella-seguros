@@ -1,0 +1,103 @@
+/* Mural da equipe no Painel da administração (proposta C, reunião de 30/10/2026). */
+.mural {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media (min-width: 900px) {
+  .mural {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mural > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 1200px) {
+  .mural {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .mural > :last-child {
+    grid-column: auto;
+  }
+}
+.coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.subtitulo {
+  margin: -4px 0 4px;
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}
+.pendencias {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pendencia {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 12px 14px;
+  border-radius: var(--caixa-raio, 12px);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  text-decoration: none;
+}
+.pendencia:hover {
+  border-color: var(--destaque-fio);
+}
+.numero {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.destaque {
+  background: var(--destaque-fundo);
+  color: var(--destaque-texto);
+}
+.info {
+  background: var(--primaria-fundo);
+  color: var(--primaria);
+}
+.perigo {
+  background: var(--perigo-fundo);
+  color: var(--perigo);
+}
+.neutro {
+  background: var(--superficie-3);
+  color: var(--texto-suave);
+}
+.texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 14px;
+}
+.texto small {
+  font-size: 12.5px;
+  color: var(--texto-suave);
+  overflow-wrap: anywhere;
+}
+.vazio {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--texto-suave);
+}

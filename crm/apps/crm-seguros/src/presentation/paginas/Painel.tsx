@@ -26,6 +26,7 @@ import {
   serieMensal,
 } from '../../application/painelInicial';
 import { filaRenovacao } from '../../domain/apolice';
+import { MuralEquipe } from '../componentes/MuralEquipe';
 import { EstadoErro } from '../componentes/EstadoErro';
 import { useApolices } from '../hooks';
 import styles from './Painel.module.css';
@@ -142,10 +143,13 @@ export function PaginaPainel() {
       }
     />
   );
+  // O mural fica sempre no mesmo lugar: recarregar os números não apaga o recado que está sendo digitado.
+  const mural = gestao && <MuralEquipe />;
   if (isError) {
     return (
       <>
         {cabecalho}
+        {mural}
         <EstadoErro oque="a carteira" aoTentar={() => refetch()} />
       </>
     );
@@ -154,6 +158,7 @@ export function PaginaPainel() {
     return (
       <>
         {cabecalho}
+        {mural}
         <Carregando texto="Carregando o painel…" />
       </>
     );
@@ -181,8 +186,9 @@ export function PaginaPainel() {
   return (
     <>
       {cabecalho}
+      {mural}
 
-      {aguardando > 0 && (
+      {aguardando > 0 && !gestao && (
         <div className={styles.aviso} role="status">
           <span className={styles.avisoNumero} aria-hidden="true">
             {aguardando}

@@ -190,6 +190,22 @@ Regras extras:
 - Tabela por seguradora (prêmio líquido e quantidade, com "Outras"), gráfico por ramo e resumo do funil.
 - O produtor não vê a comissão da corretora: no lugar dela aparecem as cotações em aberto.
 
+**Mural da equipe e bloco de notas** (reunião de 30/10/2026)
+- **Administração e gestão**: o Painel abre com o mural, em três quadros:
+  - **Pendências do CRM**, que aparecem sozinhas e somem quando resolvidas: parcelas de apólice vencidas
+    sem a data da consulta nem "pago" (falta conferir a baixa), propostas aguardando aprovação (no lugar do
+    aviso que ficava no topo), renovações dos próximos 15 dias (quantas ainda sem contato) e cotações sem
+    movimento há 7 dias ou mais. Cada uma leva à tela correspondente.
+  - **Recados da equipe**: recado para um produtor ou para toda a equipe, com prazo opcional; mostra quem
+    já fez ("Em aberto", "Feito", "Feito por Gisele, Mary", "Feito por todos") e pode ser apagado.
+  - **Meu checklist**: lista pessoal (digitar e Enter; marcar; "Ver feitas"; "Limpar feitas").
+- **Produtor**: botão **Notas** no topo (no celular, só o ícone; no computador com menu lateral, no rodapé
+  do menu), com o número do que está em aberto. Abre o **bloco de notas** por cima de qualquer tela, com o
+  checklist pessoal (barra de "x de y feitas") e os recados da administração, que ele marca como feitos
+  (num recado para todos, cada um marca o seu). Sem anotações livres, a pedido da Portella. Esc fecha.
+- O checklist é só de quem o criou: nem a administração vê o dos outros. Recados: a administração escreve e
+  apaga; o produtor vê os dele e os de toda a equipe.
+
 **Clientes**
 - Pessoa física ou jurídica, com validação de CPF/CNPJ, telefone/WhatsApp, e-mail, data de nascimento,
   endereço, **origem** (Indicação, Instagram, Google…) com **indicado por**, e observações.

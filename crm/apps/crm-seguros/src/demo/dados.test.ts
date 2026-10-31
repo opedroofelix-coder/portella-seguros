@@ -3,6 +3,8 @@ import type { Despesa, Fechamento, Movimento } from '../domain/financeiro';
 import { ADMIN_DEMO, prepararEquipeDemo, PRODUTORA_DEMO } from '@portella/app-base';
 import type {
   Catalogo,
+  ItemChecklist,
+  Recado,
   Cliente,
   Estorno,
   Oportunidade,
@@ -26,6 +28,8 @@ const servicos = () =>
     vales: new RepositorioMemoria<Vale>(),
     pagamentos: new RepositorioMemoria<PagamentoProdutor>(),
     catalogos: new RepositorioMemoria<Catalogo>(),
+    checklist: new RepositorioMemoria<ItemChecklist>(),
+    recados: new RepositorioMemoria<Recado>(),
     apolices: new RepositorioMemoria<Apolice>(),
     movimentos: new RepositorioMemoria<Movimento>(),
     despesas: new RepositorioMemoria<Despesa>(),

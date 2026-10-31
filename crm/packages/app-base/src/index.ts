@@ -11,6 +11,8 @@ export * from './sessao/Sessao';
 export * from './paginas/Propostas';
 export * from './exportar';
 export * from './instalacao';
+export { MeuChecklist, useChecklist } from './notas/Checklist';
+export { RecadosEquipe, RecadosRecebidos, useRecados } from './notas/Recados';
 export * from './padroes';
 export * from './importacaoComissoes';
 export * from './demo';

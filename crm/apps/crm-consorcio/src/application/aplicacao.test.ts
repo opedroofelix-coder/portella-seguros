@@ -1,5 +1,7 @@
 import type {
   Catalogo,
+  ItemChecklist,
+  Recado,
   Cliente,
   Estorno,
   Oportunidade,
@@ -37,6 +39,8 @@ const servicos = () =>
     vales: new RepositorioMemoria<Vale>(),
     pagamentos: new RepositorioMemoria<PagamentoProdutor>(),
     catalogos: new RepositorioMemoria<Catalogo>(),
+    checklist: new RepositorioMemoria<ItemChecklist>(),
+    recados: new RepositorioMemoria<Recado>(),
     cotas: new RepositorioMemoria<Cota>(),
     lances: new RepositorioMemoria<Lance>(),
   });

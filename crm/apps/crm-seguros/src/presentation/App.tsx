@@ -63,6 +63,7 @@ export function App({
       MENU_COMUM.conta,
     ],
     propostaPagamento: true,
+    notas: true,
     acoesProposta: (proposta) => <CadastrarApolice proposta={proposta} />,
     catalogosExtras: [
       {
