@@ -27,13 +27,19 @@ import {
 } from '@portella/core';
 import { AreaTexto, Botao, Campo, ConfirmarAcao, Entrada, Modal, Selecao, useAvisos } from '@portella/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { formaPagamentoDaApolice, montarChecklist, propostaDaApolice } from '../../application/checklist';
 import { renovarApolice } from '../../application/renovacao';
 import type { Apolice } from '../../domain/apolice';
-import { gerarParcelas, MOTIVOS_CANCELAMENTO, normalizarPlaca, placaValida } from '../../domain/apolice';
+import {
+  gerarParcelas,
+  MOTIVOS_CANCELAMENTO,
+  normalizarPlaca,
+  placaValida,
+  usaDataConsulta,
+} from '../../domain/apolice';
 import { RAMOS, RAMOS_ANUAIS, RAMOS_VEICULO, SEGURADORAS, seguradorasDoRamo } from '../../domain/catalogo';
 import { useServicosSeguros } from '../hooks';
 import styles from './FormularioApolice.module.css';
@@ -59,6 +65,7 @@ const esquema = z
       .string()
       .refine((v) => !v.trim() || (/^\d+$/.test(v.trim()) && +v >= 1 && +v <= 24), 'De 1 a 24.'),
     primeiroVencimento: z.string(),
+    consultaBaixa: z.boolean(),
     parcelas: z.array(
       z.object({ valor: dinheiro, vencimento: z.string(), consulta: z.string(), pago: z.boolean() }),
     ),
@@ -145,6 +152,7 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
         premioTotal: textoDinheiro(base.premioTotal),
         quantidadeParcelas: base.quantidadeParcelas == null ? '' : String(base.quantidadeParcelas),
         primeiroVencimento: base.parcelas?.[0]?.vencimento ?? '',
+        consultaBaixa: usaDataConsulta(base),
         parcelas: (base.parcelas ?? []).map((p) => ({
           valor: textoDinheiro(p.valor),
           vencimento: p.vencimento ?? '',
@@ -232,6 +240,7 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
       premioTotal: d.premioTotal ? (lerDinheiro(d.premioTotal) ?? undefined) : undefined,
       quantidadeParcelas: d.quantidadeParcelas ? Number(d.quantidadeParcelas) : undefined,
       parcelas: parcelasLimpas.length ? parcelasLimpas : undefined,
+      consultaBaixa: v.consultaBaixa,
       cancelada: cancelada || undefined,
       dataCancelamento: cancelada ? d.dataCancelamento : undefined,
       motivoCancelamento: cancelada
@@ -296,6 +305,8 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
   };
   const somaParcelas = (watch('parcelas') ?? []).reduce((t, p) => t + (lerDinheiro(p.valor ?? '') ?? 0), 0);
   const premioTotal = lerDinheiro(watch('premioTotal') ?? '');
+  const comConsulta = watch('consultaBaixa');
+  const idConsulta = useId();
 
   const baixarChecklist = async () => {
     setGerandoPdf(true);
@@ -493,9 +504,6 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
             <h3 id="titulo-pagamentos">Acompanhamento dos pagamentos</h3>
           </div>
           <p className={styles.nota}>
-            Data da consulta: quando a baixa da parcela foi conferida no site da seguradora.
-          </p>
-          <p className={styles.nota}>
             Forma de pagamento: <strong>{formaPagamento ?? 'informe na proposta'}</strong>
             {proposta?.numero ? ` (proposta nº ${proposta.numero})` : ''}
           </p>
@@ -520,6 +528,21 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
               <Entrada type="date" {...register('primeiroVencimento')} />
             </Campo>
           </div>
+          <div className={styles.opcao}>
+            <input
+              id={`${idConsulta}-campo`}
+              type="checkbox"
+              aria-describedby={`${idConsulta}-dica`}
+              {...register('consultaBaixa')}
+            />
+            <span>
+              <label htmlFor={`${idConsulta}-campo`}>Acompanhar a data da consulta</label>
+              <small id={`${idConsulta}-dica`}>
+                Quando a baixa da parcela é conferida no site da seguradora (ex.: cartão Porto Seguro).
+                Acrescenta a coluna no checklist.
+              </small>
+            </span>
+          </div>
           <div className={styles.acoesBloco}>
             <Botao pequeno variante="secundario" icone="calendario" onClick={gerar}>
               {parcelasCampos.fields.length ? 'Gerar parcelas de novo' : 'Gerar parcelas'}
@@ -534,7 +557,10 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
             </Botao>
           </div>
           {parcelasCampos.fields.map((campo, i) => (
-            <div key={campo.id} className={`${styles.linha} ${styles.linhaParcela}`}>
+            <div
+              key={campo.id}
+              className={`${styles.linha} ${styles.linhaParcela} ${comConsulta ? '' : styles.semConsulta}`}
+            >
               <p className={styles.numeroParcela}>{i + 1}ª</p>
               <Campo rotulo="Valor" erro={erros.parcelas?.[i]?.valor?.message}>
                 <EntradaDinheiro {...register(`parcelas.${i}.valor`)} />
@@ -542,9 +568,11 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
               <Campo rotulo="Vencimento">
                 <Entrada type="date" {...register(`parcelas.${i}.vencimento`)} />
               </Campo>
-              <Campo rotulo="Data da consulta">
-                <Entrada type="date" {...register(`parcelas.${i}.consulta`)} />
-              </Campo>
+              {comConsulta && (
+                <Campo rotulo="Data da consulta">
+                  <Entrada type="date" {...register(`parcelas.${i}.consulta`)} />
+                </Campo>
+              )}
               <label className={styles.pago}>
                 <input type="checkbox" {...register(`parcelas.${i}.pago`)} />
                 Pago
