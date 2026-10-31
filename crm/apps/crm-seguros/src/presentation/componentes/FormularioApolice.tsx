@@ -493,6 +493,9 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
             <h3 id="titulo-pagamentos">Acompanhamento dos pagamentos</h3>
           </div>
           <p className={styles.nota}>
+            Data da consulta: quando a baixa da parcela foi conferida no site da seguradora.
+          </p>
+          <p className={styles.nota}>
             Forma de pagamento: <strong>{formaPagamento ?? 'informe na proposta'}</strong>
             {proposta?.numero ? ` (proposta nº ${proposta.numero})` : ''}
           </p>
@@ -539,10 +542,7 @@ export function FormularioApolice({ apolice, inicial, renovando, aoFechar }: For
               <Campo rotulo="Vencimento">
                 <Entrada type="date" {...register(`parcelas.${i}.vencimento`)} />
               </Campo>
-              <Campo
-                rotulo="Data da consulta"
-                dica={i === 0 ? 'Quando conferiu a baixa na seguradora.' : undefined}
-              >
+              <Campo rotulo="Data da consulta">
                 <Entrada type="date" {...register(`parcelas.${i}.consulta`)} />
               </Campo>
               <label className={styles.pago}>

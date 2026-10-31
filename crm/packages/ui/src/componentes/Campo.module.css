@@ -33,11 +33,20 @@
     border-color 0.15s,
     box-shadow 0.15s;
 }
+/* O seletor de data do celular cresce com a fonte de 16px: altura fixa para alinhar com os vizinhos. */
+input.controle[type='date'],
+input.controle[type='month'] {
+  height: var(--touch);
+}
 /* Com mouse, numa tela larga, o campo pode ser mais baixo; no celular fica com 44px. */
 @media (min-width: 720px) and (pointer: fine) {
   .controle {
     min-height: var(--campo-altura, 40px);
     font-size: 14.5px;
+  }
+  input.controle[type='date'],
+  input.controle[type='month'] {
+    height: var(--campo-altura, 40px);
   }
 }
 .controle::placeholder {
@@ -134,6 +143,9 @@ input.controle[list],
 .controle.controleAfixado {
   flex: 1;
   min-width: 0;
+  /* A moldura (1px em cima e embaixo) fica no conjunto; o campo avança sobre ela para o total ter a
+     mesma altura dos outros campos, sem perder os 44px de toque. */
+  margin-block: -1px;
   border: 0;
   background: transparent;
   text-align: right;
