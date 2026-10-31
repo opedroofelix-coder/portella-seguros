@@ -171,7 +171,8 @@ test.describe('CRM Seguros — fluxo completo', () => {
 
     // Administradora: aviso no painel e contador no menu; dá a baixa e aprova
     await entrar(page, URL, ADMIN);
-    // No Painel da administração, o aviso fica nas pendências do mural.
+    // No Painel da administração, o aviso fica nas pendências do mural (o quadro começa fechado).
+    await page.getByRole('button', { name: /Pendências do CRM/ }).click();
     await expect(page.getByRole('link', { name: /Proposta aguardando aprovação/ })).toContainText('Corretor');
     await expect(page.getByRole('link', { name: 'Aprovações 1 pendente(s)' })).toBeVisible();
 
@@ -347,13 +348,26 @@ test.describe('CRM Seguros — fluxo completo', () => {
     // Administração: mural no Painel, recado para o produtor e checklist pessoal
     await irPara(page, 'Painel');
     const mural = page.getByLabel('Mural da equipe');
-    await expect(mural.getByRole('heading', { name: 'Pendências do CRM' })).toBeVisible();
+    // Os quadros começam fechados e abrem com um clique
+    const pendencias = mural.getByRole('button', { name: /Pendências do CRM/ });
+    await expect(pendencias).toHaveAttribute('aria-expanded', 'false');
+    await expect(pendencias).toContainText('Nada pendente');
+    await expect(mural.getByText('Nada pendente agora.')).toBeHidden();
+    await pendencias.click();
     await expect(mural.getByText('Nada pendente agora.')).toBeVisible();
-    await mural.getByLabel('Novo recado').fill('Ligar para a Ana Paula sobre a 2ª parcela');
+    await mural.getByRole('button', { name: /Recados da equipe/ }).click();
+    // O formulário fica recolhido até clicar em "Novo recado"
+    await expect(mural.getByLabel('Texto do recado')).toHaveCount(0);
+    await mural.getByRole('button', { name: 'Novo recado' }).click();
+    await mural.getByLabel('Texto do recado').fill('Ligar para a Ana Paula sobre a 2ª parcela');
     await escolher(mural.getByLabel('Para'), { label: CORRETOR.nome });
     await mural.getByRole('button', { name: 'Enviar recado' }).click();
     await expect(page.getByText(`Recado enviado para ${CORRETOR.nome}.`)).toBeVisible();
     await expect(mural.getByRole('list', { name: 'Recados enviados' })).toContainText('Em aberto');
+    // Depois de enviar, o formulário recolhe de novo
+    await expect(mural.getByLabel('Texto do recado')).toHaveCount(0);
+    await expect(mural.getByRole('button', { name: /Recados da equipe/ })).toContainText('1 em aberto');
+    await mural.getByRole('button', { name: /Meu checklist/ }).click();
     await mural.getByLabel('Novo item do checklist').fill('Fechar pagamento dos produtores');
     await mural.getByLabel('Novo item do checklist').press('Enter');
     await expect(mural.getByRole('checkbox', { name: 'Fechar pagamento dos produtores' })).not.toBeChecked();
@@ -387,7 +401,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await expect(page.getByRole('dialog', { name: 'Bloco de notas' })).toBeVisible();
     await sair(page);
 
-    // Administração vê que o recado foi feito
+    // Administração vê que o recado foi feito (o quadro de recados lembra que ficou aberto)
     await entrar(page, URL, ADMIN);
     await expect(
       page.getByLabel('Mural da equipe').getByRole('list', { name: 'Recados enviados' }),
