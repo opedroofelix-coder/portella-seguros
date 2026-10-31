@@ -152,7 +152,7 @@
 .novoRecado {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 @media (min-width: 720px) {
   .novoRecado {

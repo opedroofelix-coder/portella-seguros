@@ -674,8 +674,12 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                         <Entrada inputMode="decimal" {...register(`produtores.${i}.percentual`)} />
                       )}
                     </Campo>
-                    <p className={styles.previa} aria-live={refinada ? undefined : 'polite'}>
-                      Receberá {formatarDinheiro(repassePrevisto({ comissaoReceber }, pctAtual))}
+                    <p
+                      className={`${styles.calculado} ${styles.receber}`}
+                      aria-live={refinada ? undefined : 'polite'}
+                    >
+                      <span>Receberá</span>{' '}
+                      <strong>{formatarDinheiro(repassePrevisto({ comissaoReceber }, pctAtual))}</strong>
                     </p>
                     <Botao
                       variante="fantasma"
@@ -741,9 +745,8 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
                       )}
                     </Campo>
                     {refinada ? (
-                      <p className={styles.saldoDepois} aria-live="polite">
-                        <span>Saldo depois</span>
-                        <strong>{formatarDinheiro(saldosDepois[i] ?? 0)}</strong>
+                      <p className={styles.calculado} aria-live="polite">
+                        <span>Saldo depois</span> <strong>{formatarDinheiro(saldosDepois[i] ?? 0)}</strong>
                       </p>
                     ) : (
                       <Campo rotulo="Parcela">
