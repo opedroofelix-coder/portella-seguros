@@ -20,7 +20,7 @@ export interface Usuario {
 }
 
 /** Senha provisória de todo usuário novo ou com senha redefinida; a troca é obrigatória no 1º acesso. */
-export const SENHA_PADRAO = '1234';
+export const SENHA_PADRAO = 'portella1';
 export const SENHA_TAMANHO_MINIMO = 6;
 
 const LOGIN = /^[a-z0-9._@-]{3,60}$/;
@@ -68,6 +68,8 @@ export function validarSenha(senha: string): void {
     });
   }
   if (senha === SENHA_PADRAO) {
-    throw new ErroValidacao('Escolha uma senha diferente da senha padrão.', { senha: 'Diferente de 1234.' });
+    throw new ErroValidacao('Escolha uma senha diferente da senha padrão.', {
+      senha: `Diferente de ${SENHA_PADRAO}.`,
+    });
   }
 }

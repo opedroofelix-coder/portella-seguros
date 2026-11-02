@@ -13,7 +13,7 @@ export interface NovoUsuario {
   nome: string;
   login: string;
   perfil: Perfil;
-  /** Sem senha, o usuário recebe a senha padrão (1234) e troca no primeiro acesso. */
+  /** Sem senha, o usuário recebe a senha padrão (SENHA_PADRAO) e troca no primeiro acesso. */
   senha?: string;
   percentualRepasse?: number;
 }
@@ -41,13 +41,14 @@ export class ServicoUsuarios {
   }
 
   async existeAlgum(): Promise<boolean> {
+    if (this.auth.sistemaConfigurado) return this.auth.sistemaConfigurado();
     return (await this.repositorio.listar()).length > 0;
   }
 
   /** Primeiro acesso: cria o administrador inicial (com senha própria) quando não há nenhum usuário. */
   async configurarAdministrador(dados: Omit<NovoUsuario, 'perfil'> & { senha: string }): Promise<Usuario> {
     if (await this.existeAlgum()) throw new ErroValidacao('O sistema já foi configurado.');
-    return this.registrar({ ...dados, perfil: 'admin' });
+    return this.registrar({ ...dados, perfil: 'admin' }, true);
   }
 
   async criar(ator: Usuario, dados: NovoUsuario): Promise<Usuario> {
@@ -56,7 +57,7 @@ export class ServicoUsuarios {
   }
 
   /**
-   * Cadastra a equipe inicial de produtores com senha 1234. Quem já existe (mesmo nome ou o
+   * Cadastra a equipe inicial de produtores com a senha padrão. Quem já existe (mesmo nome ou o
    * primeiro nome de quem está cadastrado, como a própria administradora) é pulado.
    */
   async criarProdutoresIniciais(ator: Usuario, produtores: ProdutorInicial[]): Promise<Usuario[]> {
@@ -104,7 +105,7 @@ export class ServicoUsuarios {
     return novo;
   }
 
-  /** O administrador volta a senha de alguém para 1234; a pessoa troca no próximo acesso. */
+  /** O administrador volta a senha de alguém para a padrão; a pessoa troca no próximo acesso. */
   async redefinirSenhaPadrao(ator: Usuario, id: string): Promise<void> {
     exigir(ator, 'usuarios:gerenciar');
     const usuario = await this.repositorio.obter(id);
@@ -113,7 +114,7 @@ export class ServicoUsuarios {
     await this.repositorio.salvar({ ...usuario, trocarSenha: true });
   }
 
-  /** Troca da própria senha, conferindo a senha atual. Libera o acesso de quem estava com a senha 1234. */
+  /** Troca da própria senha, conferindo a senha atual. Libera o acesso de quem estava com a senha padrão. */
   async alterarPropriaSenha(ator: Usuario, senhaAtual: string, novaSenha: string): Promise<Usuario> {
     await this.auth.verificarCredenciais(ator.login, senhaAtual);
     validarSenha(novaSenha);
@@ -124,11 +125,13 @@ export class ServicoUsuarios {
     return semFlag;
   }
 
-  private async registrar(dados: NovoUsuario): Promise<Usuario> {
+  private async registrar(dados: NovoUsuario, primeiroAcesso = false): Promise<Usuario> {
     const login = normalizarLogin(dados.login);
     validarUsuario({ ...dados, login });
     if (dados.senha != null) validarSenha(dados.senha);
-    const usuarios = await this.repositorio.listar();
+    // No 1º acesso com servidor, ninguém está logado para ler a lista (e ela está vazia); o servidor
+    // confere o login repetido do mesmo jeito.
+    const usuarios = primeiroAcesso && this.auth.cadastrarUsuario ? [] : await this.repositorio.listar();
     if (usuarios.some((u) => u.login === login)) {
       throw new ErroValidacao('Já existe um usuário com este login.', { login: 'Login já cadastrado.' });
     }
@@ -142,6 +145,10 @@ export class ServicoUsuarios {
       ...(dados.senha == null ? { trocarSenha: true } : {}),
       ...(dados.percentualRepasse != null ? { percentualRepasse: dados.percentualRepasse } : {}),
     };
+    if (this.auth.cadastrarUsuario) {
+      await this.auth.cadastrarUsuario(usuario, dados.senha, primeiroAcesso);
+      return usuario;
+    }
     await this.repositorio.salvar(usuario);
     await this.auth.definirSenha(usuario, dados.senha ?? SENHA_PADRAO);
     return usuario;

@@ -2,7 +2,7 @@ import type { ProdutorInicial, TipoCatalogo } from '@portella/core';
 import { ORIGENS_LEAD_PADRAO } from '@portella/core';
 
 /**
- * Produtores cadastrados no primeiro acesso (senha 1234, troca obrigatória): a lista enviada pela
+ * Produtores cadastrados no primeiro acesso (senha padrão, troca obrigatória): a lista enviada pela
  * Portella em 26/10/2026. O % é o repasse padrão, editável em Usuários.
  */
 export const PRODUTORES_INICIAIS: ProdutorInicial[] = [

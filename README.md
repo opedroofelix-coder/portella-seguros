@@ -25,7 +25,8 @@ assets/css/style.css           # estilos; cores e fontes em :root (variáveis CS
 assets/js/main.js              # pó dourado, menu mobile, carrosséis, contadores, FAQ e modal de cotação
 api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
 crm/                           # CRM de seguros e consórcio (React); especificação em docs/CRM.md
-vercel.json, scripts/build-vercel.sh  # publicação: site na raiz e demonstração do CRM em /seguro
+vercel.json, scripts/build-vercel.sh  # publicação: site na raiz, CRM de Seguros em /seguro e demo do Consórcio
+crm/supabase/                  # banco do CRM de Seguros (migrations SQL) e a função `usuarios`
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
 assets/img/seguradoras/         # logos da faixa (26): *.png originais 600x240; o site usa *.webp 300x120 (mais leves)
@@ -55,12 +56,48 @@ Elementos extras: botão flutuante e modal de cotação em 2 etapas, que monta a
 ## Publicação na Vercel
 
 O `vercel.json` instala o CRM (`cd crm && npm ci`) e roda `scripts/build-vercel.sh`, que monta a
-pasta `publico/` com o site na raiz e a **demonstração do CRM de Seguros em `/seguro`**, só com a
-equipe (administradora e produtores), sem clientes de teste; os dados ficam só no navegador e quem
-abriu a demonstração antiga tem os clientes de teste dela apagados (`/seguros` também leva para lá).
+pasta `publico/` com o site na raiz e o **CRM de Seguros em `/seguro`**, já com os dados no Supabase
+(ver "CRM de Seguros no Supabase" abaixo; `/seguros` também leva para lá). Quem tinha aberto a
+demonstração antiga tem o banco dela apagado do navegador.
 A **demonstração do CRM de Consórcio fica em `/consorcio`**, com cotas, lances e propostas fictícios
 (dados só no navegador; o botão "Recomeçar" da faixa de demonstração volta ao início). A função `api/avaliacoes.js`
-continua publicada. As demonstrações não são indexadas pelo Google (`X-Robots-Tag: noindex`).
+continua publicada. O CRM e a demonstração não são indexados pelo Google (`X-Robots-Tag: noindex`).
+
+## CRM de Seguros no Supabase
+
+Desde 02/11/2026 os dados do CRM de Seguros ficam no projeto Supabase **"Portella CRM"**
+(`ruycxxylbqpqkgrznggw`, região São Paulo, plano gratuito), compartilhados pela equipe.
+
+- **Banco:** `crm/supabase/migrations/` (aplicadas no projeto). Uma tabela por coleção do CRM, com o
+  registro em `dados` (jsonb).
+- **Regras de acesso:** ficam no banco (RLS e gatilhos), não só na tela.
+  - O produtor vê só a própria carteira e as propostas em que participa; não aprova, não lança
+    recebimentos e não vê o financeiro.
+  - A gestão vê tudo.
+  - Quem está inativo ou ainda com a senha provisória não vê nenhum dado.
+  - A tabela `auditoria` guarda quem criou, alterou ou excluiu cada registro.
+- **Logins:** a função `usuarios` (`crm/supabase/functions/usuarios/`) cria logins e redefine senhas com a
+  chave de serviço, que só existe no servidor. O login vira um e-mail interno
+  (`login@crm.portellacorretora.com.br`), e nenhum e-mail é enviado.
+- **Senha padrão:** `portella1`, para usuário novo e senha redefinida. A troca é obrigatória no 1º acesso.
+- **Configuração do app:** `crm/apps/crm-seguros/.env.production` tem a URL e a chave **publicável** do projeto.
+  As duas são públicas por natureza e vão para o navegador; a proteção vem das regras do banco.
+  A chave de serviço nunca entra no repositório.
+- **Desenvolvimento e testes:** `npm run dev:seguros`, `npm test` e o e2e continuam com os dados no navegador
+  (IndexedDB). Só o build de publicação usa o Supabase.
+
+**1º acesso:** a tela "Primeiro acesso" cria a administradora e já cadastra a equipe (`padroes.ts`) com a
+senha padrão. Leva uns 15 segundos. Faça o 1º acesso assim que o CRM for publicado, porque até lá qualquer
+pessoa que abrir `/seguro` pode fazer isso. Os logins da equipe ficam com a senha padrão até cada pessoa
+entrar e trocar.
+
+**Painel do Supabase (uma vez):** em *Authentication › Sign In / Providers*, desligar
+"Allow new users to sign up". Os logins são criados só pela função.
+
+**Cuidados do plano gratuito:**
+- Não há backup automático: exporte os relatórios em Excel toda semana até migrar para o plano Pro,
+  que tem backup diário.
+- O projeto pausa depois de 7 dias sem uso. Com uso diário, isso não acontece; se pausar, reative no painel.
 
 Para testar o build na máquina: `sh scripts/build-vercel.sh` e depois `cd publico && python3 -m http.server`.
 
@@ -126,12 +163,14 @@ O que depende da Portella (contas próprias):
 - [ ] CRM de seguros e consórcio: em `crm/` (React), especificação em `docs/CRM.md`. O CRM de Seguros
   passou pela revisão de UX/UI (interface refinada) e segue o visual "A5 · Vidro + Bento" escolhido pela
   cliente (tema claro padrão, menu no topo, busca Ctrl K e painel inicial com produção, comissões e
-  pagamento do mês). Falta escolher o backend para os dados serem compartilhados entre computadores.
+  pagamento do mês). Os dados do CRM de Seguros ficam no Supabase desde 02/11/2026 (ver acima).
   Ajustes da reunião de 29/10/2026 feitos (apólice simplificada com status e checklist em PDF, ramo Moto,
   proposta com forma de pagamento e placa, saldo no lugar da parcela, comissões pendentes por cliente,
   origem e distribuição dos leads, endereço pelo CEP/CNPJ e instalação como aplicativo). Pendentes:
-  - [ ] Backend com banco de dados (entrega combinada para terça).
-  - [ ] Aniversário dos clientes por e-mail (vem com o backend).
+  - [x] Backend com banco de dados (CRM de Seguros no Supabase, 02/11/2026). Falta o 1º acesso da administradora.
+  - [ ] CRM de Consórcio no Supabase (hoje continua como demonstração no navegador).
+  - [ ] Aniversário dos clientes por e-mail (agora possível com o Supabase: tarefa agendada + envio de e-mail).
+  - [ ] Plano Pro do Supabase, para ter backup diário automático.
   - [ ] Consórcio dentro do CRM de Seguros: aguardando a planilha e os dados de assembleia e contemplação da Deliziane.
   - [ ] Acesso para publicar o site (Deliziane vai pedir ao Bruno).
 

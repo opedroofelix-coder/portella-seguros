@@ -83,6 +83,12 @@
   distribuição por produto (Usuários › "Recebe as cotações novas de"). Endereço pelo CEP e pelo CNPJ (não há
   consulta pública por CPF). CRM instalável como aplicativo (PWA). Ficam para depois: backend, aniversário por
   e-mail (com o backend) e consórcio dentro do CRM de Seguros.
+- **Backend (02/11/2026):** o CRM de Seguros publicado em `/seguro` (antes demonstração) usa o Supabase "Portella CRM"
+  (`ruycxxylbqpqkgrznggw`, São Paulo, plano gratuito): migrations em `crm/supabase/migrations/` (mudança de
+  banco = nova migration aplicada no projeto + cópia no repositório), função `usuarios` em `crm/supabase/functions/`,
+  adaptador em `crm/packages/infra-supabase`. Senha padrão `portella1` (troca obrigatória). Desenvolvimento,
+  testes e demo do Consórcio continuam no IndexedDB. Regras de acesso também no banco (RLS): mudou uma regra
+  em `permissoes.ts`/`propostas.ts`/`notas.ts`, mude a política correspondente.
 - **Bloco de notas (30/10/2026):** produtor tem a gaveta "Notas" (proposta B, só checklist + recados recebidos,
   sem anotações livres); administração/gestão tem o mural no Painel (proposta C: pendências do CRM, recados da
   equipe, meu checklist). Canvas das propostas: https://claude.ai/artifact/6mSTs99JfpKx7xKu9tdKW8

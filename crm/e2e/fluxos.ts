@@ -25,9 +25,9 @@ export async function entrar(page: Page, url: string, u: { login: string; senha:
   await page.getByRole('button', { name: 'Entrar' }).click();
 }
 
-/** Primeiro login de um usuário cadastrado com a senha 1234: troca obrigatória antes de entrar. */
+/** Primeiro login de um usuário cadastrado com a senha padrão (portella1): troca obrigatória antes de entrar. */
 export async function entrarPelaPrimeiraVez(page: Page, url: string, u: { login: string; senha: string }) {
-  await entrar(page, url, { login: u.login, senha: '1234' });
+  await entrar(page, url, { login: u.login, senha: 'portella1' });
   await expect(page.getByRole('heading', { name: 'Crie sua senha' })).toBeVisible();
   await page.getByLabel('Nova senha', { exact: true }).fill(u.senha);
   await page.getByLabel('Confirme a nova senha').fill(u.senha);
@@ -75,7 +75,7 @@ export async function sair(page: Page) {
   await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible();
 }
 
-/** Cadastra com a senha provisória 1234. */
+/** Cadastra com a senha provisória (portella1). */
 export async function cadastrarUsuario(
   page: Page,
   u: { nome: string; login: string; percentual?: string },

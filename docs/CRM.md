@@ -149,8 +149,8 @@ produtor envolvido (ranking de vendas), e não o prêmio dividido pelo % de cada
 | Relatório de comissões pendentes por produtor e por cliente | ✔ PDF e Excel |
 | Painel: produção por produtor (proporcional ao %), novo × renovação, por produto e seguradora em R$, recebida × repassada, pendente por produtor, crescimento mês a mês e ano a ano | ✔ menu **Painel de produção** |
 | Consórcio | ✔ CRM separado, com as mesmas telas de propostas e relatórios |
-| Dados compartilhados entre computadores | ✘ falta: depende da escolha do backend |
-| Aniversário dos clientes por e-mail (29/10/2026) | ✘ vem com o backend (envio automático precisa de servidor); a data de nascimento já fica no cadastro |
+| Dados compartilhados entre computadores | ✔ CRM de Seguros no Supabase (02/11/2026); Consórcio ainda no navegador |
+| Aniversário dos clientes por e-mail (29/10/2026) | ✘ falta: agora dá para fazer com o Supabase (tarefa agendada + envio de e-mail); a data de nascimento já fica no cadastro |
 | Consórcio dentro do CRM de Seguros (29/10/2026) | ✘ aguardando a planilha de consórcio e os dados de assembleia e contemplação |
 
 ## 2. Perfis de usuário
@@ -498,14 +498,43 @@ crm/
   a passo do iPhone (Safari › Compartilhar › Adicionar à Tela de Início). A versão nova baixa sozinha e
   entra quando o aplicativo é aberto de novo; o acesso pelo navegador continua igual.
 
-### Backend (decisão pendente)
+### Backend: Supabase (02/11/2026)
 
-Hoje os dados ficam no **navegador** (IndexedDB), separados por app. Isso serve para
-avaliar o sistema e para uso num único computador, mas **não sincroniza entre pessoas
-nem tem backup**. Para a equipe usar de verdade, falta escolher um backend (ex.: Supabase,
-com login e regras de acesso no servidor). A troca é feita só no `container.ts` de cada
-app, com novas implementações de `Repositorio` e `GatewayAutenticacao`; as regras de perfil
-de `core/application/permissoes.ts` viram políticas no servidor.
+O **CRM de Seguros publicado** (`/seguro`) guarda os dados no Supabase: projeto "Portella CRM",
+`ruycxxylbqpqkgrznggw`, região São Paulo, plano gratuito. O desenvolvimento, os testes e a demonstração
+do Consórcio continuam no **navegador** (IndexedDB).
+
+- **Troca de infraestrutura:** só em `apps/crm-seguros/src/infrastructure/container.ts`
+  (`criarServicosSupabase`), com o pacote `packages/infra-supabase`.
+  - `RepositorioSupabase`: uma tabela por coleção, com o registro inteiro em `dados` (jsonb).
+  - `RepositorioUsuariosSupabase`: perfil, ativo e senha provisória em colunas próprias.
+  - `AutenticacaoSupabase`: Auth do Supabase. O login vira o e-mail interno
+    `login@crm.portellacorretora.com.br`.
+- **Regras no servidor:** `crm/supabase/migrations/`. A RLS e os gatilhos repetem
+  `core/application/permissoes.ts`, `propostas.ts` e `notas.ts`:
+
+  | Tabela | Quem lê | Quem grava |
+  |---|---|---|
+  | clientes, oportunidades, apólices | gestão; produtor, os próprios | produtor cria e edita os próprios (sem transferir); gestão tudo; só a gestão exclui |
+  | propostas | gestão; dono; quem participa da divisão | produtor só pendente e sem recebimentos; gestão tudo |
+  | estornos, vales, pagamentos | gestão; produtor, os próprios | gestão |
+  | movimentos, despesas, fechamentos | gestão | gestão |
+  | catálogos | todos | gestão |
+  | checklist | só o dono | só o dono |
+  | recados | gestão; destinatário | gestão; destinatário só marca o próprio "feito" |
+  | usuários | todos (a equipe aparece nas listas) | administração; cada um só tira a própria marca de senha provisória |
+
+  Quem está inativo ou ainda com a senha provisória não lê nenhum dado. A tabela `auditoria` registra quem
+  criou, alterou ou excluiu cada registro, e só a administração a lê.
+- **Logins:** função `usuarios` (`crm/supabase/functions/usuarios/index.ts`), com a chave de serviço, que só
+  existe no servidor.
+  - `configurar`: o 1º administrador; só funciona com o sistema vazio.
+  - `criar`: novo usuário com a senha padrão `portella1`.
+  - `redefinir-senha`: volta a senha de alguém para a padrão.
+  - A porta `GatewayAutenticacao` ganhou `cadastrarUsuario?` e `sistemaConfigurado?`, usadas pelo
+    `ServicoUsuarios` quando existem.
+- **Consórcio:** pode passar para o mesmo projeto depois, com tabelas `cotas` e `lances` e o mesmo
+  `container.ts`.
 
 ## 7. Qualidade
 

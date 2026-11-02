@@ -22,7 +22,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
 
   test('primeiro acesso, equipe, cliente, apólice, renovação e permissões', async ({ page }) => {
     await primeiroAcesso(page, URL);
-    // Os produtores da Portella já entram cadastrados, com senha 1234 e o % padrão
+    // Os produtores da Portella já entram cadastrados, com a senha padrão e o % padrão
     await irPara(page, 'Usuários');
     await expect(page.getByRole('row', { name: /Deliziane.*40%/ })).toContainText('Aguardando 1º acesso');
     await cadastrarUsuario(page, CORRETOR, 'Produtor');
@@ -97,7 +97,7 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await escolher(page.getByLabel('Etapa de Lead Teste'), { label: 'Proposta enviada' });
     await expect(page.getByRole('region', { name: 'Proposta enviada' })).toContainText('Lead Teste');
 
-    // Corretor: troca a senha 1234 no primeiro acesso; não vê a carteira da administradora nem usuários
+    // Corretor: troca a senha padrão no primeiro acesso; não vê a carteira da administradora nem usuários
     await sair(page);
     await entrarPelaPrimeiraVez(page, URL, CORRETOR);
     await expect(page.getByRole('link', { name: 'Usuários' })).toHaveCount(0);
