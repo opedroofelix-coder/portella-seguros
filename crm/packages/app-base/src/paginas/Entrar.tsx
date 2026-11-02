@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SENHA_TAMANHO_MINIMO } from '@portella/core';
+import { SENHA_PADRAO, SENHA_TAMANHO_MINIMO } from '@portella/core';
 import { Botao, Campo, Carregando, Entrada } from '@portella/ui';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -100,7 +100,8 @@ function FormularioLogin({ destino }: { destino: string }) {
         </Botao>
         {refinada && (
           <p className={styles.texto}>
-            Esqueceu a senha? Peça à administradora para redefinir: você entra com 1234 e cria uma nova.
+            Esqueceu a senha? Peça à administradora para redefinir: você entra com {SENHA_PADRAO} e cria uma
+            nova.
           </p>
         )}
       </form>
@@ -122,7 +123,7 @@ function FormularioPrimeiroAcesso() {
     setErro(null);
     try {
       const admin = await usuarios.configurarAdministrador({ nome, login, senha });
-      // Equipe inicial de produtores (senha 1234, troca no primeiro acesso).
+      // Equipe inicial de produtores (senha padrão, troca no primeiro acesso).
       if (produtoresIniciais?.length) await usuarios.criarProdutoresIniciais(admin, produtoresIniciais);
       await entrar(login, senha);
     } catch (e) {
@@ -137,7 +138,7 @@ function FormularioPrimeiroAcesso() {
       {refinada && produtoresIniciais?.length ? (
         <p className={styles.texto}>
           Crie a conta de administrador. A equipe já entra cadastrada, com usuário igual ao primeiro nome e
-          senha 1234: {produtoresIniciais.map((p) => p.nome).join(', ')}. Ajuste em Usuários depois.
+          senha {SENHA_PADRAO}: {produtoresIniciais.map((p) => p.nome).join(', ')}. Ajuste em Usuários depois.
         </p>
       ) : (
         <p className={styles.texto}>

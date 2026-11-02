@@ -33,7 +33,7 @@ export interface ConfigApp {
   nomeFunil: string;
   /** Seções extras na ficha do cliente (ex.: apólices, cotas). */
   importacao?: Importacao;
-  /** Produtores cadastrados no primeiro acesso, com senha 1234. */
+  /** Produtores cadastrados no primeiro acesso, com a senha padrão. */
   produtoresIniciais?: ProdutorInicial[];
   abasCliente?: Array<{ id: string; rotulo: string; render: (cliente: Cliente) => ReactNode }>;
   /**

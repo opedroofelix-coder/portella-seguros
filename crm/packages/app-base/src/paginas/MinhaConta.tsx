@@ -16,7 +16,7 @@ const esquema = z
     nova: z
       .string()
       .min(SENHA_TAMANHO_MINIMO, `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres.`)
-      .refine((v) => v !== SENHA_PADRAO, 'Escolha uma senha diferente de 1234.'),
+      .refine((v) => v !== SENHA_PADRAO, `Escolha uma senha diferente de ${SENHA_PADRAO}.`),
     confirmacao: z.string(),
   })
   .refine((d) => d.nova === d.confirmacao, { path: ['confirmacao'], message: 'As senhas não conferem.' });
@@ -106,7 +106,7 @@ export function PaginaMinhaConta() {
   );
 }
 
-/** Tela única para quem entrou com a senha provisória 1234: só segue depois de trocar. */
+/** Tela única para quem entrou com a senha provisória (SENHA_PADRAO): só segue depois de trocar. */
 export function TrocaObrigatoria() {
   const usuario = useUsuario();
   const { sair } = useSessao();

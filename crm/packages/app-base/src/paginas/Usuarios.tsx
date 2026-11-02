@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Perfil, Usuario } from '@portella/core';
-import { PERFIS, sugerirLogin } from '@portella/core';
+import { PERFIS, SENHA_PADRAO, sugerirLogin } from '@portella/core';
 import {
   Botao,
   CabecalhoPagina,
@@ -53,7 +53,7 @@ export function PaginaUsuarios() {
             Usuários e <em>produtores</em>
           </>
         }
-        descricao="Todo usuário novo entra com a senha 1234 e cria a própria senha no primeiro acesso."
+        descricao={`Todo usuário novo entra com a senha ${SENHA_PADRAO} e cria a própria senha no primeiro acesso.`}
         acoes={
           <Botao icone="mais" onClick={() => setEditando('novo')}>
             Novo usuário
@@ -90,7 +90,7 @@ export function PaginaUsuarios() {
                   !u.ativo ? (
                     <Selo tom="perigo">Desativado</Selo>
                   ) : u.trocarSenha ? (
-                    <Selo tom="alerta">{refinada ? 'Aguardando 1º acesso' : 'Senha 1234'}</Selo>
+                    <Selo tom="alerta">{refinada ? 'Aguardando 1º acesso' : `Senha ${SENHA_PADRAO}`}</Selo>
                   ) : (
                     <Selo tom="sucesso">Ativo</Selo>
                   ),
@@ -140,7 +140,7 @@ function ModalNovoUsuario({ aoFechar }: { aoFechar: () => void }) {
       }),
     onSuccess: async (u) => {
       await cliente.invalidateQueries({ queryKey: ['usuarios'] });
-      avisar(`${u.nome} foi cadastrado. Usuário: ${u.login} · senha inicial 1234.`);
+      avisar(`${u.nome} foi cadastrado. Usuário: ${u.login} · senha inicial ${SENHA_PADRAO}.`);
       aoFechar();
     },
     onError: (e) => {
@@ -209,7 +209,7 @@ function ModalNovoUsuario({ aoFechar }: { aoFechar: () => void }) {
           <Entrada inputMode="decimal" placeholder="Ex.: 40" {...register('percentualRepasse')} />
         </Campo>
         <p className="texto-suave span-todo" style={{ margin: 0 }}>
-          Senha inicial: <strong>1234</strong>. A troca é obrigatória no primeiro acesso.
+          Senha inicial: <strong>{SENHA_PADRAO}</strong>. A troca é obrigatória no primeiro acesso.
         </p>
       </form>
     </Modal>
@@ -279,7 +279,7 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
     onSuccess: async () => {
       await atualizarCache();
       setConfirmarSenha(false);
-      avisar(`Senha de ${usuario.nome} redefinida para 1234.`);
+      avisar(`Senha de ${usuario.nome} redefinida para ${SENHA_PADRAO}.`);
     },
     onError: (e) => avisar(mensagemErro(e), 'erro'),
   });
@@ -296,7 +296,7 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
           <>
             {!(refinada && proprio) && (
               <Botao variante="secundario" onClick={() => setConfirmarSenha(true)}>
-                Redefinir senha para 1234
+                Redefinir senha para {SENHA_PADRAO}
               </Botao>
             )}
             <Botao variante="secundario" onClick={aoFechar}>
@@ -408,7 +408,7 @@ function ModalEditarUsuario({ usuario, aoFechar }: { usuario: Usuario; aoFechar:
       <ConfirmarAcao
         aberto={confirmarSenha}
         titulo="Redefinir senha?"
-        mensagem={`A senha de ${usuario.nome} volta a ser 1234 e será trocada no próximo acesso.`}
+        mensagem={`A senha de ${usuario.nome} volta a ser ${SENHA_PADRAO} e será trocada no próximo acesso.`}
         textoConfirmar="Redefinir"
         carregando={redefinir.isPending}
         aoConfirmar={() => redefinir.mutate()}

@@ -3,6 +3,7 @@ import type { Cliente } from '../domain/cliente';
 import { validarCliente } from '../domain/cliente';
 import { ErroAutenticacao, ErroNaoEncontrado, ErroPermissao, ErroValidacao } from '../domain/erros';
 import type { Usuario } from '../domain/usuario';
+import { SENHA_PADRAO } from '../domain/usuario';
 import { AutenticacaoMemoria, RepositorioMemoria } from '../testes/memoria';
 import { ServicoAutenticacao } from './autenticacao';
 import { ServicoCarteira } from './carteira';
@@ -34,6 +35,24 @@ describe('usuários e autenticação', () => {
     ).rejects.toThrow(ErroValidacao);
   });
 
+  it('com servidor (Supabase), o 1º acesso não lê a lista de usuários antes do login', async () => {
+    const cadastrados: Array<{ usuario: Usuario; primeiroAcesso: boolean }> = [];
+    const servidor = Object.assign(new AutenticacaoMemoria(), {
+      sistemaConfigurado: async () => cadastrados.length > 0,
+      cadastrarUsuario: async (usuario: Usuario, _senha: string | undefined, primeiroAcesso: boolean) => {
+        cadastrados.push({ usuario, primeiroAcesso });
+      },
+    });
+    const semAcesso = new RepositorioMemoria<Usuario>();
+    semAcesso.listar = async () => {
+      throw new ErroPermissao();
+    };
+    const remoto = new ServicoUsuarios(semAcesso, servidor, ambiente);
+    const admin = await remoto.configurarAdministrador(ADMIN);
+    expect(cadastrados).toEqual([{ usuario: admin, primeiroAcesso: true }]);
+    await expect(remoto.configurarAdministrador(ADMIN)).rejects.toThrow(ErroValidacao);
+  });
+
   it('entra com login ou e-mail, mantém a sessão e sai', async () => {
     await usuarios.configurarAdministrador({ ...ADMIN, login: 'ana@x.com' });
     await expect(sessao.entrar('ana@x.com', 'errada')).rejects.toThrow(ErroAutenticacao);
@@ -43,7 +62,7 @@ describe('usuários e autenticação', () => {
     expect(await sessao.usuarioAtual()).toBeNull();
   });
 
-  it('usuário novo recebe a senha 1234 e precisa trocá-la; a nova não pode ser 1234 nem curta', async () => {
+  it('usuário novo recebe a senha padrão e precisa trocá-la; a nova não pode ser a padrão nem curta', async () => {
     const admin = await usuarios.configurarAdministrador(ADMIN);
     const gisele = await usuarios.criar(admin, {
       nome: 'Gisele',
@@ -52,17 +71,19 @@ describe('usuários e autenticação', () => {
       percentualRepasse: 50,
     });
     expect(gisele).toMatchObject({ trocarSenha: true, percentualRepasse: 50 });
-    const logada = await sessao.entrar('gisele', '1234');
-    await expect(usuarios.alterarPropriaSenha(logada, '1234', '1234')).rejects.toThrow(ErroValidacao);
-    await expect(usuarios.alterarPropriaSenha(logada, '1234', '123')).rejects.toThrow(ErroValidacao);
-    const atualizada = await usuarios.alterarPropriaSenha(logada, '1234', 'gisele-nova');
+    const logada = await sessao.entrar('gisele', SENHA_PADRAO);
+    await expect(usuarios.alterarPropriaSenha(logada, SENHA_PADRAO, SENHA_PADRAO)).rejects.toThrow(
+      ErroValidacao,
+    );
+    await expect(usuarios.alterarPropriaSenha(logada, SENHA_PADRAO, '123')).rejects.toThrow(ErroValidacao);
+    const atualizada = await usuarios.alterarPropriaSenha(logada, SENHA_PADRAO, 'gisele-nova');
     expect(atualizada.trocarSenha).toBeUndefined();
     expect((await repo.obter(gisele.id))?.trocarSenha).toBeUndefined();
-    await expect(sessao.entrar('gisele', '1234')).rejects.toThrow(ErroAutenticacao);
+    await expect(sessao.entrar('gisele', SENHA_PADRAO)).rejects.toThrow(ErroAutenticacao);
     await expect(sessao.entrar('gisele', 'gisele-nova')).resolves.toBeTruthy();
   });
 
-  it('só administrador cria usuários e redefine senha para 1234; login é único', async () => {
+  it('só administrador cria usuários e redefine senha para a padrão; login é único', async () => {
     const admin = await usuarios.configurarAdministrador(ADMIN);
     const gestor = await usuarios.criar(admin, { nome: 'Gil', login: 'gil', perfil: 'gestor' });
     await expect(usuarios.criar(gestor, { nome: 'Cid', login: 'cid', perfil: 'corretor' })).rejects.toThrow(
@@ -84,7 +105,7 @@ describe('usuários e autenticação', () => {
     await expect(usuarios.redefinirSenhaPadrao(gestor, cid.id)).rejects.toThrow(ErroPermissao);
     await usuarios.redefinirSenhaPadrao(admin, cid.id);
     expect((await repo.obter(cid.id))?.trocarSenha).toBe(true);
-    await expect(sessao.entrar('cid', '1234')).resolves.toBeTruthy();
+    await expect(sessao.entrar('cid', SENHA_PADRAO)).resolves.toBeTruthy();
   });
 
   it('cria a equipe inicial com logins pelo primeiro nome, sem repetir a administradora', async () => {

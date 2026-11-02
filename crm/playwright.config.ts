@@ -2,7 +2,9 @@ import { defineConfig } from '@playwright/test';
 import { existsSync } from 'node:fs';
 
 // No ambiente de nuvem o Chromium já vem instalado; localmente o Playwright usa o próprio.
-const chromium = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const chromium = ['/opt/pw-browsers/chromium-1194/chrome-linux/chrome', '/opt/pw-browsers/chromium'].find(
+  (c) => existsSync(c),
+);
 
 const todos = [
   { nome: 'catalogo', comando: 'npm run catalogo', porta: 5180 },
@@ -29,7 +31,7 @@ export default defineConfig({
   timeout: 60_000,
   use: {
     locale: 'pt-BR',
-    launchOptions: existsSync(chromium) ? { executablePath: chromium } : {},
+    launchOptions: chromium ? { executablePath: chromium } : {},
   },
   // E2E_SERVIDORES=catalogo,seguros sobe só os servidores informados (padrão: todos).
   webServer: servidores.map(({ comando, porta }) => ({
