@@ -33,3 +33,13 @@ export function CotasDoCliente({ cliente }: { cliente: Cliente }) {
     </>
   );
 }
+
+/** Cliente com cota ativa ou contemplada não pode ser excluído: a cota perderia o vínculo. */
+export function useBloqueioExclusaoConsorcio(cliente: Cliente): string | null {
+  const { data = [] } = useCotas();
+  const ativas = data.filter(
+    (c) => c.clienteId === cliente.id && (c.status === 'ativa' || c.status === 'contemplada'),
+  ).length;
+  if (!ativas) return null;
+  return `${cliente.nome} tem ${ativas === 1 ? '1 cota ativa ou contemplada' : `${ativas} cotas ativas ou contempladas`}. Cancele ou quite ${ativas === 1 ? 'a cota' : 'as cotas'} antes de excluir o cadastro.`;
+}

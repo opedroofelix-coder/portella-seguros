@@ -4,7 +4,7 @@ import { AppCrm, MENU_COMUM, PRODUTORES_INICIAIS, ROTA_FUNIL } from '@portella/a
 import { criarImportacao } from '../application/importacao';
 import type { ServicosSeguros } from '../application/servicos';
 import { RAMOS } from '../domain/catalogo';
-import { ApolicesDoCliente } from './componentes/ApolicesDoCliente';
+import { ApolicesDoCliente, useBloqueioExclusaoSeguros } from './componentes/ApolicesDoCliente';
 import { CadastrarApolice } from './componentes/CadastrarApolice';
 import { PaginaApolices } from './paginas/Apolices';
 import { PaginaFinanceiro } from './paginas/Financeiro';
@@ -81,6 +81,7 @@ export function App({
     ],
     importacao: criarImportacao(servicos),
     produtoresIniciais: PRODUTORES_INICIAIS,
+    useBloqueioExclusaoCliente: useBloqueioExclusaoSeguros,
     abasCliente: [
       { id: 'apolices', rotulo: 'Apólices', render: (cliente) => <ApolicesDoCliente cliente={cliente} /> },
     ],

@@ -352,6 +352,7 @@
 /* Ação sempre à mão (bloco de notas) no topo do celular: à direita, depois da busca. */
 .topoAcao {
   display: flex;
+  gap: 4px;
   margin-left: auto;
 }
 .topoBusca + .topoAcao {

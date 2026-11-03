@@ -37,6 +37,8 @@ export interface EstruturaProps {
   marca?: { icone: string; nomeClaro: string; nomeEscuro: string };
   /** Ação fixa na cápsula (ex.: "Nova proposta"). */
   acaoTopo?: ReactNode;
+  /** A mesma ação na barra do topo do celular, só com ícone (ex.: "Nova proposta"). */
+  acaoMovel?: ReactNode;
   /**
    * Botão que fica sempre à mão (ex.: o bloco de notas): na cápsula, antes de `acaoTopo`; no menu lateral,
    * no topo do celular e no rodapé do menu no computador.
@@ -143,6 +145,7 @@ function EstruturaLateral({
   marca,
   buscar,
   acaoBarra,
+  acaoMovel,
 }: EstruturaProps) {
   const [aberto, setAberto] = useState(false);
   const [slot, setSlot] = useState<HTMLElement | null>(null);
@@ -233,7 +236,12 @@ function EstruturaLateral({
             Buscar
           </Botao>
         )}
-        {acaoBarra && !desktop && <span className={styles.topoAcao}>{acaoBarra('topo')}</span>}
+        {(acaoBarra || acaoMovel) && !desktop && (
+          <span className={styles.topoAcao}>
+            {acaoMovel}
+            {acaoBarra?.('topo')}
+          </span>
+        )}
       </header>
 
       {aberto && <button className={styles.veu} aria-label="Fechar menu" onClick={() => setAberto(false)} />}

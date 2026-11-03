@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SENHA_PADRAO, SENHA_TAMANHO_MINIMO } from '@portella/core';
+import { ErroAutenticacao, SENHA_PADRAO, SENHA_TAMANHO_MINIMO } from '@portella/core';
 import { Botao, Campo, Carregando, Entrada } from '@portella/ui';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -10,6 +10,11 @@ import { aplicarErros, mensagemErro } from '../erros';
 import { useServicos } from '../servicos';
 import { useSessao } from '../sessao/Sessao';
 import styles from './Entrar.module.css';
+
+/** Senhas erradas seguidas antes da primeira espera; a espera dobra a cada nova falha, até 5 minutos. */
+const TENTATIVAS_SEM_ESPERA = 5;
+const ESPERA_INICIAL_MS = 30_000;
+const ESPERA_MAXIMA_MS = 5 * 60_000;
 
 const esquemaLogin = z.object({
   login: z.string().trim().min(1, 'Informe o usuário.'),
@@ -59,14 +64,41 @@ function FormularioLogin({ destino }: { destino: string }) {
   const { register, handleSubmit, formState } = useForm<z.infer<typeof esquemaLogin>>({
     resolver: zodResolver(esquemaLogin),
   });
+  // Depois de várias senhas erradas seguidas, uma espera crescente antes de tentar de novo
+  // (o Supabase também limita por IP; isto evita chegar lá e desanima quem tenta adivinhar).
+  const falhas = useRef(0);
+  const [esperaAte, setEsperaAte] = useState(0);
+  const [agora, setAgora] = useState(() => Date.now());
+  const segundos = Math.max(0, Math.ceil((esperaAte - agora) / 1000));
+  useEffect(() => {
+    if (!esperaAte) return;
+    const relogio = setInterval(() => {
+      setAgora(Date.now());
+      if (Date.now() >= esperaAte) {
+        setEsperaAte(0);
+        clearInterval(relogio);
+      }
+    }, 1000);
+    return () => clearInterval(relogio);
+  }, [esperaAte]);
 
   const enviar = handleSubmit(async ({ login, senha }) => {
+    if (Date.now() < esperaAte) return;
     setErro(null);
     try {
       await entrar(login, senha);
+      falhas.current = 0;
       navegar(destino, { replace: true });
     } catch (e) {
       setErro(mensagemErro(e));
+      if (!(e instanceof ErroAutenticacao)) return;
+      falhas.current += 1;
+      if (falhas.current >= TENTATIVAS_SEM_ESPERA) {
+        const vezes = falhas.current - TENTATIVAS_SEM_ESPERA;
+        const espera = Math.min(ESPERA_MAXIMA_MS, ESPERA_INICIAL_MS * 2 ** vezes);
+        setAgora(Date.now());
+        setEsperaAte(Date.now() + espera);
+      }
     }
   });
 
@@ -95,9 +127,14 @@ function FormularioLogin({ destino }: { destino: string }) {
             Mostrar a senha
           </label>
         )}
-        <Botao type="submit" blocoInteiro carregando={formState.isSubmitting}>
-          Entrar
+        <Botao type="submit" blocoInteiro carregando={formState.isSubmitting} disabled={segundos > 0}>
+          {segundos > 0 ? `Aguarde ${segundos} s` : 'Entrar'}
         </Botao>
+        {segundos > 0 && (
+          <p className={styles.texto} role="status">
+            Muitas tentativas com a senha errada. Aguarde {segundos} segundos para tentar de novo.
+          </p>
+        )}
         {refinada && (
           <p className={styles.texto}>
             Esqueceu a senha? Peça à administradora para redefinir: você entra com {SENHA_PADRAO} e cria uma

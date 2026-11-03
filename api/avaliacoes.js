@@ -9,7 +9,9 @@ var CAMPOS = ['id', 'rating', 'userRatingCount', 'googleMapsUri', 'reviews'];
 
 module.exports = async function (req, res) {
   var key = process.env.GOOGLE_PLACES_API_KEY;
-  if (!key) return responder(res, 503, { erro: 'GOOGLE_PLACES_API_KEY não configurada' }, 'no-store');
+  // Sem a chave ou com o Google fora do ar, responde 200 com a lista vazia: o site mantém as
+  // avaliações fixas do HTML e o navegador do visitante não registra erro no console.
+  if (!key) return responder(res, 200, { avaliacoes: [], indisponivel: 'GOOGLE_PLACES_API_KEY não configurada' }, 'no-store');
 
   try {
     var headers = { 'X-Goog-Api-Key': key, 'Content-Type': 'application/json' };
@@ -58,7 +60,7 @@ module.exports = async function (req, res) {
     }, 's-maxage=86400, stale-while-revalidate=86400');
   } catch (e) {
     console.error(e);
-    responder(res, 502, { erro: 'Falha ao consultar o Google' }, 'no-store');
+    responder(res, 200, { avaliacoes: [], indisponivel: 'Falha ao consultar o Google' }, 's-maxage=300');
   }
 };
 

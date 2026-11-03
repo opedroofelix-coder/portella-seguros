@@ -394,6 +394,24 @@
   $$('form input, form textarea').forEach(function (c) {
     c.addEventListener('input', function () { c.setCustomValidity(''); });
   });
+  // Máscara do WhatsApp: (11) 91234-5678 enquanto digita; colar com +55 também funciona.
+  function mascaraTelefone(v) {
+    var d = v.replace(/\D/g, '');
+    if (d.length > 11 && d.indexOf('55') === 0) d = d.slice(2);
+    d = d.slice(0, 11);
+    if (d.length <= 2) return d ? '(' + d : '';
+    if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2);
+    if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6);
+    return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+  }
+  $$('[data-mascara-telefone]').forEach(function (c) {
+    c.addEventListener('input', function (e) {
+      // apagando: deixa como está, para o hífen e os parênteses não "voltarem" sozinhos
+      if (e.inputType && e.inputType.indexOf('delete') === 0) return;
+      c.value = mascaraTelefone(c.value);
+    });
+    c.addEventListener('blur', function () { c.value = mascaraTelefone(c.value); });
+  });
 
   /* ---------- Modal de cotação ---------- */
   var modal = $('[data-modal]');
@@ -512,6 +530,7 @@
   /* ---------- Formulário de contato: abre o WhatsApp com a mensagem pronta ---------- */
   var contactForm = $('[data-contact-form]');
   var contatoEnviado = 0;
+  var contactStatus = $('[data-contact-status]');
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -529,8 +548,14 @@
         '',
         d.mensagem.value.trim()
       ].filter(function (l, i) { return l || i === 4; }).join('\n');
-      window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+      var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
+      // nova aba bloqueada pelo navegador: abre na mesma aba (a mensagem não se perde)
+      if (!window.open(url, '_blank')) { window.location.href = url; return; }
+      contactForm.reset();
+      if (contactStatus) contactStatus.textContent = 'Mensagem pronta no WhatsApp.';
     });
+    // começou a escrever outra mensagem: tira o aviso
+    contactForm.addEventListener('input', function () { if (contactStatus) contactStatus.textContent = ''; });
   }
 
   /* ---------- Ano no rodapé ---------- */

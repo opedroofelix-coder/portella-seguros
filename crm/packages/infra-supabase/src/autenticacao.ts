@@ -25,6 +25,9 @@ export class AutenticacaoSupabase implements GatewayAutenticacao {
     });
     if (error || !data.user) {
       if (error && /fetch|network/i.test(error.message)) throw traduzirErro(error);
+      // Limite de tentativas do Supabase (por IP): não é senha errada.
+      if (error?.status === 429)
+        throw new ErroAutenticacao('Muitas tentativas seguidas. Aguarde um minuto e tente de novo.');
       throw new ErroAutenticacao();
     }
     const id = await this.idDoAuth(data.user.id);

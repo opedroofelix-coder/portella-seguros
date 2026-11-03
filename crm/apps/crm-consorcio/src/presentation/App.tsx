@@ -4,7 +4,7 @@ import { AppCrm, MENU_COMUM, PRODUTORES_INICIAIS, ROTA_FUNIL } from '@portella/a
 import { criarImportacao } from '../application/importacao';
 import type { ServicosConsorcio } from '../application/servicos';
 import { TIPOS_BEM } from '../domain/cota';
-import { CotasDoCliente } from './componentes/CotasDoCliente';
+import { CotasDoCliente, useBloqueioExclusaoConsorcio } from './componentes/CotasDoCliente';
 import { PaginaCotas } from './paginas/Cotas';
 import { PaginaLances } from './paginas/Lances';
 import { PaginaPainel } from './paginas/Painel';
@@ -47,6 +47,7 @@ export function App({
     ],
     importacao: criarImportacao(servicos),
     produtoresIniciais: PRODUTORES_INICIAIS,
+    useBloqueioExclusaoCliente: useBloqueioExclusaoConsorcio,
     abasCliente: [
       {
         id: 'cotas',

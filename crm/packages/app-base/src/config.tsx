@@ -37,6 +37,11 @@ export interface ConfigApp {
   produtoresIniciais?: ProdutorInicial[];
   abasCliente?: Array<{ id: string; rotulo: string; render: (cliente: Cliente) => ReactNode }>;
   /**
+   * Hook do app que diz por que o cliente não pode ser excluído (ex.: apólice em vigor), ou null.
+   * Precisa ser um hook estável: é chamado em toda renderização da ficha.
+   */
+  useBloqueioExclusaoCliente?: (cliente: Cliente) => string | null;
+  /**
    * 'refinada' liga a revisão de UX nas telas comuns: confirmações antes de excluir, campos de R$ e %
    * com máscara, pilha de modais, avisos de erro que não somem… Sem ela, as telas ficam como eram.
    */

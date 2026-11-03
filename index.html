@@ -375,8 +375,8 @@
         <!-- TODO: conectar o formulário a um serviço de envio (ex.: Formspree, e-mail ou WhatsApp) -->
         <form class="contact-form reveal reveal-d1" data-contact-form>
           <h3>Envie uma mensagem</h3>
-          <label><span class="sr-only">Nome</span><input type="text" name="nome" placeholder="Seu nome" autocomplete="name" required></label>
-          <label><span class="sr-only">E-mail (opcional)</span><input type="email" name="email" placeholder="E-mail (opcional)" autocomplete="email"></label>
+          <label><span class="sr-only">Nome</span><input type="text" name="nome" placeholder="Seu nome" autocomplete="name" maxlength="80" required></label>
+          <label><span class="sr-only">E-mail (opcional)</span><input type="email" name="email" placeholder="E-mail (opcional)" autocomplete="email" maxlength="120"></label>
           <label><span class="sr-only">Assunto</span>
             <!-- os grupos de seguros são copiados da lista "Cotar" (data-type-select) pelo main.js -->
             <select name="assunto" data-subject-select>
@@ -387,9 +387,10 @@
               </optgroup>
             </select>
           </label>
-          <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="2" placeholder="Como podemos ajudar?" required data-autogrow></textarea></label>
+          <label><span class="sr-only">Mensagem</span><textarea name="mensagem" rows="2" placeholder="Como podemos ajudar?" maxlength="1000" required data-autogrow></textarea></label>
           <button class="btn btn-gold btn-lg" type="submit">Enviar pelo WhatsApp</button>
           <p class="form-note">Abrimos o WhatsApp com a sua mensagem pronta. É só tocar em enviar.</p>
+          <p class="form-status" data-contact-status role="status"></p>
         </form>
       </div>
     </section>
@@ -452,8 +453,8 @@
       <h3 id="modal-title">Solicitar cotação</h3>
       <p class="modal__lead">São 2 etapas rápidas. No fim, abrimos o WhatsApp com tudo preenchido.</p>
       <form class="modal__step" data-step="1">
-        <label class="field">Seu nome<input type="text" name="nome" autocomplete="name" required></label>
-        <label class="field">WhatsApp com DDD<input type="tel" name="telefone" inputmode="tel" autocomplete="tel" placeholder="(11) 90000-0000" required></label>
+        <label class="field">Seu nome<input type="text" name="nome" autocomplete="name" maxlength="80" required></label>
+        <label class="field">WhatsApp com DDD<input type="tel" name="telefone" inputmode="tel" autocomplete="tel" placeholder="(11) 90000-0000" maxlength="20" data-mascara-telefone required></label>
         <button class="btn btn-gold btn-lg" type="submit">Continuar</button>
       </form>
       <form class="modal__step" data-step="2" hidden>
@@ -470,13 +471,13 @@
             <button class="plan" type="button" aria-pressed="false">Por adesão (pela profissão)</button>
             <button class="plan" type="button" aria-pressed="false">Empresarial (PME)</button>
           </fieldset>
-          <label class="field">Profissão (para planos por adesão)<input type="text" name="profissao"></label>
+          <label class="field">Profissão (para planos por adesão)<input type="text" name="profissao" maxlength="60"></label>
           <div class="field-row">
-            <label class="field">Idade do titular<input type="number" name="idade" min="0" inputmode="numeric"></label>
-            <label class="field">Nº de pessoas<input type="number" name="pessoas" min="1" inputmode="numeric"></label>
+            <label class="field">Idade do titular<input type="number" name="idade" min="0" max="120" inputmode="numeric"></label>
+            <label class="field">Nº de pessoas<input type="number" name="pessoas" min="1" max="99" inputmode="numeric"></label>
           </div>
         </div>
-        <label class="field">Algum detalhe? (opcional)<textarea name="detalhes" rows="1" data-modal-details data-autogrow></textarea></label>
+        <label class="field">Algum detalhe? (opcional)<textarea name="detalhes" rows="1" maxlength="500" data-modal-details data-autogrow></textarea></label>
         <button class="btn btn-gold btn-lg" type="submit">Enviar pelo WhatsApp</button>
       </form>
     </div>

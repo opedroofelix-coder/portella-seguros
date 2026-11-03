@@ -1,7 +1,9 @@
 import type { Cliente } from '@portella/core';
+import { hojeISO } from '@portella/core';
 import { Botao, Carregando, EstadoVazio } from '@portella/ui';
 import { useState } from 'react';
 import type { Apolice } from '../../domain/apolice';
+import { situacao } from '../../domain/apolice';
 import { useApolices } from '../hooks';
 import { EstadoErro } from './EstadoErro';
 import { FormularioApolice } from './FormularioApolice';
@@ -45,4 +47,18 @@ export function ApolicesDoCliente({ cliente }: { cliente: Cliente }) {
       )}
     </>
   );
+}
+
+/**
+ * Cliente com apólice em vigor (ou a iniciar) não pode ser excluído: a apólice perderia o vínculo.
+ * Vencidas, renovadas e canceladas não bloqueiam.
+ */
+export function useBloqueioExclusaoSeguros(cliente: Cliente): string | null {
+  const { data = [] } = useApolices();
+  const hoje = hojeISO();
+  const ativas = data.filter(
+    (a) => a.clienteId === cliente.id && ['vigente', 'a_vencer', 'a_iniciar'].includes(situacao(a, hoje)),
+  ).length;
+  if (!ativas) return null;
+  return `${cliente.nome} tem ${ativas === 1 ? '1 apólice em vigor' : `${ativas} apólices em vigor`}. Cancele ${ativas === 1 ? 'a apólice' : 'as apólices'} antes de excluir o cadastro.`;
 }

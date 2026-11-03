@@ -215,6 +215,18 @@ function Layout() {
           </Link>
         ) : undefined
       }
+      acaoMovel={
+        navegacao === 'topo' ? (
+          <Link
+            className={classesBotao({ variante: 'fantasma', soIcone: true })}
+            to="/propostas?nova=1"
+            aria-label="Nova proposta"
+            title="Nova proposta"
+          >
+            <Icone nome="mais" tamanho={20} />
+          </Link>
+        ) : undefined
+      }
       usuario={{ nome: usuario.nome, perfil: rotuloPerfil(usuario.perfil) }}
       aoSair={async () => {
         // Vai para o login antes de encerrar a sessão, para não guardar a página atual

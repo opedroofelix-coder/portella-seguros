@@ -74,7 +74,8 @@ export function ProvedorAvisos({ children, duracao = 4500 }: { children: ReactNo
     const el = pilha.current;
     if (!el) return;
     const posicionar = () => {
-      const celular = window.matchMedia('(max-width: 719px)').matches;
+      const celular =
+        typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 719px)').matches;
       const rodapes = document.querySelectorAll('[role="dialog"] footer, [role="alertdialog"] footer');
       const rodape = rodapes[rodapes.length - 1];
       if (!celular || !rodape) {

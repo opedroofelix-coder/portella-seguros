@@ -21,6 +21,7 @@ import {
   Entrada,
   EstadoVazio,
   Icone,
+  Modal,
   Selecao,
   Selo,
   Tabela,
@@ -188,7 +189,8 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
   const { clientes } = useServicos();
   const { pode } = useSessao();
   const { nomeDe } = useEquipe();
-  const { abasCliente = [] } = useConfig();
+  const { abasCliente = [], useBloqueioExclusaoCliente = semBloqueio } = useConfig();
+  const bloqueio = useBloqueioExclusaoCliente(cliente);
   const refinada = useRefinada();
   const { avisar } = useAvisos();
   const navegar = useNavigate();
@@ -300,8 +302,18 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
         )}
       </div>
       {editar && <FormularioCliente cliente={cliente} aoFechar={() => setEditar(false)} />}
+      {confirmar && bloqueio && (
+        <Modal
+          aberto
+          titulo="Não dá para excluir este cliente"
+          aoFechar={() => setConfirmar(false)}
+          rodape={<Botao onClick={() => setConfirmar(false)}>Entendi</Botao>}
+        >
+          <p>{bloqueio}</p>
+        </Modal>
+      )}
       <ConfirmarAcao
-        aberto={confirmar}
+        aberto={confirmar && !bloqueio}
         perigo
         titulo={refinada ? 'Excluir cliente?' : 'Remover cliente?'}
         mensagem={
@@ -325,6 +337,8 @@ function FichaCliente({ cliente }: { cliente: Cliente }) {
     </>
   );
 }
+
+const semBloqueio = (): string | null => null;
 
 /** Propostas (vendas) do cliente: pelo vínculo ou, nas importadas, pelo nome. */
 function PropostasDoCliente({ cliente }: { cliente: Cliente }) {

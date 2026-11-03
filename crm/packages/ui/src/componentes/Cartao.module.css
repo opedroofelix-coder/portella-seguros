@@ -24,6 +24,15 @@
 .titulo {
   font-size: 17px;
 }
+/* Link de ação do cartão ("Detalhes", "Ver lances"…): área de toque de 44px sem mudar o desenho. */
+.cabecalho > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-block: -10px;
+  padding-inline: 4px;
+  margin-inline-end: -4px;
+}
 
 /* Indicador: faixa colorida de 3px no topo, ícone em caixa tonal e valor em negrito na cor do tom. */
 .indicador {
