@@ -265,7 +265,10 @@ function FormularioOportunidade({
       nomeContato: oportunidade?.nomeContato ?? '',
       telefone: oportunidade?.telefone ? formatarTelefone(oportunidade.telefone) : '',
       email: oportunidade?.email ?? '',
-      produto: oportunidade?.produto ?? produtos[0] ?? '',
+      // Interface refinada: a lista vem do catálogo e chega depois do formulário montar; um padrão
+      // fixado aqui (ex.: "Auto") seria salvo mesmo com outro produto na tela. Começa em "Escolha…",
+      // como em Propostas: o produto decide quem recebe a cotação.
+      produto: oportunidade?.produto ?? (refinada ? '' : (produtos[0] ?? '')),
       etapa: oportunidade?.etapa ?? 'novo',
       valorEstimado: (refinada ? textoDinheiro : centavosParaTexto)(oportunidade?.valorEstimado),
       motivoPerda: oportunidade?.motivoPerda ?? '',
@@ -372,6 +375,7 @@ function FormularioOportunidade({
           </Campo>
           <Campo rotulo="Produto" obrigatorio erro={erros.produto?.message}>
             <Selecao {...register('produto')}>
+              {refinada && <option value="">Escolha…</option>}
               {[...new Set([...produtos, oportunidade?.produto].filter(Boolean) as string[])].map((p) => (
                 <option key={p}>{p}</option>
               ))}
