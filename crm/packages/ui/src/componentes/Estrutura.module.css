@@ -358,6 +358,22 @@
 .topoBusca + .topoAcao {
   margin-left: 0;
 }
+/* Botões do topo nunca encolhem abaixo de 44px; quem cede espaço é a marca. */
+.topo > button,
+.topo > a:not(.topoMarca),
+.topoAcao {
+  flex-shrink: 0;
+}
+.topoMarca {
+  min-width: 0;
+  overflow: hidden;
+}
+/* Celular estreito com ação extra no topo (Nova proposta, notas): sai o nome do sistema. */
+@media (max-width: 379px) {
+  .topo:has(.topoAcao) .topoSistema {
+    display: none;
+  }
+}
 
 /*
  * Modo "topo" no computador largo: cápsula de vidro flutuante com o grupo principal do menu,
