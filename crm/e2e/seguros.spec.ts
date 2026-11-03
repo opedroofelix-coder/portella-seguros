@@ -92,8 +92,13 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await escolher(lead.getByLabel('Origem'), { label: 'Indicação' });
     await lead.getByLabel('Indicado por').fill('Maria Teste');
     await expect(lead.getByRole('button', { name: 'Cadastrar como cliente' })).toBeVisible();
+    // Sem produto escolhido não salva (antes salvava "Auto" com outro produto na tela).
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(lead.getByText('Escolha o produto.')).toBeVisible();
+    await escolher(lead.getByLabel('Produto'), { label: 'Vida' });
     await page.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByRole('region', { name: 'Novo' })).toContainText('Indicação de Maria Teste');
+    await expect(page.getByRole('region', { name: 'Novo' })).toContainText('Vida');
     await escolher(page.getByLabel('Etapa de Lead Teste'), { label: 'Proposta enviada' });
     await expect(page.getByRole('region', { name: 'Proposta enviada' })).toContainText('Lead Teste');
 
