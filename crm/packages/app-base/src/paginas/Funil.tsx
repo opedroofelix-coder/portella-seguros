@@ -363,14 +363,14 @@ function FormularioOportunidade({
           <Campo rotulo="Contato" obrigatorio erro={erros.nomeContato?.message}>
             <Entrada {...register('nomeContato')} />
           </Campo>
-          <Campo rotulo="Telefone">
+          <Campo rotulo="Telefone" erro={erros.telefone?.message}>
             {refinada ? (
               <EntradaMascara mascara="telefone" type="tel" {...register('telefone')} />
             ) : (
               <Entrada type="tel" inputMode="tel" {...register('telefone')} />
             )}
           </Campo>
-          <Campo rotulo="E-mail">
+          <Campo rotulo="E-mail" erro={erros.email?.message}>
             <Entrada type="email" {...register('email')} />
           </Campo>
           <Campo rotulo="Produto" obrigatorio erro={erros.produto?.message}>

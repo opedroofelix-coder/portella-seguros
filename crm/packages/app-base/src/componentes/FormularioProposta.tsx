@@ -4,6 +4,7 @@ import {
   centavosParaTexto,
   FORMAS_PAGAMENTO,
   comissaoCalculada,
+  conferirRecebimentos,
   formatarData,
   formatarDinheiro,
   hojeISO,
@@ -326,7 +327,9 @@ export function FormularioProposta({ proposta, aoFechar }: { proposta?: Proposta
 
   const salvar = useMutation({
     mutationFn: async ({ valores, aprovar }: { valores: Valores; aprovar: boolean }) => {
-      const salva = await propostas.salvar(usuario, montar(valores));
+      const dados = montar(valores);
+      conferirRecebimentos(dados);
+      const salva = await propostas.salvar(usuario, dados);
       return aprovar && salva.status === 'pendente' ? propostas.aprovar(usuario, salva.id) : salva;
     },
     onSuccess: async (p, { aprovar }) => {

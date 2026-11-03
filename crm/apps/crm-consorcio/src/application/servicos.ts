@@ -3,7 +3,7 @@ import { CATALOGOS_PADRAO, montarServicosBase } from '@portella/app-base';
 import type { Repositorio } from '@portella/core';
 import { ServicoCarteira } from '@portella/core';
 import type { Cota } from '../domain/cota';
-import { validarCota } from '../domain/cota';
+import { conferirCotaRepetida, validarCota } from '../domain/cota';
 import type { Lance } from '../domain/lance';
 import { validarLance } from '../domain/lance';
 
@@ -17,7 +17,7 @@ export function montarServicos(
 ): ServicosConsorcio {
   return {
     ...montarServicosBase(repos, CATALOGOS_PADRAO),
-    cotas: new ServicoCarteira<Cota>(repos.cotas, validarCota),
+    cotas: new ServicoCarteira<Cota>(repos.cotas, validarCota, undefined, conferirCotaRepetida),
     lances: new ServicoCarteira<Lance>(repos.lances, validarLance),
   };
 }

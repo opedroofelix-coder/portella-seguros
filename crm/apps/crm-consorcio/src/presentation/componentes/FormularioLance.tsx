@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { identificacaoCota } from '../../domain/cota';
 import type { Lance } from '../../domain/lance';
-import { ROTULO_TIPO_LANCE, TIPOS_LANCE } from '../../domain/lance';
+import { ROTULO_TIPO_LANCE, TIPOS_LANCE, validarLanceNaCota } from '../../domain/lance';
 import { useCotas, useServicosConsorcio } from '../hooks';
 
 const esquema = z.object({
@@ -49,14 +49,17 @@ export function FormularioLance({ lance, aoFechar }: { lance?: Lance; aoFechar: 
 
   const enviar = handleSubmit(async (v) => {
     const d = limparVazios(v);
+    const cota = cotas.find((c) => c.id === v.cotaId);
     try {
+      const valor = d.valor ? (paraCentavos(d.valor) ?? undefined) : undefined;
+      if (cota) validarLanceNaCota({ assembleia: v.assembleia, valor }, cota);
       await salvar.mutateAsync({
         ...(lance ?? { resultado: 'aguardando' as const }),
         ...d,
         percentual: d.percentual ? (paraCentavos(d.percentual) ?? 0) / 100 : undefined,
-        valor: d.valor ? (paraCentavos(d.valor) ?? undefined) : undefined,
+        valor,
         // O lance pertence ao responsável pela cota.
-        responsavelId: lance?.responsavelId ?? cotas.find((c) => c.id === v.cotaId)?.responsavelId,
+        responsavelId: lance?.responsavelId ?? cota?.responsavelId,
       });
       avisar(lance ? 'Lance atualizado.' : 'Lance registrado.');
       aoFechar();

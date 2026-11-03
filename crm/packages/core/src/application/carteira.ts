@@ -15,6 +15,8 @@ export class ServicoCarteira<T extends Registro> {
     protected readonly repositorio: Repositorio<T>,
     protected readonly validarDados: (dados: DadosRegistro<T>) => void = () => {},
     protected readonly ambiente: Ambiente = ambientePadrao,
+    /** Regras que dependem dos outros registros (ex.: CPF já cadastrado). Não vale na importação. */
+    protected readonly conferirExistentes?: (dados: DadosRegistro<T>, existentes: T[]) => void,
   ) {}
 
   async listar(usuario: Usuario): Promise<T[]> {
@@ -30,6 +32,7 @@ export class ServicoCarteira<T extends Registro> {
 
   async salvar(usuario: Usuario, dados: DadosRegistro<T>): Promise<T> {
     this.validarDados(dados);
+    if (this.conferirExistentes) this.conferirExistentes(dados, await this.repositorio.listar());
     const agora = this.ambiente.agora().toISOString();
     const existente = dados.id ? await this.repositorio.obter(dados.id) : null;
 

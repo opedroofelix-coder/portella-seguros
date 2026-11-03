@@ -1,5 +1,6 @@
 import type { Centavos, DataISO, Registro } from '@portella/core';
-import { dataValida, ErroValidacao } from '@portella/core';
+import { dataValida, ErroValidacao, formatarData, formatarDinheiro } from '@portella/core';
+import type { Cota } from './cota';
 
 export const TIPOS_LANCE = ['livre', 'fixo', 'embutido'] as const;
 export type TipoLance = (typeof TIPOS_LANCE)[number];
@@ -35,5 +36,18 @@ export function validarLance(l: Partial<Lance>): void {
   if (l.percentual == null && l.valor == null) campos.percentual = 'Informe o percentual ou o valor.';
   if (l.percentual != null && (l.percentual <= 0 || l.percentual > 100))
     campos.percentual = 'Entre 0 e 100%.';
+  if (Object.keys(campos).length) throw new ErroValidacao('Confira os dados do lance.', campos);
+}
+
+/** Lance coerente com a cota: valor até o crédito e assembleia depois da adesão. */
+export function validarLanceNaCota(
+  l: Pick<Lance, 'assembleia' | 'valor'>,
+  cota: Pick<Cota, 'valorCredito' | 'dataAdesao'>,
+): void {
+  const campos: Record<string, string> = {};
+  if (l.valor != null && l.valor > cota.valorCredito)
+    campos.valor = `Maior que o crédito da cota (${formatarDinheiro(cota.valorCredito)}).`;
+  if (l.assembleia && cota.dataAdesao && l.assembleia < cota.dataAdesao)
+    campos.assembleia = `Antes da adesão da cota (${formatarData(cota.dataAdesao)}).`;
   if (Object.keys(campos).length) throw new ErroValidacao('Confira os dados do lance.', campos);
 }

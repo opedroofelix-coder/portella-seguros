@@ -287,6 +287,8 @@ test.describe('CRM Seguros — fluxo completo', () => {
     await cli.getByLabel('Nome completo').fill('Joana Pereira Lima');
     await escolher(cli.getByLabel('Origem'), { label: 'Instagram' });
     await page.getByRole('button', { name: 'Salvar' }).click();
+    // Com a janela ainda aberta (salvando), "Instagram" aparece também na lista de origem.
+    await expect(cli).toBeHidden();
     await expect(page.getByText('Instagram')).toBeVisible();
 
     await irPara(page, 'Propostas');

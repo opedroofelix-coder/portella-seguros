@@ -1,4 +1,4 @@
-import { telefoneValido } from './documento';
+import { emailValido, telefoneValido } from './documento';
 import type { Centavos } from './dinheiro';
 import { ErroValidacao } from './erros';
 import type { DataISO, Registro } from './registro';
@@ -85,13 +85,14 @@ export function registrarMovimentacoes(
 }
 
 export function validarOportunidade(
-  o: Pick<Oportunidade, 'nomeContato' | 'produto' | 'etapa' | 'telefone'>,
+  o: Pick<Oportunidade, 'nomeContato' | 'produto' | 'etapa' | 'telefone' | 'email'>,
 ): void {
   const campos: Record<string, string> = {};
   if (o.nomeContato.trim().length < 2) campos.nomeContato = 'Informe o nome do contato.';
   if (!o.produto.trim()) campos.produto = 'Informe o produto.';
   if (!ETAPAS.includes(o.etapa)) campos.etapa = 'Etapa inválida.';
   if (o.telefone && !telefoneValido(o.telefone)) campos.telefone = 'Telefone inválido.';
+  if (o.email && !emailValido(o.email)) campos.email = 'E-mail inválido.';
   if (Object.keys(campos).length) throw new ErroValidacao('Confira os dados da oportunidade.', campos);
 }
 
