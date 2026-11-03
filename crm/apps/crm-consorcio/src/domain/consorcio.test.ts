@@ -3,13 +3,14 @@ import { describe, expect, it } from 'vitest';
 import type { Cota } from './cota';
 import {
   camposPendentes,
+  conferirCotaRepetida,
   identificacaoCota,
   parcelasRestantes,
   progresso,
   resumirCotas,
   validarCota,
 } from './cota';
-import { validarLance } from './lance';
+import { validarLance, validarLanceNaCota } from './lance';
 
 let n = 0;
 const cota = (p: Partial<Cota>): Cota => ({
@@ -106,5 +107,38 @@ describe('lance', () => {
         resultado: 'aguardando',
       }),
     ).toThrow();
+  });
+});
+
+describe('cota repetida e lance coerente com a cota', () => {
+  const existentes = [{ id: 'a', administradora: 'Porto Seguro', grupo: '1234', cota: '57' }];
+  it('recusa a mesma administradora, grupo e cota', () => {
+    expect(() =>
+      conferirCotaRepetida({ administradora: 'porto seguro ', grupo: '1234', cota: '57' }, existentes),
+    ).toThrow(ErroValidacao);
+  });
+  it('aceita outra cota, cota pendente e a edição da própria cota', () => {
+    expect(() =>
+      conferirCotaRepetida({ administradora: 'Porto Seguro', grupo: '1234', cota: '58' }, existentes),
+    ).not.toThrow();
+    expect(() =>
+      conferirCotaRepetida({ administradora: 'Porto Seguro', grupo: '1234' }, existentes),
+    ).not.toThrow();
+    expect(() =>
+      conferirCotaRepetida(
+        { id: 'a', administradora: 'Porto Seguro', grupo: '1234', cota: '57' },
+        existentes,
+      ),
+    ).not.toThrow();
+  });
+  it('lance: valor até o crédito e assembleia depois da adesão', () => {
+    const cota = { valorCredito: 10_000_000, dataAdesao: '2025-01-10' };
+    try {
+      validarLanceNaCota({ assembleia: '2000-01-01', valor: 99_999_999_900 }, cota);
+      expect.unreachable();
+    } catch (e) {
+      expect(Object.keys((e as ErroValidacao).campos).sort()).toEqual(['assembleia', 'valor']);
+    }
+    expect(() => validarLanceNaCota({ assembleia: '2026-11-20', valor: 3_000_000 }, cota)).not.toThrow();
   });
 });

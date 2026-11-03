@@ -17,6 +17,16 @@
     width: 380px;
   }
 }
+/* Com uma janela aberta, os botões dela ficam embaixo (Salvar, Cancelar): no computador os avisos
+   sobem para o topo, à esquerda, longe do botão de fechar. No celular, o Avisos.tsx os põe logo
+   acima dos botões da janela. */
+@media (min-width: 720px) {
+  :global(body:has([role='dialog'], [role='alertdialog'])) .pilha {
+    top: 24px;
+    left: 24px;
+    right: auto;
+  }
+}
 .aviso {
   pointer-events: auto;
   display: flex;

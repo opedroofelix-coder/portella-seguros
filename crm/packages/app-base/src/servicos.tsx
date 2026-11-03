@@ -23,6 +23,7 @@ import {
   ServicoPropostas,
   ServicoRecados,
   ServicoUsuarios,
+  conferirClienteRepetido,
   validarCliente,
   validarEstorno,
   validarOportunidade,
@@ -84,7 +85,7 @@ export function montarServicosBase(
   return {
     autenticacao: new ServicoAutenticacao(r.auth, r.usuarios),
     usuarios,
-    clientes: new ServicoCarteira<Cliente>(r.clientes, validarCliente),
+    clientes: new ServicoCarteira<Cliente>(r.clientes, validarCliente, undefined, conferirClienteRepetido),
     oportunidades: new ServicoOportunidades(r.oportunidades, validarOportunidade, () => usuarios.listar()),
     propostas: new ServicoPropostas(r.propostas),
     estornos: new ServicoLancamentosGestao<Estorno>(r.estornos, validarEstorno),

@@ -1,5 +1,5 @@
 import type { Centavos, DataISO, Registro } from '@portella/core';
-import { dataValida, ErroValidacao } from '@portella/core';
+import { dataValida, ErroValidacao, normalizar } from '@portella/core';
 
 export const TIPOS_BEM = [
   { id: 'imovel', nome: 'Imóvel' },
@@ -57,6 +57,29 @@ export function validarCota(c: Partial<Cota>): void {
   if (c.status === 'contemplada' && !c.contemplacao)
     campos.contemplacao = 'Informe a data e a forma da contemplação.';
   if (Object.keys(campos).length) throw new ErroValidacao('Confira os dados da cota.', campos);
+}
+
+const chaveCota = (c: Pick<Cota, 'administradora' | 'grupo' | 'cota'>) =>
+  c.grupo?.trim() && c.cota?.trim()
+    ? [normalizar(c.administradora ?? ''), normalizar(c.grupo), normalizar(c.cota)].join('|')
+    : null;
+
+/**
+ * Não deixa cadastrar a mesma cota (administradora, grupo e cota) duas vezes. Cota com grupo ou
+ * número pendente não é conferida; repetidas de antes desta regra continuam editáveis.
+ */
+export function conferirCotaRepetida(
+  c: Partial<Pick<Cota, 'id' | 'administradora' | 'grupo' | 'cota'>>,
+  existentes: Array<Pick<Cota, 'id' | 'administradora' | 'grupo' | 'cota'>>,
+): void {
+  const chave = chaveCota({ administradora: c.administradora ?? '', grupo: c.grupo, cota: c.cota });
+  if (!chave) return;
+  const anterior = c.id ? existentes.find((x) => x.id === c.id) : undefined;
+  if (anterior && chaveCota(anterior) === chave) return;
+  if (existentes.some((x) => x.id !== c.id && chaveCota(x) === chave))
+    throw new ErroValidacao('Esta cota já está cadastrada.', {
+      cota: `Já existe a cota ${c.grupo} / ${c.cota} da ${c.administradora}.`,
+    });
 }
 
 /** Campos que faltam para completar o cadastro da cota. */

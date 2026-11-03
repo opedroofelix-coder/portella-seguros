@@ -1,5 +1,5 @@
 import type { Centavos } from './dinheiro';
-import { porcentagem } from './dinheiro';
+import { formatarDinheiro, porcentagem } from './dinheiro';
 import { dataValida } from './datas';
 import { ErroValidacao } from './erros';
 import type { DataISO, Registro } from './registro';
@@ -168,6 +168,18 @@ export function validarProposta(p: Partial<Proposta>): void {
   if ((p.recebimentos ?? []).some((r) => !dataValida(r.data) || r.valor < 0))
     campos.recebimentos = 'Confira data e valor dos recebimentos.';
   if (Object.keys(campos).length) throw new ErroValidacao('Confira os dados da proposta.', campos);
+}
+
+/**
+ * Recebimentos da comissão principal (sem o vitalício) acima da comissão a receber: o saldo ficaria
+ * em zero e o excesso sumiria. Conferido no formulário, para não travar propostas antigas.
+ */
+export function conferirRecebimentos(p: Pick<Proposta, 'comissaoReceber' | 'recebimentos'>): void {
+  const recebido = recebidoPrincipal(p);
+  if (recebido <= p.comissaoReceber) return;
+  throw new ErroValidacao('Os recebimentos passam da comissão a receber.', {
+    comissaoReceber: `Os recebimentos somam ${formatarDinheiro(recebido)}, mais que a comissão a receber. Ajuste a comissão ou os valores recebidos.`,
+  });
 }
 
 /** Estorno (cancelamento): desconta da comissão da corretora e do pagamento do produtor. */

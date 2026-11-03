@@ -383,6 +383,18 @@
     if (t.form) t.form.addEventListener('reset', function () { setTimeout(function () { t.style.height = ''; }); });
   });
 
+  /* ---------- Validação: campo só com espaços conta como vazio; telefone com DDD ---------- */
+  function exigir(campo, ok, msg) {
+    campo.setCustomValidity(ok ? '' : msg);
+    if (!ok) campo.reportValidity();
+    return ok;
+  }
+  // 10 ou 11 dígitos com DDD, ou com o 55 do Brasil na frente
+  function telefoneOk(v) { return /^(55)?\d{10,11}$/.test(v.replace(/\D/g, '')); }
+  $$('form input, form textarea').forEach(function (c) {
+    c.addEventListener('input', function () { c.setCustomValidity(''); });
+  });
+
   /* ---------- Modal de cotação ---------- */
   var modal = $('[data-modal]');
   var typeSelect = $('[data-type-select]');
@@ -459,6 +471,8 @@
 
   step1.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (!exigir(step1.nome, step1.nome.value.trim().length >= 2, 'Informe seu nome.') ||
+      !exigir(step1.telefone, telefoneOk(step1.telefone.value), 'Informe o WhatsApp com DDD, ex.: (11) 91234-5678.')) return;
     lead.nome = step1.nome.value.trim(); lead.telefone = step1.telefone.value.trim();
     setStep(2);
   });
@@ -497,10 +511,16 @@
 
   /* ---------- Formulário de contato: abre o WhatsApp com a mensagem pronta ---------- */
   var contactForm = $('[data-contact-form]');
+  var contatoEnviado = 0;
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
       var d = contactForm;
+      if (!exigir(d.nome, d.nome.value.trim().length >= 2, 'Informe seu nome.') ||
+        !exigir(d.mensagem, d.mensagem.value.trim().length > 0, 'Escreva como podemos ajudar.')) return;
+      // duplo clique: abre o WhatsApp uma vez só
+      if (Date.now() - contatoEnviado < 3000) return;
+      contatoEnviado = Date.now();
       var msg = [
         'Olá, Portella! Vim pelo site.',
         'Nome: ' + d.nome.value.trim(),
