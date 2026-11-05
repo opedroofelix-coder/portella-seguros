@@ -26,6 +26,7 @@ assets/js/main.js              # pó dourado, menu mobile, carrosséis, contador
 api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
 crm/                           # CRM de seguros e consórcio (React); especificação em docs/CRM.md
 vercel.json, scripts/build-vercel.sh  # publicação: site na raiz, CRM de Seguros em /seguro e demo do Consórcio
+scripts/build-digilocal.sh, scripts/digilocal/  # pacote zip + .htaccess para a hospedagem da DigiLocal
 crm/supabase/                  # banco do CRM de Seguros (migrations SQL) e a função `usuarios`
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
@@ -174,6 +175,22 @@ Passos:
 
 Enquanto a Portella usar o e-mail da DigiLocal, a hospedagem de lá não pode ser cancelada. O site antigo tinha
 uma página só (`/index.html`), que já redireciona para `/` no `vercel.json`.
+
+### Alternativa: hospedar na própria DigiLocal
+
+Sem mexer no DNS: `sh scripts/build-digilocal.sh` gera `publico-digilocal.zip` (o build da Vercel mais os
+`.htaccess` de `scripts/digilocal/`, que fazem o papel do `vercel.json`: https e sem www, `/index.html` → `/`,
+`/seguros` → `/seguro/`, `noindex` no CRM e cache de fontes e imagens). Testado no Apache em 05/11/2026.
+
+1. No gerenciador de arquivos do painel, mover os arquivos do site antigo de `public_html` para uma pasta de
+   backup (não apagar). Não mexer nas pastas de e-mail nem nas que começam com ponto, exceto o `.htaccess` antigo.
+2. Enviar o zip para `public_html` e extrair lá dentro (o `index.html` fica direto em `public_html`).
+3. Conferir o certificado (AutoSSL) e abrir o site, `/seguro` e `/consorcio`.
+
+Diferenças em relação à Vercel:
+- **Avaliações do Google:** a função `api/avaliacoes.js` não roda lá; o site mostra as 5 avaliações fixas do HTML.
+- **Atualizações:** cada mudança no site ou no CRM pede um novo zip e um novo envio (na Vercel é automático a cada push).
+- O CRM de Seguros funciona igual: os dados ficam no Supabase, e as rotas usam `#`, sem regra de reescrita.
 
 ## Pendências
 

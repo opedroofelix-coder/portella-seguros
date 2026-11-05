@@ -1,2 +1,5 @@
 # Saída do build de publicação (scripts/build-vercel.sh)
 publico/
+
+# Pacote da hospedagem da DigiLocal (scripts/build-digilocal.sh)
+publico-digilocal.zip
