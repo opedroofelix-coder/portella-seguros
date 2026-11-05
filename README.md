@@ -182,8 +182,10 @@ Sem mexer no DNS: `sh scripts/build-digilocal.sh` gera `publico-digilocal.zip` (
 `.htaccess` de `scripts/digilocal/`, que fazem o papel do `vercel.json`: https e sem www, `/index.html` → `/`,
 `/seguros` → `/seguro/`, `noindex` no CRM e cache de fontes e imagens). Testado no Apache em 05/11/2026.
 
-1. No gerenciador de arquivos do painel, mover os arquivos do site antigo de `public_html` para uma pasta de
-   backup (não apagar). Não mexer nas pastas de e-mail nem nas que começam com ponto, exceto o `.htaccess` antigo.
+1. No gerenciador de arquivos do painel, compactar o site antigo (backup), baixar o zip e tirar de `public_html`
+   tudo o que era dele. O backup não pode ficar dentro de `public_html`: o formulário antigo
+   (`imemail/imEmailForm.php`) continuaria aberto na internet. Não mexer nas pastas de e-mail nem nas que
+   começam com ponto, exceto o `.htaccess` antigo, que é trocado pelo novo.
 2. Enviar o zip para `public_html` e extrair lá dentro (o `index.html` fica direto em `public_html`).
 3. Conferir o certificado (AutoSSL) e abrir o site, `/seguro` e `/consorcio`.
 
@@ -191,6 +193,19 @@ Diferenças em relação à Vercel:
 - **Avaliações do Google:** a função `api/avaliacoes.js` não roda lá; o site mostra as 5 avaliações fixas do HTML.
 - **Atualizações:** cada mudança no site ou no CRM pede um novo zip e um novo envio (na Vercel é automático a cada push).
 - O CRM de Seguros funciona igual: os dados ficam no Supabase, e as rotas usam `#`, sem regra de reescrita.
+
+### Segurança da publicação
+
+- O pacote não tem código-fonte, mapas de código nem chaves secretas. A única chave do Supabase que vai junto é a
+  publicável, que é pública por natureza; os dados ficam protegidos pelas regras do banco (RLS nas 15 tabelas).
+- Cabeçalhos de segurança no `vercel.json` e no `.htaccess`: HSTS (sem `includeSubDomains`, para não afetar
+  webmail e painel), `nosniff`, `X-Frame-Options: SAMEORIGIN` (o CRM não abre dentro de outro site),
+  `Referrer-Policy` e `Permissions-Policy`.
+- Supabase (05/11/2026): cadastro aberto desligado, 1º acesso feito pela administradora. **8 dos 10 logins de
+  produtor ainda estão com a senha padrão**, que está escrita neste repositório: quem souber um login entra,
+  troca a senha e fica com a conta. Cada pessoa deve entrar e trocar a senha, ou a administração deve
+  desativar quem ainda não vai usar.
+- Proteção contra senhas vazadas (Supabase Auth) só existe no plano Pro.
 
 ## Pendências
 
