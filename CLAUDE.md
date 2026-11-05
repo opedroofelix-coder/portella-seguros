@@ -86,7 +86,7 @@
 - **Backend (02/11/2026):** o CRM de Seguros publicado em `/seguro` (antes demonstração) usa o Supabase "Portella CRM"
   (`ruycxxylbqpqkgrznggw`, São Paulo, plano gratuito): migrations em `crm/supabase/migrations/` (mudança de
   banco = nova migration aplicada no projeto + cópia no repositório), função `usuarios` em `crm/supabase/functions/`,
-  adaptador em `crm/packages/infra-supabase`. Senha padrão `portella1` (troca obrigatória). Desenvolvimento,
+  adaptador em `crm/packages/infra-supabase`. Senha provisória para usuário novo e senha redefinida, com troca obrigatória (o valor não vai para a documentação). Desenvolvimento,
   testes e demo do Consórcio continuam no IndexedDB. Regras de acesso também no banco (RLS): mudou uma regra
   em `permissoes.ts`/`propostas.ts`/`notas.ts`, mude a política correspondente.
 - **Bloco de notas (30/10/2026):** produtor tem a gaveta "Notas" (proposta B, só checklist + recados recebidos,

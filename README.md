@@ -80,7 +80,8 @@ Desde 02/11/2026 os dados do CRM de Seguros ficam no projeto Supabase **"Portell
 - **Logins:** a função `usuarios` (`crm/supabase/functions/usuarios/`) cria logins e redefine senhas com a
   chave de serviço, que só existe no servidor. O login vira um e-mail interno
   (`login@crm.portellacorretora.com.br`), e nenhum e-mail é enviado.
-- **Senha padrão:** `portella1`, para usuário novo e senha redefinida. A troca é obrigatória no 1º acesso.
+- **Senha provisória:** a mesma para usuário novo e senha redefinida (a administração sabe qual é). A troca é
+  obrigatória no 1º acesso.
 - **Configuração do app:** `crm/apps/crm-seguros/.env.production` tem a URL e a chave **publicável** do projeto.
   As duas são públicas por natureza e vão para o navegador; a proteção vem das regras do banco.
   A chave de serviço nunca entra no repositório.
@@ -88,8 +89,8 @@ Desde 02/11/2026 os dados do CRM de Seguros ficam no projeto Supabase **"Portell
   (IndexedDB). Só o build de publicação usa o Supabase.
 
 **1º acesso:** a tela "Primeiro acesso" cria a administradora e já cadastra a equipe (`padroes.ts`) com a
-senha padrão. Leva uns 15 segundos. Faça o 1º acesso assim que o CRM for publicado, porque até lá qualquer
-pessoa que abrir `/seguro` pode fazer isso. Os logins da equipe ficam com a senha padrão até cada pessoa
+senha provisória. Leva uns 15 segundos. Faça o 1º acesso assim que o CRM for publicado, porque até lá qualquer
+pessoa que abrir `/seguro` pode fazer isso. Os logins da equipe ficam com a senha provisória até cada pessoa
 entrar e trocar.
 
 **Painel do Supabase (uma vez):** em *Authentication › Sign In / Providers*, desligar
@@ -202,7 +203,7 @@ Diferenças em relação à Vercel:
   webmail e painel), `nosniff`, `X-Frame-Options: SAMEORIGIN` (o CRM não abre dentro de outro site),
   `Referrer-Policy` e `Permissions-Policy`.
 - Supabase (05/11/2026): cadastro aberto desligado, 1º acesso feito pela administradora. **8 dos 10 logins de
-  produtor ainda estão com a senha padrão**, que está escrita neste repositório: quem souber um login entra,
+  produtor ainda estão com a senha provisória**, que aparece na tela de entrada do CRM e no código: quem souber um login entra,
   troca a senha e fica com a conta. Cada pessoa deve entrar e trocar a senha, ou a administração deve
   desativar quem ainda não vai usar.
 - Proteção contra senhas vazadas (Supabase Auth) só existe no plano Pro.
