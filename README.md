@@ -133,8 +133,7 @@ consultora com versão de 440px para o celular e cache longo para fontes e image
 Primeira pintura caiu de 3,0 s para 1,2 s; SEO, acessibilidade e boas práticas em 96–100.
 
 O que depende da Portella (contas próprias):
-1. **Domínio:** na Vercel, *Settings → Domains*, adicionar `portellacorretora.com.br` e `www.portellacorretora.com.br`
-   (o www redireciona para o sem www) e trocar o DNS no registro do domínio conforme a Vercel indicar.
+1. **Domínio:** ver "Troca do domínio para a Vercel" abaixo.
 2. **Google Search Console:** criar a propriedade do tipo *Domínio* (verificação por registro TXT no DNS),
    enviar `https://portellacorretora.com.br/sitemap.xml` e pedir a indexação da página inicial.
 3. **Teste de pesquisa aprimorada do Google (Rich Results Test)** e **PageSpeed Insights:** rodar no domínio oficial depois da troca.
@@ -144,6 +143,37 @@ O que depende da Portella (contas próprias):
 5. **Pesquisa de palavras-chave** (Planejador do Google Ads, Google Trends, Ubersuggest, AnswerThePublic):
    com os dados em mãos, dá para criar páginas próprias por seguro (ex.: seguro auto em Osasco), que é o
    que mais ajuda a aparecer em buscas específicas. Hoje o site é uma página só.
+
+## Troca do domínio para a Vercel
+
+Situação em 05/11/2026: `portellacorretora.com.br` e o www ainda abrem o site antigo (feito no WebSite X5,
+servidor LiteSpeed no IP `162.141.110.147`). O DNS do domínio fica na DigiLocal (nameservers
+`ns1.digilocalmarketing.com.br` e `ns2.digilocalmarketing.com.br`), editado no painel
+https://painel.digilocalmarketing.com.br/. O **e-mail** `contato@` também está nesse servidor e não pode cair na troca.
+
+Registros atuais (não mexer nos de e-mail):
+
+| Nome | Tipo | Valor | Na troca |
+|---|---|---|---|
+| `portellacorretora.com.br` | A | 162.141.110.147 | **trocar** pelo IP que a Vercel mostrar |
+| `www` | CNAME | portellacorretora.com.br | **trocar** pelo CNAME que a Vercel mostrar |
+| `mail` | A | 162.141.110.147 | manter |
+| `portellacorretora.com.br` | MX | 0 mail.portellacorretora.com.br | manter |
+| `portellacorretora.com.br` | TXT (SPF) | v=spf1 +a +mx … | manter |
+
+Passos:
+
+1. **Vercel** (projeto `portella`, conta felix-3fc8), *Settings → Domains*: adicionar `portellacorretora.com.br`
+   (produção) e `www.portellacorretora.com.br` com redirecionamento para o sem www. A Vercel mostra o registro A
+   e o CNAME a usar.
+2. **Painel da DigiLocal**, zona DNS de `portellacorretora.com.br`: trocar só o A da raiz e o CNAME do www pelos
+   valores da Vercel. Não trocar os nameservers no Registro.br: o e-mail continua na DigiLocal.
+3. Esperar a Vercel marcar os dois domínios como válidos e emitir o certificado (TTL de 5 min; costuma levar
+   menos de 1 hora). Conferir o site, `/seguro`, o envio e o recebimento de um e-mail de teste.
+4. Depois: Google Search Console e Perfil da Empresa (itens 2 a 4 acima).
+
+Enquanto a Portella usar o e-mail da DigiLocal, a hospedagem de lá não pode ser cancelada. O site antigo tinha
+uma página só (`/index.html`), que já redireciona para `/` no `vercel.json`.
 
 ## Pendências
 
