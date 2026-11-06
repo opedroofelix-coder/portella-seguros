@@ -16,7 +16,7 @@ const esquema = z
     nova: z
       .string()
       .min(SENHA_TAMANHO_MINIMO, `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres.`)
-      .refine((v) => v !== SENHA_PADRAO, `Escolha uma senha diferente de ${SENHA_PADRAO}.`),
+      .refine((v) => v !== SENHA_PADRAO, 'Escolha uma senha diferente da senha provisória.'),
     confirmacao: z.string(),
   })
   .refine((d) => d.nova === d.confirmacao, { path: ['confirmacao'], message: 'As senhas não conferem.' });
@@ -55,7 +55,7 @@ function FormularioTrocarSenha({ senhaAtualConhecida }: { senhaAtualConhecida?: 
         erro={formState.errors.nova?.message}
         dica={
           refinada
-            ? `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres, diferente de ${SENHA_PADRAO}.`
+            ? `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres, diferente da senha provisória.`
             : `Mínimo de ${SENHA_TAMANHO_MINIMO} caracteres.`
         }
       >
