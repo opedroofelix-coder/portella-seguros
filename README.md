@@ -27,6 +27,7 @@ api/avaliacoes.js              # função da Vercel: avaliações do Google (Pla
 crm/                           # CRM de seguros e consórcio (React); especificação em docs/CRM.md
 vercel.json, scripts/build-vercel.sh  # publicação: site na raiz, CRM de Seguros em /seguro e demo do Consórcio
 scripts/build-digilocal.sh, scripts/digilocal/  # pacote zip + .htaccess para a hospedagem da DigiLocal
+.github/workflows/publicacao-digilocal.yml  # gera o branch "publicacao" (site pronto) para a DigiLocal
 crm/supabase/                  # banco do CRM de Seguros (migrations SQL) e a função `usuarios`
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
@@ -194,6 +195,22 @@ Diferenças em relação à Vercel:
 - **Avaliações do Google:** a função `api/avaliacoes.js` não roda lá; o site mostra as 5 avaliações fixas do HTML.
 - **Atualizações:** cada mudança no site ou no CRM pede um novo zip e um novo envio (na Vercel é automático a cada push).
 - O CRM de Seguros funciona igual: os dados ficam no Supabase, e as rotas usam `#`, sem regra de reescrita.
+
+### Publicação automática pelo GitHub
+
+O painel da DigiLocal não deve puxar o `main`: o repositório tem o código do CRM, este README e documentos
+internos, e o `/seguro` e o `/consorcio` só existem depois do build. A cada push no `main`, a ação
+`.github/workflows/publicacao-digilocal.yml` faz o build e atualiza o branch **`publicacao`**, que só tem o site
+pronto (o mesmo conteúdo do zip). Também dá para rodar à mão em *Actions › Publicação DigiLocal › Run workflow*.
+
+No painel da DigiLocal, ligar o repositório ao branch `publicacao`:
+- se o painel puxar direto para a pasta do site, apontar para `public_html` (vazia, com o site antigo já no
+  backup);
+- se for o "Git Version Control" do cPanel, clonar fora do `public_html` (ex.: `~/repositorios/portella`) e usar
+  *Deploy HEAD Commit*: o `.cpanel.yml` do branch copia o site para o `public_html`.
+
+Depois de cada atualização do `main`, puxar de novo no painel (*Update from Remote* / *Pull*), a não ser que o
+painel puxe sozinho.
 
 ### Segurança da publicação
 
