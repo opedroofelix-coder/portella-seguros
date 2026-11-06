@@ -1,0 +1,4 @@
+# CRM: fora do Google
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex"
+</IfModule>

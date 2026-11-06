@@ -69,7 +69,7 @@ export function validarSenha(senha: string): void {
   }
   if (senha === SENHA_PADRAO) {
     throw new ErroValidacao('Escolha uma senha diferente da senha padrão.', {
-      senha: `Diferente de ${SENHA_PADRAO}.`,
+      senha: 'Diferente da senha provisória.',
     });
   }
 }

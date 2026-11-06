@@ -1,0 +1,58 @@
+# Gera o branch "publicacao" só com o site pronto (o mesmo pacote de scripts/build-digilocal.sh).
+# A DigiLocal puxa esse branch para o public_html: o código do CRM, o README e os documentos
+# internos nunca vão para a hospedagem.
+name: Publicação DigiLocal
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicacao-digilocal
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: crm/package-lock.json
+
+      - name: Build do site e dos CRMs
+        run: |
+          cd crm && npm ci --no-audit --no-fund && cd ..
+          sh scripts/build-vercel.sh
+          cp -R scripts/digilocal/. publico/
+
+      - name: Atualiza o branch publicacao
+        env:
+          URL: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        run: |
+          if git ls-remote --exit-code --heads "$URL" publicacao >/dev/null; then
+            git clone -q --depth 1 --branch publicacao "$URL" saida
+          else
+            mkdir saida && git -C saida init -q -b publicacao && git -C saida remote add origin "$URL"
+          fi
+          find saida -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R publico/. saida/
+          # a Vercel não publica este branch (ela publica o main)
+          echo '{ "git": { "deploymentEnabled": false } }' > saida/vercel.json
+          cd saida
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nada mudou no site."
+          else
+            git commit -q -m "Publicação de ${GITHUB_SHA::7}"
+            git push -q origin publicacao
+          fi

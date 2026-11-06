@@ -1,0 +1,7 @@
+# Para o "Git Version Control" do cPanel: com o repositório clonado fora do public_html,
+# "Deploy HEAD Commit" copia o site para o public_html (sem a pasta .git, este arquivo e o vercel.json).
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=$HOME/public_html/
+    - /usr/bin/rsync -a --exclude .git --exclude .cpanel.yml --exclude vercel.json ./ $DEPLOYPATH

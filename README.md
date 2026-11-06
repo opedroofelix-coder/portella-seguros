@@ -26,6 +26,8 @@ assets/js/main.js              # pó dourado, menu mobile, carrosséis, contador
 api/avaliacoes.js              # função da Vercel: avaliações do Google (Places API)
 crm/                           # CRM de seguros e consórcio (React); especificação em docs/CRM.md
 vercel.json, scripts/build-vercel.sh  # publicação: site na raiz, CRM de Seguros em /seguro e demo do Consórcio
+scripts/build-digilocal.sh, scripts/digilocal/  # pacote zip + .htaccess para a hospedagem da DigiLocal
+.github/workflows/publicacao-digilocal.yml  # gera o branch "publicacao" (site pronto) para a DigiLocal
 crm/supabase/                  # banco do CRM de Seguros (migrations SQL) e a função `usuarios`
 assets/img/brand/              # logos vetoriais da marca (originais e versões douradas)
 assets/img/hero/               # fotos da consultora com fundo removido
@@ -79,7 +81,8 @@ Desde 02/11/2026 os dados do CRM de Seguros ficam no projeto Supabase **"Portell
 - **Logins:** a função `usuarios` (`crm/supabase/functions/usuarios/`) cria logins e redefine senhas com a
   chave de serviço, que só existe no servidor. O login vira um e-mail interno
   (`login@crm.portellacorretora.com.br`), e nenhum e-mail é enviado.
-- **Senha padrão:** `portella1`, para usuário novo e senha redefinida. A troca é obrigatória no 1º acesso.
+- **Senha provisória:** a mesma para usuário novo e senha redefinida (a administração sabe qual é). A troca é
+  obrigatória no 1º acesso.
 - **Configuração do app:** `crm/apps/crm-seguros/.env.production` tem a URL e a chave **publicável** do projeto.
   As duas são públicas por natureza e vão para o navegador; a proteção vem das regras do banco.
   A chave de serviço nunca entra no repositório.
@@ -87,8 +90,8 @@ Desde 02/11/2026 os dados do CRM de Seguros ficam no projeto Supabase **"Portell
   (IndexedDB). Só o build de publicação usa o Supabase.
 
 **1º acesso:** a tela "Primeiro acesso" cria a administradora e já cadastra a equipe (`padroes.ts`) com a
-senha padrão. Leva uns 15 segundos. Faça o 1º acesso assim que o CRM for publicado, porque até lá qualquer
-pessoa que abrir `/seguro` pode fazer isso. Os logins da equipe ficam com a senha padrão até cada pessoa
+senha provisória. Leva uns 15 segundos. Faça o 1º acesso assim que o CRM for publicado, porque até lá qualquer
+pessoa que abrir `/seguro` pode fazer isso. Os logins da equipe ficam com a senha provisória até cada pessoa
 entrar e trocar.
 
 **Painel do Supabase (uma vez):** em *Authentication › Sign In / Providers*, desligar
@@ -133,8 +136,7 @@ consultora com versão de 440px para o celular e cache longo para fontes e image
 Primeira pintura caiu de 3,0 s para 1,2 s; SEO, acessibilidade e boas práticas em 96–100.
 
 O que depende da Portella (contas próprias):
-1. **Domínio:** na Vercel, *Settings → Domains*, adicionar `portellacorretora.com.br` e `www.portellacorretora.com.br`
-   (o www redireciona para o sem www) e trocar o DNS no registro do domínio conforme a Vercel indicar.
+1. **Domínio:** ver "Troca do domínio para a Vercel" abaixo.
 2. **Google Search Console:** criar a propriedade do tipo *Domínio* (verificação por registro TXT no DNS),
    enviar `https://portellacorretora.com.br/sitemap.xml` e pedir a indexação da página inicial.
 3. **Teste de pesquisa aprimorada do Google (Rich Results Test)** e **PageSpeed Insights:** rodar no domínio oficial depois da troca.
@@ -144,6 +146,84 @@ O que depende da Portella (contas próprias):
 5. **Pesquisa de palavras-chave** (Planejador do Google Ads, Google Trends, Ubersuggest, AnswerThePublic):
    com os dados em mãos, dá para criar páginas próprias por seguro (ex.: seguro auto em Osasco), que é o
    que mais ajuda a aparecer em buscas específicas. Hoje o site é uma página só.
+
+## Troca do domínio para a Vercel
+
+Situação em 05/11/2026: `portellacorretora.com.br` e o www ainda abrem o site antigo (feito no WebSite X5,
+servidor LiteSpeed no IP `162.141.110.147`). O DNS do domínio fica na DigiLocal (nameservers
+`ns1.digilocalmarketing.com.br` e `ns2.digilocalmarketing.com.br`), editado no painel
+https://painel.digilocalmarketing.com.br/. O **e-mail** `contato@` também está nesse servidor e não pode cair na troca.
+
+Registros atuais (não mexer nos de e-mail):
+
+| Nome | Tipo | Valor | Na troca |
+|---|---|---|---|
+| `portellacorretora.com.br` | A | 162.141.110.147 | **trocar** pelo IP que a Vercel mostrar |
+| `www` | CNAME | portellacorretora.com.br | **trocar** pelo CNAME que a Vercel mostrar |
+| `mail` | A | 162.141.110.147 | manter |
+| `portellacorretora.com.br` | MX | 0 mail.portellacorretora.com.br | manter |
+| `portellacorretora.com.br` | TXT (SPF) | v=spf1 +a +mx … | manter |
+
+Passos:
+
+1. **Vercel** (projeto `portella`, conta felix-3fc8), *Settings → Domains*: adicionar `portellacorretora.com.br`
+   (produção) e `www.portellacorretora.com.br` com redirecionamento para o sem www. A Vercel mostra o registro A
+   e o CNAME a usar.
+2. **Painel da DigiLocal**, zona DNS de `portellacorretora.com.br`: trocar só o A da raiz e o CNAME do www pelos
+   valores da Vercel. Não trocar os nameservers no Registro.br: o e-mail continua na DigiLocal.
+3. Esperar a Vercel marcar os dois domínios como válidos e emitir o certificado (TTL de 5 min; costuma levar
+   menos de 1 hora). Conferir o site, `/seguro`, o envio e o recebimento de um e-mail de teste.
+4. Depois: Google Search Console e Perfil da Empresa (itens 2 a 4 acima).
+
+Enquanto a Portella usar o e-mail da DigiLocal, a hospedagem de lá não pode ser cancelada. O site antigo tinha
+uma página só (`/index.html`), que já redireciona para `/` no `vercel.json`.
+
+### Alternativa: hospedar na própria DigiLocal
+
+Sem mexer no DNS: `sh scripts/build-digilocal.sh` gera `publico-digilocal.zip` (o build da Vercel mais os
+`.htaccess` de `scripts/digilocal/`, que fazem o papel do `vercel.json`: https e sem www, `/index.html` → `/`,
+`/seguros` → `/seguro/`, `noindex` no CRM e cache de fontes e imagens). Testado no Apache em 05/11/2026.
+
+1. No gerenciador de arquivos do painel, compactar o site antigo (backup), baixar o zip e tirar de `public_html`
+   tudo o que era dele. O backup não pode ficar dentro de `public_html`: o formulário antigo
+   (`imemail/imEmailForm.php`) continuaria aberto na internet. Não mexer nas pastas de e-mail nem nas que
+   começam com ponto, exceto o `.htaccess` antigo, que é trocado pelo novo.
+2. Enviar o zip para `public_html` e extrair lá dentro (o `index.html` fica direto em `public_html`).
+3. Conferir o certificado (AutoSSL) e abrir o site, `/seguro` e `/consorcio`.
+
+Diferenças em relação à Vercel:
+- **Avaliações do Google:** a função `api/avaliacoes.js` não roda lá; o site mostra as 5 avaliações fixas do HTML.
+- **Atualizações:** cada mudança no site ou no CRM pede um novo zip e um novo envio (na Vercel é automático a cada push).
+- O CRM de Seguros funciona igual: os dados ficam no Supabase, e as rotas usam `#`, sem regra de reescrita.
+
+### Publicação automática pelo GitHub
+
+O painel da DigiLocal não deve puxar o `main`: o repositório tem o código do CRM, este README e documentos
+internos, e o `/seguro` e o `/consorcio` só existem depois do build. A cada push no `main`, a ação
+`.github/workflows/publicacao-digilocal.yml` faz o build e atualiza o branch **`publicacao`**, que só tem o site
+pronto (o mesmo conteúdo do zip). Também dá para rodar à mão em *Actions › Publicação DigiLocal › Run workflow*.
+
+No painel da DigiLocal, ligar o repositório ao branch `publicacao`:
+- se o painel puxar direto para a pasta do site, apontar para `public_html` (vazia, com o site antigo já no
+  backup);
+- se for o "Git Version Control" do cPanel, clonar fora do `public_html` (ex.: `~/repositorios/portella`) e usar
+  *Deploy HEAD Commit*: o `.cpanel.yml` do branch copia o site para o `public_html`.
+
+Depois de cada atualização do `main`, puxar de novo no painel (*Update from Remote* / *Pull*), a não ser que o
+painel puxe sozinho.
+
+### Segurança da publicação
+
+- O pacote não tem código-fonte, mapas de código nem chaves secretas. A única chave do Supabase que vai junto é a
+  publicável, que é pública por natureza; os dados ficam protegidos pelas regras do banco (RLS nas 15 tabelas).
+- Cabeçalhos de segurança no `vercel.json` e no `.htaccess`: HSTS (sem `includeSubDomains`, para não afetar
+  webmail e painel), `nosniff`, `X-Frame-Options: SAMEORIGIN` (o CRM não abre dentro de outro site),
+  `Referrer-Policy` e `Permissions-Policy`.
+- Supabase (05/11/2026): cadastro aberto desligado, 1º acesso feito pela administradora. **8 dos 10 logins de
+  produtor ainda estão com a senha provisória**, que aparece na tela de entrada do CRM e no código: quem souber um login entra,
+  troca a senha e fica com a conta. Cada pessoa deve entrar e trocar a senha, ou a administração deve
+  desativar quem ainda não vai usar.
+- Proteção contra senhas vazadas (Supabase Auth) só existe no plano Pro.
 
 ## Pendências
 
