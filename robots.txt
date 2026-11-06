@@ -1,7 +1,8 @@
 User-agent: *
 Allow: /
-# demonstração do CRM (dados fictícios) e funções internas
+# CRM de Seguros, demonstração do Consórcio e funções internas
 Disallow: /seguro/
+Disallow: /consorcio/
 Disallow: /api/
 
 Sitemap: https://portellacorretora.com.br/sitemap.xml
