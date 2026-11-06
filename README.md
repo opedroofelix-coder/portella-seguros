@@ -203,14 +203,24 @@ internos, e o `/seguro` e o `/consorcio` só existem depois do build. A cada pus
 `.github/workflows/publicacao-digilocal.yml` faz o build e atualiza o branch **`publicacao`**, que só tem o site
 pronto (o mesmo conteúdo do zip). Também dá para rodar à mão em *Actions › Publicação DigiLocal › Run workflow*.
 
-No painel da DigiLocal, ligar o repositório ao branch `publicacao`:
-- se o painel puxar direto para a pasta do site, apontar para `public_html` (vazia, com o site antigo já no
-  backup);
-- se for o "Git Version Control" do cPanel, clonar fora do `public_html` (ex.: `~/repositorios/portella`) e usar
-  *Deploy HEAD Commit*: o `.cpanel.yml` do branch copia o site para o `public_html`.
+Como está configurado (06/11/2026). O painel da DigiLocal é o **Enhance**:
+- *GitHub › GitHub Implantar*: repositório `opedroofelix-coder/portella-seguros`, branch **`publicacao`**,
+  implantação automática ligada. Cada implantação vai para `deploys/<id>/`, e `deploys/current` aponta para a
+  última que deu certo. O painel não oferece "diretório de publicação", então o site continua sendo o `public_html`.
+- *Avançado › Cron jobs*, a cada 5 minutos: copia `deploys/current` para o `public_html` (só se houver
+  `index.html`; preserva `.well-known`; não leva `.git`, `.cpanel.yml` nem `vercel.json`):
 
-Depois de cada atualização do `main`, puxar de novo no painel (*Update from Remote* / *Pull*), a não ser que o
-painel puxe sozinho.
+  ```
+  [ -f /var/www/8df76450-4366-406d-a20e-395603fa591a/deploys/current/index.html ] && rsync -a --delete --exclude=.git --exclude=.well-known --exclude=.cpanel.yml --exclude=vercel.json /var/www/8df76450-4366-406d-a20e-395603fa591a/deploys/current/ /var/www/8df76450-4366-406d-a20e-395603fa591a/public_html/
+  ```
+- O site antigo ficou em `site-antigo/`, fora do `public_html`.
+- Fluxo: push no `main` → ação do GitHub atualiza `publicacao` → Enhance implanta → em até 5 minutos o cron
+  publica.
+- O servidor é **OpenLiteSpeed**, que só lê `.htaccess` novo ou alterado quando é recarregado. O Enhance
+  recarrega ao salvar o arquivo pelo gerenciador de arquivos, mas não quando o cron copia. Quando um `.htaccess`
+  mudar no repositório, abrir o `public_html/.htaccess` no gerenciador e salvar (sem mudar nada) depois da
+  publicação. O `noindex` do CRM também vai no HTML (`<meta name="robots">`) e no `robots.txt`, para não
+  depender do servidor.
 
 ### Segurança da publicação
 
