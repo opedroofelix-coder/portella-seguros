@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+# demonstração do CRM (dados fictícios) e funções internas
+Disallow: /seguro/
+Disallow: /api/
+
+Sitemap: https://portellacorretora.com.br/sitemap.xml
